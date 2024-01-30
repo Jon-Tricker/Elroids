@@ -1,0 +1,47 @@
+body,
+
+html {
+    overflow-x: hidden;
+}
+
+.controlsclass {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 6;
+}
+
+.hudclass {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+
+.terminalclass {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 5;
+}
+
+.statusclass {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 3;
+}
+
+.messagesclass {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 4;
+}
+
+.screenclass {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
