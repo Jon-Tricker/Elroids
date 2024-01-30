@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE>Elroids Menu System notes.</TITLE>
+	<meta name="description" content="3D, space, rock bashing game.">
+	<meta name="keywords" content="elroids, Menu System notes">
+	<meta name="author" content="Jon Tricker">
+
+	<!-- Include external CSS -->
+	<link rel="stylesheet" href="../../mycss.css">
+
+</HEAD>
+<H1>Introduction to the Menu System (Experimental!)</H1>
+
+<P>The system is based on a much simplified HTML. This is at an early stage of development. If you think you can improve it feel free to do so. However please re-test/update existing menus so they still work.</P>
+
+<P>Each page consists of a static XML 'document'. Eventually these will be seperate .xml files but for now all in the MenuSystem.js file.</P>
+
+<P>The menus system. Reads the docs and displays them using Terminal.js.</P>
+
+<P>Menus are handled as a 'stack'. It is possible to go 'back' to previously veiwed menus.</P>
+
+<H2>Structure</H2>
+
+<P>Try to base new menus on the existing ones. Correct implementation of escape sequences can be complex.</P>
+<P>Each menu doc contains something like the following:</P>
+<UL>
+	<LI>An outer &ltBODY&gt tag.</LI>
+	<LI>A number of &ltP&gt tags:  
+		<UL>
+			<LI>These contain descriptive text.</LI>
+			<LI>May contain standasd '\t', '\n' and '\c' control characters.</LI>
+			<LI>ToDo ... Text boxes containing dynamically generated output.</LI>
+		</UL>
+	</LI>
+	<LI>A single &ltUL&gt tag. This contains the selectable menu elements that can interact with the user. Each menu item is defined by a &ltLI&gt tag. This may contain:
+		<UL>
+			<LI>Just text</LI>
+			<LI>An &ltA&gt tag with another menu name (eventually file name) as it's HREF. This opens/pushes a sub menu.</LI>
+			<LI>Nothing. This will lead to the default 'back' and 'exit' items being displayed.</LI>
+			<LI>ToDo ... Text boxes and buttons.</LI>
+			<LI>ToDo ... Multiple entries on each line with 'left' and 'right' selection.</LI>
+		</UL>
+	</LI>
+</UL>
+
+<P>All text can have the following attibutes.</P>
+<UL>
+	<LI>HIGHLIGHT - Display in reverse video.</LI>
+	<LI>CENTER - Center on the screen. May not work if text contains control characters.</LI>
+</UL>
+
+<P>Default 'Back' and 'Exit' items are automatically added to every menu.</P>
+
+<P>In the event of unparsable XML an error is displayed on the terminal (no sure why ... the wasn't planned) and also on the browsers 'Inspect' console.</P>
+
+<BODY>
+</BODY>
+</HTML>

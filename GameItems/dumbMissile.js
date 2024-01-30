@@ -1,0 +1,28 @@
+// Simple non homing missile
+import * as THREE from 'three';
+import Missile from './missile.js'
+
+const COLOUR = "#ff00ff"
+
+// Create material.
+const missileMaterial = new THREE.MeshStandardMaterial(
+  {
+    color: COLOUR,
+    emissive: COLOUR,
+    roughness: 0,
+    opacity: 1,
+    metalness: 1,
+  }
+)
+
+// Damage (hp)
+const MISSILE_DAMAGE = 1;
+
+class DumbMissile extends Missile {
+
+  constructor(direction, owner) {
+    super(direction, owner, MISSILE_DAMAGE, COLOUR, missileMaterial);
+  }
+}
+
+export default DumbMissile;

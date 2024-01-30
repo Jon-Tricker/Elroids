@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE>Elroids developer notes.</TITLE>
+	<meta name="description" content="3D, space, rock bashing game.">
+	<meta name="keywords" content="elroids, developer notes">
+	<meta name="author" content="Jon Tricker">
+
+	<!-- Include external CSS -->
+	<link rel="stylesheet" href="../../mycss.css">
+
+</HEAD>
+
+<BODY>
+	<P LANG="en-GB" ALIGN=CENTER><IMG SRC="../Logo.jpg" NAME="Logo" WIDTH=250 HEIGHT=200 BORDER=0>
+</P>
+	<H1 LANG="en-GB" ALIGN=CENTER CLASS="western">'Elroids' Developer Notes.</H1>
+
+	<H2>Bugs</H2>
+	<UL>
+		<LI>Exhaust flame is supposed to be yellow ... investigate why it is not.</LI>
+		<LI>Missiles are created too far in front of ship (see 'quantization' issue below) ... fix</LI>
+	</UL>
+
+	<H2>ToDos (In some sort of priority order)</H2>
+
+	<H3>Pre V1.0 (Minimum feature set)</H3>
+	<UL>
+		<LI>Put source under GitHub.</LI>
+		<LI>Organise some sort of discussion forum</LI>
+	</UL>
+
+	<H3>V1.x Ship maintence game</H3>
+	<P>There is no point having the economic game if there is nothing to spend the profits on. The next thing is to componientize the ship ... So it can have upgrades.</P>
+	<P>Component basic attributes:</P>
+	<UL>
+		<LI>HP</LI>
+		<LI>Name</LI>
+		<LI>Cost</LI>
+		<LI>Mass</LI>
+	</UL>
+	<P>Conponent sub classes:</P>
+	<UL>
+		<LI>Weapon beam</LI>
+		<LI>Weapon missile</LI>
+		<LI>Hull</LI>
+		<LI>Engine</LI>
+		<LI>Targeting computer</LI>
+		<LI>Range finder</LI>
+		<LI>Cargo bay</LI>
+	</UL>
+	<P>Do all physics as SI.</P>
+	<P>Add ship management interface.</P>
+	<P>Add component purchace interface</P>
+
+	<H3>V2.x Economics game</H3>
+	<P>Add the 'Elite' stuff about trading, upgrades etc.</P>
+		<UL>
+			<LI>Add 'minerals' to pick up after rock destroyed (dependant on rock composition).</LI>
+			<LI>Extend menu syetem to have extra controls necessary for trading.</LI>
+			<LI>Add space station:
+				<UL>
+					<LI>Docking.</LI>
+					<LI>Trade.</LI>
+					<LI>Ship upgrades.</LI>
+					<LI>Ship repairs.</LI>
+				</UL>
+			</LI>
+			<LI>Extended uiverse:
+				<UL>
+					<LI>Multiple systems (stations?).</LI>
+					<LI>Warp drive.</LI>
+					<LI>Galactic map.</LI>
+				</UL>
+			</LI>
+		</UL>
+
+
+	<H3>General 'good stuff' ... Post V1.0</H3>
+	<UL>
+		<LI>Game mechanics:
+			<UL>
+				<LI>Improve 'vision through' wrap to take account of camera direction (i.e. dont just use Universe.handleWrap()). i.e. allow rocks to be seen at full universe width not half.</LI>
+			<LI>Improve 'collision detection' mechanism (Item.detectCollision()).
+				<UL>
+					<LI>Currently using, crude, bounding boxes.</LI>
+					<LI>Use ray tracing.</LI>
+					<LI>Carve the universe into 'regions'. So don't have the square law issue of checking collisions between everything and 'everthing else'.</LI>
+				</UL>
+				</LI>
+				<LI>Limited number of missiles in flight (like Asteroids).</LI>
+			</UL>
+			<LI>Implement some way of 'topping up' rock supply.</LI>
+			<LI>Do something about saucer 'seeking' target location behaviour ... or maybe just leave it since it looks like defensive manouvering.</LI>
+			<LI>Move menu data into seperate .xml files.</LI>
+			<LI>Come up with some sort of meaningful (SI) units for speed, distance and location.</LI>
+			<LI>Componentize sacucer</LI>
+			<LI>Handle rock re-spawning when they are destroyed.</LI>
+		</LI>
+
+		<LI>Code:</LI>
+		<LI>Prettiness:</LI>
+		<UL>
+		<LI>Create 'exploding ship' animation. (Exploding Mesh? Then it could also do rocks/saucers etc.)</LI>
+		<LI>Add surface texture to ship.</LI>
+		<LI>Make saucers more 'shiny'. Probably involves MeshPhongMaterial ... but for me that just comes out white.</LI>
+		<LI>Add extra vt100 features (e.g. block graphics) to ship control terminal.</LI>
+		<LI>Find way to puiblicise/discuss it (facebook group?)</LI>
+		</UL>
+		
+		<LI>Additional features:
+			<UL>
+				<LI>Add 'lock' to cross hairs. Colour change and display range when allingned with a target.</LI>
+				<LI>Add upgrades to ship (as purchaces):
+					<UL>
+						<LI>Homeing missile + Missile lock.</LI>
+						<LI>Proximity missiles (mainly for use by the bad guys).</LI>
+						<LI>'Elite style' (over heating) laser.</LI>
+						<LI>Shields.</LI>	
+						<LI>Hypespace button. </LI>
+						<LI>Improved terminal (but keep VT100 as default).</LI>
+					</UL>
+					<LI>Handle damage (malfunction) of ship sub-systems (engineering control panel).</LI>
+				</LI>
+				<LI>Implement mother ships spawning more mother ships?</LI>
+			</UL>
+		</LI>
+
+		<LI>UI improvements:
+			<UL>
+				<LI>Add mouse controls.</LI>
+				<LI>Make radar zoomable.</LI>
+				<LI>Add joystick/tablet controls (maybe via on screen buttons reproducing keyboard keys).</LI>
+			</UL>
+		</LI>
+
+		<LI>Extensions:
+			<UL>
+				<LI>Test on platforms other than PC/Chrome</LI>
+				<LI>Add sound (3D?).</LI>
+				<LI>Make it multi-player (AJAX?).</LI>
+				<LI>Add optional gravity effects (like Gravitar).</LI>
+				<LI>Add on line high score table?</LI>
+				<LI>Add save/load ... not sure how on a web based game.</LI>
+				<LI>Maybe collision damage should be proportional to mass and relative speed of colliding object. Common for all items apart from 'rock on rock' impacts.</LI>
+				<LI>Revisit inline 'ToDos'.</LI>
+				<LI>Do the whole thing with typescript ... As a C/Java programmer I should have probably done that from the start. Howewver:
+					<OL>
+						<LI>I dont want to burden 3rd party developers with setting up a compiler(tsc) and build environment.</LI>
+						<LI>Seems to be problems integrating new .ts code with existing .js (in/exports have issues).</LI>
+					</OL>
+				</LI>
+			</UL>
+		</LI>
+	</UL>
+
+	<H2>Learnings</H2>
+	<UL>	
+		<LI>Three JS is oriented towards 'landscape' scenes. 
+		odd things (flipings and unexpected rotations) 
+		can happen if a camera flies over the 'poles'. 
+		After a lot of effort I worked round this by making the 'chase/pilot
+		cameras' part of the ship.
+		</LI>
+		<LI>1D conservation of momentum, during collisions, is handled as described in the equasions
+		<A HREF="https://en.wikipedia.org/wiki/Momentum"> here.</A>
+		Most discussion on extending this to 3D decends into a mass of 'Euler angles' and 'trig'. However since we have both the
+		velocities and impact direction as x, y and z components it can be handled using
+		dot products (and less CPU) ... but it took a while to get the maths right.
+		</LI>
+		<LI>There are problems with 'quantized' time. A slower moving object can catch up with and collide with a faster one if it gets a move phase 'first'. Some messy work round have been required.</LI>
+	</UL>
+</BODY>
+</HTML>
