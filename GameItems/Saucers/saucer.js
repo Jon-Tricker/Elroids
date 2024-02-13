@@ -133,10 +133,11 @@ class Saucer extends NonShipItem {
         this.rotation.y += this.rotateRate/Universe.getAnimateRate();
 
         // Lean towards direction of travel. Dont wobble.
+        // TODO : Not really right but looks pretty ... feel free to improve.
         if (0 != this.getMaxSpeed()) {
             if (0.5 < (this.speed.length()/this.getMaxSpeed())) {
-             this.rotation.x = (Math.PI / 2) - (Math.PI * ((this.speed.x/this.getMaxSpeed())/4));
-             this.rotation.z = (Math.PI * ((this.speed.z/this.getMaxSpeed())/4));
+             this.rotation.x = (Math.PI / 2) - (Math.PI * ((this.speed.x/this.getMaxSpeed())/8));
+             this.rotation.z = (Math.PI * ((this.speed.z/this.getMaxSpeed())/8));
             }
         }
 

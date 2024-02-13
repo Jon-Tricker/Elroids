@@ -5,10 +5,14 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import Item from './item.js';
+import Item from '../GameItems/item.js';
 import MyCamera from '../Scenery/myCamera.js';
-import DumbMissile from './dumbMissile.js';
+import DumbMissile from '../GameItems/dumbMissile.js';
 import Universe from '../universe.js'
+import EngineSet from './Components/Engines/engineSet.js';
+import BasicEngine from './Components/Engines/basicEngine.js';
+import HullSet from './Components/Hulls/hullSet.js';
+import BasicHull from './Components/Hulls/basicHull.js';
 
 // Create ship material.
 const shipMaterial = new THREE.MeshStandardMaterial(
@@ -35,7 +39,6 @@ const engineMaterial = new THREE.MeshStandardMaterial(
         // bumpMap: texture,
         metalness: 0.1,
         side: THREE.DoubleSide,
-
     }
 )
 
@@ -58,19 +61,13 @@ const flameMaterial = new THREE.MeshStandardMaterial(
 )
 
 const MAXSPEED = 100;       // m/s. Must be slower tha missiles so cannot run them over.
-const ACC_RATE = 50;        // m/s^2
-const DEC_RATE = 0.8;       // %/s
 
 // Slightly damped attitude contols to allow fine adjustment.
 const ROTATE_RATE_DELTA = 0.125;        // r/s
 const ROTATE_RATE_MAX = 5;              // r/s
-const SHIP_MASS = 50;                  // tonnes
-const SHIP_HIT_POINTS = 3
 
 // Missiles/s
 const FIRE_RATE = 4;
-
-const SHIP_RAM_DAMAGE = 5;
 
 class Ship extends Item {
 
@@ -91,8 +88,13 @@ class Ship extends Item {
     yawRate = 0;
     rollRate = 0;
 
+    // Ship components
+    compSets;
+    engineSet;
+    hullSet;
+
     constructor(height, width, length, locationX, locationY, locationZ, game) {
-        super(locationX, locationY, locationZ, 0, 0, 0, game, length, SHIP_MASS);
+        super(locationX, locationY, locationZ, 0, 0, 0, game, length);
 
         this.originalPosition = new THREE.Vector3(locationX, locationY, locationZ);
 
@@ -101,11 +103,35 @@ class Ship extends Item {
         this.width = width;
         this.shipLength = length;
 
-        this.hitPoints = SHIP_HIT_POINTS;
-
         this.setupMesh();
 
+        this.buildShip();
+
         this.createCameras();
+    }
+
+    // Build/Rebuild ship components.
+    buildShip() {
+        this.engineSet = new EngineSet();
+        this.engineSet.add(new BasicEngine());
+
+        this.hullSet = new HullSet();
+        this.hullSet.add(new BasicHull());
+        this.hitPoints = this.hullSet.getHp();
+
+        // Build set of all componets sets
+        this.compSets = new Set();
+        this.compSets.add(this.engineSet);
+        this.compSets.add(this.hullSet);
+
+        // Add in weight of all components.
+        this.calculateMass();
+    }
+
+    calculateMass() {
+        for(const set of this.compSets) {
+            this.mass += set.getMass();
+        }
     }
 
     createCameras() {
@@ -263,9 +289,11 @@ class Ship extends Item {
 
         let xDirection = this.getOrientation();
 
-        // TODO: This should be calculated from the ship mass and sun off engine component's thrust.
+        // Thrust in kN, mass in Tonnes. This should work without scaling.
+        let accRate = this.engineSet.getThrust()/this.hullSet.getMass();
+
         let newSpeed = this.speed.clone();
-        newSpeed.addScaledVector(xDirection, ACC_RATE/Universe.getAnimateRate());
+        newSpeed.addScaledVector(xDirection, accRate/Universe.getAnimateRate());
 
         if (newSpeed.length() > MAXSPEED) {
             newSpeed = newSpeed.normalize().multiplyScalar(MAXSPEED);
@@ -276,9 +304,9 @@ class Ship extends Item {
 
     deceletarte() {
         let newSpeed = this.speed.clone();
-        if ((this.speed.length()/Universe.getAnimateRate()) > DEC_RATE) {
+        if ((this.speed.length()/Universe.getAnimateRate()) > this.engineSet.getDecRate()) {
             // Slow down in all directions.
-            newSpeed.multiplyScalar(1 - (DEC_RATE/Universe.getAnimateRate()));
+            newSpeed.multiplyScalar(1 - (this.engineSet.getDecRate()/Universe.getAnimateRate()));
         } else {
             // Stop
             newSpeed.multiplyScalar(0);
@@ -396,7 +424,8 @@ class Ship extends Item {
     // Ships get re-spawned so do not destruct.
     takeDamage(hits, that) {
         // Dont call 'super'. We want to re-use the same ship. So don't want it to destruct.
-        this.hitPoints -= hits;
+        this.hullSet.takeDamage(hits);
+        this.hitPoints = this.hullSet.getHp();
 
         if (this.hitPoints > 0) {
             this.game.displays.setMessage("Ship damaged!", 1000);
@@ -407,7 +436,10 @@ class Ship extends Item {
 
     // Return to original state
     respawn() {
-        this.hitPoints = SHIP_HIT_POINTS;
+        // Repair damaged components.
+        this.buildShip();
+
+        // Return to start location.
         this.location.set(this.originalPosition.x, this.originalPosition.y, this.originalPosition.x);
         this.rotation.set(0, 0, 0);
         this.setSpeed(new THREE.Vector3(0, 0, 0));
@@ -423,8 +455,9 @@ class Ship extends Item {
     }
 
     // Ships do some dameage when they ram things.
+    // Todo: Maybe should be based on mass and speed.
     doDamage(that) {
-        that.takeDamage(SHIP_RAM_DAMAGE, this);
+        that.takeDamage(this.hullSet.getRamDamage(), this);
     }
 
 }

@@ -6,7 +6,7 @@
 
 import * as THREE from 'three';
 
-import Ship from "./GameItems/ship.js";
+import Ship from "./Ship/ship.js";
 import Rock from "./GameItems/rock.js";
 
 import SaucerWanderer from "./GameItems/Saucers/saucerWanderer.js";
@@ -24,7 +24,7 @@ import Keyboard from "./keyboard.js";
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 80;           // m
-const VERSION = "0.21";
+const VERSION = "0.22";
 
 const RESPAWN_SIZE = 1000;          // m
 
@@ -68,8 +68,8 @@ class Game {
 
         // Create items.
         // Create ship first so it is 1st, for collision detection purposes,  in the item list.
-        this.createShip();
         this.createRocks(rockCount);
+        this.createShip();
         this.createSaucers();
 
         // Now we have a ship. Switch to it's camera
