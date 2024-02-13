@@ -46,7 +46,6 @@ class Sun extends THREE.Mesh {
   constructor(size) {
     let sunGeometry = new THREE.SphereGeometry(size, FACIT_COUNT, FACIT_COUNT);
     sunGeometry.computeVertexNormals();
-    sunGeometry.computeBoundingBox();
 
     super(sunGeometry, sunMaterial);
   }
@@ -57,7 +56,6 @@ class Moon extends THREE.Mesh {
   constructor(size) {
     let moonGeometry = new THREE.SphereGeometry(size, FACIT_COUNT, FACIT_COUNT);
     moonGeometry.computeVertexNormals();
-    moonGeometry.computeBoundingBox();
 
     let material = moonMaterial.clone();
     material.color.set(Moon.randomColour());

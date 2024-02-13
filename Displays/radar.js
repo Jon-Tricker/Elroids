@@ -3,10 +3,10 @@ import Universe from '../universe.js'
 import * as THREE from 'three';
 import DarkPanel from './darkPanel.js';
 
-const RANGE = 250;
+const RANGE = 2500;     // m
 const FLAG_SIZE = 5;
 
-class Radar extends DarkPanel{
+class Radar extends DarkPanel {
     game;
 
     constructor(game, ctx, defaultColour) {
@@ -31,45 +31,44 @@ class Radar extends DarkPanel{
         // this.ctx.bezierCurveTo(this.x + this.width, this.height, this.x, this.height, this.x, this.height / 2);
 
         // Horizontal lines
-        for (let count = 1; count < 4; count++){
-            this.ctx.moveTo(this.x, this.y + (this.height/4) * count);
-            this.ctx.lineTo(this.x + this.width, this.y + (this.height/4) * count);
-        } 
-        
-        // Vertical lines
-        for (let count = 0; count < 5; count++){
-            this.ctx.moveTo(this.x + (this.width/8) * (count + 2), this.y );
-            this.ctx.lineTo(this.x + (this.width/4) * count, this.y + this.height );
+        for (let count = 1; count < 4; count++) {
+            this.ctx.moveTo(this.x, this.y + (this.height / 4) * count);
+            this.ctx.lineTo(this.x + this.width, this.y + (this.height / 4) * count);
         }
-        this.ctx.moveTo(this.x + (this.width/8), this.y );
-        this.ctx.lineTo(this.x, this.y + this.height/4 );
-        this.ctx.moveTo(this.x + (this.width/8) * 7, this.y );
-        this.ctx.lineTo(this.x + this.width, this.y + this.height/4 );
+
+        // Vertical lines
+        for (let count = 0; count < 5; count++) {
+            this.ctx.moveTo(this.x + (this.width / 8) * (count + 2), this.y);
+            this.ctx.lineTo(this.x + (this.width / 4) * count, this.y + this.height);
+        }
+        this.ctx.moveTo(this.x + (this.width / 8), this.y);
+        this.ctx.lineTo(this.x, this.y + this.height / 4);
+        this.ctx.moveTo(this.x + (this.width / 8) * 7, this.y);
+        this.ctx.lineTo(this.x + this.width, this.y + this.height / 4);
 
         this.ctx.stroke();
 
         // No longer dashed
         this.ctx.setLineDash([]);
-        
-        let ship =  this.game.getShip(); 
-        
+
+        let ship = this.game.getShip();
+
         for (let item of Universe.itemList) {
-            
-            let relPos = new THREE.Vector3(item.location.x, item.location.y, item.location.z);
+
+            let relPos = item.location.clone();
 
             // Handle wrap round relative to ship.
-            relPos.subVectors(relPos, ship.location);
+            relPos.sub(ship.location);
             Universe.handleWrap(relPos);
-            relPos.addVectors(relPos, ship.location);
-
-            // Rotate to same angle as ship.
-            ship.worldToLocal(relPos);
-
-            let basePos = relPos.clone();
-            basePos.z = 0;
 
             // if not out of range.
             if (relPos.length() < RANGE) {
+                // Make it back relative to world and then Rotate to same angle as ship.
+                relPos.add(ship.location);
+                ship.worldToLocal(relPos);
+
+                let basePos = relPos.clone();
+                basePos.z = 0;
 
                 // Scale by x ... attempt at proper perspective.
                 // Doesn't really work because front, most important, arc becomes smallest.
@@ -85,11 +84,11 @@ class Radar extends DarkPanel{
                 if (this.height > maxDim) {
                     maxDim = this.height;
                 }
-                let scaleFactor = maxDim/(RANGE * 2);
+                let scaleFactor = maxDim / (RANGE * 2);
 
                 relPos.multiplyScalar(scaleFactor);
                 basePos.multiplyScalar(scaleFactor);
-        
+
 
                 // Move y down by scaled z
                 // basePos.x = relPos.x - relPos.z;
@@ -110,7 +109,7 @@ class Radar extends DarkPanel{
                 this.ctx.fillRect(relPos.x, relPos.y, FLAG_SIZE, FLAG_SIZE);
 
                 this.ctx.moveTo(basePos.x, basePos.y);
-                this.ctx.lineTo(relPos.x, relPos.y); 
+                this.ctx.lineTo(relPos.x, relPos.y);
                 this.ctx.stroke();
 
                 this.ctx.fillStyle = this.defaultColour;
@@ -118,15 +117,15 @@ class Radar extends DarkPanel{
             }
         }
 
-    }  
-    
+    }
+
     resize(parentWidth, parentHeight) {
         this.y = 0;
         this.width = parentWidth * 0.4;
         if (this.width > 2 * parentHeight) {
             this.width = 2 * parentHeight;
         }
-        this.x = (parentWidth - this.width)/2 ;
+        this.x = (parentWidth - this.width) / 2;
         this.height = parentHeight;
     }
 
@@ -139,25 +138,25 @@ class Radar extends DarkPanel{
 
         // Distort so equal amount of siastace in both directions.
         if (this.height > this.width) {
-            ip.x *= this.width/this.height;
+            ip.x *= this.width / this.height;
         } else {
-            ip.y *= this.height/this.width;
+            ip.y *= this.height / this.width;
         }
 
         // x and y offsets.
         ip.x += this.x + this.width / 2;
         ip.y += this.y + this.height / 2;
-        
-    
+
+
         if ((ip.x < FLAG_SIZE) || (ip.x > this.width + this.x)) {
             return (false)
-        }   
-        
+        }
+
         if ((ip.y < FLAG_SIZE) || (ip.y > this.height)) {
             return (false)
         }
 
-        return(true);
+        return (true);
     }
 }
 

@@ -5,14 +5,14 @@ import NonShipItem from './nonShipItem.js';
 import Universe from '../universe.js'
 import Explosion from './explosion.js'
 
-const MISSILE_SIZE = 0.1;
-const MISSILE_SPEED = 3;
-const MISSILE_MASS = 0.001;
+const MISSILE_SIZE = 1;     // m
+const MISSILE_SPEED = 300;   // m/s
+const MISSILE_MASS = 0.1;
 
 const MISSILE_DAMAGE = 1;
 
 // Tine to live ms.
-const MISSILE_TTL = 7000;
+const MISSILE_TTL = 7000;   // s
 
 class Missile extends NonShipItem {
 
@@ -40,15 +40,19 @@ class Missile extends NonShipItem {
 
     this.setupMesh(material);
 
+
     // Move it clear of parents new position. 
-    let thatBox = owner.getBoundingBox()
-    thatBox.translate(owner.speed)
-    while (this.getBoundingBox().intersectsBox(thatBox)) {
-      this.location.add(this.speed);
-    } 
+    let thatBoundary = owner.getBoundary()
+    //thatBoundary.translate(owner.speedFrame)
+    while (this.getBoundary().intersects(thatBoundary)) {
+      this.moveItem(false);
+    }  
+    this.moveItem(false);
 
     // Once launched add in relative speed of owner
-    this.speed.add(owner.speed);
+    let newSpeed = this.speed.clone();
+    newSpeed.add(owner.speed);
+    this.setSpeed(newSpeed);
   }
 
   getRadarColour() {
@@ -62,8 +66,6 @@ class Missile extends NonShipItem {
 
     // compute vertex normals
     missileGeometry.computeVertexNormals();
-    // Do this once
-    missileGeometry.computeBoundingBox();
 
     let missileMesh = new THREE.Mesh(missileGeometry, material);
 

@@ -26,13 +26,14 @@
 	<UL>
 		<LI>Exhaust flame is supposed to be yellow ... investigate why it is not.</LI>
 		<LI>Missiles are created too far in front of ship (see 'quantization' issue below) ... fix</LI>
+		<LI>Occasional OOM lock ups are seen ... investigate.</LI>
 	</UL>
 
 	<H2>ToDos (In some sort of priority order)</H2>
 
 	<H3>Pre V1.0 (Minimum feature set)</H3>
 	<UL>
-		<P>Reworks the physics as SI.</P>
+		<P>Think it's all done :-).</P>
 	</UL>
 
 	<H3>V1.x Ship maintence game (CURRENTLY IN PROGRESS)</H3>
@@ -100,6 +101,7 @@
 			<LI>Come up with some sort of meaningful (SI) units for speed, distance and location.</LI>
 			<LI>Componentize sacucer</LI>
 			<LI>Handle rock re-spawning when they are destroyed.</LI>
+			<LI>Handle collisions based on 'regions' of the universe. i.e. ony check against list of Items in own, and adjacent, regions ... not the entire item list.</LI>
 		</LI>
 
 		<LI>Code:</LI>
@@ -174,5 +176,29 @@
 		</LI>
 		<LI>There are problems with 'quantized' time. A slower moving object can catch up with and collide with a faster one if it gets a move phase 'first'. Some messy work round have been required.</LI>
 	</UL>
+
+	<H2>Units and dimensions</H2>
+	<P>This project was coded with arbitary units of distance/mass. I have since modified it to use something resembling SI.</P>
+	<UL>
+		<LI>Distance is in Meters.</LI>
+		<LI>Mass is in Tonnes (1000KG).</LI>
+		<LI>Time is in seconds.</LI>
+		<LI>Rocks have a mass equal to the cube of their size. i.e (assuming cubic rocks) a density of about 1 tonne/m^3. Probably should be a bit higher and related to their composition. However it will do for now. </LI>
+	</UL>
+
+	<P>There are a few incorrect 'artifacts' to make the game playable.</P>
+	<UL>
+		<LI>Rock mass is proportional to the cube of its size. When a rock splits it make 2 rocks of half the size. So 3/4 of the mass is lost. However this makes for a mangable amounts of minerals once a rock is broken down. (The spare mass becomes 'dark matter')</LI>
+		<LI>Universe is too small. Only a few km across. Necessary to keep a reasonable rock density wihtout a huge number of rocks.</LI>
+		<LI>Distances and sizes are far too small for a 'realistic' universe. However if made realistic objects would only be points of light in the distance. For playability everything is moved closer together. (Excuse: StarTrek/Wars battles where ships engage a few hundred meters apart and travelling at a few 10s of kph.)</LI>
+		<LI>Ship 'braking' doesn't have real physics equivalent ... but it's useful for game play.</LI>
+	</UL>
+
+	<H2>Why not Typescript?</H2>
+	<P>As a Java coder I prefer stongly typed languages. However...</P>
+	<OL>
+		<LI>I only found out about Typescript late in the development of this project.</LI>
+		<LI>I want the code available warts/comments and all. Not an additional build step with modified output.</LI>
+	</OL>
 </BODY>
 </HTML>

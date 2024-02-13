@@ -57,15 +57,15 @@ const flameMaterial = new THREE.MeshStandardMaterial(
     }
 )
 
-const MAXSPEED = 2;     // Must be slower tha missiles so cannot run them over.
-const ACC_RATE = 0.04;
-const DEC_RATE = 0.08;
+const MAXSPEED = 100;       // m/s. Must be slower tha missiles so cannot run them over.
+const ACC_RATE = 50;        // m/s^2
+const DEC_RATE = 0.8;       // %/s
 
 // Slightly damped attitude contols to allow fine adjustment.
-const ROTATE_RATE_DELTA = 0.005;
-const ROTATE_RATE_MAX = 0.2;
-const SHIP_MASS = 10;
-const SHIP_HIT_POINTS = 3;
+const ROTATE_RATE_DELTA = 0.125;        // r/s
+const ROTATE_RATE_MAX = 5;              // r/s
+const SHIP_MASS = 50;                  // tonnes
+const SHIP_HIT_POINTS = 3
 
 // Missiles/s
 const FIRE_RATE = 4;
@@ -181,8 +181,6 @@ class Ship extends Item {
 
         // compute vertex normals
         bodyGeometry.computeVertexNormals();
-        // Do this once
-        bodyGeometry.computeBoundingBox();
 
         let bodyMesh = new THREE.Mesh(bodyGeometry, shipMaterial);
 
@@ -265,66 +263,69 @@ class Ship extends Item {
 
         let xDirection = this.getOrientation();
 
+        // TODO: This should be calculated from the ship mass and sun off engine component's thrust.
         let newSpeed = this.speed.clone();
-        newSpeed.addScaledVector(xDirection, ACC_RATE);
+        newSpeed.addScaledVector(xDirection, ACC_RATE/Universe.getAnimateRate());
 
         if (newSpeed.length() > MAXSPEED) {
             newSpeed = newSpeed.normalize().multiplyScalar(MAXSPEED);
         }
 
-        this.speed = newSpeed;
+        this.setSpeed(newSpeed);
     }
 
     deceletarte() {
-        if (this.speed.length() > DEC_RATE) {
+        let newSpeed = this.speed.clone();
+        if ((this.speed.length()/Universe.getAnimateRate()) > DEC_RATE) {
             // Slow down in all directions.
-            this.speed.multiplyScalar(1 - DEC_RATE);
+            newSpeed.multiplyScalar(1 - (DEC_RATE/Universe.getAnimateRate()));
         } else {
             // Stop
-            this.speed.multiplyScalar(0);
+            newSpeed.multiplyScalar(0);
         }
+        this.setSpeed(newSpeed);
     }
 
     // In general to rotate. Asjust relative to our own axis.
     // Positive is clockwise when looking at the origin. So needs to be reversed for roll and pitch when we a re looking away from origin.
     rollL() {
-        if (this.rollRate > -ROTATE_RATE_MAX) {
-            this.rollRate -= ROTATE_RATE_DELTA;
+        if (this.rollRate > -ROTATE_RATE_MAX/Universe.getAnimateRate()) {
+            this.rollRate -= ROTATE_RATE_DELTA/Universe.getAnimateRate();
         }
         this.rotateX(this.rollRate);
     }
 
     rollR() {
-        if (this.rollRate < ROTATE_RATE_MAX) {
-            this.rollRate += ROTATE_RATE_DELTA;
+        if (this.rollRate < ROTATE_RATE_MAX/Universe.getAnimateRate()) {
+            this.rollRate += ROTATE_RATE_DELTA/Universe.getAnimateRate();
         }
         this.rotateX(this.rollRate);
     }
 
     climb() {
-        if (this.pitchRate > -ROTATE_RATE_MAX) {
-            this.pitchRate -= ROTATE_RATE_DELTA;
+        if (this.pitchRate > -ROTATE_RATE_MAX/Universe.getAnimateRate()) {
+            this.pitchRate -= ROTATE_RATE_DELTA/Universe.getAnimateRate();
         }
         this.rotateY(this.pitchRate);
     }
 
     dive() {
-        if (this.pitchRate < ROTATE_RATE_MAX) {
-            this.pitchRate += ROTATE_RATE_DELTA;
+        if (this.pitchRate < ROTATE_RATE_MAX/Universe.getAnimateRate()) {
+            this.pitchRate += ROTATE_RATE_DELTA/Universe.getAnimateRate();
         }
         this.rotateY(this.pitchRate);
     }
 
     yawL() {
-        if (this.yawRate < ROTATE_RATE_MAX) {
-            this.yawRate += ROTATE_RATE_DELTA;
+        if (this.yawRate < ROTATE_RATE_MAX/Universe.getAnimateRate()) {
+            this.yawRate += ROTATE_RATE_DELTA/Universe.getAnimateRate();
         }
         this.rotateZ(this.yawRate);
     }
 
     yawR() {
-        if (this.yawRate > -ROTATE_RATE_MAX) {
-            this.yawRate -= ROTATE_RATE_DELTA;
+        if (this.yawRate > -ROTATE_RATE_MAX/Universe.getAnimateRate()) {
+            this.yawRate -= ROTATE_RATE_DELTA/Universe.getAnimateRate();
         }
         this.rotateZ(this.yawRate);
     }
@@ -409,7 +410,7 @@ class Ship extends Item {
         this.hitPoints = SHIP_HIT_POINTS;
         this.location.set(this.originalPosition.x, this.originalPosition.y, this.originalPosition.x);
         this.rotation.set(0, 0, 0);
-        this.speed.set(0, 0, 0);
+        this.setSpeed(new THREE.Vector3(0, 0, 0));
     }
 
     // Some on line magic to get the current directions X access

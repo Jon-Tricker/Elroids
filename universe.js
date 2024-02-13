@@ -5,13 +5,13 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import * as THREE from 'three';
 
-const ANIMATE_RATE = 25;  // Per second
-
 // Load textures once.
 export const craterTexture = new THREE.TextureLoader().load("./Scenery/CraterTexture.gif");
 craterTexture.wrapS = THREE.RepeatWrapping;
 craterTexture.wrapT = THREE.RepeatWrapping;
 craterTexture.repeat.set(4, 4);
+
+const ANIMATE_RATE = 25;  // frames/second
 
 class Universe {
 
@@ -27,6 +27,8 @@ class Universe {
     static itemList = new Set();
 
     static nextAnimateTime = Date.now();
+    static lastAnimateTime = Date.now();
+    static actualAmimateRate = ANIMATE_RATE;
 
     static addItem(item) {
         this.itemList.add(item);
@@ -34,6 +36,14 @@ class Universe {
 
     static getCraterTexture() {
         return(craterTexture);
+    }
+
+    static getAnimateRate() {
+        // Return the achieved frame rate.
+        return(ANIMATE_RATE);
+
+        // TODO: I tried this ... the frame rate became lousey.
+        // return(this.actualAmimateRate);
     }
 
     static removeItem(item) {
@@ -48,14 +58,19 @@ class Universe {
     // Animate all objects.
     static animate(date, keyBoard) {
         if (date >= this.nextAnimateTime) {
-            this.universeTime += 1000 / ANIMATE_RATE;
+            this.universeTime += 1000 / this.getActualAnimateRate();
+            this.nextAnimateTime = date + 1000 / this.getAnimateRate();
 
             for (let item of Universe.itemList) {
                 item.animate(this.universeTime, keyBoard);
             }
-            this.nextAnimateTime = date + 1000 / ANIMATE_RATE;
+            this.actualAmimateRate = 1000/(date - this.lastAnimateTime);
+            this.lastAnimateTime = date;
         }
+    }
 
+    static getActualAnimateRate() {
+        return(this.actualAmimateRate)
     }
 
     static getTime() {
@@ -92,8 +107,8 @@ class Universe {
         let clearBox = new THREE.Box3(min, max);
 
         for (let item of Universe.itemList) {
-            let thatBox = item.getBoundingBox();
-            if ((null != thatBox) && (thatBox.intersectsBox(clearBox))) {
+            let thatBoundary = item.getBoundary();
+            if ((null != thatBoundary) && (thatBoundary.intersectsBox(clearBox))) {
                 // Bounce it far away.
                 if (item.location.x < 0) {
                     item.location.x += Universe.UNI_SIZE;

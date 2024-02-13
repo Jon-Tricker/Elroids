@@ -5,28 +5,34 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import Universe from '../universe.js'
+import Universe from '../universe.js';
+import ItemBoundary from './itemBoundary.js';
 
 const COLOUR = "#FFFFFF"
 
 class Item extends THREE.Group {
 
-    speed;
+    speed;              // m/s
+    speedFrame;         // m/frame
+
     location;
     originalMaterial;
     game;
-    mass;
+    mass;               // tonnes
     hitPoints;
     owner;
 
     // Some sort of 'size' indicating average 'radius'.
-    size;
+    size;               // m
+    
+    // Bounding volume for collision detectionn.
+    boundary = null;
 
     // Construct with optional mass
     constructor(locationX, locationY, locationZ, speedX, speedY, speedZ, game, size, mass, hitPoints, owner) {
         super();
         this.location = new THREE.Vector3(locationX, locationY, locationZ);
-        this.speed = new THREE.Vector3(speedX, speedY, speedZ);
+        this.setSpeed(new THREE.Vector3(speedX, speedY, speedZ));
         this.game = game;
         this.size = size;
         this.owner = owner;
@@ -50,11 +56,30 @@ class Item extends THREE.Group {
             this.owner = owner;
         }
 
+        // Set default boundary
+        this.setBoundary(size);
+
         // Add self to the game universe
         Universe.addItem(this);
 
         // Add self to graphics scene.
         game.getScene().add(this);
+    }
+
+    // Get boundary.
+    getBoundary() {
+        return(this.boundary)
+    }
+
+    setBoundary(size) {
+        this.boundary = new ItemBoundary(this.location, size);
+    }
+
+    // Set speed/
+    // Do frame rate division only one.
+    setSpeed(speed) {
+        this.speed = speed.clone();
+        this.speedFrame = speed.clone().divideScalar(Universe.getAnimateRate())
     }
 
     getLocation() {
@@ -80,10 +105,28 @@ class Item extends THREE.Group {
         return (this.mass);
     }
 
+    // TODO: Remove
+    // temp to check sped set correct
+    checkSpeed() {
+        let checkSpeed = this.speed.clone();
+        checkSpeed.divideScalar(Universe.getAnimateRate());
+        if (!checkSpeed.equals(this.speedFrame)) {
+            console.log("We have a speed issue.")
+        }
+    }
+
     // Move item in universal space, Handle wrap round.
     // Optinally detect collisions.
     moveItem(detect) {
-        this.location.addVectors(this.location, this.speed);
+
+        // TODO remove. Temp that speed correct
+        this.checkSpeed();
+
+        this.location.addVectors(this.location, this.speedFrame);
+
+        // Move boundary object.
+        this.boundary.moveTo(this.location);
+
         Universe.handleWrap(this.location);
         if (detect) {
             this.detectCollisions();
@@ -91,17 +134,6 @@ class Item extends THREE.Group {
     }
 
 
-    // Get the bounding box. If not overridden get the default box
-    // Return 'null' if collisions with this not to be checked.
-    getBoundingBox() {
-        let offset = new THREE.Vector3(this.size, this.size, this.size);
-        let min = new THREE.Vector3();
-        min.subVectors(this.location, offset);
-        let max = new THREE.Vector3();
-        max.addVectors(this.location, offset);
-        let box = new THREE.Box3(min, max);
-        return (box);
-    }
 
     // Detect colisions.
     // Do this in display space. Possible colisions that occur through wrap round are out of the users sight ... so ignore.
@@ -134,15 +166,15 @@ class Item extends THREE.Group {
         // For now do a quick and nasty aproximation.
         // TODO make boxes a bit smaller so it has to ba a solid hit.
         // TODO get above working.
-        let thisBox = this.getBoundingBox();
+        let thisBoundary = this.getBoundary();
 
         let collided = false;
         for (let that of Universe.itemList) {
 
-            let thatBox = that.getBoundingBox();
+            let thatBoundary = that.getBoundary();
 
-            if (null != thatBox) {
-                if (thisBox.intersectsBox(thatBox)) {
+            if (null != thatBoundary) {
+                if (thisBoundary.intersects(thatBoundary)) {
 
                     // Don't collide with self.
                     if (this != that) {
@@ -151,6 +183,8 @@ class Item extends THREE.Group {
 
                         this.handleCollision(that);
 
+                        // Only collode with one thing per frame.
+                        return;
                     }
                 }
             }
@@ -162,21 +196,23 @@ class Item extends THREE.Group {
         // Don't loop forever.
         let count = 1000;
 
-        while ((this.getBoundingBox().intersectsBox(that.getBoundingBox())) && (0 < count--)) {
+        while ((this.getBoundary().intersects(that.getBoundary())) && (0 < count--)) {
             if (this.speed.equals(that.speed)) {
                 // Never going to separate ... fiddle something
-                let delta = (Math.random() * 0.02) - 0.01;
+                let delta = (Math.random() * 0.5) - 0.25;
+                let newSpeed = this.speed.clone();
                 switch (Math.floor(Math.random() * 3)) {
                     case 0:
-                        this.speed.x += delta;
+                        newSpeed.x += delta;
                         break;
                     case 1:
-                        this.speed.y += delta;
+                        newSpeed.y += delta;
                         break;
                     case 2:
-                        this.speed.z += delta;
                     default:
+                        newSpeed.z += delta;
                 }
+                this.setSpeed(newSpeed);
             } else {
                 this.moveItem(false);
                 that.moveItem(false);
@@ -270,7 +306,9 @@ class Item extends THREE.Group {
 
         // Add new speed
         // console.log("add before sx " + this.speed.x + " sy " + this.speed.y + " sz " + this.speed.z)
-        this.speed.add(deltav);
+        let newSpeed = this.speed.clone();
+        newSpeed.add(deltav);
+        this.setSpeed(newSpeed);
         // console.log("add after sx " + this.speed.x + " sy " + this.speed.y + " sz " + this.speed.z)
     }
 

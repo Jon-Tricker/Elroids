@@ -9,9 +9,9 @@ const missileMaterial = new THREE.MeshStandardMaterial(
   {
     color: COLOUR,
     emissive: COLOUR,
-    roughness: 0,
+    roughness: 1,
     opacity: 1,
-    metalness: 1,
+    metalness: 0,
   }
 )
 

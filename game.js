@@ -9,7 +9,7 @@ import * as THREE from 'three';
 import Ship from "./GameItems/ship.js";
 import Rock from "./GameItems/rock.js";
 
-import SaucerWanderer from "./GameItems/Saucers/saucerMother.js";
+import SaucerWanderer from "./GameItems/Saucers/saucerWanderer.js";
 import SaucerShooter from "./GameItems/Saucers/saucerShooter.js";
 import SaucerStatic from "./GameItems/Saucers/saucerStatic.js";
 import SaucerMother from "./GameItems/Saucers/saucerMother.js";
@@ -22,9 +22,11 @@ import MyCamera from './Scenery/myCamera.js'
 import Displays from './Displays/displays.js'
 import Keyboard from "./keyboard.js";
 
-const MAX_ROCK_VELOCITY = 0.5;
-const MAX_ROCK_SIZE = 8;
-const VERSION = "0.20";
+const MAX_ROCK_VELOCITY = 25;       // m/s
+const MAX_ROCK_SIZE = 80;           // m
+const VERSION = "0.21";
+
+const RESPAWN_SIZE = 1000;          // m
 
 class Game {
     // Probably the wrong place for this.
@@ -68,6 +70,7 @@ class Game {
         // Create ship first so it is 1st, for collision detection purposes,  in the item list.
         this.createShip();
         this.createRocks(rockCount);
+        this.createSaucers();
 
         // Now we have a ship. Switch to it's camera
         this.scene.setCamera(MyCamera.PILOT);
@@ -77,7 +80,7 @@ class Game {
     }
 
     createShip() {
-        this.ship = new Ship(0.5, 1, 2, 0, 0, 0, this);
+        this.ship = new Ship(5, 10, 20, 0, 0, 0, this);
     }
 
     shipDestroyed() {
@@ -85,8 +88,7 @@ class Game {
         if (0 < this.lives) {
             this.displays.setMessage("Ship destroyed! ... restarting", 3000);
 
-            // Clear our respawn area.
-            Universe.clearBox(-50, -50, -50, 50, 50, 50);
+            this.clearRespawnArea();
 
             this.ship.respawn();
         } else {
@@ -103,45 +105,51 @@ class Game {
         return (this.scene);
     }
 
+    createSaucers() {
+        if (this.testMode) {
+            // New saucer
+            new SaucerStatic(200, 100, -50, this, false);
+            new SaucerWanderer(400, 100, -50, this, null, false);
+            new SaucerShooter(300, 100, -50, this, null, true);
+            new SaucerHunter(300, 200, -50, this, null, true);
+            new SaucerRam(1000, 100, 200, this, null, true);
+            this.motherSaucer = new SaucerMother(600, 100, -50, this, null, true);
+        } else {
+            // First mother ship always in safe mode.
+            this.createMotherSaucer(true);
+        }
+    }
+
     createRocks(rockCount, rockStyle) {
         if (this.testMode) {
             // Create a few test rocks at set locations
 
             // Horizontal colliders
-            /*
-            new Rock(2, 3, 5, 0, 0, 0, 0, this);
-            new Rock(1, -3, 5, 0, 0.1, 0, 0, this);
-            */
+            // new Rock(20, 100, 50, 0, 0, 0, 0, this);
+            //new Rock(10, 100, -50, 10, 0, 25, 0, this);
 
             // Big target
-            // new Rock(2, 7, 0, 0, 0.05, 0, 0, this);
+            // new Rock(20, 900, 900, 0, 0, 0, 0, this);
 
             // Small target
-            // new Rock(8, -10, 0, 0, 0, 0, 0, this);
+            // new Rock(80, -100, 0, 0, 0, 0, 0, this);
 
             // Row of rocks
-
-            for (let i = -Universe.UNI_SIZE; i < Universe.UNI_SIZE; i += 21) {
+            for (let i = -Universe.UNI_SIZE; i < Universe.UNI_SIZE; i += 211) {
                 let sz = Math.abs(i % MAX_ROCK_SIZE);
                 if (sz != 0) {
-                    new Rock(sz, i, -10, 0, 0, 0, 0, this);
+                    new Rock(sz, i, -100, 0, 0, 0, 0, this);
                 }
             }
 
-
             // Diagonal row of rocks.
-            for (let i = 0; i < Universe.UNI_SIZE; i += 21) {
+            /*
+            for (let i = 0; i < Universe.UNI_SIZE; i += 211) {
                 let sz = i % MAX_ROCK_SIZE;
-                new Rock(sz, -20 + i, i, i, 0, 0, 0, this);
+                new Rock(sz,  i, i, i, 0, 0, 0, this);
             }
+            */
 
-            // New saucer
-            new SaucerStatic(20, 10, -5, this, false);
-            new SaucerWanderer(40, 10, -5, this, null, false);
-            new SaucerShooter(30, 10, -5, this, null, true);
-            // new SaucerHunter(30, 10, -5, this, null, true);
-            new SaucerRam(100, 10, 20, this, null, true);
-            this.motherSaucer = new SaucerMother(60, 10, -5, this, null, true);
         } else {
             // Create a bunch of random rocks
             for (let r = 0; r <= rockCount; r++) {
@@ -151,36 +159,17 @@ class Game {
                 let vx = (Math.random() * MAX_ROCK_VELOCITY * 2) - MAX_ROCK_VELOCITY;
                 let vy = (Math.random() * MAX_ROCK_VELOCITY * 2) - MAX_ROCK_VELOCITY;
                 let vz = (Math.random() * MAX_ROCK_VELOCITY * 2) - MAX_ROCK_VELOCITY;
-                let sz = Math.floor((Math.random() * MAX_ROCK_SIZE) + 1);
-
-                // Move towards the universe boundaries.
-                switch (Math.floor(Math.random() * 6)) {
-                    case (0):
-                        rx = (Universe.UNI_SIZE + Math.random() * Universe.UNI_SIZE) / 2;
-                        break;
-                    case (1):
-                        rx = -(Universe.UNI_SIZE + Math.random() * Universe.UNI_SIZE) / 2;
-                        break;
-                    case (2):
-                        ry = (Universe.UNI_SIZE + Math.random() * Universe.UNI_SIZE) / 2;
-                        break;
-                    case (3):
-                        ry = -(Universe.UNI_SIZE + Math.random() * Universe.UNI_SIZE) / 2;
-                        break;
-                    case (4):
-                        rz = (Universe.UNI_SIZE + Math.random() * Universe.UNI_SIZE) / 2;
-                        break;
-                    default:
-                        rz = -(Universe.UNI_SIZE + Math.random() * Universe.UNI_SIZE) / 2;
-                        break;
-                }
+                let sz = Math.floor((Math.random() * MAX_ROCK_SIZE) + 10);
 
                 new Rock(sz, rx, ry, rz, vx, vy, vz, this);
             }
 
-            // First mother ship always in safe mode.
-            this.createMotherSaucer(true);
+            this.clearRespawnArea();
         }
+    }
+
+    clearRespawnArea() {
+        Universe.clearBox(-RESPAWN_SIZE, -RESPAWN_SIZE, -RESPAWN_SIZE, RESPAWN_SIZE,  RESPAWN_SIZE,  RESPAWN_SIZE);
     }
 
     createRandomVector(max) {
@@ -192,9 +181,9 @@ class Game {
 
         // Create it close so we can find it.
         if (safe) {
-            let offset = 100;
+            let offset = 500;
             loc.x += offset;
-            loc.y += offset;
+            loc.y += offset / 2;
         } else {
             // Move it far away. Let wrap calculation take care if too big.
             loc.x += Math.random() * Universe.UNI_SIZE;
@@ -204,16 +193,16 @@ class Game {
             // Move it to one edge of the universe.
             switch (Math.floor(Math.random()) * 3) {
                 case 0:
-                    loc.x = this.ship.location.x +  Universe.UNI_SIZE;
+                    loc.x = this.ship.location.x + Universe.UNI_SIZE;
                     break;
 
                 case 1:
-                    loc.y = this.ship.location.y +  Universe.UNI_SIZE;
+                    loc.y = this.ship.location.y + Universe.UNI_SIZE;
                     break;
 
                 case 2:
                 default:
-                    loc.z = this.ship.location.z +  Universe.UNI_SIZE;
+                    loc.z = this.ship.location.z + Universe.UNI_SIZE;
                     break;
             }
         }
@@ -246,7 +235,7 @@ class Game {
 
     addRockScore(size, that) {
         if (that.owner == this.getShip()) {
-            this.addScore(MAX_ROCK_SIZE - size + 1, that);
+            this.addScore((MAX_ROCK_SIZE - size) / 10 + 1, that);
         }
     }
 

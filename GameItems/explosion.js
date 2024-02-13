@@ -2,6 +2,7 @@
 // For now simple spheres.
 import * as THREE from 'three';
 import Item from './item.js';
+import Universe from '../universe.js';
 
 // Create material.
 const explosionMaterial = new THREE.MeshStandardMaterial(
@@ -44,7 +45,7 @@ class Explosion extends Item {
   }  
   
   // Don't check collisions with explosions
-  getBoundingBox() {
+  getBoundary() {
     return (null);
   }
 
@@ -57,7 +58,7 @@ class Explosion extends Item {
       this.moveMesh();
       
       // Grow
-      this.currentSize ++;
+      this.currentSize += 250/Universe.getAnimateRate();
     }
   }
 }

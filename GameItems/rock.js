@@ -10,8 +10,8 @@ import Universe from '../universe.js'
 import FacitRockGeometry from '../facitRockGeometry.js'
 import { MineralType, MineralComponent, Composition } from './minerals.js';
 
-const SPLIT_VIOLENCE = 0.05;
-const MAX_ROTATION_RATE = 0.02;
+const SPLIT_VIOLENCE = 2;
+const MAX_ROTATION_RATE = 0.5;    // R/s
 
 // Type of rock graphics
 const ROCK_STYLE_SPHERE = 0;
@@ -45,7 +45,7 @@ class Rock extends NonShipItem {
   static rockStyle = Rock.ROCK_STYLE_SPHERE;
 
   constructor(rockSize, locationX, locationY, locationZ, speedX, speedY, speedZ, game, composition) {
-    super(locationX, locationY, locationZ, speedX, speedY, speedZ, game, rockSize / Universe.CBRT_THREE, rockSize * rockSize, rockSize);
+    super(locationX, locationY, locationZ, speedX, speedY, speedZ, game, rockSize, rockSize * rockSize * rockSize, 1 + rockSize/10);
 
     this.rockSize = rockSize;
     this.originalHP = this.hitPoints;
@@ -85,14 +85,14 @@ class Rock extends NonShipItem {
     let rockGeometry;
     if (Rock.rockStyle == ROCK_STYLE_SPHERE) {
       rockGeometry = new THREE.SphereGeometry(this.rockSize, 64, 64);
+      this.setBoundary(this.rockSize);
     } else {
       rockGeometry = new FacitRockGeometry(this.rockSize, this.composition);
+      this.setBoundary(rockGeometry.getAverageSize());
     }
 
     // compute vertex normals
     rockGeometry.computeVertexNormals();
-    // Do this once
-    rockGeometry.computeBoundingBox();
 
     // Create material for this rock.
     let rockMaterial = BASE_ROCK_MATERIAL.clone();
@@ -124,11 +124,11 @@ class Rock extends NonShipItem {
       let newComp = this.composition.split();
 
       // Create a pair of repacements.
-      let r1 = new Rock(this.rockSize / 2, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, this.composition);
+      new Rock(this.rockSize / 2, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, this.composition);
 
       speedRatio = 1 - speedRatio;
       bang.multiplyScalar(-1);
-      let r2 = new Rock(this.rockSize / 2, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, newComp);
+      new Rock(this.rockSize / 2, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, newComp);
 
       // Get rid of original
       this.destruct();
@@ -143,9 +143,9 @@ class Rock extends NonShipItem {
   }
 
   animate() {
-    this.rotateX(this.rotationRate.x);
-    this.rotateY(this.rotationRate.y);
-    this.rotateZ(this.rotationRate.z);
+    this.rotateX(this.rotationRate.x/Universe.getAnimateRate());
+    this.rotateY(this.rotationRate.y/Universe.getAnimateRate());
+    this.rotateZ(this.rotationRate.z/Universe.getAnimateRate());
 
     this.moveItem(true);
     this.moveMesh();

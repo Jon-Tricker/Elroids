@@ -5,6 +5,7 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
+import Universe from './universe.js'
 
 class FacitRockGeometry extends THREE.BufferGeometry {
     vertices;
@@ -51,7 +52,7 @@ class FacitRockGeometry extends THREE.BufferGeometry {
         );
 
         // Add extra vertices. Since new vertices are in already mapped triangles should get away without extra uvs.
-        let addCount = (Math.floor(Math.random() * this.composition.facets)) * size;
+        let addCount = (Math.floor(Math.random() * this.composition.facets)) * (1 + size/10);
         for (let i = 0; i <= addCount; i++) {
             this.addVertex(size);
         }
@@ -109,6 +110,20 @@ class FacitRockGeometry extends THREE.BufferGeometry {
         this.indices.push(new THREE.Vector3(vNum1, vNum2, vNewNum));
         this.indices.push(new THREE.Vector3(vNum2, vNum3, vNewNum));
         this.indices.push(new THREE.Vector3(vNum3, vNum1, vNewNum));
+    }
+
+    // Compute average height.
+    getAverageSize() {
+        let total = 0;
+        for (let i = 0; i < this.vertices.length; i++) {
+            total += this.vertices[i].length();
+        }
+        total /= this.vertices.length;
+
+        // But that's the peaks ... reduce it by a bit.
+        total /= Universe.CBRT_THREE; 
+        
+        return(total);
     }
 
     // TODO There has to be some easy way to do this ... but I can't find it.

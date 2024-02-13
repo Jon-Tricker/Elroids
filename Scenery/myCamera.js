@@ -16,7 +16,7 @@ class MyCamera extends THREE.PerspectiveCamera {
     // At a fixed point in space
     static FIXED = 3;
 
-    static STANDOFF_DIST = 20;
+    static STANDOFF_DIST = 200;
 
     type;
     ship;
@@ -79,7 +79,7 @@ class MyCamera extends THREE.PerspectiveCamera {
         this.isFixedRotation = false;
 
         // Behind so it can lookAt.
-        this.position.x = -MyCamera.STANDOFF_DIST;
+        this.position.x = -1;
         this.position.z = 0;
 
         // Look at the ship
@@ -89,7 +89,7 @@ class MyCamera extends THREE.PerspectiveCamera {
         this.rotateZ(-Math.PI / 2);
 
         // Move juat ahead of ship. 
-        this.position.x = ship.position.x + 1;
+        this.position.x = ship.position.x + 10;
     }
 
     createFixed() {
@@ -97,7 +97,7 @@ class MyCamera extends THREE.PerspectiveCamera {
         // const camera = new THREE.PerspectiveCamera(45, 800 / 600, 0.1, 100);
 
         // Move camera back a bit. So it can see scene.
-        this.position.z = 20;
+        this.position.z = 200;
         this.isFixedLocation = true;
         this.isFixedRotation = true;
     }
