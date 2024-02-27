@@ -24,7 +24,7 @@ import Keyboard from "./keyboard.js";
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 80;           // m
-const VERSION = "1.0";
+const VERSION = "1.1";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 1000;          // m
@@ -34,11 +34,10 @@ class Game {
     ship;
     scene;
     displays;
+    player;
 
     safe = false;
 
-    lives = 3;
-    score = 0;
     rockStyle;
 
     testMode = false;
@@ -51,9 +50,10 @@ class Game {
 
     paused = false;
 
-    constructor(rockCount, rockStyle, safe) {
+    constructor(rockCount, rockStyle, safe, player) {
 
         this.safe = safe;
+        this.player = player;
 
         if (0 == rockCount) {
             this.testMode = true;
@@ -85,8 +85,7 @@ class Game {
     }
 
     shipDestroyed() {
-        this.lives--;
-        if (0 < this.lives) {
+        if (this.player.killed()) {
             this.displays.setMessage("Ship destroyed! ... restarting", 3000);
 
             this.clearRespawnArea();
@@ -94,7 +93,7 @@ class Game {
             this.ship.respawn();
         } else {
             this.ship.destruct();
-            this.displays.setMessage("Game Over! ... Final score=" + this.score + " ... Refresh page to play again.", 0);
+            this.displays.setMessage("Game Over! ... Final score = " + this.player.getScore() + " ... Refresh page to play again.", 0);
         }
     }
 
@@ -104,6 +103,10 @@ class Game {
 
     getScene() {
         return (this.scene);
+    }
+
+    getPlayer() {
+        return(this.player);
     }
 
     createSaucers() {
@@ -230,7 +233,7 @@ class Game {
     addScore(score, that) {
         // Only score damage we caused.
         if (that.owner == this.ship) {
-            this.score += score;
+            this.player.addScore(score);
         }
     }
 

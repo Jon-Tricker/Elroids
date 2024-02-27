@@ -7,13 +7,14 @@
 import * as THREE from 'three';
 import Item from '../GameItems/item.js';
 import MyCamera from '../Scenery/myCamera.js';
-import DumbMissile from '../GameItems/dumbMissile.js';
 import Universe from '../universe.js'
 import EngineSet from './Components/Engines/engineSet.js';
 import BasicEngine from './Components/Engines/basicEngine.js';
 import HullSet from './Components/Hulls/hullSet.js';
+import WeaponSet from './Components/Weapons/weaponSet.js';
 import BasicHull from './Components/Hulls/basicHull.js';
 import ComponentSets from './Components/componentSets.js';
+import DumbMissileWeapon from './Components/Weapons/dumbMissileWeapon.js';
 
 // Create ship material.
 const shipMaterial = new THREE.MeshStandardMaterial(
@@ -67,9 +68,6 @@ const MAXSPEED = 100;       // m/s. Must be slower tha missiles so cannot run th
 const ROTATE_RATE_DELTA = 0.125;        // r/s
 const ROTATE_RATE_MAX = 5;              // r/s
 
-// Missiles/s
-const FIRE_RATE = 4;
-
 class Ship extends Item {
 
     height;
@@ -81,8 +79,6 @@ class Ship extends Item {
     pilotCamera;
     chaseCamera;
 
-    fireLast = Universe.getTime();
-
     originalPosition;
 
     pitchRate = 0;
@@ -93,6 +89,7 @@ class Ship extends Item {
     compSets;
     engineSet;
     hullSet;
+    weaponSet;
 
     constructor(height, width, length, locationX, locationY, locationZ, game) {
         super(locationX, locationY, locationZ, 0, 0, 0, game, length);
@@ -113,17 +110,21 @@ class Ship extends Item {
 
     // Build/Rebuild ship components.
     buildShip() {
-        this.engineSet = new EngineSet();
-        this.engineSet.add(new BasicEngine());
+        this.engineSet = new EngineSet(1);
+        this.engineSet.add(new BasicEngine(this));
 
-        this.hullSet = new HullSet();
-        this.hullSet.add(new BasicHull());
-        this.hitPoints = this.hullSet.getHp();
+        this.hullSet = new HullSet(1);
+        this.hullSet.add(new BasicHull(this));
+
+        this.weaponSet = new WeaponSet(1);
+        this.weaponSet.add(new DumbMissileWeapon(this));
 
         // Build set of all componets sets
         this.compSets = new ComponentSets();
         this.compSets.add(this.engineSet);
         this.compSets.add(this.hullSet);
+        this.compSets.add(this.weaponSet);
+
 
         // Add in weight of all components.
         this.calculateMass();
@@ -155,6 +156,10 @@ class Ship extends Item {
 
     getChaseCamera() {
         return (this.chaseCamera);
+    }
+
+    getHitPoints() {
+        return(this.hullSet.getHp());
     }
 
     setupMesh() {
@@ -396,10 +401,7 @@ class Ship extends Item {
 
         // if (keyboard.getClearState("M") || keyboard.getClearState("m")) { 
         if (keyboard.getState("M") || keyboard.getState("m")) {
-            if (Universe.getTime() > this.fireLast + 1000 / FIRE_RATE) {
-                let missile = new DumbMissile(this.getOrientation(), this);
-                this.fireLast = Universe.getTime();
-            }
+            this.weaponSet.fire(this.getOrientation(), date);
         }
 
         this.moveItem(true);
@@ -416,9 +418,8 @@ class Ship extends Item {
     takeDamage(hits, that) {
         // Dont call 'super'. We want to re-use the same ship. So don't want it to destruct.
         this.hullSet.takeDamage(hits);
-        this.hitPoints = this.hullSet.getHp();
 
-        if (this.hitPoints > 0) {
+        if (this.hullSet.getHp() > 0) {
             this.game.displays.setMessage("Ship damaged!", 1000);
         } else {
             this.game.shipDestroyed();

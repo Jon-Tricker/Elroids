@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import Universe from '../universe.js';
 import ItemBoundary from './itemBoundary.js';
+import BugError from "../Errors/bugError.js"
 
 const COLOUR = "#FFFFFF"
 
@@ -78,6 +79,9 @@ class Item extends THREE.Group {
     // Set speed/
     // Do frame rate division only one.
     setSpeed(speed) {
+        if (speed.length() > 401) {
+          //  throw (new BugError("Something too fast"));
+        }
         this.speed = speed.clone();
         this.speedFrame = speed.clone().divideScalar(Universe.getAnimateRate())
     }

@@ -13,7 +13,7 @@ class ComponentSetMenu {
 
         for (let set of sets) {
             if (set.size > 0) {
-                doc += "<P>" + set.name + "</P>"
+                doc += "<P>" + set.name + " (Slots = " + set.getSlots() + ")" + "</P>"
 
                 let tab = new MenuTable();
 

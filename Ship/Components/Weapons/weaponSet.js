@@ -1,25 +1,26 @@
-// Base list class for all hulls.
-// For now ships only have one hull ... maybe one day it willbe possible to have multiple hulls 'welded together'.
+// Base list class for all weapons.
 
 import ComponentSet from '../componentSet.js'
 
-class HullSet extends ComponentSet {
-
-    totalHp = 0;
-    totalRamDamage = 0;
+class WeaponSet extends ComponentSet {
 
     constructor(slots) {
-        super("Hulls", slots);
+        super("Weapons", slots);
     }
 
-    getHp() {
-        return(this.totalHp);
-    }    
-    
-    getRamDamage() {
-        return(this.totalRamDamage);
+    // Fire all selected weapons.
+    fire(target, date) {
+
+        if (undefined == date) {
+            date = Universe.getTime();
+        }
+        
+        for(let weapon of this) {
+            weapon.fire(target, date);
+        }
     }
 
+    /*
     add(hull) {
         if (0 == this.size) {
             super.add(hull);
@@ -41,6 +42,7 @@ class HullSet extends ComponentSet {
         // this[0].hp -= damage;
         this.totalHp -= hits;
     }
+    */
 }
 
-export default HullSet;
+export default WeaponSet;

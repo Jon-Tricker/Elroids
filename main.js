@@ -5,6 +5,7 @@
 import Keyboard from "./keyboard.js";
 import Universe from './universe.js'
 import Game from './game.js'
+import Player from './player.js'
 import MyCamera from './Scenery/myCamera.js'
 
 // Some plumbing to get passed parameters.
@@ -19,7 +20,8 @@ var safe = false;
 Universe.setSize(uniSize);
 
 // Create the game objects
-const game = new Game(rockCount, rockStyle, safe);
+const player = new Player();
+const game = new Game(rockCount, rockStyle, safe, player);
 
 // Add event listener on clicks.
 // It takes a while for auto repeat to kick in. Also we don't know how fast it will be. So
