@@ -13,6 +13,7 @@ import EngineSet from './Components/Engines/engineSet.js';
 import BasicEngine from './Components/Engines/basicEngine.js';
 import HullSet from './Components/Hulls/hullSet.js';
 import BasicHull from './Components/Hulls/basicHull.js';
+import ComponentSets from './Components/componentSets.js';
 
 // Create ship material.
 const shipMaterial = new THREE.MeshStandardMaterial(
@@ -120,7 +121,7 @@ class Ship extends Item {
         this.hitPoints = this.hullSet.getHp();
 
         // Build set of all componets sets
-        this.compSets = new Set();
+        this.compSets = new ComponentSets();
         this.compSets.add(this.engineSet);
         this.compSets.add(this.hullSet);
 
@@ -289,17 +290,7 @@ class Ship extends Item {
 
         let xDirection = this.getOrientation();
 
-        // Thrust in kN, mass in Tonnes. This should work without scaling.
-        let accRate = this.engineSet.getThrust()/this.hullSet.getMass();
-
-        let newSpeed = this.speed.clone();
-        newSpeed.addScaledVector(xDirection, accRate/Universe.getAnimateRate());
-
-        if (newSpeed.length() > MAXSPEED) {
-            newSpeed = newSpeed.normalize().multiplyScalar(MAXSPEED);
-        }
-
-        this.setSpeed(newSpeed);
+        this.thrust(this.engineSet.getThrust(), xDirection, MAXSPEED);
     }
 
     deceletarte() {

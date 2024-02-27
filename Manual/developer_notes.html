@@ -26,37 +26,29 @@
 	<UL>
 		<LI>Exhaust flame is supposed to be yellow ... investigate why it is not.</LI>
 		<LI>Missiles are created too far in front of ship (see 'quantization' issue below) ... fix</LI>
-		<LI>Occasional OOM lock ups are seen ... investigate.</LI>
+		<LI>Sometime rock split and the fragmants dissapear at high speed. Possibly some bug in separateFrom().</LI>
 	</UL>
 
 	<H2>ToDos (In some sort of priority order)</H2>
 
-	<H3>Pre V1.0 (Minimum feature set)</H3>
-	<UL>
-		<P>Think it's all done :-).</P>
-	</UL>
-
 	<H3>V1.x Ship maintence game (CURRENTLY IN PROGRESS)</H3>
 	<P>There is no point having the economic game if there is nothing to spend the profits on. The next thing is to componientize the ship ... So it can have upgrades.</P>
-	<P>Component basic attributes:</P>
-	<UL>
-		<LI>HP</LI>
-		<LI>Name</LI>
-		<LI>Cost</LI>
-		<LI>Mass</LI>
-	</UL>
 	<P>Conponent sub classes:</P>
 	<UL>
 		<LI>Weapon beam</LI>
 		<LI>Weapon missile</LI>
 		<LI>Hull</LI>
 		<LI>Engine</LI>
+		<LI>Thrusters (directional control)</LI>
 		<LI>Targeting computer</LI>
+		<LI>Docking computer</LI>
 		<LI>Range finder</LI>
 		<LI>Cargo bay</LI>
 	</UL>
-	<P>Add ship management interface.</P>
-	<P>Add component purchace interface</P>
+	<P>Add ship management menu.</P>
+	<P>Add component purchace menu.</P>
+	<P>Implement menu INPUT tags,</P>
+	<P>Add menu error handling (pop up?).</P>
 
 	<H3>V2.x Economics game</H3>
 	<P>Add the 'Elite' stuff about trading, upgrades etc.</P>
@@ -88,20 +80,17 @@
 				<LI>Improve 'vision through' wrap to take account of camera direction (i.e. dont just use Universe.handleWrap()). i.e. allow rocks to be seen at full universe width not half.</LI>
 			<LI>Improve 'collision detection' mechanism (Item.detectCollision()).
 				<UL>
-					<LI>Currently using, crude, bounding boxes.</LI>
+					<LI>Currently using, crude, bounding spheres.</LI>
+					<LI>Collision only checked at end of animate phase. Posibly check a cylinder, occupied by the object during the phase, against sphere of target,</LI>
 					<LI>Use ray tracing.</LI>
 					<LI>Carve the universe into 'regions'. So don't have the square law issue of checking collisions between everything and 'everthing else'.</LI>
 				</UL>
 				</LI>
 				<LI>Limited number of missiles in flight (like Asteroids).</LI>
 			</UL>
-			<LI>Implement some way of 'topping up' rock supply.</LI>
 			<LI>Do something about saucer 'seeking' target location behaviour ... or maybe just leave it since it looks like defensive manouvering.</LI>
-			<LI>Move menu data into seperate .xml files.</LI>
-			<LI>Come up with some sort of meaningful (SI) units for speed, distance and location.</LI>
 			<LI>Componentize sacucer</LI>
 			<LI>Handle rock re-spawning when they are destroyed.</LI>
-			<LI>Handle collisions based on 'regions' of the universe. i.e. ony check against list of Items in own, and adjacent, regions ... not the entire item list.</LI>
 		</LI>
 
 		<LI>Code:</LI>
@@ -111,7 +100,6 @@
 		<LI>Add surface texture to ship.</LI>
 		<LI>Make saucers more 'shiny'. Probably involves MeshPhongMaterial ... but for me that just comes out white.</LI>
 		<LI>Add extra vt100 features (e.g. block graphics) to ship control terminal.</LI>
-		<LI>Find way to puiblicise/discuss it (facebook group?)</LI>
 		</UL>
 		
 		<LI>Additional features:
@@ -150,12 +138,6 @@
 				<LI>Add save/load ... not sure how on a web based game.</LI>
 				<LI>Maybe collision damage should be proportional to mass and relative speed of colliding object. Common for all items apart from 'rock on rock' impacts.</LI>
 				<LI>Revisit inline 'ToDos'.</LI>
-				<LI>Do the whole thing with typescript ... As a C/Java programmer I should have probably done that from the start. Howewver:
-					<OL>
-						<LI>I dont want to burden 3rd party developers with setting up a compiler(tsc) and build environment.</LI>
-						<LI>Seems to be problems integrating new .ts code with existing .js (in/exports have issues).</LI>
-					</OL>
-				</LI>
 			</UL>
 		</LI>
 	</UL>

@@ -13,13 +13,18 @@
 </HEAD>
 <H1>Introduction to the Menu System (Experimental!)</H1>
 
-<P>The system is based on a much simplified HTML. This is at an early stage of development. If you think you can improve it feel free to do so. However please re-test/update existing menus so they still work.</P>
+<P>The system had a simple, VT100 like, terminal (terminal.js).  menuSystem.js is an, extramly primative, 'web browser' that displays pages on the terminal..</P>
 
-<P>Each page consists of a static XML 'document'. Eventually these will be seperate .xml files but for now all in the MenuSystem.js file.</P>
+<P>The menus are defined as a, much simplified, HTML pages. This is at an early stage of development. If you think you can improve it feel free to do so. However please re-test/update existing menus so they still work.</P>
 
-<P>The menus system. Reads the docs and displays them using Terminal.js.</P>
+<P>Each page consists of a static HTML 'document'. These can be either inline or imported from a separte file.</P>
 
 <P>Menus are handled as a 'stack'. It is possible to go 'back' to previously veiwed menus.</P>
+
+<H2>Why???</H2>
+<P>Well 1st because it's fun.</P>
+<P>2nd eventually the game may be ported to non-keyboard device. So, whtever the menu system looks like, the interface needs to be accessible via just the flight contols (whatever they are on each system). 
+i.e must be driven by 'left', 'right', 'up', 'down' and 'select' ... NOT a mouse or other system dependant UI. </P>
 
 <H2>Structure</H2>
 
@@ -43,6 +48,7 @@
 			<LI>ToDo ... Multiple entries on each line with 'left' and 'right' selection.</LI>
 		</UL>
 	</LI>
+	<LI>'script' tags. These invoke methods on the 'local' (not 'remote' like real HTML) machine that generate dynaamic pages.</LI>
 </UL>
 
 <P>All text can have the following attibutes.</P>
@@ -52,9 +58,5 @@
 </UL>
 
 <P>Default 'Back' and 'Exit' items are automatically added to every menu.</P>
-
-<P>In the event of unparsable XML an error is displayed on the terminal (no sure why ... the wasn't planned) and also on the browsers 'Inspect' console.</P>
-
-<BODY>
 </BODY>
 </HTML>

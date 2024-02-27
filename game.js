@@ -24,8 +24,9 @@ import Keyboard from "./keyboard.js";
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 80;           // m
-const VERSION = "0.22";
+const VERSION = "1.0";
 
+// Box to clear out arround respawn site.
 const RESPAWN_SIZE = 1000;          // m
 
 class Game {

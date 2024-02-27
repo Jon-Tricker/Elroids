@@ -17,6 +17,18 @@ class Hull extends Component {
 
     getHp() {
         return(this.hp);
+    } 
+    
+    getHeadings() {
+        let heads = super.getHeadings();
+        heads.push("HP");
+        return(heads);
+    } 
+    
+    getValues() {
+        let vals = super.getValues();
+        vals.push(this.hp);
+        return(vals);
     }
 }
 

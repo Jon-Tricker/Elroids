@@ -24,7 +24,7 @@ class Item extends THREE.Group {
 
     // Some sort of 'size' indicating average 'radius'.
     size;               // m
-    
+
     // Bounding volume for collision detectionn.
     boundary = null;
 
@@ -68,7 +68,7 @@ class Item extends THREE.Group {
 
     // Get boundary.
     getBoundary() {
-        return(this.boundary)
+        return (this.boundary)
     }
 
     setBoundary(size) {
@@ -94,6 +94,21 @@ class Item extends THREE.Group {
         this.hitPoints = 0;
         Universe.removeItem(this);
         this.game.getScene().remove(this);
+    }
+
+    // Push item. Thrust in kN, mass in Tonnes. This should work without scaling.
+    thrust(thrust, direction, maxspeed) {
+        let accRate = thrust / this.mass;
+        direction = direction.normalize();
+
+        let newSpeed = this.speed.clone();
+        newSpeed.addScaledVector(direction, accRate / Universe.getAnimateRate());
+
+        if (newSpeed.length() > maxspeed) {
+            newSpeed = newSpeed.normalize().multiplyScalar(maxspeed);
+        }
+
+        this.setSpeed(newSpeed);
     }
 
     // Do damage to 'that' (default zero but at least tell 'that' that it's been hit).
@@ -277,7 +292,7 @@ class Item extends THREE.Group {
 
     collideWith(that) {
         // Things don't damage thier owners.
-        if((this.owner != that) && (that.owner != this)) {
+        if ((this.owner != that) && (that.owner != this)) {
             this.doDamage(that);
             that.doDamage(this);
         }

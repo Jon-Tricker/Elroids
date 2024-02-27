@@ -45,6 +45,7 @@ class SaucerHunter extends Saucer {
     }
 
     // Do navigation logic. Home to near the ship.
+    // Should really call this.thrust() ... but cheat.
     navigate() {
         let targetSpeed = this.targetLocation.clone();
         targetSpeed.sub(this.location);

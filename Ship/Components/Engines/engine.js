@@ -18,6 +18,18 @@ class Engine extends Component {
     getThrust() {
         return(this.thrust);
     }
+
+    getHeadings() {
+        let heads = super.getHeadings();
+        heads.push("Thrust(kN)");
+        return(heads);
+    }
+
+    getValues() {
+        let vals = super.getValues();
+        vals.push(this.thrust);
+        return(vals);
+    }
 }
 
 export default Engine;
