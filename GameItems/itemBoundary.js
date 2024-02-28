@@ -7,7 +7,6 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import Universe from '../universe.js'
 
 class ItemBoundary extends THREE.Sphere{
 
@@ -22,6 +21,10 @@ class ItemBoundary extends THREE.Sphere{
 
     moveTo(location) {
         super.set(location, this.size);
+    }
+
+    getSize() {
+        return(this.size);
     }
 
     /*

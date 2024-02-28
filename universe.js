@@ -30,6 +30,8 @@ class Universe {
     static lastAnimateTime = Date.now();
     static actualAmimateRate = ANIMATE_RATE;
 
+    static originVector = new THREE.Vector3(0, 0, 0);
+
     static addItem(item) {
         this.itemList.add(item);
     }

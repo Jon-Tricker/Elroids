@@ -1,7 +1,7 @@
 // Base list class for the components that make up a ship.
 // Can be a set because, contain >1 instance of the same type, the individual instances are different objects..
 
-import GameError from '../../Errors/gameError.js'
+import GameError from '../../GameErrors/gameError.js'
 
 class ComponentSet extends Set {
 

@@ -17,7 +17,7 @@ class DumbMissileWeapon extends MissileWeapon {
                 new DumbMissile(target, this.ship);
             }
             catch(GameError) {
-                // Failed to fir for some reason.
+                // Failed to for for some reason. e.g. out of ammo Ignore 
             }
         }
     }

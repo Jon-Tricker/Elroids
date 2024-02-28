@@ -129,8 +129,8 @@ class Game {
             // Create a few test rocks at set locations
 
             // Horizontal colliders
-            // new Rock(20, 100, 50, 0, 0, 0, 0, this);
-            //new Rock(10, 100, -50, 10, 0, 25, 0, this);
+            new Rock(20, 100, 50, 0, 0, 0, 0, this);
+            new Rock(10, 100, -50, 10, 0, 25, 0, this);
 
             // Big target
             // new Rock(20, 900, 900, 0, 0, 0, 0, this);

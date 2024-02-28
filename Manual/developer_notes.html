@@ -25,8 +25,7 @@
 	<H2>Bugs</H2>
 	<UL>
 		<LI>Exhaust flame is supposed to be yellow ... investigate why it is not.</LI>
-		<LI>Missiles are created too far in front of ship (see 'quantization' issue below) ... fix</LI>
-		<LI>Sometime rock split and the fragmants dissapear at high speed. Possibly some bug in separateFrom().</LI>
+		<LI>Missiles are created too far in front of ship (see 'quantization' issue below). Sometimes miss very close targets ... fix</LI>
 	</UL>
 
 	<H2>ToDos (In some sort of priority order)</H2>
@@ -64,7 +63,7 @@
 					<LI>Ship repairs.</LI>
 				</UL>
 			</LI>
-			<LI>Extended uiverse:
+			<LI>Extended universe:
 				<UL>
 					<LI>Multiple systems (stations?).</LI>
 					<LI>Warp drive.</LI>
@@ -79,11 +78,9 @@
 		<LI>Game mechanics:
 			<UL>
 				<LI>Improve 'vision through' wrap to take account of camera direction (i.e. dont just use Universe.handleWrap()). i.e. allow rocks to be seen at full universe width not half.</LI>
-			<LI>Improve 'collision detection' mechanism (Item.detectCollision()).
+				<LI>Improve 'collision detection' mechanism (Item.detectCollision()). Although, for now, the 'cylinder Vs sphere' bounding check seems to be doing good service.
 				<UL>
-					<LI>Currently using, crude, bounding spheres.</LI>
-					<LI>Collision only checked at end of animate phase. Posibly check a cylinder, occupied by the object during the phase, against sphere of target,</LI>
-					<LI>Use ray tracing.</LI>
+					<LI>Use ray tracing. This may not work because need to detect collision throughout the movement phase. So would need to do many raytracing comparisons during each phase.</LI>
 					<LI>Carve the universe into 'regions'. So don't have the square law issue of checking collisions between everything and 'everthing else'.</LI>
 				</UL>
 				</LI>

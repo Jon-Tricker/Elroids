@@ -7,7 +7,7 @@
 import * as THREE from 'three';
 import Universe from '../universe.js';
 import ItemBoundary from './itemBoundary.js';
-import BugError from "../Errors/bugError.js"
+import BugError from "../GameErrors/bugError.js"
 
 const COLOUR = "#FFFFFF"
 
@@ -80,7 +80,7 @@ class Item extends THREE.Group {
     // Do frame rate division only one.
     setSpeed(speed) {
         if (speed.length() > 401) {
-          //  throw (new BugError("Something too fast"));
+            throw (new BugError("Something too fast"));
         }
         this.speed = speed.clone();
         this.speedFrame = speed.clone().divideScalar(Universe.getAnimateRate())
@@ -124,22 +124,13 @@ class Item extends THREE.Group {
         return (this.mass);
     }
 
-    // TODO: Remove
-    // temp to check sped set correct
-    checkSpeed() {
-        let checkSpeed = this.speed.clone();
-        checkSpeed.divideScalar(Universe.getAnimateRate());
-        if (!checkSpeed.equals(this.speedFrame)) {
-            console.log("We have a speed issue.")
-        }
-    }
-
     // Move item in universal space, Handle wrap round.
     // Optinally detect collisions.
     moveItem(detect) {
 
-        // TODO remove. Temp that speed correct
-        this.checkSpeed();
+        if (detect) {
+            this.detectCollisions();
+        }
 
         this.location.addVectors(this.location, this.speedFrame);
 
@@ -147,59 +138,47 @@ class Item extends THREE.Group {
         this.boundary.moveTo(this.location);
 
         Universe.handleWrap(this.location);
-        if (detect) {
-            this.detectCollisions();
-        }
     }
 
 
 
-    // Detect colisions.
-    // Do this in display space. Possible colisions that occur through wrap round are out of the users sight ... so ignore.
+    // Detects if a colisions will occur in next move.
+    //
+    // If so returns the identity of hit item.
+    // 
+    // Collides if a cylinder, described by our boundary over the next move, intersects with the target.
+    // Fortunatly this can be handled by determining if the vector of the next move is closer to the targets location than the sum of the radii.
     detectCollisions() {
-        /*
-        for (let count = 0; count < this.children.length; count++) {
-            
-            let child = this.children[count];
- 
-            if (child == this.flameMesh) {
- 
-                for (var vertexIndex = 0; vertexIndex < child.geometry.attributes.position.array.length; vertexIndex++) {
-                    var localVertex = new THREE.Vector3().fromBufferAttribute(child.geometry.attributes.position, vertexIndex).clone();
-                    var globalVertex = localVertex.applyMatrix4(child.matrix);
-                    var directionVector = globalVertex.sub(child.position);
- 
-                    var ray = new THREE.Raycaster(child.position, directionVector.clone().normalize());
-                    var collisionResults = ray.intersectObject(meshRock);
-                    if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
-                        console.log("Crunch " + count + " " + child + " " + collisionResults[0].distance);
-                        return(true);
-                    }
-                }
-            }
+        // Things that don't move don't hit things
+        if (0 == this.speed.length()) {
+            return;
         }
-        return(false);
-        */
 
-        // The above ray tracin method sort of works but seems over sensitive.
-        // For now do a quick and nasty aproximation.
-        // TODO make boxes a bit smaller so it has to ba a solid hit.
-        // TODO get above working.
         let thisBoundary = this.getBoundary();
 
-        let collided = false;
+        // Create line for move.
+        let move = new THREE.Line3(Universe.originVector, this.speedFrame);
+
         for (let that of Universe.itemList) {
 
             let thatBoundary = that.getBoundary();
 
             if (null != thatBoundary) {
-                if (thisBoundary.intersects(thatBoundary)) {
+
+                let relLocation = that.location.clone();
+                relLocation.sub(this.location);
+                Universe.handleWrap(relLocation);
+                let minDist = thisBoundary.getSize() + thatBoundary.getSize();
+
+                // This would be a load of math ... however threeJS does it for us.
+                let closestPoint = new THREE.Vector3(0, 0, 0);
+                move.closestPointToPoint(relLocation, true, closestPoint);
+                let dist = closestPoint.distanceTo(relLocation)
+
+                if (dist <= minDist) {
 
                     // Don't collide with self.
                     if (this != that) {
-                        // Remeber we hit something/
-                        collided = true;
-
                         this.handleCollision(that);
 
                         // Only collode with one thing per frame.
@@ -210,32 +189,26 @@ class Item extends THREE.Group {
         }
     }
 
+
     // Separate two overlapping objects.
     separateFrom(that) {
-        // Don't loop forever.
-        let count = 1000;
+        let relLoc = that.location.clone();
+        relLoc.sub(this.location)
+        while (0 == relLoc.length()) {
+            relLoc.add(this.game.createRandomVector(1));
+        }
 
-        while ((this.getBoundary().intersects(that.getBoundary())) && (0 < count--)) {
-            if (this.speed.equals(that.speed)) {
-                // Never going to separate ... fiddle something
-                let delta = (Math.random() * 0.5) - 0.25;
-                let newSpeed = this.speed.clone();
-                switch (Math.floor(Math.random() * 3)) {
-                    case 0:
-                        newSpeed.x += delta;
-                        break;
-                    case 1:
-                        newSpeed.y += delta;
-                        break;
-                    case 2:
-                    default:
-                        newSpeed.z += delta;
-                }
-                this.setSpeed(newSpeed);
-            } else {
-                this.moveItem(false);
-                that.moveItem(false);
-            }
+        if ((this.getBoundary().getSize() + that.getBoundary().getSize()) > relLoc.length()) {
+            relLoc = relLoc.normalize();
+            relLoc.multiplyScalar(2);
+
+            let delta = relLoc.clone();
+            delta.multiplyScalar(this.getBoundary().getSize());
+            this.location.sub(delta);
+
+            delta = relLoc.clone();
+            delta.multiplyScalar(that.getBoundary().getSize());
+            that.location.add(delta)
         }
     }
 

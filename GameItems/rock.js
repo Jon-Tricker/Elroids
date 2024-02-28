@@ -45,7 +45,7 @@ class Rock extends NonShipItem {
   static rockStyle = Rock.ROCK_STYLE_SPHERE;
 
   constructor(rockSize, locationX, locationY, locationZ, speedX, speedY, speedZ, game, composition) {
-    super(locationX, locationY, locationZ, speedX, speedY, speedZ, game, rockSize, rockSize * rockSize * rockSize, 1 + rockSize/10);
+    super(locationX, locationY, locationZ, speedX, speedY, speedZ, game, rockSize, rockSize * rockSize * rockSize, 1 + rockSize / 10);
 
     this.rockSize = rockSize;
     this.originalHP = this.hitPoints;
@@ -115,24 +115,35 @@ class Rock extends NonShipItem {
 
     // If still there split it.
     if (!destroyed && (this.hitPoints > 0)) {
-      let speedRatio = Math.random();
 
+      this.split();
+
+    }
+  }
+
+  split() {
+
+    // Create a pair of repacements.
+    let newSize = Math.floor(this.rockSize / 2);
+
+    if (0 < newSize) {
+
+      let speedRatio = Math.random();
       // Some ramdom violence based on size of impact.
       let bang = new THREE.Vector3((Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, (Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, Math.random() * (SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE);
-
+  
       // Create a pair of compositions.
       let newComp = this.composition.split();
 
-      // Create a pair of repacements.
-      new Rock(this.rockSize / 2, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, this.composition);
+      new Rock(newSize, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, this.composition);
 
       speedRatio = 1 - speedRatio;
       bang.multiplyScalar(-1);
-      new Rock(this.rockSize / 2, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, newComp);
-
-      // Get rid of original
-      this.destruct();
+      new Rock(newSize, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, newComp);
     }
+
+    this.destruct();
+
   }
 
   doDamage(that) {
@@ -143,9 +154,9 @@ class Rock extends NonShipItem {
   }
 
   animate() {
-    this.rotateX(this.rotationRate.x/Universe.getAnimateRate());
-    this.rotateY(this.rotationRate.y/Universe.getAnimateRate());
-    this.rotateZ(this.rotationRate.z/Universe.getAnimateRate());
+    this.rotateX(this.rotationRate.x / Universe.getAnimateRate());
+    this.rotateY(this.rotationRate.y / Universe.getAnimateRate());
+    this.rotateZ(this.rotationRate.z / Universe.getAnimateRate());
 
     this.moveItem(true);
     this.moveMesh();
