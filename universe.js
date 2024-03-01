@@ -1,4 +1,4 @@
-// Everything related to the simulated 'Universe'. Does not include artefacts related to the 'game' (e.g. cameras or the skybox).
+// Everything related to the simulated 'Universe'.
 
 // Copyright (C) Jon Tricker 2023.
 // Released under the terms of the GNU Public licence (GPL)

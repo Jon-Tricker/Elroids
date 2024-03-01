@@ -1,6 +1,7 @@
-// The wrap round box
+// Pretty background graphics than we don't interact with.
 
-// Contains code to both load from images and create textures. Latter should give quicker, cheaper start up.
+// Actually quite close to the ship (only just beyond the universe size). But moves with the ship. So perspective remains constant.
+
 import * as THREE from 'three';
 import StarFieldTexture from './starFieldText.js';
 import Universe from '../universe.js';
@@ -18,9 +19,6 @@ const sunMaterial = new THREE.MeshStandardMaterial(
     roughness: 1,
     opacity: 1,
     emissive: 1,
-    // map: texture,
-    // roughnessMap: texture,
-    // bumpMap: texture,
     metalness: 0,
   }
 )

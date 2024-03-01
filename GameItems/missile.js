@@ -12,7 +12,7 @@ const MISSILE_MASS = 0.1;
 const MISSILE_DAMAGE = 1;
 
 // Tine to live ms.
-const MISSILE_TTL = 7000;   // s
+const MISSILE_TTL = 7000;   // ms
 
 class Missile extends NonShipItem {
 

@@ -86,8 +86,8 @@ class Composition {
       for (let i = 0; i < this.composition.length; i++) {
         if (i != largest) {
           let ratio = Math.random();
-            newComp.composition.push(new MineralComponent(this.composition[i].type, this.composition[i].percentage * ratio));
-            this.composition[i].percentage *= (1 - ratio);
+          newComp.composition.push(new MineralComponent(this.composition[i].type, this.composition[i].percentage * ratio));
+          this.composition[i].percentage *= (1 - ratio);
         }
       }
     }
@@ -140,24 +140,38 @@ class MineralType {
   facets;
   value;
 
+  material;
+
   // Ammont of this (0 - 1) in the universe
   abundance;
 
-  constructor(name, colour, spikyness, facets, abundance) {
+  constructor(name, colour, spikyness, facets, abundance, value) {
     this.colour = colour;
     this.name = name;
     this.spikyness = spikyness;
     this.facets = facets;
     this.abundance = abundance;
+    this.value = value;           // Cr/t
+
+    this.material = new THREE.MeshStandardMaterial(
+      {
+        color: this.colour,
+        roughness: 0,
+        metalness: 0.8,
+      })
+    }
+
+    getMaterial() {
+      return(this.material);
+    }
   }
-}
 
-const MineralTypes = new Array(
-  new MineralType("silica", new THREE.Color(0x808080), 0.6, 10, 1),
-  new MineralType("iron", new THREE.Color(0xFF8000), 0.3, 15, 0.5),
-  new MineralType("copper", new THREE.Color(0x00D080), 0.2, 15, 0.2),
-  new MineralType("radium", new THREE.Color(0x0080D0), 0.8, 20, 0.1),
-  new MineralType("gold", new THREE.Color(0xFFF000), 0.3, 15, 0.01)
-)
+  const MineralTypes = new Array(
+    new MineralType("potch", new THREE.Color(0x808080), 0.6, 10, 1, 0),
+    new MineralType("iron", new THREE.Color(0xFF8000), 0.3, 15, 0.5, 10),
+    new MineralType("copper", new THREE.Color(0x00D080), 0.2, 15, 0.2, 20),
+    new MineralType("radium", new THREE.Color(0x0080D0), 0.8, 20, 0.1, 40),
+    new MineralType("gold", new THREE.Color(0xFFF000), 0.3, 15, 0.03, 100)
+  )
 
-export { MineralType, MineralComponent, Composition };
+export { MineralType, MineralComponent, Composition, MineralTypes };

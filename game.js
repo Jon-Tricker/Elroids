@@ -21,10 +21,12 @@ import MyScene from './Scenery/myScene.js'
 import MyCamera from './Scenery/myCamera.js'
 import Displays from './Displays/displays.js'
 import Keyboard from "./keyboard.js";
+import Mineral from "./GameItems/mineral.js";
+import { MineralTypes } from './GameItems/minerals.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
-const MAX_ROCK_SIZE = 80;           // m
-const VERSION = "1.1";
+const MAX_ROCK_SIZE = 40;           // m
+const VERSION = "1.2";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 1000;          // m
@@ -139,12 +141,14 @@ class Game {
             // new Rock(80, -100, 0, 0, 0, 0, 0, this);
 
             // Row of rocks
+            
             for (let i = -Universe.UNI_SIZE; i < Universe.UNI_SIZE; i += 211) {
                 let sz = Math.abs(i % MAX_ROCK_SIZE);
                 if (sz != 0) {
                     new Rock(sz, i, -100, 0, 0, 0, 0, this);
                 }
             }
+            
 
             // Diagonal row of rocks.
             /*
@@ -153,6 +157,9 @@ class Game {
                 new Rock(sz,  i, i, i, 0, 0, 0, this);
             }
             */
+
+            // And a sample mineral
+            new Mineral(100, 150, -10, 20, 0, 0, 0, this, MineralTypes[3]);
 
         } else {
             // Create a bunch of random rocks
@@ -234,12 +241,6 @@ class Game {
         // Only score damage we caused.
         if (that.owner == this.ship) {
             this.player.addScore(score);
-        }
-    }
-
-    addRockScore(size, that) {
-        if (that.owner == this.getShip()) {
-            this.addScore((MAX_ROCK_SIZE - size) / 10 + 1, that);
         }
     }
 

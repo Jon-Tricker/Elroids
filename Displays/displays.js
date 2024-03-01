@@ -145,7 +145,9 @@ class Displays {
 
     hudEnable(state) {
         this.hudIsOn = state;
-        // this.animateHud();
+
+        // One animate to allow it to (dis)apear.
+        this.animateHud();
     }
 
     setMessage(message, expiry) {

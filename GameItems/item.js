@@ -1,4 +1,4 @@
-// Common stuff, graphics and physics for every item in the universe.
+// In game 'Objects'. But the word 'Object' is overloaded ... so call them 'Items'.
 
 // Copyright (C) Jon Tricker 2023.
 // Released under the terms of the GNU Public licence (GPL)
@@ -189,7 +189,6 @@ class Item extends THREE.Group {
         }
     }
 
-
     // Separate two overlapping objects.
     separateFrom(that) {
         let relLoc = that.location.clone();
@@ -215,6 +214,11 @@ class Item extends THREE.Group {
     // Handle collision physics
     // SInce we already have everything as x,y,z components hopefully can avoid any messy 'trig'.
     handleCollision(that) {
+
+        if (this.handleSpecialCollisions(that)) {
+            return;
+        }
+
         // Do any damage
         this.collideWith(that);
 
@@ -227,6 +231,14 @@ class Item extends THREE.Group {
 
         // If overlapping separate.
         this.separateFrom(that);
+    }
+
+    // Handle any class specific collisions.
+    // Return true if no need to proceede with normal handling.
+    // Handled by child classes because A hitting B does not necessarily have the same result as B hitting A.
+    handleSpecialCollisions(that) {
+        // Nothing special for base class.
+        return(false);
     }
 
     transferMomentum(that) {

@@ -15,6 +15,7 @@ import WeaponSet from './Components/Weapons/weaponSet.js';
 import BasicHull from './Components/Hulls/basicHull.js';
 import ComponentSets from './Components/componentSets.js';
 import DumbMissileWeapon from './Components/Weapons/dumbMissileWeapon.js';
+import Mineral from "../GameItems/mineral.js";
 
 // Create ship material.
 const shipMaterial = new THREE.MeshStandardMaterial(
@@ -450,6 +451,22 @@ class Ship extends Item {
     // Todo: Maybe should be based on mass and speed.
     doDamage(that) {
         that.takeDamage(this.hullSet.getRamDamage(), this);
+    }
+
+    // Pick up a mineral.
+    // Return true if successful.
+    mineralPickup(mineral) {
+        this.game.displays.setMessage("Got " + mineral.type.name + " ( " + Math.floor(mineral.mass) + " t, "+ mineral.getValue() + "  Pts)", 2000);
+        this.game.player.addScore(mineral.getValue())
+        mineral.destruct();
+        return(true);
+    }
+
+    handleSpecialCollisions(that) {
+        if (that instanceof Mineral) {
+            return(this.mineralPickup(that));
+        }
+        return(false);
     }
 
 }

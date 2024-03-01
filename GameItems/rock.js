@@ -9,9 +9,9 @@ import NonShipItem from './nonShipItem.js';
 import Universe from '../universe.js'
 import FacitRockGeometry from '../facitRockGeometry.js'
 import { MineralType, MineralComponent, Composition } from './minerals.js';
+import Mineral from "./mineral.js";
 
 const SPLIT_VIOLENCE = 2;
-const MAX_ROTATION_RATE = 0.5;    // R/s
 
 // Type of rock graphics
 const ROCK_STYLE_SPHERE = 0;
@@ -19,8 +19,8 @@ const ROCK_STYLE_FACIT = 1;
 
 const ROCK_RAM_DAMAGE = 1;
 
-// Radar colour. Same fo all rocks.
-const RADAR_COLOUR = "#606060";
+// Radar colour. Same for all rocks.
+const RADAR_COLOUR = "#505050";
 
 // Create material.
 const BASE_ROCK_MATERIAL = new THREE.MeshStandardMaterial(
@@ -76,10 +76,6 @@ class Rock extends NonShipItem {
     return (RADAR_COLOUR);
   }
 
-  generateRotationRate() {
-    let rr = Math.random() * 2 * MAX_ROTATION_RATE - MAX_ROTATION_RATE;
-    return (rr);
-  }
 
   setupMesh() {
     let rockGeometry;
@@ -108,27 +104,27 @@ class Rock extends NonShipItem {
 
   // Need some special handling to cover splitting.
   takeDamage(hits, that) {
-    let destroyed = super.takeDamage(hits, that);
 
-    // Score it
-    this.game.addRockScore(this.rockSize, that);
+    // Rocks only take 1 point of damage
+    if (1 > hits) {
+      hits = 1;
+    }
+    
+    let destroyed = super.takeDamage(hits, that);
 
     // If still there split it.
     if (!destroyed && (this.hitPoints > 0)) {
-
       this.split();
-
     }
   }
 
   split() {
-
-    // Create a pair of repacements.
     let newSize = Math.floor(this.rockSize / 2);
 
-    if (0 < newSize) {
-
+    if (1 < newSize) {
+      // Create a pair of repacements.
       let speedRatio = Math.random();
+
       // Some ramdom violence based on size of impact.
       let bang = new THREE.Vector3((Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, (Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, Math.random() * (SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE);
   
@@ -140,6 +136,19 @@ class Rock extends NonShipItem {
       speedRatio = 1 - speedRatio;
       bang.multiplyScalar(-1);
       new Rock(newSize, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, newComp);
+    } else {
+      // Break down into minerals (ignore valueless).
+      for(let component of this.composition.composition) {
+        if ((0 != component.type.value) && (10 < component.percentage)) {
+          let speedRatio = Math.random();
+          
+          // Some ramdom violence based on size of impact.
+          let bang = new THREE.Vector3((Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, (Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, Math.random() * (SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE);
+
+          new Mineral(this.mass * 100/component.percentage, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, component.type);
+        }
+      }
+
     }
 
     this.destruct();

@@ -1,4 +1,4 @@
-// Camera mechanic
+// Camera mechanics
 import * as THREE from 'three';
 import Universe from '../universe.js';
 
