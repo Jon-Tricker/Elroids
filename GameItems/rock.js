@@ -9,7 +9,6 @@ import NonShipItem from './nonShipItem.js';
 import Universe from '../universe.js'
 import FacitRockGeometry from '../facitRockGeometry.js'
 import { MineralType, MineralComponent, Composition } from './minerals.js';
-import Mineral from "./mineral.js";
 
 const SPLIT_VIOLENCE = 2;
 
@@ -41,6 +40,7 @@ class Rock extends NonShipItem {
   originalHP;
   rotationRate;
   composition;
+  game;
 
   static rockStyle = Rock.ROCK_STYLE_SPHERE;
 
@@ -49,6 +49,7 @@ class Rock extends NonShipItem {
 
     this.rockSize = rockSize;
     this.originalHP = this.hitPoints;
+    this.game = game;
 
     this.rotationRate = new THREE.Vector3(this.generateRotationRate(), this.generateRotationRate(), this.generateRotationRate());
 
@@ -62,6 +63,13 @@ class Rock extends NonShipItem {
     }
 
     this.setupMesh();
+
+    game.rockCount++;
+  }
+
+  destruct() {
+    this.game.rockCount--;
+    super.destruct();
   }
 
   static setRockStyle(style) {
@@ -109,7 +117,7 @@ class Rock extends NonShipItem {
     if (1 > hits) {
       hits = 1;
     }
-    
+
     let destroyed = super.takeDamage(hits, that);
 
     // If still there split it.
@@ -127,7 +135,7 @@ class Rock extends NonShipItem {
 
       // Some ramdom violence based on size of impact.
       let bang = new THREE.Vector3((Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, (Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, Math.random() * (SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE);
-  
+
       // Create a pair of compositions.
       let newComp = this.composition.split();
 
@@ -137,18 +145,7 @@ class Rock extends NonShipItem {
       bang.multiplyScalar(-1);
       new Rock(newSize, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, newComp);
     } else {
-      // Break down into minerals (ignore valueless).
-      for(let component of this.composition.composition) {
-        if ((0 != component.type.value) && (10 < component.percentage)) {
-          let speedRatio = Math.random();
-          
-          // Some ramdom violence based on size of impact.
-          let bang = new THREE.Vector3((Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, (Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, Math.random() * (SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE);
-
-          new Mineral(this.mass * 100/component.percentage, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, component.type);
-        }
-      }
-
+      this.composition.mineralize(this.location, this.speed, this.mass, this.game);
     }
 
     this.destruct();

@@ -16,7 +16,7 @@ let topMenu = "\
 <UL>\
     <LI><A HREF=\"maintenanceMenu\">Ship Maintenance/Upgrade Menu.</A></LI>\
     <LI><A HREF=\"commerceMenu\">Commerce Menu (TBD).</A></LI>\
-    <LI><A HREF=\"configurationMenu\">Game Configuration Menu (TBD).</A></LI>\
+    <LI><A HREF=\"gameMenu\">Game Configuration Menu (TBD).</A></LI>\
     <LI><A HREF=\"helpMenu\">Menu controls help screen.</A></LI>\
 </UL>\
 </BODY>"

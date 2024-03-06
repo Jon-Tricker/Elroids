@@ -5,6 +5,9 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
+import Mineral from './mineral.js'
+
+const SPLIT_VIOLENCE = 2;
 
 // One components of a minerals composition.
 class MineralComponent {
@@ -51,7 +54,7 @@ class Composition {
     }
 
     for (let i = 0; i < this.composition.length; i++) {
-      this.composition[i].percentage = this.composition[i].percentage * 100 / totalPercentage;
+      this.composition[i].percentage = Math.floor(this.composition[i].percentage * 100 / totalPercentage);
     }
 
     for (let i = 0; i < this.composition.length; i++) {
@@ -59,6 +62,13 @@ class Composition {
         this.composition.splice(i, 1);
       }
     }
+  }
+
+  dump(msg) {
+    for (let i = 0; i < this.composition.length; i++) {
+      msg += this.composition[i].percentage + " ";
+    }
+    console.log(msg);
   }
 
   // Split in a way that 'concentrates' minerals.
@@ -70,6 +80,8 @@ class Composition {
       if (this.composition[i].percentage >= this.composition[largest].percentage)
         largest = i;
     }
+
+    this.dump("was ");
 
     let newComp = new Composition(false);
 
@@ -83,11 +95,11 @@ class Composition {
       this.composition[largest].percentage = 0;
 
       // Top up with other stuff.
-      for (let i = 0; i < this.composition.length; i++) {
-        if (i != largest) {
+      for (let j = 0; j < this.composition.length; j++) {
+        if (j != largest) {
           let ratio = Math.random();
-          newComp.composition.push(new MineralComponent(this.composition[i].type, this.composition[i].percentage * ratio));
-          this.composition[i].percentage *= (1 - ratio);
+          newComp.composition.push(new MineralComponent(this.composition[j].type, this.composition[j].percentage * ratio));
+          this.composition[j].percentage *= (1 - ratio);
         }
       }
     }
@@ -99,6 +111,9 @@ class Composition {
     // Calculate values for both parts.
     this.calculateValues();
     newComp.calculateValues();
+
+    this.dump("old ");
+    newComp.dump("new ");
 
     return (newComp);
   }
@@ -130,6 +145,24 @@ class Composition {
 
     // console.log("xx" + this.spikyness + " " + this.facets);
   }
+
+  // Convert into a number of Minerals.
+  mineralize(location, speed, mass, game) {
+    // Break down into minerals (ignore valueless).
+    for (let component of this.composition) {
+      if ((0 != component.type.value) && (10 < component.percentage)) {
+        let newMass = mass * component.percentage/100
+        if (1 <= newMass) {
+          let speedRatio = Math.random();
+
+          // Some ramdom violence based on size of impact.
+          let bang = new THREE.Vector3((Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, (Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, Math.random() * (SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE);
+
+          new Mineral(newMass, location.x, location.y, location.z, speed.x * speedRatio + bang.x, speed.y * speedRatio + bang.y, speed.z * speedRatio + bang.z, game, component.type);
+        }
+      }
+    }
+  }
 }
 
 class MineralType {
@@ -159,19 +192,20 @@ class MineralType {
         roughness: 0,
         metalness: 0.8,
       })
-    }
-
-    getMaterial() {
-      return(this.material);
-    }
   }
 
-  const MineralTypes = new Array(
-    new MineralType("potch", new THREE.Color(0x808080), 0.6, 10, 1, 0),
-    new MineralType("iron", new THREE.Color(0xFF8000), 0.3, 15, 0.5, 10),
-    new MineralType("copper", new THREE.Color(0x00D080), 0.2, 15, 0.2, 20),
-    new MineralType("radium", new THREE.Color(0x0080D0), 0.8, 20, 0.1, 40),
-    new MineralType("gold", new THREE.Color(0xFFF000), 0.3, 15, 0.03, 100)
-  )
+  getMaterial() {
+    return (this.material);
+  }
+}
+
+const MineralTypes = new Array(
+  new MineralType("potch", new THREE.Color(0x808080), 0.6, 10, 1, 0),
+  new MineralType("iron", new THREE.Color(0xD08000), 0.3, 15, 0.5, 10),
+  new MineralType("copper", new THREE.Color(0x00D080), 0.2, 15, 0.2, 20),
+  new MineralType("gold", new THREE.Color(0xFFF000), 0.3, 15, 0.05, 40),
+  new MineralType("dilithium", new THREE.Color(0x0080D0), 0.8, 20, 0.03, 100),
+  new MineralType("octarine", new THREE.Color(0xD000D0), 0.8, 20, 0.02, 200)
+)
 
 export { MineralType, MineralComponent, Composition, MineralTypes };

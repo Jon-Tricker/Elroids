@@ -3,7 +3,7 @@ import Universe from '../universe.js'
 import * as THREE from 'three';
 import DarkPanel from './darkPanel.js';
 
-const RANGE = 2500;     // m
+const RANGE = 1500;     // m
 const FLAG_SIZE = 5;
 
 class Radar extends DarkPanel {

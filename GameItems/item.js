@@ -202,11 +202,11 @@ class Item extends THREE.Group {
             relLoc.multiplyScalar(2);
 
             let delta = relLoc.clone();
-            delta.multiplyScalar(this.getBoundary().getSize());
+            delta.multiplyScalar(that.getBoundary().getSize());
             this.location.sub(delta);
 
             delta = relLoc.clone();
-            delta.multiplyScalar(that.getBoundary().getSize());
+            delta.multiplyScalar(this.getBoundary().getSize());
             that.location.add(delta)
         }
     }

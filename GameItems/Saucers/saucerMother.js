@@ -12,6 +12,7 @@ import SaucerWanderer from "./saucerWanderer.js";
 import SaucerShooter from "./saucerShooter.js";
 import SaucerRam from "./saucerRam.js";
 import SaucerHunter from "./saucerHunter.js";
+import SaucerPirate from "./saucerPirate.js";
 
 const COLOUR = "#80FF80";
 const SIZE = 70;
@@ -98,7 +99,7 @@ class SaucerMother extends Saucer {
                 if (this.game.saucerCount < this.game.maxSaucerCount) {
                     let saucer;
 
-                    let type = Math.floor(Math.random() * 5)
+                    let type = Math.floor(Math.random() * 6)
                     switch (type) {
                         case 0:
                         // saucer = new SaucerStatic(this.location.x, this.location.y, this.location.z, this.game, this.safe);
@@ -118,9 +119,13 @@ class SaucerMother extends Saucer {
 
                         case 3:
                             saucer = new SaucerHunter(this.location.x, this.location.y, this.location.z, this.game, this, this.safe);
+                            break; 
+                            
+                        case 4:
+                            saucer = new SaucerPirate(this.location.x, this.location.y, this.location.z, this.game, this, this.safe);
                             break;
 
-                        case 4:
+                        case 5:
                         default:
                             saucer = new SaucerRam(this.location.x, this.location.y, this.location.z, this.game, this, this.safe);
                             break;

@@ -8,6 +8,8 @@ import * as THREE from 'three';
 import Terminal from './terminal.js';
 import helpMenu from './Menus/helpMenu.js';
 import topMenu from './Menus/topMenu.js';
+import {gameMenu} from './Menus/gameMenu.js'
+import {GameIternalsMenu} from './Menus/gameMenu.js'
 import maintenanceMenu from './Menus/maintenanceMenu.js';
 import ComponentSetMenu from './Menus/componentSetMenu.js';
 import Universe from '../universe.js';
@@ -20,16 +22,6 @@ class MenuSystem {
     <BODY> \
     <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Commerce Menu</P> \
     <P ALIGN=\"CENTER\">Eventually these options will only be available when docked at a station.</P> \
-    <P>\n</P> \
-    <P ALIGN=\"CENTER\">To be done (TBD).</P> \
-    <UL> \
-    </UL> \
-    </BODY> \
-    "
-
-    static configurationMenu = " \
-    <BODY> \
-    <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Game Configuration Menu</P> \
     <P>\n</P> \
     <P ALIGN=\"CENTER\">To be done (TBD).</P> \
     <UL> \
@@ -120,6 +112,8 @@ class MenuSystem {
     }
 
     printDoc(doc, keyboard) {
+        // this.dumpXmlDoc(doc)
+
         // Cursor to first field
         let cursor = new THREE.Vector2(0, 1);
 
