@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import Universe from '../universe.js';
 import ItemBoundary from './itemBoundary.js';
 import BugError from "../GameErrors/bugError.js"
+import Ship from "../Ship/ship.js"
 
 const COLOUR = "#FFFFFF"
 
@@ -79,8 +80,8 @@ class Item extends THREE.Group {
     // Set speed/
     // Do frame rate division only one.
     setSpeed(speed) {
-        if (speed.length() > 401) {
-            throw (new BugError("Something too fast"));
+        if (speed.length() > 1000) {
+            throw (new BugError("Something too fast " + speed.length()));
         }
         this.speed = speed.clone();
         this.speedFrame = speed.clone().divideScalar(Universe.getAnimateRate())
@@ -102,7 +103,7 @@ class Item extends THREE.Group {
 
     // Push item. Thrust in kN, mass in Tonnes. This should work without scaling.
     thrust(thrust, direction, maxspeed) {
-        let accRate = thrust / this.mass;
+        let accRate = thrust / this.getMass();
         direction = direction.normalize();
 
         let newSpeed = this.speed.clone();
@@ -168,7 +169,21 @@ class Item extends THREE.Group {
                 let relLocation = that.location.clone();
                 relLocation.sub(this.location);
                 Universe.handleWrap(relLocation);
-                let minDist = thisBoundary.getSize() + thatBoundary.getSize();
+
+                // For the ship be generous ... has to go through windscreen.
+                let minDist = 0;
+                if (this instanceof Ship) {
+                    // console.log("X " + thisBoundary.getSize() + " " + thatBoundary.getSize())
+                    minDist += thisBoundary.getSize()/4;
+                } else {
+                    minDist += thisBoundary.getSize();
+                }
+
+                if (that instanceof Ship) {
+                    minDist += thatBoundary.getSize()/4;
+                } else {
+                    minDist += thatBoundary.getSize();
+                }
 
                 // This would be a load of math ... however threeJS does it for us.
                 let closestPoint = new THREE.Vector3(0, 0, 0);
@@ -191,22 +206,25 @@ class Item extends THREE.Group {
 
     // Separate two overlapping objects.
     separateFrom(that) {
-        let relLoc = that.location.clone();
-        relLoc.sub(this.location)
+        
+        let relLoc = this.getRelativePosition(that.location);
         while (0 == relLoc.length()) {
             relLoc.add(this.game.createRandomVector(1));
         }
 
-        if ((this.getBoundary().getSize() + that.getBoundary().getSize()) > relLoc.length()) {
+        // Split should really be based on relative masses but use size for now.
+        let totalSize = this.getBoundary().getSize() + that.getBoundary().getSize();
+        if (totalSize > relLoc.length()) {
+
             relLoc = relLoc.normalize();
             relLoc.multiplyScalar(2);
 
             let delta = relLoc.clone();
-            delta.multiplyScalar(that.getBoundary().getSize());
+            delta.multiplyScalar(this.getBoundary().getSize());
             this.location.sub(delta);
 
             delta = relLoc.clone();
-            delta.multiplyScalar(this.getBoundary().getSize());
+            delta.multiplyScalar(that.getBoundary().getSize());
             that.location.add(delta)
         }
     }
@@ -214,23 +232,17 @@ class Item extends THREE.Group {
     // Handle collision physics
     // SInce we already have everything as x,y,z components hopefully can avoid any messy 'trig'.
     handleCollision(that) {
-
         if (this.handleSpecialCollisions(that)) {
             return;
         }
 
-        // Do any damage
-        this.collideWith(that);
-
-        // Check that original still exists ... if not don't transfer momemntum.
-        if (0 >= this.hitPoints) {
-            return;
-        }
+        // If overlapping separate ... even if one of us is about to be destroyed.
+        this.separateFrom(that);
 
         this.transferMomentum(that);
 
-        // If overlapping separate.
-        this.separateFrom(that);
+        // Do any damage
+        this.collideWith(that);
     }
 
     // Handle any class specific collisions.
@@ -238,7 +250,7 @@ class Item extends THREE.Group {
     // Handled by child classes because A hitting B does not necessarily have the same result as B hitting A.
     handleSpecialCollisions(that) {
         // Nothing special for base class.
-        return(false);
+        return (false);
     }
 
     transferMomentum(that) {
@@ -303,17 +315,13 @@ class Item extends THREE.Group {
     // Given a scalar velocity and direction add it's x, y and z components to our speed.
     deltaVelocityComponentInDirection(d, v) {
 
-        let vx = v * d.x;
-        let vy = v * d.y;
-        let vz = v * d.z;
-        let deltav = new THREE.Vector3(vx, vy, vz);
+        let deltav = d.clone();
+        deltav.multiplyScalar(v);
 
         // Add new speed
-        // console.log("add before sx " + this.speed.x + " sy " + this.speed.y + " sz " + this.speed.z)
         let newSpeed = this.speed.clone();
         newSpeed.add(deltav);
         this.setSpeed(newSpeed);
-        // console.log("add after sx " + this.speed.x + " sy " + this.speed.y + " sz " + this.speed.z)
     }
 
     // Move mesh in graphics space. Will be relative to ship position.
@@ -334,9 +342,11 @@ class Item extends THREE.Group {
 
     // Get position relative to something else.
     // Handle seeing Items > Universe size away.
-    // ToDo - Sign on this may be wrong. However in about half the usage cases it's as needed.
-    getRelativePosition(target) {
-        let rel = new THREE.Vector3(this.location.x - target.x, this.location.y - target.y, this.location.z - target.z);
+    // ToDo: Possibly the sign on this is wrong ... but rest of game has been written to work with it.
+    getRelativePosition(loc) {
+        let rel = this.location.clone();
+        rel.sub(loc);
+
         Universe.handleWrap(rel);
         return (rel);
     }

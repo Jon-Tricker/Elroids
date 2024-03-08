@@ -27,10 +27,10 @@ import { MineralTypes } from './GameItems/minerals.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "1.3";
+const VERSION = "1.4";
 
 // Box to clear out arround respawn site.
-const RESPAWN_SIZE = 500;          // m
+const RESPAWN_SIZE = 250;          // m
 
 class Game {
     // Probably the wrong place for this.
@@ -147,7 +147,6 @@ class Game {
             // new Rock(80, -100, 0, 0, 0, 0, 0, this);
 
             // Row of rocks
-
             for (let i = -Universe.UNI_SIZE; i < Universe.UNI_SIZE; i += 211) {
                 let sz = Math.abs(i % MAX_ROCK_SIZE);
                 if (sz != 0) {
@@ -208,11 +207,6 @@ class Game {
             Universe.handleWrap(loc);
         } else {
             loc = this.getFarAway(this.ship.location);
-            // Move it far away. Let wrap calculation take care if too big.
-            loc.x += Math.random() * Universe.UNI_SIZE;
-            loc.y += Math.random() * Universe.UNI_SIZE;
-            loc.z += Math.random() * Universe.UNI_SIZE;
-
         }
         new SaucerMother(loc.x, loc.y, loc.z, this, null, safe);
 
@@ -227,25 +221,25 @@ class Game {
     getFarAway(location) {
         let loc = location.clone();
 
-        loc.x += Math.random() * Universe.UNI_SIZE;
-        loc.y += Math.random() * Universe.UNI_SIZE;
-        loc.z += Math.random() * Universe.UNI_SIZE;
+        let delta = this.createRandomVector(Universe.UNI_SIZE);
 
         // Move it to one edge of the universe.
         switch (Math.floor(Math.random()) * 3) {
             case 0:
-                loc.x = location.x + Universe.UNI_SIZE;
+                delta.x += Universe.UNI_SIZE;
                 break;
 
             case 1:
-                loc.y = location.y + Universe.UNI_SIZE;
+                delta.y += Universe.UNI_SIZE;
                 break;
 
             case 2:
             default:
-                loc.z = location.z + Universe.UNI_SIZE;
+                delta.z += Universe.UNI_SIZE;
                 break;
         }
+
+        loc.add(delta);
 
         Universe.handleWrap(loc);
 

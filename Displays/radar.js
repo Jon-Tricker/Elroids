@@ -63,60 +63,63 @@ class Radar extends DarkPanel {
 
             // if not out of range.
             if (relPos.length() < RANGE) {
-                // Make it back relative to world and then Rotate to same angle as ship.
-                relPos.add(ship.location);
-                ship.worldToLocal(relPos);
+                let colour = item.getRadarColour();
 
-                let basePos = relPos.clone();
-                basePos.z = 0;
+                if (null != colour) {
+                    // Make it back relative to world and then Rotate to same angle as ship.
+                    relPos.add(ship.location);
+                    ship.worldToLocal(relPos);
 
-                // Scale by x ... attempt at proper perspective.
-                // Doesn't really work because front, most important, arc becomes smallest.
-                /*
-                let scaleFactor = 1 + (RANGE + relPos.x); 
-                if (scaleFactor != 0) {
-                    scaleFactor = RANGE/scaleFactor;
+                    let basePos = relPos.clone();
+                    basePos.z = 0;
+
+                    // Scale by x ... attempt at proper perspective.
+                    // Doesn't really work because front, most important, arc becomes smallest.
+                    /*
+                    let scaleFactor = 1 + (RANGE + relPos.x); 
+                    if (scaleFactor != 0) {
+                        scaleFactor = RANGE/scaleFactor;
+                    }
+                    */
+
+                    // For now scale so max range at edge of box.
+                    let maxDim = this.width;
+                    if (this.height > maxDim) {
+                        maxDim = this.height;
+                    }
+                    let scaleFactor = maxDim / (RANGE * 2);
+
+                    relPos.multiplyScalar(scaleFactor);
+                    basePos.multiplyScalar(scaleFactor);
+
+
+                    // Move y down by scaled z
+                    // basePos.x = relPos.x - relPos.z;
+                    relPos.x = relPos.x + relPos.z;
+
+                    // Convert window to screen positions.
+                    if (!this.toScreen(relPos)) {
+                        continue;
+                    }
+                    if (!this.toScreen(basePos)) {
+                        continue;
+                    }
+
+                    // Plot it.
+                    this.ctx.fillStyle = colour;
+                    this.ctx.strokeStyle = colour;
+                    this.ctx.beginPath();
+                    this.ctx.fillRect(relPos.x, relPos.y, FLAG_SIZE, FLAG_SIZE);
+
+                    this.ctx.moveTo(basePos.x, basePos.y);
+                    this.ctx.lineTo(relPos.x, relPos.y);
+                    this.ctx.stroke();
+
+                    this.ctx.fillStyle = this.defaultColour;
+                    this.ctx.strokeStyle = this.defaultColour;
                 }
-                */
-
-                // For now scale so max range at edge of box.
-                let maxDim = this.width;
-                if (this.height > maxDim) {
-                    maxDim = this.height;
-                }
-                let scaleFactor = maxDim / (RANGE * 2);
-
-                relPos.multiplyScalar(scaleFactor);
-                basePos.multiplyScalar(scaleFactor);
-
-
-                // Move y down by scaled z
-                // basePos.x = relPos.x - relPos.z;
-                relPos.x = relPos.x + relPos.z;
-
-                // Convert window to screen positions.
-                if (!this.toScreen(relPos)) {
-                    continue;
-                }
-                if (!this.toScreen(basePos)) {
-                    continue;
-                }
-
-                // Plot it.
-                this.ctx.fillStyle = item.getRadarColour();
-                this.ctx.strokeStyle = item.getRadarColour();
-                this.ctx.beginPath();
-                this.ctx.fillRect(relPos.x, relPos.y, FLAG_SIZE, FLAG_SIZE);
-
-                this.ctx.moveTo(basePos.x, basePos.y);
-                this.ctx.lineTo(relPos.x, relPos.y);
-                this.ctx.stroke();
-
-                this.ctx.fillStyle = this.defaultColour;
-                this.ctx.strokeStyle = this.defaultColour;
             }
         }
-
     }
 
     resize(parentWidth, parentHeight) {

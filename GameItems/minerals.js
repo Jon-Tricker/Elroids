@@ -81,7 +81,7 @@ class Composition {
         largest = i;
     }
 
-    this.dump("was ");
+    // this.dump("was ");
 
     let newComp = new Composition(false);
 
@@ -111,9 +111,9 @@ class Composition {
     // Calculate values for both parts.
     this.calculateValues();
     newComp.calculateValues();
-
-    this.dump("old ");
-    newComp.dump("new ");
+ 
+    // this.dump("old ");
+    // newComp.dump("new ");
 
     return (newComp);
   }
@@ -201,11 +201,11 @@ class MineralType {
 
 const MineralTypes = new Array(
   new MineralType("potch", new THREE.Color(0x808080), 0.6, 10, 1, 0),
-  new MineralType("iron", new THREE.Color(0xD08000), 0.3, 15, 0.5, 10),
-  new MineralType("copper", new THREE.Color(0x00D080), 0.2, 15, 0.2, 20),
-  new MineralType("gold", new THREE.Color(0xFFF000), 0.3, 15, 0.05, 40),
-  new MineralType("dilithium", new THREE.Color(0x0080D0), 0.8, 20, 0.03, 100),
-  new MineralType("octarine", new THREE.Color(0xD000D0), 0.8, 20, 0.02, 200)
+  new MineralType("iron", new THREE.Color(0xD08000), 0.3, 15, 0.5, 20),
+  new MineralType("copper", new THREE.Color(0x00D080), 0.2, 15, 0.2, 40),
+  new MineralType("gold", new THREE.Color(0xFFF000), 0.3, 15, 0.05, 80),
+  new MineralType("dilithium", new THREE.Color(0x0080D0), 0.8, 20, 0.03, 200),
+  new MineralType("octarine", new THREE.Color(0xD000D0), 0.8, 20, 0.02, 500)
 )
 
 export { MineralType, MineralComponent, Composition, MineralTypes };

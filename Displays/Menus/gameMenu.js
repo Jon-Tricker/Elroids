@@ -17,7 +17,8 @@ class GameIternalsMenu {
 
         doc += "<BODY>"
 
-        doc += "<P>Rock count " + game.rockCount + " Max rock count " + game.maxRockCount + "(ish)</P>";
+        doc += "<P>Rocks: count=" + game.rockCount + ", Max count=" + game.maxRockCount + "(ish)</P>";
+        doc += "<P>Saucers: Mother count=" + game.motherSaucerCount + ", Count=" + game.saucerCount + ", Max count=" + game.maxSaucerCount + "</P>";
         doc += "</BODY>"
 
         return (doc);

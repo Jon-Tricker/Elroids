@@ -6,17 +6,10 @@
 
 import * as THREE from 'three';
 
-import Universe from './universe.js'
-import Keyboard from "./keyboard.js";
-
-const DEFAULT_LIVES = 3;
-
 class Player {
-    lives;
     score;
 
     constructor() {
-        this.lives = DEFAULT_LIVES;
         this.score = 0;
     }
 
@@ -24,14 +17,9 @@ class Player {
         return (this.score);
     }
 
-    getLives() {
-        return(this.lives);
-    }
-
     // Loose a life. Return 'true' if still some left.
     killed() {
-        this.lives--;
-        return (this.lives > 0);
+        return (false);
     } 
     
     addScore(score) {

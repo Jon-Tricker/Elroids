@@ -7,15 +7,19 @@ class Keyboard {
     static keyState = new Set();
 
     static keyDown(event) {
-        if (!this.keyState.has(event.key)) {
-            this.keyState.add(event.key);
+        let key = event.key.toLowerCase(); 
+
+        if (!this.keyState.has(key)) {
+            this.keyState.add(key);
         }
     }
 
     static keyUp(event) {
-        if (this.keyState.has(event.key)) {
+        let key = event.key.toLowerCase(); 
+
+        if (this.keyState.has(key)) {
             // console.log("down" + event.key)
-            this.keyState.delete(event.key);
+            this.keyState.delete(key);
         }
     }
 

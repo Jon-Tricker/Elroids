@@ -21,150 +21,17 @@
 
 	<H1 LANG="en-GB" ALIGN=CENTER CLASS="western">'Elroids' game Manual.</H1>
 
-	<H2>Controls</H2>
-	<P>Based on 'BBC Elite' control set.</P>
-	<UL>	
-		<LI>'<'/'>' - Roll left/right</LI>
-		<LI>'s'/'x' - Climb/dive</LI>
-		<LI>'z'/'c' - Yaw left/right</LI>
-		<LI>'space' - Thrust</LI>
-		<LI>'?' - Brake ... (Relative to what???)</LI>
-		<LI>'m' - Fire 'Asteroids style' dumb missile. Hold down for auto-fire.</LI>
-		<LI>'p' - Pause/unpause game.</LI>
-	</UL>
-
-	<H2>Camera angles.</H2>
-	<UL>	
-		<LI>'1' - 'Pilot'. Pilot's eye view.</LI>
-		<LI>'2' - 'Chase ship'. Following just behind and above ship.</LI>
-		<LI>'3' - 'Tracking'. Follows ship but does not turn with it.</LI>
-		<LI>'4' - 'Fixed'. Ship can fly out of shot.</LI>
-	</UL>
-
-	<H2>Radar</H2>
-	<P>In 'Pilot' mode a 'radar' is provided in the lower centre of the display.</P>
-	<P>The radar is a 2D representation an inclined plane 'horizontal' to the ship. The ship is shown by the central white blob. It's forward arc is towards the top of the screen</P>
-	<P>Once withing range other objects are diplayed as 'flags'.</P>
+	<H2>Learn more about:</H2>	
 	<UL>
-		<LI>If an object is above the horizontal plane it has a 'stick' downwards to its projected location on the plane.</LI>
-		<LI>If an object is below the horizontal plane it has a 'stick' upwards to its projected location on the plane.</LI>
-		<LI>Flags have similar colour to the object they represent.</LI>
-	</UL>	
-	<P>This takes a while to get used to but hopefully is familiar to 'Elite' players.</P>
-	<P>Radar 'perspective' implementation is not geometrically correct ... however because forward, most important, arc is not 'shrunk' it's more useful like this.</P>
-	<P>ToDo ... add a much better description with diagrams.</P>
-
-	<H2>Rocks</H2>
-	<P>Come in various sizes. When hit they split into two parts. If the parts get too small they turn into 'Minerals' (or vanish if contaning nothing of value).</P>
-	<P>Rocks have individual 'mineral composition'. The effects their apperance.</P>
-	<P>When a rock splits it's components are not divided equally. They 'concentrate' in the remaining parts. Enables the creation of pure 'Minerals' for mining.</P>
-	<P>Regardless of composition the radar displays all rocks as dark grey.</P>
-
-	<H2>Minerals</H2>
-	<P>Once a rock gets small enough it breaks into 'Minerals', dependant on it's composition, repesented by metalic cylinders.</P>
-	<P>Minerals can be picked up by ramming them.</P>
-	<P>For now a score/credits are awarded for picking up Minerals. Eventually they will go into the ship's cargo bay and have to be traded for other stuff.</P>
-	<P>Minerals have a limited lifetime. If not picked up (or destroyed) they self-destruct.</P>
-
-	<H2>Lives</H2>
-	<P>Each ship has 3 hit points. Once these are exhausted the ship is destroyed and re-spawns at the start location.</P>
-	<P>There are 3 lives in the course of a game.</P>
-	<P>Currrently no additional lives.</P>
-
-
-	<H2>Saucers</H2>
-	<P>There are several types of saucer. They have differing behaviour, colours and sizes. In 'safe' mode some are less agressive.</P>
-	<UL>
-		<LI>'Mothership' (light green):
-			<UL>
-				<LI>A single, large, 'Mothership' is created.</LI>
-				<LI>Periodically it spawns other saucers.</LI>
-				<LI>It will try to avoid you.</LI>
-				<LI>The first Mothership, and all it's spawn, are created in 'safe mode'. This gived beginers a chance of learning to fly without too much opposition.</LI>
-				<LI>If destroyed a random time latter a replacement is generated. This is in 'normal mode'.</LI>
-				<LI>Score a large numer of points. So worth hunting.</LI>
-			</UL>
-		</LI>
-		<LI>'Static' (light green). Doesn't move.</LI>
-		<LI>'Wanderer' (light blue). Wanders about aimlessly.</LI> 
-		<UL>
-			<LI>Aren't too dangerous and they block up the 'maximum number of saucers' 'slots'.</LI>
-		</UL>
-		<LI>'Shooter' (pink):
-			<UL> 
-				<LI>Moves to a loation near the ship.</LI>
-				<LI>Fires missiles in random directions.</LI>
-				<LI>Occsionally re-locates.</LI>
-			</UL>
-		</LI>
-		<LI>'Hunter' (dark green). Like a 'Shooter' but fires bursts of targeted missiles.</LI>
-		<LI>'Rammer' (red):
-			<UL>
-				<LI>Tries to collide with ship.</LI>
-				<LI>Best countered by... 
-					<UL>
-						<LI>Fly past it at high speed.</LI>
-						<LI>Turn 180 degrees</LI>
-						<LI>It will now be in your sights and trying to catch up.</LI>
-						<LI>Slow down and when it gets close enough kill it.</LI>
-					</UL>
-			</UL>
-		</LI>
-		<LI>'Pirate' (dark gray):
-			<UL>
-				<LI>Steals Minerals and runs away.</LI>
-				<LI>Gradually consumes the Minerals it has stolen.</LI>
-			</UL>
-		</LI>
+		<LI><A HREF="./controls.html">Controls and configuration menus.</A></LI>
+		<LI><A HREF="./radar.html">Radar.</A></LI>
+		<LI><A HREF="./rocks.html">Rocks and Minerals.</A></LI>
+		<LI><A HREF="./saucers.html">Saucers.</A></LI>
+		<LI><A HREF="./game.html">Gameplay scoring and hints.</A></LI>
 	</UL>
-	<P>Todo: Make above list into a table including colours and scores.</P>
-	<P>Saucer pilots aren't great 'navigators'. Even in 'safe' mode they occasionally collide with things.</P>
-	<P>All types tend to 'wobble about' while 'seeking' their target location. Makes them difficult to hit. Probably held up with bits of string ... just like 'real' saucers.</P>
-
-	<H2>Scenery</H2>
-	<P>There are a few things you cant interact with. But they are useful for orirntation:</P>
-	<UL>
-		<LI>The Sun. A sphere in the location that most of the light is coming from.</LI>
-		<LI>Moons. Spheres for orientation. They display 'phase' accurate relatice to the sun. There are several colours:</LI>
-		<UL>
-			<LI>Gray. Standard.</LI>
-			<LI>Pink. All hail 'the Lunar Empire'. (Runequest players will understand).</LI>
-			<LI>Custard. Beware the custard moon!</LI>
-			<LI>Blue. Not often seen.</LI>
-			<li>'That's no moon' ... possibly in an expansion.</li>
-		</UL>
-	</UL>
-
-	<H2>Points</H2>
-	<P>Points are currently scord for:</P>
-	<UL>
-		<LI>Shooting saucers.</LI>
-		<LI>Picking up minerals.</LI>
-	</UL>
-	
-	<H2>Hints</H2>
-	<UL>
-		<LI>Getting killed early on? ... The initial mothership is created in 'safe' (low leathality) mode. If it is killed replacements are in 'standard' mode. Practice flying, and rock breaking, before killing the initial mothership.</LI>
-		<LI>Missiles going in 'odd' directions? They are launched relative to the ships current speed. You may be drifting sideways. Use '?' to stop the ship before fireing.</LI>
-		<LI>Sometimes rocks don't break. I think this is generally because they are big rocks that are out of range (the universe is a REALLY big place) get closer.</LI>
-		<LI>How to get close to a rock:</LI>
-		<OL>
-			<LI>Observe direction of rock's movement.</LI>
-			<LI>Aim cross hairs slightly ahead of rock's trajectory.</LI>
-			<LI>Acceletate. This will move you closer to the rocks trajectory.</LI>
-			<LI>When you get close use '?' to stop.</LI>
-			<LI>Repeat above.</LI>
-		</OL>
-		<LI>Minerals can be shot. When firing at large rocks hold down the fire button. When shooting at small rocks fire single shots or you may destroy the products.</LI>
-	</UL>
-
-	<H2>Ship control menu.</H2>
-	<P>Is deliberatly 'primative'. (Even if it took a hell of a lot of coding).</P>
-	<P>Eventually it may be possible to buy an upgrade with in game currency.</P>
-	<P>Whatever is done menus should be controlable via the 'ship contol' interface. i.e Should still be usable if/when we move to tablet/phone or other non-keyboard interfaces.</P>
 
 	<H2>Commerce.To be implemented.</H2>
-	<P>Eventually it should be possible to harvest minerals from rocks (or destroyed ships) and trade them for ship upgrades/repairs etc.</P>
+	<P>Eventually it should be possible to trade Minerals for ship upgrades/repairs etc.</P>
 	<P>Initially at any time. Eventually throught trading at 'stations' like 'Elite'.</P>
 
 	<H2>Features</H2>
@@ -175,10 +42,10 @@
 	</UL>
 
 	<H2>Developer information</H2>
-	<P>Is is separate docs.</P>
+	<P>See:</P>
 	<UL>
-		<LI><A HREF="./developer_notes.html">'The Developer Notes'.</LI>
-		<LI><A HREF="./menu_system_notes.html">'Menu System Notes'.</LI>
+		<LI><A HREF="./developer_notes.html">'The Developer Notes'.</A></LI>
+		<LI><A HREF="./menu_system_notes.html">'Menu System Notes'.</A></LI>
 	</UL>
 </BODY>
 </HTML>

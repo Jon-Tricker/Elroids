@@ -8,21 +8,17 @@ import * as THREE from 'three';
 
 class ItemBoundary extends THREE.Sphere{
 
-    size;
-    location;
 
     constructor(location, size) {
         super(location, size);
-        this.location = location;
-        this.size = size;
     }
 
     moveTo(location) {
-        super.set(location, this.size);
+        super.set(location, this.radius);
     }
 
     getSize() {
-        return(this.size);
+        return(this.radius);
     }
 
     intersects(that) {

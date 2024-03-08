@@ -12,9 +12,6 @@ import Explosion from './explosion.js';
 
 const MAX_SIZE = 10;
 
-// Radar colour. Same for all minerals.
-const RADAR_COLOUR = "#606060";
-
 // Tine to live ms.
 const TTL = 100000;   // ms
 
@@ -46,7 +43,8 @@ class Mineral extends NonShipItem {
   }
 
   getRadarColour() {
-    return (RADAR_COLOUR);
+    let colour = this.type.colour;
+    return ("#" + colour.getHexString());
   }
 
   setupMesh() {
@@ -65,7 +63,7 @@ class Mineral extends NonShipItem {
   }
 
   getValue() {
-    return(Math.floor(this.type.value * this.mass));
+    return(Math.ceil(this.type.value * this.mass));
   }
 
   animate(date) {

@@ -140,7 +140,7 @@ class Displays {
         this.controlsCtx.globalAlpha = 1;
         this.controlsCtx.fillStyle = this.defaultColour;
 
-        this.controlsCtx.strokeText("V" +  this.game.getVersion() + "    Lives:" + this.printNum(this.game.player.getLives()) + "    Score:" + this.printNum(this.game.player.getScore()) + "    Frame rate:" + this.printNum(Universe.getActualAnimateRate()) + "/s", 20, this.height * 0.9);
+        this.controlsCtx.strokeText("V" +  this.game.getVersion() + "    Score:" + this.printNum(this.game.player.getScore()) + "    Frame rate:" + this.printNum(Universe.getActualAnimateRate()) + "/s", 20, this.height * 0.9);
     }
 
     hudEnable(state) {

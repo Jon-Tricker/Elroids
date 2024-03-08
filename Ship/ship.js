@@ -423,7 +423,7 @@ class Ship extends Item {
         if (this.hullSet.getHp() > 0) {
             this.game.displays.setMessage("Ship damaged!", 1000);
         } else {
-            this.game.shipDestroyed();
+            this.game.shipDestroyed(that);
         }
     }
 

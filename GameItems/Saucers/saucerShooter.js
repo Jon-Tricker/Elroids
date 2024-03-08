@@ -8,7 +8,7 @@ import DumbMissile from '../dumbMissile.js';
 import Saucer from './saucer.js';
 import Universe from '../../universe.js';
 
-const COLOUR = "#FFD0D0";
+const COLOUR = "#F0C0C0";
 const SIZE = 10;
 const MASS = 50;
 
@@ -32,6 +32,7 @@ class SaucerShooter extends Saucer {
     getMaxSpeed() {
         return(MAX_SPEED);
     }
+    
     createTargetLocation() {
         this.targetLocation = this.game.getShip().location.clone();
 

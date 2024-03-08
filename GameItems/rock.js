@@ -114,7 +114,7 @@ class Rock extends NonShipItem {
   takeDamage(hits, that) {
 
     // Rocks only take 1 point of damage
-    if (1 > hits) {
+    if (1 <  hits) {
       hits = 1;
     }
 
@@ -145,7 +145,7 @@ class Rock extends NonShipItem {
       bang.multiplyScalar(-1);
       new Rock(newSize, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, newComp);
     } else {
-      this.composition.mineralize(this.location, this.speed, this.mass, this.game);
+      this.composition.mineralize(this.location, this.speed, this.mass/2, this.game);
     }
 
     this.destruct();

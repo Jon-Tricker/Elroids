@@ -7,16 +7,18 @@
 import Saucer from './saucer.js';
 import Universe from '../../universe.js';
 import Mineral from '../mineral.js';
+import DumbMissile from '../../GameItems/dumbMissile.js'
 
 const COLOUR = "#505050";
 const SIZE = 20;
 const MASS = 20;
 const MAX_SPEED = 80;  // m/s
-const MAX_ACC = 10;      // m/s^2
+const THRUST = 2000     // kN
 const DECAY_RATE = 2    // t/s
 
 const SHOOT_FREQUENCY = 200;
 const MAX_RANGE = 500;
+const STANDOFF_DISTANCE = 500;
 
 class SaucerPirate extends Saucer {
 
@@ -52,47 +54,47 @@ class SaucerPirate extends Saucer {
         if (0 < this.cargoMass) {
             // Run away
             if (null == this.farAway) {
-                this.farAway = this.game.getFarAway(this.location);
+                this.farAway = this.game.getFarAway(this.game.getShip().location);
             }
             targetLoc = this.farAway;
         } else {
             if ((null == this.target) || (0 == this.target.hitPoints)) {
                 // Find a new target
-                if (null == this.farAway) {
-                    this.target = this.getTarget();
-                }
+                this.target = this.getTarget();
             }
 
             if (null == this.target) {
-                return;
+                // Loiter
+                this.farAway = this.createLoiterLocation();
+                targetLoc = this.farAway;
+            } else {
+                targetLoc = this.target.location;
             }
-            
-            targetLoc = this.target.location;
         }
 
-        // Home on target location        
+        // Home on target location 
         let targetSpeed = this.getRelativePosition(targetLoc);
+        targetSpeed.multiplyScalar(-1);
+        this.thrust(THRUST, targetSpeed, MAX_SPEED);
+    }
 
-        targetSpeed.normalize();
-        targetSpeed.multiplyScalar(-MAX_SPEED);
+    getMass() {
+        return(this.mass + this.cargoMass);
+    }
 
-        let delta = targetSpeed.clone();
-        delta.sub(this.speed);
+    createLoiterLocation() {
+        this.targetLocation = this.game.getShip().location.clone();
 
-        if (delta.length() > MAX_ACC / Universe.getAnimateRate()) {
-            delta.normalize;
-            delta.multiplyScalar(MAX_ACC / Universe.getAnimateRate());
-        }
+        let offset = this.game.createRandomVector(STANDOFF_DISTANCE)
+        this.targetLocation.add(offset);
 
-        let newSpeed = this.speed.clone();
-        newSpeed.add(delta);
-        this.setSpeed(newSpeed);
+        return(this.targetLocation);
     }
 
     // Do shooting logic
     shoot() {
         // Only shoot if running
-        if (null != this.farAway) {
+        if (0 != this.cargoMass) {
             if (!this.safe) {
                 if (this.shootDue++ >= SHOOT_FREQUENCY) {
 
@@ -103,7 +105,7 @@ class SaucerPirate extends Saucer {
                     if (MAX_RANGE > range.length()) {
                         range.normalize();
                         new DumbMissile(range, this);
-                        shootDue = 0;
+                        this.shootDue = 0;
                     }
                 }
             }

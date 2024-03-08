@@ -56,7 +56,10 @@ class Missile extends NonShipItem {
   }
 
   getRadarColour() {
-    return (this.colour);
+    // return (this.colour);
+
+    // For now don't plot
+    return (null);
   }
 
   setupMesh(material) {
