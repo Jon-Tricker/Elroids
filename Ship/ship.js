@@ -132,7 +132,7 @@ class Ship extends Item {
     }
 
     calculateMass() {
-        for(const set of this.compSets) {
+        for (const set of this.compSets) {
             this.mass += set.getMass();
         }
     }
@@ -160,7 +160,7 @@ class Ship extends Item {
     }
 
     getHitPoints() {
-        return(this.hullSet.getHp());
+        return (this.hullSet.getHp());
     }
 
     setupMesh() {
@@ -301,9 +301,9 @@ class Ship extends Item {
 
     deceletarte() {
         let newSpeed = this.speed.clone();
-        if ((this.speed.length()/Universe.getAnimateRate()) > this.engineSet.getDecRate()) {
+        if ((this.speed.length() / Universe.getAnimateRate()) > this.engineSet.getDecRate()) {
             // Slow down in all directions.
-            newSpeed.multiplyScalar(1 - (this.engineSet.getDecRate()/Universe.getAnimateRate()));
+            newSpeed.multiplyScalar(1 - (this.engineSet.getDecRate() / Universe.getAnimateRate()));
         } else {
             // Stop
             newSpeed.multiplyScalar(0);
@@ -314,43 +314,43 @@ class Ship extends Item {
     // In general to rotate. Asjust relative to our own axis.
     // Positive is clockwise when looking at the origin. So needs to be reversed for roll and pitch when we a re looking away from origin.
     rollL() {
-        if (this.rollRate > -ROTATE_RATE_MAX/Universe.getAnimateRate()) {
-            this.rollRate -= ROTATE_RATE_DELTA/Universe.getAnimateRate();
+        if (this.rollRate > -ROTATE_RATE_MAX / Universe.getAnimateRate()) {
+            this.rollRate -= ROTATE_RATE_DELTA / Universe.getAnimateRate();
         }
         this.rotateX(this.rollRate);
     }
 
     rollR() {
-        if (this.rollRate < ROTATE_RATE_MAX/Universe.getAnimateRate()) {
-            this.rollRate += ROTATE_RATE_DELTA/Universe.getAnimateRate();
+        if (this.rollRate < ROTATE_RATE_MAX / Universe.getAnimateRate()) {
+            this.rollRate += ROTATE_RATE_DELTA / Universe.getAnimateRate();
         }
         this.rotateX(this.rollRate);
     }
 
     climb() {
-        if (this.pitchRate > -ROTATE_RATE_MAX/Universe.getAnimateRate()) {
-            this.pitchRate -= ROTATE_RATE_DELTA/Universe.getAnimateRate();
+        if (this.pitchRate > -ROTATE_RATE_MAX / Universe.getAnimateRate()) {
+            this.pitchRate -= ROTATE_RATE_DELTA / Universe.getAnimateRate();
         }
         this.rotateY(this.pitchRate);
     }
 
     dive() {
-        if (this.pitchRate < ROTATE_RATE_MAX/Universe.getAnimateRate()) {
-            this.pitchRate += ROTATE_RATE_DELTA/Universe.getAnimateRate();
+        if (this.pitchRate < ROTATE_RATE_MAX / Universe.getAnimateRate()) {
+            this.pitchRate += ROTATE_RATE_DELTA / Universe.getAnimateRate();
         }
         this.rotateY(this.pitchRate);
     }
 
     yawL() {
-        if (this.yawRate < ROTATE_RATE_MAX/Universe.getAnimateRate()) {
-            this.yawRate += ROTATE_RATE_DELTA/Universe.getAnimateRate();
+        if (this.yawRate < ROTATE_RATE_MAX / Universe.getAnimateRate()) {
+            this.yawRate += ROTATE_RATE_DELTA / Universe.getAnimateRate();
         }
         this.rotateZ(this.yawRate);
     }
 
     yawR() {
-        if (this.yawRate > -ROTATE_RATE_MAX/Universe.getAnimateRate()) {
-            this.yawRate -= ROTATE_RATE_DELTA/Universe.getAnimateRate();
+        if (this.yawRate > -ROTATE_RATE_MAX / Universe.getAnimateRate()) {
+            this.yawRate -= ROTATE_RATE_DELTA / Universe.getAnimateRate();
         }
         this.rotateZ(this.yawRate);
     }
@@ -417,12 +417,17 @@ class Ship extends Item {
     // Take damage to self.
     // Ships get re-spawned so do not destruct.
     takeDamage(hits, that) {
+        let msg = "Ship damaged ";
+        if (0 < that.getClass().length) {
+            msg += "by " + that.getClass().toLowerCase();
+        }
+        msg += "!"
+        this.game.displays.addMessage(msg, 2000);
+
         // Dont call 'super'. We want to re-use the same ship. So don't want it to destruct.
         this.hullSet.takeDamage(hits);
 
-        if (this.hullSet.getHp() > 0) {
-            this.game.displays.setMessage("Ship damaged!", 1000);
-        } else {
+        if (this.hullSet.getHp() <= 0) {
             this.game.shipDestroyed(that);
         }
     }
@@ -456,17 +461,17 @@ class Ship extends Item {
     // Pick up a mineral.
     // Return true if successful.
     mineralPickup(mineral) {
-        this.game.displays.setMessage("Got " + mineral.type.name + " ( " + Math.floor(mineral.mass) + " t, "+ mineral.getValue() + "  Pts)", 2000);
+        this.game.displays.addMessage("Got " + mineral.type.name + " ( " + Math.floor(mineral.mass) + " t, " + mineral.getValue() + "  Pts)", 2000);
         this.game.player.addScore(mineral.getValue())
         mineral.destruct();
-        return(true);
+        return (true);
     }
 
-    handleSpecialCollisions(that) {
+    handleCollision(that) {
         if (that instanceof Mineral) {
-            return(this.mineralPickup(that));
+            return (this.mineralPickup(that));
         }
-        return(false);
+        super.handleCollision(that);
     }
 
 }

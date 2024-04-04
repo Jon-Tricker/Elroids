@@ -27,7 +27,7 @@ import { MineralTypes } from './GameItems/minerals.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "1.4";
+const VERSION = "1.5";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -93,14 +93,14 @@ class Game {
 
     shipDestroyed() {
         if (this.player.killed()) {
-            this.displays.setMessage("Ship destroyed! ... restarting", 3000);
+            this.displays.addMessage("Ship destroyed! ... restarting", 3000);
 
             this.clearRespawnArea();
 
             this.ship.respawn();
         } else {
             this.ship.destruct();
-            this.displays.setMessage("Game Over! ... Final score = " + this.player.getScore() + " ... Refresh page to play again.", 0);
+            this.displays.addMessage("Game Over! ... Final score = " + this.player.getScore() + " ... Refresh page to play again.", 0);
         }
     }
 
@@ -141,7 +141,7 @@ class Game {
             new Rock(10, 100, -50, 10, 0, 25, 0, this);
 
             // Big target
-            // new Rock(20, 900, 900, 0, 0, 0, 0, this);
+            // new Rock(20, 100, 0, 0, 0, 0, 0, this);
 
             // Small target
             // new Rock(80, -100, 0, 0, 0, 0, 0, this);
@@ -153,7 +153,6 @@ class Game {
                     new Rock(sz, i, -100, 0, 0, 0, 0, this);
                 }
             }
-
 
             // Diagonal row of rocks.
             /*

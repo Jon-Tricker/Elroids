@@ -46,6 +46,7 @@ class SaucerMother extends Saucer {
     navigate() {
         if (!this.safe) {
             let delta = this.getRelativePosition(this.game.getShip().location);
+            delta.multiplyScalar(-1);
 
             if (Math.abs(delta.length) > Universe.UNI_SIZE) {
                 // Safe to slow down

@@ -56,6 +56,10 @@ class Saucer extends NonShipItem {
     destruct() {
         this.game.saucerCount --;
         super.destruct();
+    } 
+    
+    getClass() {
+        return("Saucer");
     }
 
     getDefaultMaterial() {

@@ -68,6 +68,10 @@ class Item extends THREE.Group {
         game.getScene().add(this);
     }
 
+    getClass() {
+        return(null);
+    }
+
     // Get boundary.
     getBoundary() {
         return (this.boundary)
@@ -145,7 +149,7 @@ class Item extends THREE.Group {
 
     // Detects if a colisions will occur in next move.
     //
-    // If so returns the identity of hit item.
+    // Return true if hit something.
     // 
     // Collides if a cylinder, described by our boundary over the next move, intersects with the target.
     // Fortunatly this can be handled by determining if the vector of the next move is closer to the targets location than the sum of the radii.
@@ -197,11 +201,12 @@ class Item extends THREE.Group {
                         this.handleCollision(that);
 
                         // Only collode with one thing per frame.
-                        return;
+                        return(true);
                     }
                 }
             }
         }
+        return(false);
     }
 
     // Separate two overlapping objects.
@@ -232,9 +237,6 @@ class Item extends THREE.Group {
     // Handle collision physics
     // SInce we already have everything as x,y,z components hopefully can avoid any messy 'trig'.
     handleCollision(that) {
-        if (this.handleSpecialCollisions(that)) {
-            return;
-        }
 
         // If overlapping separate ... even if one of us is about to be destroyed.
         this.separateFrom(that);
@@ -243,14 +245,6 @@ class Item extends THREE.Group {
 
         // Do any damage
         this.collideWith(that);
-    }
-
-    // Handle any class specific collisions.
-    // Return true if no need to proceede with normal handling.
-    // Handled by child classes because A hitting B does not necessarily have the same result as B hitting A.
-    handleSpecialCollisions(that) {
-        // Nothing special for base class.
-        return (false);
     }
 
     transferMomentum(that) {
@@ -335,17 +329,17 @@ class Item extends THREE.Group {
             // Get position relative to camers       
             let cameraPos = new THREE.Vector3();
             camera.getWorldPosition(cameraPos);
-            let relPos = this.getRelativePosition(cameraPos);
+            let relPos = this.getRelativePosition(cameraPos);   
+            relPos.multiplyScalar(-1);
             this.position.set(relPos.x + cameraPos.x, relPos.y + cameraPos.y, relPos.z + cameraPos.z);
         }
     }
 
     // Get position relative to something else.
     // Handle seeing Items > Universe size away.
-    // ToDo: Possibly the sign on this is wrong ... but rest of game has been written to work with it.
     getRelativePosition(loc) {
-        let rel = this.location.clone();
-        rel.sub(loc);
+        let rel = loc.clone();
+        rel.sub(this.location);
 
         Universe.handleWrap(rel);
         return (rel);

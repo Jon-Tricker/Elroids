@@ -74,7 +74,6 @@ class SaucerPirate extends Saucer {
 
         // Home on target location 
         let targetSpeed = this.getRelativePosition(targetLoc);
-        targetSpeed.multiplyScalar(-1);
         this.thrust(THRUST, targetSpeed, MAX_SPEED);
     }
 
@@ -100,7 +99,6 @@ class SaucerPirate extends Saucer {
 
                     // Only fire if vaguley close enough.
                     let range = this.getRelativePosition(this.game.getShip().location);
-                    range.multiplyScalar(-1);
 
                     if (MAX_RANGE > range.length()) {
                         range.normalize();
@@ -126,11 +124,12 @@ class SaucerPirate extends Saucer {
         return (maxValTarget);
     }
 
-    handleSpecialCollisions(that) {
+    handleCollision(that) {
         if (that instanceof Mineral) {
             return (this.mineralPickup(that));
         }
-        return (false);
+
+        super.handleCollision(that);
     }
 
     destruct() {

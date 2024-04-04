@@ -9,6 +9,7 @@ import NonShipItem from './nonShipItem.js';
 import Universe from '../universe.js'
 import FacitRockGeometry from '../facitRockGeometry.js'
 import { MineralType, MineralComponent, Composition } from './minerals.js';
+import Ship from '../Ship/ship.js'
 
 const SPLIT_VIOLENCE = 2;
 
@@ -70,6 +71,10 @@ class Rock extends NonShipItem {
   destruct() {
     this.game.rockCount--;
     super.destruct();
+  } 
+  
+  getClass() {
+    return("Rock");
   }
 
   static setRockStyle(style) {
@@ -112,6 +117,12 @@ class Rock extends NonShipItem {
 
   // Need some special handling to cover splitting.
   takeDamage(hits, that) {
+
+    // Dont take damage from ship rams.
+    // If we do may split and fragments can also hit ship.
+    if (that instanceof Ship) {
+      return;
+    }
 
     // Rocks only take 1 point of damage
     if (1 <  hits) {

@@ -6,6 +6,19 @@ import MenuSystem from './menuSystem.js'
 
 const PAD_LENGTH = 5;
 
+class Message {
+    text;
+
+    // Expiry time 
+    // 0 if never;
+    expiry;
+
+    constructor(text, expiry) {
+        this.text = text;
+        this.expiry = expiry;
+    }
+}
+
 class Displays {
     controlsCtx;
     hudCtx;
@@ -24,19 +37,19 @@ class Displays {
     controls;
     msg;
 
+    // Messasge queue
+    msgs;
+
     terminal;
     menuSystem;
 
     radar;
 
-    message = "";
-    // Message expiry time. 0 if forever.
-    messageExpiry = 0;
-
     // Game control variables.
 
     constructor(game) {
         this.game = game;
+        this.msgs = new Array();
 
         // Get and scale page elements.
         this.controls = document.querySelector('.controlsclass');
@@ -98,7 +111,7 @@ class Displays {
         this.msgCtx.strokeStyle = "yellow";
         this.msgCtx.font = this.pt + "px serif";
     }
-    
+
     // Set terminal state.
     teminalEnable(state) {
         this.terminalIsOn = state;
@@ -117,7 +130,7 @@ class Displays {
             this.animateHud();
         }
 
-        if (this.message.length > 0) {
+        if (this.msgs.length > 0) {
             this.animateMsg(date);
         }
 
@@ -127,7 +140,7 @@ class Displays {
             this.terminal.animate(date, keyboard);
             this.menuSystem.animate(date, keyboard);
         }
-    
+
     }
 
     animateControls() {
@@ -140,7 +153,7 @@ class Displays {
         this.controlsCtx.globalAlpha = 1;
         this.controlsCtx.fillStyle = this.defaultColour;
 
-        this.controlsCtx.strokeText("V" +  this.game.getVersion() + "    Score:" + this.printNum(this.game.player.getScore()) + "    Frame rate:" + this.printNum(Universe.getActualAnimateRate()) + "/s", 20, this.height * 0.9);
+        this.controlsCtx.strokeText("V" + this.game.getVersion() + "    Score:" + this.printNum(this.game.player.getScore()) + "    Frame rate:" + this.printNum(Universe.getActualAnimateRate()) + "/s", 20, this.height * 0.9);
     }
 
     hudEnable(state) {
@@ -150,13 +163,18 @@ class Displays {
         this.animateHud();
     }
 
-    setMessage(message, expiry) {
-        this.message = message;
-        if (0 != expiry) {
-            this.messageExpiry = Universe.getTime() + expiry;
+    addMessage(message, duration) {
+
+        let expiry;
+        if (0 != duration) {
+            expiry = Universe.getTime() + duration;
         } else {
-            this.messageExpiry = 0;
+            expiry = 0;
         }
+
+        let msg = new Message(message, expiry);
+
+        this.msgs.push(msg);
     }
 
     animateHud() {
@@ -172,7 +190,7 @@ class Displays {
             ctx.strokeRect(left, top, this.height * 2, this.height * 2);
 
             ctx.beginPath();
-            ctx.moveTo(left - len , top - len);
+            ctx.moveTo(left - len, top - len);
             ctx.lineTo(left + len, top + len);
             ctx.moveTo(right + len, top - len);
             ctx.lineTo(right - len, top + len);
@@ -191,7 +209,7 @@ class Displays {
 
         let ship = this.game.ship;
         this.statusCtx.strokeText("Position:" + this.printNum(ship.location.x) + "," + this.printNum(ship.location.y) + "," + this.printNum(ship.location.z), this.status.width * 0.05, this.status.height * 0.9);
-        this.statusCtx.strokeText("Speed:" + this.printNum(ship.speed.length()) + " m/s.  HPs:" + this.printNum(ship.getHitPoints()), this.status.width * 0.75, this.status.height * 0.9);  
+        this.statusCtx.strokeText("Speed:" + this.printNum(ship.speed.length()) + " m/s.  HPs:" + this.printNum(ship.getHitPoints()), this.status.width * 0.75, this.status.height * 0.9);
         if (this.hudIsOn) {
             this.radar.animate();
         }
@@ -200,12 +218,20 @@ class Displays {
     animateMsg(date) {
         this.msgCtx.clearRect(0, 0, this.msg.width, this.msg.height);
 
-        if ((0 != this.messageExpiry) && (date >= this.messageExpiry)) {
-            this.message = "";
-        }
+        let lineNo = 0;
+        for (let i = 0; i < this.msgs.length; i++) {
 
-        // TODO: Centre this properly.
-        this.msgCtx.strokeText(this.message, this.msg.width / 2 - (this.pt / 2 * this.message.length) / 2, this.msg.height / 2);
+            let msg = this.msgs[i];
+
+            if ((0 != msg.expiry) && (date >= msg.expiry)) {
+                // Remove it.
+                this.msgs.splice(i, 1);
+            } else {
+                // Display it
+                this.msgCtx.strokeText(msg.text, this.msg.width / 2 - (this.pt / 2 * msg.text.length) / 2, this.msg.height / 2 - this.pt * (this.msgs.length / 2 - lineNo - 1));
+                lineNo++;
+            }
+        }
     }
 
     printNum(num) {

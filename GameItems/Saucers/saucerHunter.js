@@ -19,7 +19,7 @@ const SHOOT_FREQUENCY = 200;
 const MOVE_FREQUENCY = 2010;
 const STANDOFF_DISTANCE = 500;
 
-const BURST_COUNT = 2;
+const BURST_COUNT = 3;
 
 class SaucerHunter extends Saucer {
     shootDue = 0;
@@ -87,7 +87,6 @@ class SaucerHunter extends Saucer {
 
                 // Only fire if vaguley close enough.
                 let range = this.getRelativePosition(this.game.getShip().location);
-                range.multiplyScalar(-1);
 
                 if ((STANDOFF_DISTANCE * 2) > range.length()) {
                     range.normalize();

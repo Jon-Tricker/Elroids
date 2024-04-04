@@ -47,12 +47,16 @@ class Missile extends NonShipItem {
     while (this.getBoundary().intersects(thatBoundary)) {
       this.moveItem(false);
     }  
-    this.moveItem(false);
+    //this.moveItem(false);
 
     // Once launched add in relative speed of owner
     let newSpeed = this.speed.clone();
     newSpeed.add(owner.speed);
     this.setSpeed(newSpeed);
+  } 
+  
+  getClass() {
+    return("Missile");
   }
 
   getRadarColour() {
