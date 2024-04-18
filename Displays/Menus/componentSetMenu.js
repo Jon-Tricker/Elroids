@@ -6,13 +6,13 @@ class ComponentSetMenu {
         let sets = ship.compSets;
         let doc = "";
 
-        doc += "<BODY>"
+        doc += "<P>"
 
         doc += "<P>Total mass " + ship.mass + "t</P>";
         doc += "<P></P>";
 
         for (let set of sets) {
-            if (set.size > 0) {
+            if (set.length > 0) {
                 doc += "<P>" + set.name + " (Slots = " + set.getSlots() + ")" + "</P>"
 
                 let tab = new MenuTable();
@@ -31,7 +31,7 @@ class ComponentSetMenu {
             }
         }
 
-        doc += "</BODY>"
+        doc += "</P>"
 
         return (doc);
 

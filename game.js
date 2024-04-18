@@ -27,7 +27,7 @@ import { MineralTypes } from './GameItems/minerals.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "1.5";
+const VERSION = "1.6";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -256,7 +256,7 @@ class Game {
 
     addScore(score, that) {
         // Only score damage we caused.
-        if (that.owner == this.ship) {
+        if ((that.owner == this.ship) || (that == this.ship)) {
             this.player.addScore(score);
         }
     }

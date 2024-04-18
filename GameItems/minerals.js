@@ -171,7 +171,7 @@ class MineralType {
   colour;
   spikyness;
   facets;
-  value;
+  value;      // Cr/t
 
   material;
 
@@ -201,7 +201,7 @@ class MineralType {
 
 const MineralTypes = new Array(
   new MineralType("potch", new THREE.Color(0x808080), 0.6, 10, 1, 0),
-  new MineralType("iron", new THREE.Color(0xD08000), 0.3, 15, 0.5, 20),
+  new MineralType("iron", new THREE.Color(0xB06000), 0.3, 15, 0.5, 20),
   new MineralType("copper", new THREE.Color(0x00D080), 0.2, 15, 0.2, 40),
   new MineralType("gold", new THREE.Color(0xFFF000), 0.3, 15, 0.05, 80),
   new MineralType("dilithium", new THREE.Color(0x0080D0), 0.8, 20, 0.03, 200),

@@ -5,7 +5,7 @@ import Hull from './hull.js'
 class BasicHull extends Hull {
 
     constructor(ship) {
-        super("GP1", 50, 100, 3, 5, ship);
+        super("GP1", 50, 1000, 3, 5, ship);
     }
 }
 

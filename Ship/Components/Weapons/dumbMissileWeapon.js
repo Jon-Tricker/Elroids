@@ -7,7 +7,7 @@ const FIRE_RATE = 4;
 class DumbMissileWeapon extends MissileWeapon {
 
     constructor(ship) {
-        super("DML1", 3, 300, ship, FIRE_RATE);
+        super("DML1", 3, 3000, 2, ship, FIRE_RATE);
     }
 
     fire(target, date) {
@@ -16,8 +16,10 @@ class DumbMissileWeapon extends MissileWeapon {
                 super.fire(target, date);
                 new DumbMissile(target, this.ship);
             }
-            catch(GameError) {
-                // Failed to for for some reason. e.g. out of ammo Ignore 
+
+            catch(error) {
+                // Failed to for for some reason. e.g. out of ammo. 
+                this.game.displays.addMessage(error);
             }
         }
     }

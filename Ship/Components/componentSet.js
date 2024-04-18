@@ -1,39 +1,101 @@
 // Base list class for the components that make up a ship.
-// Can be a set because, contain >1 instance of the same type, the individual instances are different objects..
+//
+// Need random access and fixed order so not a JS 'set'
 
 import GameError from '../../GameErrors/gameError.js'
 
-class ComponentSet extends Set {
+class ComponentSet extends Array {
 
     name;
     totalMass = 0;      // Tonnes
     slots = 0;
+    ship;
 
-    constructor(name, slots) {
+    constructor(name, ship, slots) {
         super();
         this.name = name;
         this.slots = slots;
+        this.ship = ship;
     }
 
     add(comp) {
         if (this.slots <= this.size) {
-            throw(new GameError("No free this.slots in " + this.name + " list."));
+            throw (new GameError("No free this.slots in " + this.name + " list."));
         }
-        super.add(comp)
+        super.push(comp)
         this.totalMass += comp.mass;
-    } 
-    
+    }
+
     delete(comp) {
-        super.delete(comp)
+        for (i = 0; i < this.length; i++) {
+            if (this[i] == comp) {
+                this.splice(i, 1);
+                break;
+            }
+        }
         this.totalMass -= comp.mass;
     }
 
     getMass() {
-        return(this.totalMass);
+        return (this.totalMass);
     }
 
     getSlots() {
-        return(this.slots);
+        return (this.slots);
+    }
+
+    getRepairCost(percent) {
+        let cost = 0;
+        for (let comp of this) {
+            cost += comp.getRepairCost(percent);
+        }
+        cost /= this.length;
+
+        return (Math.floor(cost));
+    }
+
+    getAverageStatus() {
+        let status = 0;
+        for (let comp of this) {
+            status += comp.status;
+        }
+
+        status = Math.floor(status/this.length);
+
+        return (status);
+    }
+
+    takeDamage(hits) {
+        while(hits-- > 0) {
+            // Damage a random comp.
+            let index = Math.floor(Math.random() * this.length);
+            this[index].takeDamage(1);
+        }
+    }
+
+    // Repair a given amount.
+    // Reduce score.
+    // Return true if fully successful.
+    repair(percent) {
+        let cost = this.getRepairCost(percent);
+        let allDone = true;
+
+        // Can we afford it
+        if (cost > this.ship.game.player.score) {
+            percent = Math.floor(this.ship.game.player.score * 100 / cost);
+            cost = this.ship.game.player.score;
+            allDone = false;
+        }
+
+        // Do repair
+        for (let comp of this) {
+            comp.repair(percent);
+        }
+
+        // Bill player.
+        this.ship.game.player.addScore(-cost);
+
+        return (allDone);
     }
 }
 

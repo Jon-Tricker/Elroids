@@ -153,7 +153,7 @@ class Displays {
         this.controlsCtx.globalAlpha = 1;
         this.controlsCtx.fillStyle = this.defaultColour;
 
-        this.controlsCtx.strokeText("V" + this.game.getVersion() + "    Score:" + this.printNum(this.game.player.getScore()) + "    Frame rate:" + this.printNum(Universe.getActualAnimateRate()) + "/s", 20, this.height * 0.9);
+        this.controlsCtx.strokeText("V" + this.game.getVersion() + "    Credits:" + this.printNum(this.game.player.getScore()) + "    Frame rate:" + this.printNum(Universe.getActualAnimateRate()) + "/s", 20, this.height * 0.9);
     }
 
     hudEnable(state) {
@@ -208,8 +208,10 @@ class Displays {
         this.statusCtx.clearRect(0, 0, this.status.width, this.status.height);
 
         let ship = this.game.ship;
-        this.statusCtx.strokeText("Position:" + this.printNum(ship.location.x) + "," + this.printNum(ship.location.y) + "," + this.printNum(ship.location.z), this.status.width * 0.05, this.status.height * 0.9);
-        this.statusCtx.strokeText("Speed:" + this.printNum(ship.speed.length()) + " m/s.  HPs:" + this.printNum(ship.getHitPoints()), this.status.width * 0.75, this.status.height * 0.9);
+        this.statusCtx.strokeText("Position:", this.status.width * 0.1, this.status.height * 0.9 - this.pt);
+        this.statusCtx.strokeText( this.printNum(ship.location.x) + "," +this.printNum(ship.location.y) + "," + this.printNum(ship.location.z), this.status.width * 0.1, this.status.height * 0.9);
+        this.statusCtx.strokeText("Speed:" + this.printNum(ship.speed.length()) + " m/s.", this.status.width * 0.7, this.status.height * 0.9 - this.pt);
+        this.statusCtx.strokeText("Hull status:" + this.printNum(ship.hullSet[0].status) + "%", this.status.width * 0.7, this.status.height * 0.9);
         if (this.hudIsOn) {
             this.radar.animate();
         }

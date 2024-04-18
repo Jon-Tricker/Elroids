@@ -9,8 +9,8 @@ class Weapon extends Component {
     maxAmmo;    // 0 = unlimited
     ammo;       // If maxAmmo defined
 
-    constructor(name, mass, cost, ship, fireRate, maxAmmo) {
-        super(name, mass, cost, ship);
+    constructor(name, mass, cost, maxHp, ship, fireRate, maxAmmo) {
+        super(name, mass, cost, maxHp, ship);
         this.fireRate = fireRate;
         if (undefined != maxAmmo) {
             this.maxAmmo = maxAmmo;
@@ -19,14 +19,19 @@ class Weapon extends Component {
 
     // Target may be a direction or an Item.
     fire(target, date) {
+        this.fireLast = date;
+
+        if (!this.isWorking()) {
+            throw (GameError("Component failed"));
+        }
+
         if (undefined != this.maxAmmo) {
-            if (0 < this.ammo) {
+            if (0 <= this.ammo) {
                 this.ammo--;
             } else {
                 throw (GameError("Out of ammo"));
             }
         }
-        this.fireLast = date;
     }
 
     // Determine loaded and ready to fire.
@@ -34,14 +39,14 @@ class Weapon extends Component {
     isReady(date) {
         if (undefined != this.maxAmmo) {
             if (0 == this.ammo) {
-                return(false);
+                return (false);
             }
         }
 
         if (date > this.fireLast + 1000 / this.fireRate) {
-            return(true);
+            return (true);
         }
-        return(false);
+        return (false);
     }
 
     getHeadings() {

@@ -8,6 +8,7 @@ const FLAG_SIZE = 5;
 
 class Radar extends DarkPanel {
     game;
+    showMissiles = false;
 
     constructor(game, ctx, defaultColour) {
         super(ctx, defaultColour);

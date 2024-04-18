@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE>The ship</TITLE>
+	<link rel="icon" type="image/x-icon" href="../Icon.ico">
+	<meta name="description" content="Elroids gama manual.">
+	<meta name="keywords" content="elroids, manual">
+	<meta name="author" content="Jon Tricker">
+
+	<!-- Include external CSS -->
+	<link rel="stylesheet" href="../../mycss.css">
+
+</HEAD>
+<!--
+<BODY LANG="en-US" TEXT="#000080" LINK="#ff0000" VLINK="#0000ff" BGCOLOR="#c0c0c0" DIR="LTR">
+-->
+<BODY>
+	<P LANG="en-GB" ALIGN=CENTER><IMG SRC="../Logo.jpg" NAME="Logo" WIDTH=250 HEIGHT=200 BORDER=0>
+</P>
+
+	<H2>Ship internals</H2>
+	<P>The ship is made up of a number of 'components' (Engines, weapons etc.)</P>
+	<P>Each component starts with a number of 'hit points' indicating how tough it is. It also has a 'status' indicating the percentage of these hit points that remain.</P>
+	<P>This does mean that, technically, a compoent can have a non integer (maxHP * status) number of hit points.</P>
+
+	<H2>Taking damage</H2>
+	<P>When the ship is damaged the damage distributed randomly between it's components.</P>
+	<P>Once a component's status drops below 50% it may start to malfunction.</P>
+	<P>If the hull's status drops to 0% the ship is destroyed and it's GAME OVER.</P>
+
+	<H2>Repairing damage</H2>
+	<P>Damage can be repaired via the menu system. There is a cost, in credits, for this dependand on the components original cost and how much damage needs to be repaired.</P>
+	<P>Damage for a class of components can be repaired either 10% at a time or all in on go.</P>
+	<P>If you do not have enough credits the damage will only be partially repaired.</P>
+
+</BODY>
+</HTML>

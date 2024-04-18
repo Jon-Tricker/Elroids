@@ -32,7 +32,7 @@ class Missile extends NonShipItem {
     let startLocation = owner.location.clone();
 
     // Launch at just missile speed.
-    super(startLocation.x, startLocation.y, startLocation.z, startSpeed.x, startSpeed.y, startSpeed.z , owner.game, MISSILE_SIZE / Universe.CBRT_THREE, MISSILE_MASS, 1, owner);
+    super(startLocation.x, startLocation.y, startLocation.z, startSpeed.x, startSpeed.y, startSpeed.z, owner.game, MISSILE_SIZE / Universe.CBRT_THREE, MISSILE_MASS, 1, owner);
 
     this.colour = colour;
     this.damage = damage;
@@ -46,24 +46,26 @@ class Missile extends NonShipItem {
     //thatBoundary.translate(owner.speedFrame)
     while (this.getBoundary().intersects(thatBoundary)) {
       this.moveItem(false);
-    }  
+    }
     //this.moveItem(false);
 
     // Once launched add in relative speed of owner
     let newSpeed = this.speed.clone();
     newSpeed.add(owner.speed);
     this.setSpeed(newSpeed);
-  } 
-  
+  }
+
   getClass() {
-    return("Missile");
+    return ("Missile");
   }
 
   getRadarColour() {
-    // return (this.colour);
-
-    // For now don't plot
-    return (null);
+    if (this.owner.game.displays.radar.showMissiles) {
+      return (this.colour);
+    } else {
+      // Don't plot
+      return (null);
+    }
   }
 
   setupMesh(material) {

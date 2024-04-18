@@ -111,13 +111,13 @@ class Ship extends Item {
 
     // Build/Rebuild ship components.
     buildShip() {
-        this.engineSet = new EngineSet(1);
+        this.engineSet = new EngineSet(this, 1);
         this.engineSet.add(new BasicEngine(this));
 
-        this.hullSet = new HullSet(1);
+        this.hullSet = new HullSet(this, 1);
         this.hullSet.add(new BasicHull(this));
 
-        this.weaponSet = new WeaponSet(1);
+        this.weaponSet = new WeaponSet(this, 1);
         this.weaponSet.add(new DumbMissileWeapon(this));
 
         // Build set of all componets sets
@@ -425,9 +425,9 @@ class Ship extends Item {
         this.game.displays.addMessage(msg, 2000);
 
         // Dont call 'super'. We want to re-use the same ship. So don't want it to destruct.
-        this.hullSet.takeDamage(hits);
+        this.compSets.takeDamage(hits);
 
-        if (this.hullSet.getHp() <= 0) {
+        if (this.hullSet.getAverageStatus() <= 0) {
             this.game.shipDestroyed(that);
         }
     }
@@ -461,7 +461,7 @@ class Ship extends Item {
     // Pick up a mineral.
     // Return true if successful.
     mineralPickup(mineral) {
-        this.game.displays.addMessage("Got " + mineral.type.name + " ( " + Math.floor(mineral.mass) + " t, " + mineral.getValue() + "  Pts)", 2000);
+        this.game.displays.addMessage("Loaded " + mineral.type.name + " ( " + Math.floor(mineral.mass) + " t, " + mineral.getValue() + "  Cr)", 2000);
         this.game.player.addScore(mineral.getValue())
         mineral.destruct();
         return (true);

@@ -5,11 +5,10 @@ import ComponentSet from '../componentSet.js'
 
 class HullSet extends ComponentSet {
 
-    totalHp = 0;
     totalRamDamage = 0;
 
-    constructor(slots) {
-        super("Hulls", slots);
+    constructor(ship, slots) {
+        super("Hulls", ship, slots);
     }
 
     getHp() {
@@ -21,9 +20,8 @@ class HullSet extends ComponentSet {
     }
 
     add(hull) {
-        if (0 == this.size) {
+        if (0 == this.length) {
             super.add(hull);
-            this.totalHp += hull.getHp();
             this.totalRamDamage += hull.ramDamage;
         } else {
             console.log("Only one hull permitted.")
@@ -32,14 +30,7 @@ class HullSet extends ComponentSet {
 
     delete(hull) {
         super.delete(hull)
-        this.totalHp -= hull.getHp();
         this.totalRamDamage -= hull.ramDamage;
-    }
-
-    takeDamage(hits) {
-        // Should really pass random hits on to individual components.
-        // this[0].hp -= damage;
-        this.totalHp -= hits;
     }
 }
 

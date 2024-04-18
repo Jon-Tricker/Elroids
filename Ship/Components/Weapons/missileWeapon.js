@@ -3,8 +3,8 @@ import Weapon from './weapon.js';
 
 class MissileWeapon extends Weapon {
 
-    constructor(name, mass, cost, ship, fireRate, maxAmmo) {
-        super(name, mass, cost, ship, fireRate, maxAmmo);
+    constructor(name, mass, cost, maxHp, ship, fireRate, maxAmmo) {
+        super(name, mass, cost, maxHp, ship, fireRate, maxAmmo);
     }
 }
 

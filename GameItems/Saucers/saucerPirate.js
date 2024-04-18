@@ -9,7 +9,7 @@ import Universe from '../../universe.js';
 import Mineral from '../mineral.js';
 import DumbMissile from '../../GameItems/dumbMissile.js'
 
-const COLOUR = "#505050";
+const COLOUR = "#202060";
 const SIZE = 20;
 const MASS = 20;
 const MAX_SPEED = 80;  // m/s

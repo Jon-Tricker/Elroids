@@ -8,8 +8,8 @@ class EngineSet extends ComponentSet {
     totalThrust = 0;        // kN
     decRate = 0;
 
-    constructor(slots) {
-        super("Engines", slots);
+    constructor(ship, slots) {
+        super("Engines", ship, slots);
     }
 
     getThrust() {

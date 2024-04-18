@@ -3,6 +3,7 @@
 // For now columns widths are set by widest element.
 // For now right justified.
 import * as THREE from 'three';
+import MenuSystem from '../menuSystem.js';
 
 class MenuTable {
     headers;
@@ -23,9 +24,10 @@ class MenuTable {
 
     addRow(row) {
         this.rows.push(row);
-        for (let i = 0; i < row.length; i ++) {
-            if ((row[i].length + 2) > this.widths[i]) {
-                this.widths[i] = row[i].length + 2;
+        for (let i = 0; i < row.length; i++) {
+            let length = MenuSystem.getTextLength("<td>" + row[i] + "</td>");
+            if ((length + 2) > this.widths[i]) {
+                this.widths[i] = length + 2;
             }
         }
     }
@@ -37,22 +39,22 @@ class MenuTable {
         // Print headers
         doc += "<tr>";
         for (let i = 0; i < this.headers.length; i++) {
-            doc += "<td>";
+            doc += "<th>";
             doc += this.printElement(this.headers[i], this.widths[i]);
-            doc += "</td>"
-        }
-        doc += "</tr>";  
-        
-        // Print rows
-        doc += "<tr>";
-        for (let row of this.rows) {
-            for (let i = 0; i < row.length; i++) {
-                doc += "<td>";
-                doc += this.printElement(row[i], this.widths[i]);
-                doc += "</td>"
-            }
+            doc += "</th>"
         }
         doc += "</tr>";
+
+        // Print rows
+        for (let row of this.rows) {
+            doc += "<tr>";
+            for (let i = 0; i < row.length; i++) {
+                doc += "<td>";
+                doc += this.printElement(row[i]);
+                doc += "</td>"
+            }
+            doc += "</tr>";
+        }
 
         doc += "</table>";
 
@@ -62,10 +64,12 @@ class MenuTable {
     printElement(ele, len) {
         let op = "";
         op += ele;
-        while(op.length < len) {
-            op += " ";
+        if (undefined != len) {
+            while (op.length < len) {
+                op += " ";
+            }
         }
-        return(op);
+        return (op);
     }
 }
 

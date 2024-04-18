@@ -8,11 +8,25 @@ import * as THREE from 'three';
 import Terminal from './terminal.js';
 import helpMenu from './Menus/helpMenu.js';
 import topMenu from './Menus/topMenu.js';
-import {gameMenu} from './Menus/gameMenu.js'
-import {GameIternalsMenu} from './Menus/gameMenu.js'
-import maintenanceMenu from './Menus/maintenanceMenu.js';
+import { gameMenu } from './Menus/gameMenu.js'
+import { GameInternalsMenu } from './Menus/gameMenu.js'
+import repairMenu from './Menus/repairMenu.js';
+import componentsMenu from './Menus/componentsMenu.js';
 import ComponentSetMenu from './Menus/componentSetMenu.js';
+import RepairSetMenu from './Menus/repairSetMenu.js';
 import Universe from '../universe.js';
+
+// Result of printing a child element.
+class ElementResult {
+    selectableCount = 0;
+    width = 0;
+}
+
+// Data related to table management
+class TableData {
+    colWidths = new Array;
+    currentCol = 0;
+}
 
 class MenuSystem {
     // Menus as 'pig' XML. 
@@ -37,12 +51,10 @@ class MenuSystem {
     targetCursor;           // Target position of cursor in parent menu
     maxYCursor = 0;
 
-    parser;
+    static parser = new DOMParser();
 
     constructor(display) {
         this.display = display;
-
-        this.parser = new DOMParser();
         this.pushMenu(topMenu);
     }
 
@@ -59,7 +71,7 @@ class MenuSystem {
     }
 
     resetMenu() {
-        this.targetCursor = new THREE.Vector2(1, 1);
+        this.targetCursor = new THREE.Vector2(0, 0);
         this.maxYCursor = 0;
     }
 
@@ -67,7 +79,7 @@ class MenuSystem {
 
         this.display.terminal.clearScreen();
 
-        let doc = this.parser.parseFromString(this.menuStack[this.menuStack.length - 1], "text/xml");
+        let doc = MenuSystem.parser.parseFromString(this.menuStack[this.menuStack.length - 1], "text/xml");
 
         this.liCount = 0;
 
@@ -87,13 +99,13 @@ class MenuSystem {
         }
 
         if (keyboard.getClearState("S") || keyboard.getClearState("s")) {
-            if (this.targetCursor.y > 1) {
+            if (this.targetCursor.y > 0) {
                 this.targetCursor.y--;
             }
         }
 
         if (keyboard.getClearState("<") || keyboard.getClearState(",")) {
-            if (this.targetCursor.x > 1) {
+            if (this.targetCursor.x > 0) {
                 this.targetCursor.x--;
             }
         }
@@ -115,15 +127,17 @@ class MenuSystem {
         // this.dumpXmlDoc(doc)
 
         // Cursor to first field
-        let cursor = new THREE.Vector2(0, 1);
+        let cursor = new THREE.Vector2(0, 0);
 
-        this.printChild(doc.children[0], keyboard, cursor, false, false);
+        let tableData = new TableData();
+
+        this.printChild(doc.children[0], keyboard, cursor, false, false, tableData);
 
         // Add default 'back' and 'exit' selection.
         if (this.menuStack.length > 1) {
-            cursor.x = 1;
+            cursor.x = 0;
             if (this.targetCursor.y == cursor.y) {
-                this.targetCursor.x = 1;
+                this.targetCursor.x = 0;
             }
             let selected = this.targetCursor.equals(cursor);
             this.display.terminal.println("\tBack", selected);
@@ -134,9 +148,9 @@ class MenuSystem {
             cursor.y++;
         }
 
-        cursor.x = 1;
+        cursor.x = 0;
         if (this.targetCursor.y == cursor.y) {
-            this.targetCursor.x = 1;
+            this.targetCursor.x = 0;
         }
         let selected = this.targetCursor.equals(cursor);
         this.display.terminal.println("\tExit", selected);
@@ -151,7 +165,8 @@ class MenuSystem {
     // Do the specifics for each child element type.
     // Returns number of selectable items within child.
     // ToDo. Really should be driven of a table mappinng tag to 'features'.
-    printChild(child, keyboard, cursor, highlight, centered) {
+    printChild(child, keyboard, cursor, highlight, centered, tableData) {
+        let result = new ElementResult();
 
         // Handle attributes
         if (child.attributes != undefined) {
@@ -177,6 +192,8 @@ class MenuSystem {
             // Selectable items on line.
             case "input":
             case "INPUT":
+            case "button":
+            case "BUTTON":
             case "a":
             case "A":
                 selectable = true;
@@ -186,11 +203,27 @@ class MenuSystem {
                 break
         }
 
-        let selectableCount = 0;
         if (selectable) {
-            cursor.x++;
-            selectableCount++;
+            result.selectableCount++;
         }
+
+        // handle table related stuff.
+        switch (child.nodeName) {
+            case "table":
+            case "TABLE":
+                // Start a new table.
+                tableData.colWidths = new Array;
+                break;
+
+            case "TR":
+            case "tr":
+                tableData.colNumber = 0;
+                break;
+
+            default:
+                break;
+        }
+
 
         // Are we the element at target cursor?
         let clicked = false;
@@ -199,6 +232,22 @@ class MenuSystem {
             if (this.isClicked(keyboard)) {
                 clicked = true;
             }
+        }
+
+        // In some cases print a line feed.
+        let lfReqd = false;
+        switch (child.nodeName) {
+            case "li":
+            case "LI":
+            case "tr":
+            case "TR":
+            case "p":
+            case "P":
+                lfReqd = true;
+                break;
+
+            default:
+                break
         }
 
         // console.log(child.tagName + " " + this.boundedCursor.x + " " + + this.boundedCursor.y + " " + cursor.x + " " + cursor.y + " " + clicked + " " + highlight)
@@ -219,8 +268,8 @@ class MenuSystem {
                     op = eval(scriptName.nodeValue).printMenu(eval(params.nodeValue));
                 }
 
-                let childDoc = this.parser.parseFromString(op, "text/xml");
-                this.printChild(childDoc, keyboard, cursor, false, false);
+                let childDoc = MenuSystem.parser.parseFromString(op, "text/xml");
+                result.selectableCount += this.printChild(childDoc, keyboard, cursor, false, false, tableData);
 
                 break;
 
@@ -254,63 +303,99 @@ class MenuSystem {
 
             case "#text":
                 this.display.terminal.print(child.textContent, highlight, centered);
+                result.width += child.textContent.length;
                 break;
 
-            default:
-                break;
-        }
+            case "button":
+            case "BUTTON":
+                if (clicked) {
+                    let action = null;
 
-        selectableCount += this.printChildren(child, keyboard, cursor, highlight, centered);
-
-        // In some cases print a line feed.
-        let lfReqd = false;
-        switch (child.nodeName) {
-            case "li":
-            case "LI":
-            case "tr":
-            case "TR":
-            case "p":
-            case "P":
-                lfReqd = true;
-                break;
-
-            default:
-                break
-        }
-
-        if (lfReqd) {
-            // If this is the current line limit X cursor to available item count.
-            if (this.targetCursor.y == cursor.y) {
-                if (selectableCount > 0) {
-                    if (this.targetCursor.x > selectableCount) {
-                        this.targetCursor.x = selectableCount;
+                    for (let i = 0; i < child.attributes.length; i++) {
+                        let attrib = child.attributes[i];
+                        if (attrib.specified) {
+                            if (attrib.name === "onclick") {
+                                action = attrib.value;
+                            }
+                        }
                     }
+                    
+                    eval(action + ";");
                 }
-            }
+                break;
+
+            default:
+                break;
         }
+
+        let op = this.printChildren(child, keyboard, cursor, highlight, centered, tableData);
+
+        // Table related stuff
+        switch (child.nodeName) {
+            case "th":
+            case "TH":
+                // Headings define col widths.
+                tableData.colWidths.push(op.width);
+                tableData.colNumber++;
+                break;
+
+            case "td":
+            case "TD":
+                // Pad if necessary
+                while (op.width < tableData.colWidths[tableData.colNumber]) {
+                    this.display.terminal.print(" ", highlight, centered);
+                    op.width ++;
+                }
+                tableData.colNumber++;
+                break;
+
+            default:
+                break;
+        }
+
+        result.selectableCount += op.selectableCount;
+        result.width += op.width;
 
         if (lfReqd) {
             // Move display down
             this.display.terminal.print("\n", false, false);
-
-            // If there was anything selectable also move cursor down.
-            if (0 < selectableCount) {
-                cursor.y++;
-                cursor.x = 0;
-            }
-
         }
 
-        return (selectableCount);
+        // If this is the current line limit X cursor to available item count.
+        if (this.targetCursor.y == cursor.y) {
+            if (result.selectableCount > 0) {
+                if (this.targetCursor.x > result.selectableCount) {
+                    this.targetCursor.x = result.selectableCount;
+                }
+            }
+        }
+
+        // If there was anything selectable also move cursor.
+        if (result.selectableCount > 0) {
+            if (lfReqd) {
+                cursor.y++;
+                cursor.x = 0;
+                result.selectableCount = 0;
+            } else {
+                if (selectable) {
+                    cursor.x++;
+                }
+            }
+        }
+
+        return (result);
     }
 
     // Print the child element
-    printChildren(parent, keyboard, cursor, highlight, centered) {
-        let selectableCount = 0;
-        for(let child of parent.childNodes) {
-            selectableCount += this.printChild(child, keyboard, cursor, highlight, centered);
+    printChildren(parent, keyboard, cursor, highlight, centered, tableData) {
+        let result = new ElementResult();
+        for (let child of parent.childNodes) {
+            let op = this.printChild(child, keyboard, cursor, highlight, centered, tableData);
+            result.selectableCount += op.selectableCount;
+            result.width += op.width;
         }
-        return (selectableCount);
+
+        return (result);
     }
 
     // ToDo : Remove.
@@ -332,6 +417,26 @@ class MenuSystem {
                 this.dumpXmlDoc(child);
             }
         }
+    }
+
+    // Get textual lenght of an element
+    static getTextLength(elem) {
+        let doc = MenuSystem.parser.parseFromString(elem, "text/xml");
+        return (MenuSystem.getChildTextLength(doc));
+    }
+
+    static getChildTextLength(doc) {
+        let length = 0;
+
+        for (let i = 0; i < doc.childElementCount; i++) {
+            let child = doc.children[i];
+            if (0 == child.childElementCount) {
+                return (child.textContent.length);
+            } else {
+                length += MenuSystem.getChildTextLength(child);
+            }
+        }
+        return (length);
     }
 }
 

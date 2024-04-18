@@ -9,14 +9,18 @@ class Engine extends Component {
     // TODO: Convert to something SI.
     decRate;        // %/s
 
-    constructor(name, mass, cost, thrust, decRate, ship) {
-        super(name, mass, cost, ship);
+    constructor(name, mass, cost, maxHp, thrust, decRate, ship) {
+        super(name, mass, cost, maxHp, ship);
         this.thrust = thrust;
         this.decRate = decRate;
     }
 
     getThrust() {
-        return(this.thrust);
+        if (this.isWorking()) {
+            return(this.thrust);
+        } else {
+            return(0);
+        }
     }
 
     getHeadings() {

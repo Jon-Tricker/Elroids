@@ -50,16 +50,16 @@ class Saucer extends NonShipItem {
             this.safe = safe;
         }
 
-        this.game.saucerCount ++;
+        this.game.saucerCount++;
     }
 
     destruct() {
-        this.game.saucerCount --;
+        this.game.saucerCount--;
         super.destruct();
-    } 
-    
+    }
+
     getClass() {
-        return("Saucer");
+        return ("Saucer");
     }
 
     getDefaultMaterial() {
@@ -71,7 +71,7 @@ class Saucer extends NonShipItem {
     }
 
     getMaxSpeed() {
-        return(0);
+        return (0);
     }
 
     setupMesh(material) {
@@ -118,8 +118,11 @@ class Saucer extends NonShipItem {
         let destroyed = super.takeDamage(hits, that);
 
         if (destroyed) {
-            // Score it
-            this.game.addScore(this.getScore(), that);
+            if ((that.owner == this.game.ship) || (that == this.game.ship)) {
+                // Score it
+                this.game.addScore(this.getScore(), that);
+                this.game.displays.addMessage("Bounty " + this.getScore() + "  (Cr)", 2000);
+            }
         }
     }
 
@@ -134,14 +137,14 @@ class Saucer extends NonShipItem {
 
     animate() {
         // Spin
-        this.rotation.y += this.rotateRate/Universe.getAnimateRate();
+        this.rotation.y += this.rotateRate / Universe.getAnimateRate();
 
         // Lean towards direction of travel. Dont wobble.
         // TODO : Not really right but looks pretty ... feel free to improve.
         if (0 != this.getMaxSpeed()) {
-            if (0.5 < (this.speed.length()/this.getMaxSpeed())) {
-             this.rotation.x = (Math.PI / 2) - (Math.PI * ((this.speed.x/this.getMaxSpeed())/8));
-             this.rotation.z = (Math.PI * ((this.speed.z/this.getMaxSpeed())/8));
+            if (0.5 < (this.speed.length() / this.getMaxSpeed())) {
+                this.rotation.x = (Math.PI / 2) - (Math.PI * ((this.speed.x / this.getMaxSpeed()) / 8));
+                this.rotation.z = (Math.PI * ((this.speed.z / this.getMaxSpeed()) / 8));
             }
         }
 
