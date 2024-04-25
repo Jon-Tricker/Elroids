@@ -17,8 +17,7 @@ class Keyboard {
     static keyUp(event) {
         let key = event.key.toLowerCase(); 
 
-        if (this.keyState.has(key)) {
-            // console.log("down" + event.key)
+        while (this.keyState.has(key)) {
             this.keyState.delete(key);
         }
     }
@@ -31,8 +30,9 @@ class Keyboard {
     // For held instantaneous keys. Get state and clear it. 
     static getClearState(name) {
         let pressed = this.keyState.has(name);
+        if (pressed) {
             this.keyState.delete(name);
-
+        }
         return (pressed);
     }
 

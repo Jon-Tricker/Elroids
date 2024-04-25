@@ -27,7 +27,7 @@ import { MineralTypes } from './GameItems/minerals.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "1.7";
+const VERSION = "1.8";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -100,7 +100,7 @@ class Game {
             this.ship.respawn();
         } else {
             this.ship.destruct();
-            this.displays.addMessage("Game Over! ... Final score = " + this.player.getScore() + " ... Refresh page to play again.", 0);
+            this.displays.addMessage("Game Over! ... Refresh page to play again.", 0);
         }
     }
 

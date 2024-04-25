@@ -5,15 +5,37 @@ import ComponentSet from '../componentSet.js'
 
 class HullSet extends ComponentSet {
 
-    totalRamDamage = 0;
+    totalRamDamage;
+    maxSpeed;
 
     constructor(ship, slots) {
         super("Hulls", ship, slots);
+        this.recalc();
+    }
+
+    recalc() {
+        super.recalc();
+
+        this.totalRamDamage = 0;  
+        this.maxSpeed = 0;
+        for (let hull of this) {
+            this.totalRamDamage += hull.ramDamage;
+
+            // ToDo : Maybe this should be the lowest.
+            if(hull.maxSpeed > this.maxSpeed) {
+                this.maxSpeed = hull.maxSpeed;
+            }
+
+        }
     }
 
     getHp() {
         return(this.totalHp);
-    }    
+    }  
+    
+    getMaxSpeed() {
+        return(this.maxSpeed)
+    }
     
     getRamDamage() {
         return(this.totalRamDamage);
@@ -22,15 +44,10 @@ class HullSet extends ComponentSet {
     add(hull) {
         if (0 == this.length) {
             super.add(hull);
-            this.totalRamDamage += hull.ramDamage;
+            this.recalc();
         } else {
             console.log("Only one hull permitted.")
         }
-    }
-
-    delete(hull) {
-        super.delete(hull)
-        this.totalRamDamage -= hull.ramDamage;
     }
 }
 

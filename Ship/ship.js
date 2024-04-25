@@ -296,7 +296,7 @@ class Ship extends Item {
 
         let xDirection = this.getOrientation();
 
-        this.thrust(this.engineSet.getThrust(), xDirection, MAXSPEED);
+        this.thrust(this.engineSet.getThrust(), xDirection, this.hullSet.getMaxSpeed());
     }
 
     deceletarte() {

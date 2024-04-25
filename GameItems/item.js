@@ -84,7 +84,7 @@ class Item extends THREE.Group {
     // Set speed/
     // Do frame rate division only one.
     setSpeed(speed) {
-        if (speed.length() > 1000) {
+        if (speed.length() > 5000) {
             throw (new BugError("Something too fast " + speed.length()));
         }
         this.speed = speed.clone();

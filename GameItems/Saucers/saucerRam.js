@@ -10,7 +10,7 @@ import Universe from '../../universe.js';
 const COLOUR = "#FF2020";
 const SIZE = 20;
 const MASS = 20;
-const MAX_SPEED = 400;   // m/s
+const MAX_SPEED = 300;   // m/s
 const MAX_ACC = 5;   // m/s^2
 
 class SaucerRam extends Saucer {

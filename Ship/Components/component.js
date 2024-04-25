@@ -48,13 +48,19 @@ class Component  {
         return(this.maxHp);
     }
 
+    // Take damage 
+    // Return the amount taken.
     takeDamage(hits) {
         let dam = Math.floor(hits/this.getMaxHp() * 100);
-        if (this.status > dam) {
-            this.status -= dam;
-        } else {
-            this.status = 0;
-        }
+
+        if (this.status < dam) {
+            // Cant take full damage
+            hits = this.getMaxHp() * this.status/100;
+            dam = this.status;
+        } 
+
+        this.status -= dam;
+        return(hits)
     }
 
     // Determine if working.

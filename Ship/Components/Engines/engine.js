@@ -16,11 +16,7 @@ class Engine extends Component {
     }
 
     getThrust() {
-        if (this.isWorking()) {
-            return(this.thrust);
-        } else {
-            return(0);
-        }
+        return(this.thrust * this.status/100);
     }
 
     getHeadings() {

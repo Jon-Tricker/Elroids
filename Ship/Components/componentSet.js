@@ -16,6 +16,16 @@ class ComponentSet extends Array {
         this.name = name;
         this.slots = slots;
         this.ship = ship;
+
+        this.recalc();
+    }
+
+    // Recalculate any composite variables.
+    recalc() { 
+        this.totalMass = 0;   
+        for (let comp of this) {
+            this.totalMass += comp.mass;
+        }
     }
 
     add(comp) {
@@ -23,7 +33,8 @@ class ComponentSet extends Array {
             throw (new GameError("No free this.slots in " + this.name + " list."));
         }
         super.push(comp)
-        this.totalMass += comp.mass;
+
+        this.recalc();
     }
 
     delete(comp) {
@@ -33,7 +44,8 @@ class ComponentSet extends Array {
                 break;
             }
         }
-        this.totalMass -= comp.mass;
+        
+        this.recalc();
     }
 
     getMass() {
@@ -60,17 +72,22 @@ class ComponentSet extends Array {
             status += comp.status;
         }
 
-        status = Math.floor(status/this.length);
+        status = Math.floor(status / this.length);
 
         return (status);
     }
 
     takeDamage(hits) {
-        while(hits-- > 0) {
-            // Damage a random comp.
-            let index = Math.floor(Math.random() * this.length);
-            this[index].takeDamage(1);
+        // Damage a random comp.
+        let index = Math.floor(Math.random() * this.length);
+        let comp = this[index];
+        if (comp.status > 0) {
+            return (comp.takeDamage(1));
+        } else {
+            return(0);
         }
+
+        this.recalc();
     }
 
     // Repair a given amount.
@@ -94,6 +111,8 @@ class ComponentSet extends Array {
 
         // Bill player.
         this.ship.game.player.addScore(-cost);
+
+        this.recalc();
 
         return (allDone);
     }

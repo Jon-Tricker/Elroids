@@ -6,6 +6,11 @@ class WeaponSet extends ComponentSet {
 
     constructor(ship, slots) {
         super("Weapons", ship, slots);
+        this.recalc();
+    }
+
+    recalc() {
+        super.recalc();
     }
 
     // Fire all selected weapons.
@@ -19,30 +24,6 @@ class WeaponSet extends ComponentSet {
             weapon.fire(target, date);
         }
     }
-
-    /*
-    add(hull) {
-        if (0 == this.size) {
-            super.add(hull);
-            this.totalHp += hull.getHp();
-            this.totalRamDamage += hull.ramDamage;
-        } else {
-            console.log("Only one hull permitted.")
-        }
-    }
-
-    delete(hull) {
-        super.delete(hull)
-        this.totalHp -= hull.getHp();
-        this.totalRamDamage -= hull.ramDamage;
-    }
-
-    takeDamage(hits) {
-        // Should really pass random hits on to individual components.
-        // this[0].hp -= damage;
-        this.totalHp -= hits;
-    }
-    */
 }
 
 export default WeaponSet;
