@@ -12,7 +12,7 @@ const COLOUR = "#F0C0C0";
 const SIZE = 10;
 const MASS = 50;
 
-const MAX_SPEED = 75;
+const MAX_SPEED = 150;
 const MAX_ACC = 3;
 
 const SHOOT_FREQUENCY = 100;

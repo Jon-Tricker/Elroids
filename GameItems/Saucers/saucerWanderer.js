@@ -8,7 +8,7 @@ import Saucer from './saucer.js';
 const COLOUR = "#D0D0FF";
 const SIZE = 30;
 const MASS = 100;
-const MAX_SPEED = 50;
+const MAX_SPEED = 200;
 
 class SaucerWanderer extends Saucer {
 

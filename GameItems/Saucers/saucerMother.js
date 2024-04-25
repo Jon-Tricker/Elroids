@@ -17,7 +17,7 @@ import SaucerPirate from "./saucerPirate.js";
 const COLOUR = "#80FF80";
 const SIZE = 70;
 const MASS = 1000;
-const MAX_SPEED = 20;     // m/s
+const MAX_SPEED = 40;     // m/s
 const MAX_ACC = 1;      // m/s^s
 
 const START_LAUNCH_FREQUENCY = 300;

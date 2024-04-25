@@ -6,7 +6,7 @@ import Universe from '../universe.js'
 import Explosion from './explosion.js'
 
 const MISSILE_SIZE = 1;     // m
-const MISSILE_SPEED = 300;   // m/s
+const MISSILE_SPEED = 600;   // m/s
 const MISSILE_MASS = 0.1;
 
 const MISSILE_DAMAGE = 1;

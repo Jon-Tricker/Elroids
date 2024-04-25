@@ -27,7 +27,7 @@ import { MineralTypes } from './GameItems/minerals.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "1.6";
+const VERSION = "1.7";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m

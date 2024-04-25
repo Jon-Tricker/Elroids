@@ -59,7 +59,7 @@ class Component  {
 
     // Determine if working.
     isWorking() {
-        return((Math.random() * 50) < this.status);
+        return((Math.random() * 50) <= this.status);
     }
     
     getRepairCost(percent) {

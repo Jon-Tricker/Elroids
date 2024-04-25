@@ -19,7 +19,7 @@ class DumbMissileWeapon extends MissileWeapon {
 
             catch(error) {
                 // Failed to for for some reason. e.g. out of ammo. 
-                this.game.displays.addMessage(error);
+                this.ship.game.displays.addMessage(error);
             }
         }
     }

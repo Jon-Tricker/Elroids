@@ -63,7 +63,7 @@ const flameMaterial = new THREE.MeshStandardMaterial(
     }
 )
 
-const MAXSPEED = 100;       // m/s. Must be slower tha missiles so cannot run them over.
+const MAXSPEED = 200;       // m/s. Must be slower tha missiles so cannot run them over.
 
 // Slightly damped attitude contols to allow fine adjustment.
 const ROTATE_RATE_DELTA = 0.125;        // r/s
@@ -422,7 +422,7 @@ class Ship extends Item {
             msg += "by " + that.getClass().toLowerCase();
         }
         msg += "!"
-        this.game.displays.addMessage(msg, 2000);
+        this.game.displays.addMessage(msg);
 
         // Dont call 'super'. We want to re-use the same ship. So don't want it to destruct.
         this.compSets.takeDamage(hits);
@@ -461,7 +461,7 @@ class Ship extends Item {
     // Pick up a mineral.
     // Return true if successful.
     mineralPickup(mineral) {
-        this.game.displays.addMessage("Loaded " + mineral.type.name + " ( " + Math.floor(mineral.mass) + " t, " + mineral.getValue() + "  Cr)", 2000);
+        this.game.displays.addMessage("Loaded " + mineral.type.name + " ( " + Math.floor(mineral.mass) + " t, " + mineral.getValue() + "  Cr)");
         this.game.player.addScore(mineral.getValue())
         mineral.destruct();
         return (true);

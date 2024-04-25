@@ -5,6 +5,7 @@ import Terminal from './terminal.js'
 import MenuSystem from './menuSystem.js'
 
 const PAD_LENGTH = 5;
+const DEFAULT_DURATION = 2000;
 
 class Message {
     text;
@@ -164,6 +165,10 @@ class Displays {
     }
 
     addMessage(message, duration) {
+
+        if (duration === undefined) {
+            duration = DEFAULT_DURATION;
+        }
 
         let expiry;
         if (0 != duration) {

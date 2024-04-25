@@ -159,7 +159,7 @@ class FacitRockGeometry extends THREE.BufferGeometry {
 
     // Get a randomish radius.
     getRadius(size) {
-        return (Math.random() * size * this.composition.spikyness + size);
+        return ((0.5 - Math.random()) * size * this.composition.spikyness + size);
     }
 }
 
