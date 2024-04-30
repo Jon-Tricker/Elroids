@@ -63,8 +63,6 @@ const flameMaterial = new THREE.MeshStandardMaterial(
     }
 )
 
-const MAXSPEED = 200;       // m/s. Must be slower tha missiles so cannot run them over.
-
 // Slightly damped attitude contols to allow fine adjustment.
 const ROTATE_RATE_DELTA = 0.125;        // r/s
 const ROTATE_RATE_MAX = 5;              // r/s
@@ -159,8 +157,8 @@ class Ship extends Item {
         return (this.chaseCamera);
     }
 
-    getHitPoints() {
-        return (this.hullSet.getHp());
+    getCurrentHp() {
+        return (this.compSets.getCurrentHp());
     }
 
     setupMesh() {
@@ -428,7 +426,11 @@ class Ship extends Item {
         this.compSets.takeDamage(hits);
 
         if (this.hullSet.getAverageStatus() <= 0) {
+            this.playSound('scream');
+            // new Explosion(this.size, this);
             this.game.shipDestroyed(that);
+        } else { 
+            this.playSound('clang');
         }
     }
 
@@ -462,9 +464,16 @@ class Ship extends Item {
     // Return true if successful.
     mineralPickup(mineral) {
         this.game.displays.addMessage("Loaded " + mineral.type.name + " ( " + Math.floor(mineral.mass) + " t, " + mineral.getValue() + "  Cr)");
-        this.game.player.addScore(mineral.getValue())
+        this.addScore(mineral.getValue());
         mineral.destruct();
         return (true);
+    }
+
+    addScore(score) {
+        this.game.player.addScore(score);
+        if (0 < score) {
+            this.playSound('coin');
+        }
     }
 
     handleCollision(that) {

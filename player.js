@@ -13,15 +13,15 @@ class Player {
         this.score = 0;
     }
 
-    getScore () {
+    getScore() {
         return (this.score);
     }
 
     // Loose a life. Return 'true' if still some left.
     killed() {
         return (false);
-    } 
-    
+    }
+
     addScore(score) {
         this.score += score;
     }

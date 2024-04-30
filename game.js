@@ -8,6 +8,7 @@ import * as THREE from 'three';
 
 import Ship from "./Ship/ship.js";
 import Rock from "./GameItems/rock.js";
+import GameError from "./GameErrors/gameError.js"
 
 import SaucerWanderer from "./GameItems/Saucers/saucerWanderer.js";
 import SaucerShooter from "./GameItems/Saucers/saucerShooter.js";
@@ -27,7 +28,7 @@ import { MineralTypes } from './GameItems/minerals.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "1.8";
+const VERSION = "1.9";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -46,6 +47,8 @@ class Game {
     maxRockCount;
     rockCount = 0;
 
+    soundOn = false;
+
     testMode = false;
 
     saucerCount = 0;
@@ -55,14 +58,22 @@ class Game {
     maxSaucerCount = 5;
 
     paused = false;
+    
 
-    constructor(maxRockCount, rockStyle, safe, player) {
+    constructor(maxRockCount, rockStyle, safe, player, soundOn) {
 
         this.safe = safe;
         this.player = player;
 
+        if ((soundOn != null) && (soundOn.toLowerCase() == "true")) {
+            this.soundOn = true;
+        }
+
         if (0 == maxRockCount) {
             this.testMode = true;
+
+            // Give us some cash
+            player.addScore(1234);
         }
 
         Rock.setRockStyle(rockStyle);
@@ -89,6 +100,10 @@ class Game {
 
     createShip() {
         this.ship = new Ship(5, 10, 20, 0, 0, 0, this);
+        if (this.testMode) {
+            // Do some damage
+            this.ship.compSets.takeDamage(1);
+        }
     }
 
     shipDestroyed() {
@@ -254,13 +269,6 @@ class Game {
         return (this.ship);
     }
 
-    addScore(score, that) {
-        // Only score damage we caused.
-        if ((that.owner == this.ship) || (that == this.ship)) {
-            this.player.addScore(score);
-        }
-    }
-
     togglePaused() {
         this.paused = !this.paused;
         this.displays.teminalEnable(this.paused);
@@ -299,12 +307,23 @@ class Game {
     loop = () => {
         let date = Date.now();
 
-        // Update displays
-        this.animate(date);
+        try {
+            // Update displays
+            this.animate(date);
+        }
+        catch (e) {
+            if (e instanceof GameError) {
+                this.displays.addMessage("Game error ... " + e.message);
+            } else {
+                throw (e);
+            }
+        }
 
         // Re-request self
         window.requestAnimationFrame(this.loop);
     }
+
+
 }
 
 export default Game;

@@ -6,12 +6,15 @@
 import * as THREE from 'three';
 
 // Load textures once.
-export const craterTexture = new THREE.TextureLoader().load("./Scenery/CraterTexture.gif");
+const craterTexture = new THREE.TextureLoader().load("./Scenery/CraterTexture.gif");
 craterTexture.wrapS = THREE.RepeatWrapping;
 craterTexture.wrapT = THREE.RepeatWrapping;
 craterTexture.repeat.set(4, 4);
 
+// Load sounds once.
+
 const ANIMATE_RATE = 25;  // frames/second
+
 
 class Universe {
 
@@ -32,17 +35,50 @@ class Universe {
 
     static originVector = new THREE.Vector3(0, 0, 0);
 
+    // Audio plumbing.
+    static audioLoader = new THREE.AudioLoader();
+    static listener;
+
+    // Sounds bank. Sounds written in once they are loaded.
+    static sounds = new Map([
+        ["pew", null],
+        ["explosion", null],
+        ["clang", null],
+        ["coin", null],
+        ["click", null],
+        ["scream", null]
+    ]);
+
+
     static addItem(item) {
         this.itemList.add(item);
     }
 
+    static setListener(listener) {
+        Universe.listener = listener;
+    }
+
+    static loadSounds() {
+        for (let [key, value] of Universe.sounds) {
+            let path = "./Sounds/" + key + ".ogg";
+            Universe.audioLoader.load(path, function (buffer) {
+                // Callback after loading.
+                Universe.sounds.set(key, buffer);
+            });
+        }
+    }
+
+    static getListener() {
+        return (Universe.listener);
+    }
+
     static getCraterTexture() {
-        return(craterTexture);
+        return (craterTexture);
     }
 
     static getAnimateRate() {
         // Return the achieved frame rate.
-        return(ANIMATE_RATE);
+        return (ANIMATE_RATE);
 
         // TODO: I tried this ... the frame rate became lousey.
         // return(this.actualAmimateRate);
@@ -66,17 +102,17 @@ class Universe {
             for (let item of Universe.itemList) {
                 item.animate(this.universeTime, keyBoard);
             }
-            this.actualAmimateRate = 1000/(date - this.lastAnimateTime);
+            this.actualAmimateRate = 1000 / (date - this.lastAnimateTime);
             this.lastAnimateTime = date;
         }
     }
 
     static getActualAnimateRate() {
-        return(this.actualAmimateRate)
+        return (this.actualAmimateRate)
     }
 
     static getTime() {
-        return(this.universeTime);
+        return (this.universeTime);
     }
 
     // Checks and handles wrap round of a vector.
@@ -116,14 +152,14 @@ class Universe {
                     item.location.x += Universe.UNI_SIZE;
                 } else {
                     item.location.x -= Universe.UNI_SIZE;
-                }  
-                
+                }
+
                 if (item.location.y < 0) {
                     item.location.y += Universe.UNI_SIZE;
                 } else {
                     item.location.y -= Universe.UNI_SIZE;
-                }  
-                
+                }
+
                 if (item.location.z < 0) {
                     item.location.z += Universe.UNI_SIZE;
                 } else {

@@ -1,6 +1,6 @@
 // Simple non homing missile
 import * as THREE from 'three';
-import Missile from './missile.js'
+import Missile from './missile.js';
 
 const COLOUR = "#ff00ff"
 
@@ -20,8 +20,12 @@ const MISSILE_DAMAGE = 1;
 
 class DumbMissile extends Missile {
 
+  static sound;
+
   constructor(direction, owner) {
     super(direction, owner, MISSILE_DAMAGE, COLOUR, missileMaterial);
+
+    this.playSound('pew', 0.5); 
   }
 }
 

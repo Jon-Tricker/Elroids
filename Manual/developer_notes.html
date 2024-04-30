@@ -26,7 +26,7 @@
 	<UL>
 		<LI>Exhaust flame is supposed to be yellow ... investigate why it is not.</LI>
 		<LI>Missiles are created too far in front of ship (see 'quantization' issue below). Sometimes miss very close targets ... fix</LI>
-		<LI>Sometimes control keys seem to get stuck (keyboard.js) ... investigate.</LI>
+		<LI>Sometimes control keys seem to get stuck (keyboard.js) ... Think this is when the debugger is used and it consumes some of the event..</LI>
 	</UL>
 
 	<H2>ToDos (In some sort of priority order)</H2>
@@ -133,7 +133,6 @@
 		<LI>Extensions:
 			<UL>
 				<LI>Test on platforms other than PC/Chrome</LI>
-				<LI>Add sound (3D?).</LI>
 				<LI>Make it multi-player (AJAX?).</LI>
 				<LI>Add optional gravity effects (like Gravitar).</LI>
 				<LI>Add on line high score table?</LI>
@@ -159,6 +158,7 @@
 		dot products (and less CPU) ... but it took a while to get the maths right.
 		</LI>
 		<LI>There are problems with 'quantized' time. A slower moving object can catch up with and collide with a faster one if it gets a move phase 'first'. Some messy work round have been required.</LI>
+		<LI>Sound support on Chrome is a pain. In an attempt to block audio spam audio components can only ne initialized from within user events. So sounds have to be loaded on the first key/mouse click. Which means they are not yet ready if this event wans to make a sound,</LI>
 	</UL>
 
 	<H2>Units and dimensions</H2>

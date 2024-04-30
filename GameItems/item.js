@@ -12,6 +12,7 @@ import Ship from "../Ship/ship.js"
 
 const COLOUR = "#FFFFFF"
 
+
 class Item extends THREE.Group {
 
     speed;              // m/s
@@ -68,8 +69,9 @@ class Item extends THREE.Group {
         game.getScene().add(this);
     }
 
+
     getClass() {
-        return(null);
+        return (null);
     }
 
     // Get boundary.
@@ -178,13 +180,13 @@ class Item extends THREE.Group {
                 let minDist = 0;
                 if (this instanceof Ship) {
                     // console.log("X " + thisBoundary.getSize() + " " + thatBoundary.getSize())
-                    minDist += thisBoundary.getSize()/4;
+                    minDist += thisBoundary.getSize() / 4;
                 } else {
                     minDist += thisBoundary.getSize();
                 }
 
                 if (that instanceof Ship) {
-                    minDist += thatBoundary.getSize()/4;
+                    minDist += thatBoundary.getSize() / 4;
                 } else {
                     minDist += thatBoundary.getSize();
                 }
@@ -201,17 +203,17 @@ class Item extends THREE.Group {
                         this.handleCollision(that);
 
                         // Only collode with one thing per frame.
-                        return(true);
+                        return (true);
                     }
                 }
             }
         }
-        return(false);
+        return (false);
     }
 
     // Separate two overlapping objects.
     separateFrom(that) {
-        
+
         let relLoc = this.getRelativePosition(that.location);
         while (0 == relLoc.length()) {
             relLoc.add(this.game.createRandomVector(1));
@@ -329,7 +331,7 @@ class Item extends THREE.Group {
             // Get position relative to camers       
             let cameraPos = new THREE.Vector3();
             camera.getWorldPosition(cameraPos);
-            let relPos = this.getRelativePosition(cameraPos);   
+            let relPos = this.getRelativePosition(cameraPos);
             relPos.multiplyScalar(-1);
             this.position.set(relPos.x + cameraPos.x, relPos.y + cameraPos.y, relPos.z + cameraPos.z);
         }
@@ -352,6 +354,41 @@ class Item extends THREE.Group {
     animate() {
         console.log("Item had no animate() override. Probably a bug");
     }
+
+    playSound(name, volume) {
+        if (!this.game.soundOn) {
+            return(false);
+        }         
+        
+        let list = Universe.getListener();
+        if ((undefined == list)) {
+            // Dont have a listener yet ... give up. without loading
+            return (false);
+        }
+        
+        // If too far away
+        if (this.getRelativePosition(this.game.ship.location).length() > (Math.floor(Universe.UNI_SIZE/5))) {
+            return (true);
+        }
+
+        let buffer = Universe.sounds.get(name);
+        
+        let sound = new THREE.PositionalAudio(list);
+        sound.setRefDistance( 20 );
+        sound.setBuffer(buffer);
+
+        if (undefined != volume) {
+            sound.setVolume(volume);
+        }
+
+        // Play it
+        sound.stop();
+        sound.play();
+        this.add(sound);
+
+        return (true)
+    }
+
 }
 
 export default Item;

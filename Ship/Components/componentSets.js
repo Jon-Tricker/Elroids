@@ -21,11 +21,19 @@ class ComponentSets extends Array {
     }
 
     takeDamage(hits) {
-        while(hits > 0) {
+        while((hits > 0) && (this.getCurrentHp() > 0)) {
             // Damage a random set.
             let index = Math.floor(Math.random() * this.length);
             hits -= this[index].takeDamage(1);
         }
+    }
+
+    getCurrentHp() {
+        let hp = 0;       
+        for (let set of this) {
+            hp += set.getCurrentHp();
+        }
+        return(hp);
     }
 
 }

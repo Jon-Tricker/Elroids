@@ -12,7 +12,7 @@ import DumbMissile from '../../GameItems/dumbMissile.js'
 const COLOUR = "#202060";
 const SIZE = 20;
 const MASS = 20;
-const MAX_SPEED = 80;  // m/s
+const MAX_SPEED = 100;  // m/s
 const THRUST = 2000     // kN
 const DECAY_RATE = 2    // t/s
 

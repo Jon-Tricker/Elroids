@@ -1,4 +1,4 @@
-// Camera mechanics
+// Camera and listener mechanics
 import * as THREE from 'three';
 import Universe from '../universe.js';
 
@@ -22,6 +22,7 @@ class MyCamera extends THREE.PerspectiveCamera {
     ship;
     isFixedLocation;
     isFixedRotation;
+    listener;
 
     constructor(sizes, type, ship) {
         super(45, sizes.width / sizes.height, 0.1, Universe.UNI_SIZE * 4 * Universe.CBRT_THREE);
@@ -46,6 +47,17 @@ class MyCamera extends THREE.PerspectiveCamera {
 
         this.type = type;
         this.ship = ship;
+
+        // Add positional AudioListener to the camera
+        /*
+        if ((ship != undefined) && (ship.game.soundOn) && (Universe.getListener() != undefined)) {
+            this.addListener(Universe.getListener());
+        }
+        */
+    }
+
+    addListener(list) {
+        this.add(list);
     }
 
     createChase(ship) {
@@ -141,8 +153,13 @@ class MyCamera extends THREE.PerspectiveCamera {
 
             case MyCamera.FIXED:
             default:
-                //Nothing to do
                 break;
+        }
+
+        if (undefined != this.listener) {
+            list = this.listener;
+            this.remove(list);
+            this.add(list);
         }
 
     }

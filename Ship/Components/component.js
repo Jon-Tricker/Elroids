@@ -55,12 +55,16 @@ class Component  {
 
         if (this.status < dam) {
             // Cant take full damage
-            hits = this.getMaxHp() * this.status/100;
+            hits = this.getCurrentHp();
             dam = this.status;
         } 
 
         this.status -= dam;
         return(hits)
+    }
+
+    getCurrentHp() {
+        return(this.getMaxHp() * this.status/100);
     }
 
     // Determine if working.

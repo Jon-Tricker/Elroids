@@ -2,6 +2,7 @@
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
+import * as THREE from 'three';
 import Keyboard from "./keyboard.js";
 import Universe from './universe.js'
 import Game from './game.js'
@@ -10,18 +11,19 @@ import MyCamera from './Scenery/myCamera.js'
 
 // Some plumbing to get passed parameters.
 var scripts = document.getElementsByTagName('script');
-var lastScript = scripts[scripts.length-1];
+var lastScript = scripts[scripts.length - 1];
 var scriptName = lastScript;
 var rockCount = parseInt(scriptName.getAttribute('rockCount'));
 var uniSize = parseInt(scriptName.getAttribute('uniSize'));
 var rockStyle = scriptName.getAttribute('rockStyle');
+var soundOn = scriptName.getAttribute('soundOn');
 var safe = false;
 
 Universe.setSize(uniSize);
 
 // Create the game objects
 const player = new Player();
-const game = new Game(rockCount, rockStyle, safe, player);
+const game = new Game(rockCount, rockStyle, safe, player, soundOn);
 
 // Add event listener on clicks.
 // It takes a while for auto repeat to kick in. Also we don't know how fast it will be. So
@@ -31,6 +33,15 @@ window.addEventListener('keydown', (event) => {
   var code = event.code;
   // Alert the key name and key code on keydown2key
   Keyboard.keyDown(event)
+
+  // A bit mad but chrome want's this created as part of a user event.
+  // So just do it on first key click.
+  if (game.soundOn && (undefined == Universe.getListener())) {
+    Universe.loadSounds();
+    let listener = new THREE.AudioListener();
+    Universe.setListener(listener);
+    game.getScene().getCamera().addListener(listener);
+  }
 
   // Handle camera changes.
   if (Keyboard.getState("1")) {

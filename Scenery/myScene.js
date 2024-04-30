@@ -128,6 +128,10 @@ class MyScene extends THREE.Scene {
       this.resizeCamera();
     })
 
+    if (undefined != Universe.getListener()) {
+      this.getCamera().addListener(Universe.getListener());
+    }
+
     this.renderer.render(this, this.camera);
   }
 

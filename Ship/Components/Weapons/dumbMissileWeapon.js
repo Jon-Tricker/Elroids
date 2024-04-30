@@ -12,15 +12,8 @@ class DumbMissileWeapon extends MissileWeapon {
 
     fire(target, date) {
         if (this.isReady(date)) {
-            try {   
-                super.fire(target, date);
-                new DumbMissile(target, this.ship);
-            }
-
-            catch(error) {
-                // Failed to for for some reason. e.g. out of ammo. 
-                this.ship.game.displays.addMessage(error);
-            }
+            super.fire(target, date);
+            new DumbMissile(target, this.ship);
         }
     }
 

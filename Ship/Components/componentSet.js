@@ -82,12 +82,12 @@ class ComponentSet extends Array {
         let index = Math.floor(Math.random() * this.length);
         let comp = this[index];
         if (comp.status > 0) {
-            return (comp.takeDamage(1));
+            let taken = comp.takeDamage(hits)
+            this.recalc();
+            return (taken);
         } else {
             return(0);
         }
-
-        this.recalc();
     }
 
     // Repair a given amount.
@@ -99,7 +99,7 @@ class ComponentSet extends Array {
 
         // Can we afford it
         if (cost > this.ship.game.player.score) {
-            percent = Math.floor(this.ship.game.player.score * 100 / cost);
+            percent = Math.floor(this.ship.game.player.score * percent / cost);
             cost = this.ship.game.player.score;
             allDone = false;
         }
@@ -110,11 +110,19 @@ class ComponentSet extends Array {
         }
 
         // Bill player.
-        this.ship.game.player.addScore(-cost);
+        this.ship.addScore(-cost);
 
         this.recalc();
 
         return (allDone);
+    }
+
+    getCurrentHp() {
+        let hp = 0;
+        for (let comp of this) {
+            hp += comp.getCurrentHp()
+        }
+        return(hp);
     }
 }
 

@@ -1,6 +1,7 @@
 // Base class for weapons
 import Universe from '../../../universe.js';
 import Component from '../component.js';
+import GameError from "../../../GameErrors/gameError.js";
 
 class Weapon extends Component {
     fireRate;   // Per second
@@ -22,14 +23,16 @@ class Weapon extends Component {
         this.fireLast = date;
 
         if (!this.isWorking()) {
-            throw (GameError("Component failed"));
+            this.ship.playSound("click");
+            throw (new GameError("Weapon failed"));
         }
 
         if (undefined != this.maxAmmo) {
             if (0 <= this.ammo) {
                 this.ammo--;
             } else {
-                throw (GameError("Out of ammo"));
+                this.ship.GameErrorplaySound("click");
+                throw (new GameError("Out of ammo"));
             }
         }
     }

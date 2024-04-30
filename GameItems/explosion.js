@@ -15,6 +15,8 @@ const explosionMaterial = new THREE.MeshStandardMaterial(
   }
 )
 
+const MAX_SIZE = 10;
+
 class Explosion extends Item {
 
   maxSize;
@@ -24,6 +26,10 @@ class Explosion extends Item {
 
     // With same location and speed as exploding thing
     super(that.location.x, that.location.y, that.location.z, that.speed.x, that.speed.y, that.speed.z, that.game);
+
+    if (MAX_SIZE < this.maxSize) {
+      this.maxSize = MAX_SIZE;
+    }
 
     this.maxSize = maxSize;
     this.currentSize = 1;
@@ -42,6 +48,8 @@ class Explosion extends Item {
     let explosionMesh = new THREE.Mesh(explosionGeometry, explosionMaterial);
 
     this.add(explosionMesh);
+
+    this.playSound('explosion', this.maxSize/MAX_SIZE );
   }  
   
   // Don't check collisions with explosions
