@@ -34,13 +34,14 @@ window.addEventListener('keydown', (event) => {
   // Alert the key name and key code on keydown2key
   Keyboard.keyDown(event)
 
-  // A bit mad but chrome want's this created as part of a user event.
-  // So just do it on first key click.
+  // A bit mad but chrome want's all audio to be done as part of a user event.
+  // So do it on first key click.
   if (game.soundOn && (undefined == Universe.getListener())) {
-    Universe.loadSounds();
+    Universe.loadSoundBuffers();
+
     let listener = new THREE.AudioListener();
     Universe.setListener(listener);
-    game.getScene().getCamera().addListener(listener);
+    game.getScene().addListener(listener);
   }
 
   // Handle camera changes.

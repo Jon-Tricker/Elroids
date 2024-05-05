@@ -22,6 +22,7 @@ class MyScene extends THREE.Scene {
   skyBox;
   wrapBox;
 
+
   constructor(game, wrapBoxOn) {
     super();
 
@@ -133,6 +134,11 @@ class MyScene extends THREE.Scene {
     }
 
     this.renderer.render(this, this.camera);
+  }
+
+  addListener(list) {
+    // this.add(list);
+    this.camera.addListener(list);
   }
 
   resizeCamera() {

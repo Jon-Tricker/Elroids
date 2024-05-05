@@ -36,6 +36,16 @@ class ComponentSets extends Array {
         return(hp);
     }
 
+    calculateMass() {
+        let mass = 0;
+
+        for (const set of this) {
+            mass += set.getMass();
+        }
+
+        return(mass);
+    }
+
 }
 
 export default ComponentSets;

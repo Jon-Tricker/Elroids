@@ -82,11 +82,11 @@ class SaucerHunter extends Saucer {
                         this.shootDue = 0;
                     }
                 } else {
-                    this.burstCounter = 1 + Math.floor(Math.random() * (BURST_COUNT - 1));
+                    this.burstCounter = Math.floor(1 + (Math.random() * BURST_COUNT));
                 }
 
                 // Only fire if vaguley close enough.
-                let range = this.getRelativePosition(this.game.getShip().location);
+                let range = this.getRelativeLocation(this.game.getShip().location);
 
                 if ((STANDOFF_DISTANCE * 2) > range.length()) {
                     range.normalize();

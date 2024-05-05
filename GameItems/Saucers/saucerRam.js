@@ -27,7 +27,7 @@ class SaucerRam extends Saucer {
     }
     // Do navigation logic to ram ship.
     navigate() {
-        let targetSpeed = this.getRelativePosition(this.game.getShip().location);
+        let targetSpeed = this.getRelativeLocation(this.game.getShip().location);
         targetSpeed.multiplyScalar(-1);
 
         // In safe mode always miss.

@@ -47,16 +47,10 @@ class MyCamera extends THREE.PerspectiveCamera {
 
         this.type = type;
         this.ship = ship;
-
-        // Add positional AudioListener to the camera
-        /*
-        if ((ship != undefined) && (ship.game.soundOn) && (Universe.getListener() != undefined)) {
-            this.addListener(Universe.getListener());
-        }
-        */
     }
 
     addListener(list) {
+        // list.position.set(this.position);
         this.add(list);
     }
 
@@ -155,13 +149,6 @@ class MyCamera extends THREE.PerspectiveCamera {
             default:
                 break;
         }
-
-        if (undefined != this.listener) {
-            list = this.listener;
-            this.remove(list);
-            this.add(list);
-        }
-
     }
 }
 

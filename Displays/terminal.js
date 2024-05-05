@@ -4,6 +4,7 @@
 
 import * as THREE from 'three';
 import DarkPanel from './darkPanel.js';
+import Universe from '../universe.js'
 
 // Scale factor relative to parent.
 const SCALE_FACTOR = 0.9;
@@ -33,6 +34,12 @@ class Terminal extends DarkPanel {
     cursor = new THREE.Vector2(0, 0);
 
     flashDue = FLASH_FREQUENCY;
+
+    // Non positional sounds.
+    // Tried for ages to use ship.playSound() but with PositionalAudio objects sounds seem to move with the ship while listener remains at origin ...
+    //    ... even when this is not the case for sounds actually produced by the ship.
+    // Anyhow for terminal use non positional instead.
+    sounds = new Map();
 
     constructor(game, ctx, doc, defaultColour) {
         super(ctx, defaultColour);
@@ -135,7 +142,7 @@ class Terminal extends DarkPanel {
                 // Convert escaped things.
                 case 0x26:  // Ampersand
                     if (text.length > (i + 2)) {
-                        if ((text[i+1] == 'l') && (text[i + 2] == 't')) {
+                        if ((text[i + 1] == 'l') && (text[i + 2] == 't')) {
                             this.addChar("<", highlight);
                             i += 2;
                         }
@@ -261,6 +268,57 @@ class Terminal extends DarkPanel {
     highlightCell(x, y) {
         let loc = this.getCellLocation(x, y);
         this.ctx.fillRect(loc.x, loc.y, this.pt.x + 1, this.pt.y + 1);
+    }
+
+    playSound(name, volume, loop) {
+        if (!this.game.soundOn) {
+            return (false);
+        }
+
+        let list = Universe.getListener();
+        if ((undefined == list)) {
+            // Dont have a listener yet ... give up. without loading
+            return (false);
+        }
+
+        // We are going to play a sound. Get the buffer.
+        let sound = this.sounds.get(name);
+        if (undefined == sound) {
+            // Need to create/attach PositionalAudio for this Item.
+            let buffer = Universe.sounds.get(name);
+            if (null == buffer) {
+                // Buffer not yet loaded into Univese
+                return (false);
+            }
+
+            sound = new THREE.Audio(list)
+            sound.setBuffer(buffer);
+            sound.stop();
+
+            this.sounds.set(name, sound);
+        }
+
+        if (undefined != volume) {
+            sound.setVolume(volume);
+        }
+
+        if (undefined != loop) {
+            sound.setLoop(loop);
+        }
+
+        // Play it
+        if (!sound.isPlaying) {
+            sound.play();
+        }
+
+        return (true)
+    }
+
+    stopSound(name) {
+        let sound = this.sounds.get(name);
+        if (undefined != sound) {
+            sound.stop();
+        }
     }
 }
 

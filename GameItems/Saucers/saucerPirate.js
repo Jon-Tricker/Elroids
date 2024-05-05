@@ -35,6 +35,10 @@ class SaucerPirate extends Saucer {
         super(SIZE, locationX, locationY, locationZ, game, MASS, COLOUR, owner, safe);
     }
 
+    getClass() {
+        return("Pirate");
+    }
+
     getMaxSpeed() {
         return (MAX_SPEED);
     }
@@ -73,7 +77,7 @@ class SaucerPirate extends Saucer {
         }
 
         // Home on target location 
-        let targetSpeed = this.getRelativePosition(targetLoc);
+        let targetSpeed = this.getRelativeLocation(targetLoc);
         this.thrust(THRUST, targetSpeed, MAX_SPEED);
     }
 
@@ -98,7 +102,7 @@ class SaucerPirate extends Saucer {
                 if (this.shootDue++ >= SHOOT_FREQUENCY) {
 
                     // Only fire if vaguley close enough.
-                    let range = this.getRelativePosition(this.game.getShip().location);
+                    let range = this.getRelativeLocation(this.game.getShip().location);
 
                     if (MAX_RANGE > range.length()) {
                         range.normalize();

@@ -1,5 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
+
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
 	<TITLE>Elroids developer notes.</TITLE>
@@ -14,32 +15,44 @@
 
 <BODY>
 	<P LANG="en-GB" ALIGN=CENTER><IMG SRC="../Logo.jpg" NAME="Logo" WIDTH=250 HEIGHT=200 BORDER=0>
-</P>
+	</P>
 	<H1 LANG="en-GB" ALIGN=CENTER CLASS="western">'Elroids' Developer Notes.</H1>
 
 	<H2>Source access</H2>
 	<P>There is a, currently private, github repository <A HREF="https://github.com/Jon-Tricker/Elroids">here</A>. </P>
 	<P>Alternatly it's all just script. You can 'inspect'/download the code from your browser.</P>
-	<P>There is also a facebook discussion group <A HREF="https://www.facebook.com/groups/1134918534166826">here</A>. If you want github access please join this and post a request to be added.</P>
+	<P>There is also a facebook discussion group <A HREF="https://www.facebook.com/groups/1134918534166826">here</A>. If
+		you want github access please join this and post a request to be added.</P>
 
 	<H2>Bugs</H2>
 	<UL>
 		<LI>Exhaust flame is supposed to be yellow ... investigate why it is not.</LI>
-		<LI>Missiles are created too far in front of ship (see 'quantization' issue below). Sometimes miss very close targets ... fix</LI>
-		<LI>Sometimes control keys seem to get stuck (keyboard.js) ... Think this is when the debugger is used and it consumes some of the event..</LI>
+		<LI>Missiles are created too far in front of ship (see 'quantization' issue below). Sometimes miss very close
+			targets ... fix</LI>
+		<LI>Sometimes control keys seem to get stuck (keyboard.js) ... Think this is when the debugger is used and it
+			consumes some of the event..</LI>
+		<LI>Fix audio to use THREE.PositionalAudio (Item.js.playSound()). I tried but cant get the listener to stay
+			stuck to the camera in all cases. Maybe add it to the Ship instead. Fell back on manually reducing volume
+			wih distance (and living without correct stereo).</LI>
 	</UL>
 
 	<H2>ToDos (In some sort of priority order)</H2>
 
-	<H3>V1.x Ship maintence game (CURRENTLY IN PROGRESS)</H3>
-	<P>There is no point having the economic game if there is nothing to spend the profits on. Add ship upgrades.</P>
-	<P>Conponent sub classes:</P>
-	<UL>Done:
-		<LI>Weapon missile</LI>
-		<LI>Hull</LI>
-		<LI>Engine</LI>
+	<H3>V2.x Economics game</H3>
+	<P>Add the 'Elite' stuff about trading, upgrades etc.</P>
+	<UL>
+		<LI>Add space station:
+			<UL>
+				<LI>Docking.</LI>
+				<LI>Trade.</LI>
+			</UL>
+		</LI>
+		<LI>Extend menu syetem to have extra controls necessary for trading.</LI>
+		<LI>Add 'cargo bay' component.</LI>
 	</UL>
-	<UL>ToDo:
+
+	<H3>V3.x Ship upgrades:</H3><P>Add conponent sub classes:</P>
+	<UL>
 		<LI>Weapon beam</LI>
 		<LI>Thrusters (directional control)</LI>
 		<LI>Targeting computer</LI>
@@ -47,63 +60,57 @@
 		<LI>Range finder</LI>
 		<LI>Cargo bay</LI>
 	</UL>
-	<P>Add component purchace menu.</P>
-	<P>Add menu error handling (of thrown GameError exceptions).</P>
+	<P>Add component purchace menu (when docked).</P>
 
-	<H3>V2.x Economics game</H3>
-	<P>Add the 'Elite' stuff about trading, upgrades etc.</P>
-		<UL>
-			<LI>Extend menu syetem to have extra controls necessary for trading.</LI>
-			<LI>Add space station:
-				<UL>
-					<LI>Docking.</LI>
-					<LI>Trade.</LI>
-					<LI>Ship upgrades.</LI>
-					<LI>Ship repairs.</LI>
-				</UL>
-			</LI>
-			<LI>Extended universe:
-				<UL>
-					<LI>Multiple systems (stations?).</LI>
-					<LI>Warp drive.</LI>
-					<LI>Galactic map.</LI>
-				</UL>
-			</LI>
-		</UL>
+	<H3>V4.x Extend Universe</H3>
+	<UL>
+		<LI>Multiple systems (stations?).</LI>
+		<LI>Warp drive.</LI>
+		<LI>Galactic map.</LI>
+	</UL>
+	</UL>
 
 	<H3>General 'good stuff' ... Post V1.0</H3>
 	<UL>
 		<LI>Game mechanics:
 			<UL>
-				<LI>Improve 'vision through' wrap to take account of camera direction (i.e. dont just use Universe.handleWrap()). i.e. allow rocks to be seen at full universe width not half.</LI>
-				<LI>Improve 'collision detection' mechanism (Item.detectCollision()). Although, for now, the 'cylinder Vs sphere' bounding check seems to be doing good service.
-				<UL>
-					<LI>Use ray tracing. This may not work because need to detect collision throughout the movement phase. So would need to do many raytracing comparisons during each phase.</LI>
-					<LI>Carve the universe into 'regions'. So don't have the square law issue of checking collisions between everything and 'everthing else'.</LI>
-				</UL>
+				<LI>Improve 'vision through' wrap to take account of camera direction (i.e. dont just use
+					Universe.handleWrap()). i.e. allow rocks to be seen at full universe width not half.</LI>
+				<LI>Improve 'collision detection' mechanism (Item.detectCollision()). Although, for now, the 'cylinder
+					Vs sphere' bounding check seems to be doing good service.
+					<UL>
+						<LI>Use ray tracing. This may not work because need to detect collision throughout the movement
+							phase. So would need to do many raytracing comparisons during each phase.</LI>
+						<LI>Carve the universe into 'regions'. So don't have the square law issue of checking collisions
+							between everything and 'everthing else'.</LI>
+					</UL>
 				</LI>
 				<LI>Limited number of missiles in flight (like Asteroids).</LI>
 			</UL>
-			<LI>Do something about saucer 'seeking' target location behaviour ... or maybe just leave it since it looks like defensive manouvering.</LI>
-			<LI>Componentize sacucer</LI>
-			<LI>Sort out menu system:</LI>
-			<UL>
-				<LI>Current code for buttons and scripts is ugly. Works in the context of MenuSystem, where it is evaled, rather than it's own. Good enough for a 'minimum feature set' but needs a re-work.</LI>
-				<LI>Currently buttons won't work on nested tables</LI>
-				<LI>Re-work menue system as real HTML with style sheets to control look and feel. Back end to communicating via HTTP with a, localy implemeneted in the client, 'HTML server'. </LI>
-			</UL>
-			<LI>Add 'plug in' mini control panels for each ship component.</LI>
+		<LI>Do something about saucer 'seeking' target location behaviour ... or maybe just leave it since it looks like
+			defensive manouvering.</LI>
+		<LI>Componentize sacucer</LI>
+		<LI>Sort out menu system:</LI>
+		<UL>
+			<LI>Current code for buttons and scripts is ugly. Works in the context of MenuSystem, where it is evaled,
+				rather than it's own. Good enough for a 'minimum feature set' but needs a re-work.</LI>
+			<LI>Currently buttons won't work on nested tables</LI>
+			<LI>Re-work menue system as real HTML with style sheets to control look and feel. Back end to communicating
+				via HTTP with a, localy implemeneted in the client, 'HTML server'. </LI>
+		</UL>
+		<LI>Add 'plug in' mini control panels for each ship component.</LI>
 		</LI>
 
 		<LI>Code:</LI>
 		<LI>Prettiness:</LI>
 		<UL>
-		<LI>Create 'exploding ship' animation. (Exploding Mesh? Then it could also do rocks/saucers etc.)</LI>
-		<LI>Add surface texture to ship.</LI>
-		<LI>Make saucers more 'shiny'. Probably involves MeshPhongMaterial ... but for me that just comes out white.</LI>
-		<LI>Add extra vt100 features (e.g. block graphics) to ship control terminal.</LI>
+			<LI>Create 'exploding ship' animation. (Exploding Mesh? Then it could also do rocks/saucers etc.)</LI>
+			<LI>Add surface texture to ship.</LI>
+			<LI>Make saucers more 'shiny'. Probably involves MeshPhongMaterial ... but for me that just comes out white.
+			</LI>
+			<LI>Add extra vt100 features (e.g. block graphics) to ship control terminal.</LI>
 		</UL>
-		
+
 		<LI>Additional features:
 			<UL>
 				<LI>Add 'lock' to cross hairs. Colour change and display range when allingned with a target.</LI>
@@ -112,7 +119,7 @@
 						<LI>Homeing missile + Missile lock.</LI>
 						<LI>Proximity missiles (mainly for use by the bad guys).</LI>
 						<LI>'Elite style' (over heating) beam weapon.</LI>
-						<LI>Shields.</LI>	
+						<LI>Shields.</LI>
 						<LI>Hypespace button. </LI>
 						<LI>Improved terminal (but keep VT100 as default).</LI>
 					</UL>
@@ -122,12 +129,13 @@
 		</LI>
 
 		<LI>UI improvements:
-			<LI>Abstract keyboard controls to Events (Roll left, Pause, etc.) rather than characters. Makes swutch to other UIs easier.</LI>
-			<UL>
-				<LI>Add mouse controls.</LI>
-				<LI>Make radar zoomable.</LI>
-				<LI>Add joystick/tablet controls (maybe via on screen buttons reproducing keyboard keys).</LI>
-			</UL>
+		<LI>Abstract keyboard controls to Events (Roll left, Pause, etc.) rather than characters. Makes swutch to other
+			UIs easier.</LI>
+		<UL>
+			<LI>Add mouse controls.</LI>
+			<LI>Make radar zoomable.</LI>
+			<LI>Add joystick/tablet controls (maybe via on screen buttons reproducing keyboard keys).</LI>
+		</UL>
 		</LI>
 
 		<LI>Extensions:
@@ -137,44 +145,58 @@
 				<LI>Add optional gravity effects (like Gravitar).</LI>
 				<LI>Add on line high score table?</LI>
 				<LI>Add save/load ... not sure how on a web based game.</LI>
-				<LI>Maybe collision damage should be proportional to mass and relative speed of colliding object. Common for all items apart from 'rock on rock' impacts.</LI>
+				<LI>Maybe collision damage should be proportional to mass and relative speed of colliding object. Common
+					for all items apart from 'rock on rock' impacts.</LI>
 				<LI>Revisit inline 'ToDos'.</LI>
 			</UL>
 		</LI>
 	</UL>
 
 	<H2>Learnings</H2>
-	<UL>	
-		<LI>Three JS is oriented towards 'landscape' scenes. 
-		odd things (flipings and unexpected rotations) 
-		can happen if a camera flies over the 'poles'. 
-		After a lot of effort I worked round this by making the 'chase/pilot
-		cameras' part of the ship.
+	<UL>
+		<LI>Three JS is oriented towards 'landscape' scenes.
+			odd things (flipings and unexpected rotations)
+			can happen if a camera flies over the 'poles'.
+			After a lot of effort I worked round this by making the 'chase/pilot
+			cameras' part of the ship.
 		</LI>
 		<LI>1D conservation of momentum, during collisions, is handled as described in the equasions
-		<A HREF="https://en.wikipedia.org/wiki/Momentum"> here.</A>
-		Most discussion on extending this to 3D decends into a mass of 'Euler angles' and 'trig'. However since we have both the
-		velocities and impact direction as x, y and z components it can be handled using
-		dot products (and less CPU) ... but it took a while to get the maths right.
+			<A HREF="https://en.wikipedia.org/wiki/Momentum"> here.</A>
+			Most discussion on extending this to 3D decends into a mass of 'Euler angles' and 'trig'. However since we
+			have both the
+			velocities and impact direction as x, y and z components it can be handled using
+			dot products (and less CPU) ... but it took a while to get the maths right.
 		</LI>
-		<LI>There are problems with 'quantized' time. A slower moving object can catch up with and collide with a faster one if it gets a move phase 'first'. Some messy work round have been required.</LI>
-		<LI>Sound support on Chrome is a pain. In an attempt to block audio spam audio components can only ne initialized from within user events. So sounds have to be loaded on the first key/mouse click. Which means they are not yet ready if this event wans to make a sound,</LI>
+		<LI>There are problems with 'quantized' time. A slower moving object can catch up with and collide with a faster
+			one if it gets a move phase 'first'. Some messy work round have been required.</LI>
+		<LI>Sound support on Chrome is a pain. In an attempt to block audio spam audio components can only ne
+			initialized from within user events. So sounds have to be loaded on the first key/mouse click. Which means
+			they are not yet ready if this event wans to make a sound,</LI>
 	</UL>
 
 	<H2>Units and dimensions</H2>
-	<P>This project was coded with arbitary units of distance/mass. I have since modified it to use something resembling SI.</P>
+	<P>This project was coded with arbitary units of distance/mass. I have since modified it to use something resembling
+		SI.</P>
 	<UL>
 		<LI>Distance is in Meters.</LI>
 		<LI>Mass is in Tonnes (1000KG).</LI>
 		<LI>Time is in seconds.</LI>
-		<LI>Rocks have a mass equal to the cube of their size. i.e (assuming cubic rocks) a density of about 1 tonne/m^3. Probably should be a bit higher and related to their composition. However it will do for now. </LI>
+		<LI>Rocks have a mass equal to the cube of their size. i.e (assuming cubic rocks) a density of about 1
+			tonne/m^3. Probably should be a bit higher and related to their composition. However it will do for now.
+		</LI>
 	</UL>
 
 	<P>There are a few incorrect 'artifacts' to make the game playable.</P>
 	<UL>
-		<LI>Rock mass is proportional to the cube of its size. When a rock splits it make 2 rocks of half the size. So 3/4 of the mass is lost. However this makes for a mangable amounts of minerals once a rock is broken down. (The spare mass becomes 'dark matter')</LI>
-		<LI>Universe is too small. Only a few km across. Necessary to keep a reasonable rock density wihtout a huge number of rocks.</LI>
-		<LI>Distances and sizes are far too small for a 'realistic' universe. However if made realistic objects would only be points of light in the distance. For playability everything is moved closer together. (Excuse: StarTrek/Wars battles where ships engage a few hundred meters apart and travelling at a few 10s of kph.)</LI>
+		<LI>Rock mass is proportional to the cube of its size. When a rock splits it make 2 rocks of half the size. So
+			3/4 of the mass is lost. However this makes for a mangable amounts of minerals once a rock is broken down.
+			(The spare mass becomes 'dark matter')</LI>
+		<LI>Universe is too small. Only a few km across. Necessary to keep a reasonable rock density wihtout a huge
+			number of rocks.</LI>
+		<LI>Distances and sizes are far too small for a 'realistic' universe. However if made realistic objects would
+			only be points of light in the distance. For playability everything is moved closer together. (Excuse:
+			StarTrek/Wars battles where ships engage a few hundred meters apart and travelling at a few 10s of kph.)
+		</LI>
 		<LI>Ship 'braking' doesn't have real physics equivalent ... but it's useful for game play.</LI>
 	</UL>
 
@@ -185,4 +207,5 @@
 		<LI>I want the code available warts/comments and all. Not an additional build step with modified output.</LI>
 	</OL>
 </BODY>
+
 </HTML>

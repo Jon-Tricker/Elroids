@@ -97,6 +97,10 @@ class ComponentSet extends Array {
         let cost = this.getRepairCost(percent);
         let allDone = true;
 
+        if (0 == cost) {
+            return(true);
+        }
+
         // Can we afford it
         if (cost > this.ship.game.player.score) {
             percent = Math.floor(this.ship.game.player.score * percent / cost);
@@ -107,6 +111,10 @@ class ComponentSet extends Array {
         // Do repair
         for (let comp of this) {
             comp.repair(percent);
+        }
+
+        if (allDone) {
+            this.ship.game.displays.terminal.playSound("anvil", 0.5);
         }
 
         // Bill player.

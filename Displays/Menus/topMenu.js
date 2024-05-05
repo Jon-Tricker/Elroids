@@ -15,9 +15,9 @@ let topMenu = "\
 <P ALIGN=\"CENTER\">Control with navigation controls ... (\"S\" - Up, \"X\" - Down, \"M\" - Select).\n</P>\
 <UL>\
     <LI><A HREF=\"helpMenu\">Menu controls help screen.</A></LI>\
-    <LI><A HREF=\"gameMenu\">Game Configuration Menu.</A></LI>\
     <LI><A HREF=\"repairMenu\">Ship Repair Menu.</A></LI>\
     <LI><A HREF=\"componentsMenu\">Ship Components/Upgrade Menu.</A></LI>\
+    <LI><A HREF=\"gameMenu\">Game Configuration Menu.</A></LI>\
     <LI><A HREF=\"commerceMenu\">Commerce Menu (TBD).</A></LI>\
 </UL>\
 </BODY>"

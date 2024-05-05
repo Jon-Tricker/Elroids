@@ -71,10 +71,10 @@ class Rock extends NonShipItem {
   destruct() {
     this.game.rockCount--;
     super.destruct();
-  } 
-  
+  }
+
   getClass() {
-    return("Rock");
+    return ("Rock");
   }
 
   static setRockStyle(style) {
@@ -125,7 +125,7 @@ class Rock extends NonShipItem {
     }
 
     // Rocks only take 1 point of damage
-    if (1 <  hits) {
+    if (1 < hits) {
       hits = 1;
     }
 
@@ -150,13 +150,14 @@ class Rock extends NonShipItem {
       // Create a pair of compositions.
       let newComp = this.composition.split();
 
-      new Rock(newSize, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, this.composition);
+      new Rock(newSize, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, this.composition)
 
       speedRatio = 1 - speedRatio;
       bang.multiplyScalar(-1);
+
       new Rock(newSize, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, newComp);
     } else {
-      this.composition.mineralize(this.location, this.speed, this.mass/2, this.game);
+      this.composition.mineralize(this.location, this.speed, this.mass / 2, this.game);
     }
 
     this.destruct();

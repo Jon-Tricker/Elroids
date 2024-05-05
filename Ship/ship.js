@@ -90,6 +90,8 @@ class Ship extends Item {
     hullSet;
     weaponSet;
 
+    engineSoundOn = false;
+
     constructor(height, width, length, locationX, locationY, locationZ, game) {
         super(locationX, locationY, locationZ, 0, 0, 0, game, length);
 
@@ -126,13 +128,7 @@ class Ship extends Item {
 
 
         // Add in weight of all components.
-        this.calculateMass();
-    }
-
-    calculateMass() {
-        for (const set of this.compSets) {
-            this.mass += set.getMass();
-        }
+        this.mass = this.compSets.calculateMass();
     }
 
     createCameras() {
@@ -286,15 +282,39 @@ class Ship extends Item {
     }
 
     accelerate() {
-        // Flame on 
-        if (flameMaterial.transparent) {
-            flameMaterial.transparent = false;
-            flameMaterial.color = "red";
-        }
-
         let xDirection = this.getOrientation();
 
-        this.thrust(this.engineSet.getThrust(), xDirection, this.hullSet.getMaxSpeed());
+        let thrust = this.engineSet.getThrust();
+        if (0 < thrust) {
+            this.setFlameState(true);
+            this.setEngineSound(true);
+            this.thrust(thrust, xDirection, this.hullSet.getMaxSpeed());
+        } else {
+            this.setFlameState(false);
+            this.setEngineSound(false);
+        }
+    }
+
+    setFlameState(state) {
+        if (state) {
+            if (flameMaterial.transparent) {
+                flameMaterial.transparent = false;
+                flameMaterial.color = "red";
+            }
+        } else {
+            if (!flameMaterial.transparent) {
+                flameMaterial.transparent = true;
+            }
+        }
+    }
+
+    setEngineSound(state) {
+        if (true == state) { 
+            this.playSound("roar", 0.5, true);
+        } else {   
+            this.stopSound("roar");  
+        }
+        this.engineSoundOn = state;
     }
 
     deceletarte() {
@@ -307,6 +327,8 @@ class Ship extends Item {
             newSpeed.multiplyScalar(0);
         }
         this.setSpeed(newSpeed);
+
+        this.setEngineSound(true);
     }
 
     // In general to rotate. Asjust relative to our own axis.
@@ -358,14 +380,15 @@ class Ship extends Item {
         if (keyboard.getState(" ")) {
             this.accelerate();
         } else {
-            // Flame off.
-            if (!flameMaterial.transparent) {
-                flameMaterial.transparent = true;
-            }
+            this.setFlameState(false);
         }
 
         if (keyboard.getState("?") || keyboard.getState("/")) {
             this.deceletarte();
+        }
+
+        if (!keyboard.getState(" ") && !keyboard.getState("?") && !keyboard.getState("/") && this.engineSoundOn) {
+            this.setEngineSound(false);
         }
 
         if (keyboard.getState("<") || keyboard.getState(",")) {
@@ -429,7 +452,7 @@ class Ship extends Item {
             this.playSound('scream');
             // new Explosion(this.size, this);
             this.game.shipDestroyed(that);
-        } else { 
+        } else {
             this.playSound('clang');
         }
     }

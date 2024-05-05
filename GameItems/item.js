@@ -12,6 +12,8 @@ import Ship from "../Ship/ship.js"
 
 const COLOUR = "#FFFFFF"
 
+// Distance for audio volume to half
+const AUDIO_HALF_DIST = 500;
 
 class Item extends THREE.Group {
 
@@ -30,6 +32,10 @@ class Item extends THREE.Group {
 
     // Bounding volume for collision detectionn.
     boundary = null;
+
+    // PositionalAudio objects for this Item. 
+    // Create and attch once when first used.
+    sounds = new Map();
 
     // Construct with optional mass
     constructor(locationX, locationY, locationZ, speedX, speedY, speedZ, game, size, mass, hitPoints, owner) {
@@ -214,7 +220,7 @@ class Item extends THREE.Group {
     // Separate two overlapping objects.
     separateFrom(that) {
 
-        let relLoc = this.getRelativePosition(that.location);
+        let relLoc = this.getRelativeLocation(that.location);
         while (0 == relLoc.length()) {
             relLoc.add(this.game.createRandomVector(1));
         }
@@ -331,7 +337,7 @@ class Item extends THREE.Group {
             // Get position relative to camers       
             let cameraPos = new THREE.Vector3();
             camera.getWorldPosition(cameraPos);
-            let relPos = this.getRelativePosition(cameraPos);
+            let relPos = this.getRelativeLocation(cameraPos);
             relPos.multiplyScalar(-1);
             this.position.set(relPos.x + cameraPos.x, relPos.y + cameraPos.y, relPos.z + cameraPos.z);
         }
@@ -339,7 +345,7 @@ class Item extends THREE.Group {
 
     // Get position relative to something else.
     // Handle seeing Items > Universe size away.
-    getRelativePosition(loc) {
+    getRelativeLocation(loc) {
         let rel = loc.clone();
         rel.sub(this.location);
 
@@ -355,7 +361,9 @@ class Item extends THREE.Group {
         console.log("Item had no animate() override. Probably a bug");
     }
 
-    playSound(name, volume) {
+    // Play a sound optional volume (0 - 1) and loop if it is to repeat.
+    // Return true if we could do what the game requires.
+    playSound(name, volume, loop) {
         if (!this.game.soundOn) {
             return(false);
         }         
@@ -365,30 +373,83 @@ class Item extends THREE.Group {
             // Dont have a listener yet ... give up. without loading
             return (false);
         }
+      
+
+        // We are going to play a sound. Get the buffer.
+        let sound = this.sounds.get(name);
+        if (undefined == sound) {
+            // Need to create/attach PositionalAudio for this Item.
+            let buffer = Universe.sounds.get(name);
+            if (null == buffer) {
+                // Buffer not yet loaded into Univese
+                return(false);
+            }
         
-        // If too far away
-        if (this.getRelativePosition(this.game.ship.location).length() > (Math.floor(Universe.UNI_SIZE/5))) {
-            return (true);
+            sound = new THREE.Audio(list);
+            sound.setBuffer(buffer);
+            sound.stop();
+
+            this.sounds.set(name, sound);
         }
 
-        let buffer = Universe.sounds.get(name);
-        
-        let sound = new THREE.PositionalAudio(list);
-        sound.setRefDistance( 20 );
-        sound.setBuffer(buffer);
+        if (undefined == volume) {
+            volume = 1;
+        }   
 
-        if (undefined != volume) {
-            sound.setVolume(volume);
+        // Fiddle volume to fall off with distance.
+        //
+        // Tried for age to get PositionalAudio working but it seems to have problems ... just won't move with the camera.
+        // This hack gives voulme reduction but no directionality.
+        //
+        // ToDo : Fix back to PositionalAudio.
+
+        // Probably want to hear it as if on the ship even if the camera is elsewhere.
+        let rel = this.getRelativeLocation(this.game.ship.location);
+        let dist = rel.length();
+        volume = volume / (2 ** (dist/AUDIO_HALF_DIST));
+        if (volume < 0.01) {
+            // Too quiet
+            return(true);
+        }
+
+        sound.setVolume(volume);
+
+        /*
+        let pos = this.position;
+        console.log("this " + pos.x + " " + pos.y + " " + pos.z);
+        let listener = Universe.getListener();
+        pos = listener.position;
+        console.log("list " + pos.x + " " + pos.y + " " + pos.z);
+        pos = list.getWorldPosition(new THREE.Vector3(0,0,0));
+        console.log("list world " + pos.x + " " + pos.y + " " + pos.z);
+        pos = sound.position;
+        console.log("sound " + pos.x + " " + pos.y + " " + pos.z);
+        pos = this.game.scene.camera.position;
+        console.log("camera " + pos.x + " " + pos.y + " " + pos.z);
+        pos = this.game.scene.camera.getWorldPosition(new THREE.Vector3(0,0,0));
+        console.log("camera world " + pos.x + " " + pos.y + " " + pos.z);
+        pos = this.game.scene.camera.children[0].position;
+        console.log("camera list " + pos.x + " " + pos.y + " " + pos.z);
+        */
+        
+        if (undefined != loop) {
+            sound.setLoop(loop);
         }
 
         // Play it
-        sound.stop();
-        sound.play();
-        this.add(sound);
+        if (!sound.isPlaying) {
+            sound.play();
+        }
 
         return (true)
     }
 
+    stopSound(name) { 
+        let sound = this.sounds.get(name);
+        if (undefined != sound) {
+            sound.stop();
+        }
+    }
 }
 
 export default Item;

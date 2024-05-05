@@ -20,7 +20,8 @@ class GameInternalsMenu {
         doc += "<P>Rocks: count=" + game.rockCount + ", Max count=" + game.maxRockCount + "(ish)</P>";
         doc += "<P>Saucers: Mother count=" + game.motherSaucerCount + ", Count=" + game.saucerCount + ", Max count=" + game.maxSaucerCount + "</P>";
 
-        doc += "<P>Show missiles on radar <button type=\"button\" onclick=\"GameInternalsMenu.click(this.display)\">" + game.displays.radar.showMissiles + "</button></P>";
+        doc += "<P>Show missiles on radar <button type=\"button\" onclick=\"GameInternalsMenu.missileClick(this.display)\">" + game.displays.radar.showMissiles + "</button></P>";
+        doc += "<P>Play sound <button type=\"button\" onclick=\"GameInternalsMenu.soundClick(this.display.game)\">" + game.soundOn + "</button></P>";
 
         doc += "</P>";
 
@@ -28,8 +29,12 @@ class GameInternalsMenu {
 
     }
 
-    static click(display) {
+    static missileClick(display) {
         display.radar.showMissiles = !display.radar.showMissiles;
+    } 
+    
+    static soundClick(game) {
+        game.soundOn = !game.soundOn;
     }
 }
 

@@ -39,13 +39,15 @@ class Universe {
     static audioLoader = new THREE.AudioLoader();
     static listener;
 
-    // Sounds bank. Sounds written in once they are loaded.
+    // Sounds buffer bank. Sounds written in once they are loaded.
     static sounds = new Map([
         ["pew", null],
         ["explosion", null],
         ["clang", null],
         ["coin", null],
         ["click", null],
+        ["anvil", null],
+        ["roar", null],
         ["scream", null]
     ]);
 
@@ -58,7 +60,7 @@ class Universe {
         Universe.listener = listener;
     }
 
-    static loadSounds() {
+    static loadSoundBuffers() {
         for (let [key, value] of Universe.sounds) {
             let path = "./Sounds/" + key + ".ogg";
             Universe.audioLoader.load(path, function (buffer) {

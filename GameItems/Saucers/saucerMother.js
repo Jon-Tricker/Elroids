@@ -34,7 +34,12 @@ class SaucerMother extends Saucer {
     
     getMaxSpeed() {
         return(MAX_SPEED);
+    } 
+    
+    getClass() {
+        return("Mother ship");
     }
+
     destruct() {
         // Remove self from game.
         this.game.removeMotherSaucer();
@@ -45,7 +50,7 @@ class SaucerMother extends Saucer {
     // Do navigation logic
     navigate() {
         if (!this.safe) {
-            let delta = this.getRelativePosition(this.game.getShip().location);
+            let delta = this.getRelativeLocation(this.game.getShip().location);
             delta.multiplyScalar(-1);
 
             if (Math.abs(delta.length) > Universe.UNI_SIZE) {
