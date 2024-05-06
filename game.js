@@ -28,7 +28,7 @@ import { MineralTypes } from './GameItems/minerals.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "1.10";
+const VERSION = "1.11";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -73,7 +73,7 @@ class Game {
             this.testMode = true;
 
             // Give us some cash
-            player.addScore(1234);
+            player.addCredits(1234);
         }
 
         Rock.setRockStyle(rockStyle);
@@ -313,7 +313,7 @@ class Game {
         }
         catch (e) {
             if (e instanceof GameError) {
-                this.displays.addMessage("Game error ... " + e.message);
+                this.displays.addMessage(e.message);
             } else {
                 throw (e);
             }

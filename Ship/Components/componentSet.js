@@ -102,9 +102,9 @@ class ComponentSet extends Array {
         }
 
         // Can we afford it
-        if (cost > this.ship.game.player.score) {
-            percent = Math.floor(this.ship.game.player.score * percent / cost);
-            cost = this.ship.game.player.score;
+        if (cost > this.ship.game.player.getCredits()) {
+            percent = Math.floor(this.ship.game.player.getCredits() * percent / cost);
+            cost = this.ship.game.player.getCredits();
             allDone = false;
         }
 
@@ -118,7 +118,7 @@ class ComponentSet extends Array {
         }
 
         // Bill player.
-        this.ship.addScore(-cost);
+        this.ship.addCredits(-cost);
 
         this.recalc();
 

@@ -21,9 +21,10 @@ class HullSet extends ComponentSet {
         for (let hull of this) {
             this.totalRamDamage += hull.ramDamage;
 
-            // ToDo : Maybe this should be the lowest.
-            if(hull.maxSpeed > this.maxSpeed) {
-                this.maxSpeed = hull.maxSpeed;
+            // ToDo : Maybe should be the lowest
+            let ms = hull.getMaxSpeed();
+            if(ms > this.maxSpeed) {
+                this.maxSpeed = ms;
             }
 
         }
@@ -34,7 +35,7 @@ class HullSet extends ComponentSet {
     }  
     
     getMaxSpeed() {
-        return(this.maxSpeed)
+        return(this.maxSpeed);
     }
     
     getRamDamage() {

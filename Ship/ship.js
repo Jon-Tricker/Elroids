@@ -487,13 +487,13 @@ class Ship extends Item {
     // Return true if successful.
     mineralPickup(mineral) {
         this.game.displays.addMessage("Loaded " + mineral.type.name + " ( " + Math.floor(mineral.mass) + " t, " + mineral.getValue() + "  Cr)");
-        this.addScore(mineral.getValue());
+        this.addCredits(mineral.getValue());
         mineral.destruct();
         return (true);
     }
 
-    addScore(score) {
-        this.game.player.addScore(score);
+    addCredits(score) {
+        this.game.player.addCredits(score);
         if (0 < score) {
             this.playSound('coin');
         }

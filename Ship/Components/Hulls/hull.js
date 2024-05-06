@@ -26,6 +26,10 @@ class Hull extends Component {
         vals.push(this.maxSpeed);
         return(vals);
     }
+
+    getMaxSpeed() {
+        return (Math.ceil(this.maxSpeed * this.status/100));
+    }
 }
 
 export default Hull;

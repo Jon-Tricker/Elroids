@@ -35,6 +35,15 @@ class Composition {
     this.calculateValues();
   }
 
+  // Get value per tonne.
+  getValue() {  
+    let value = 0;
+    for (let comp of this.composition) {
+      value += comp.type.value * comp.percentage/100;
+    }
+    return (Math.floor(value));
+  }
+
   // Create a random composition
   createRandom() {
 

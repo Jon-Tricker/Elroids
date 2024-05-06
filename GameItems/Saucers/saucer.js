@@ -120,7 +120,7 @@ class Saucer extends NonShipItem {
         if (destroyed) {
             if ((that.owner == this.game.ship) || (that == this.game.ship)) {
                 // Score it
-                this.game.ship.addScore(this.getScore(), that);
+                this.game.ship.addCredits(this.getScore(), that);
                 this.game.displays.addMessage("Bounty " + this.getScore() + "  (Cr)");
             }
         }

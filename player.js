@@ -7,14 +7,18 @@
 import * as THREE from 'three';
 
 class Player {
-    score;
+    score = 0;
+    credits = 0;
 
     constructor() {
-        this.score = 0;
     }
 
     getScore() {
         return (this.score);
+    }  
+    
+    getCredits() {
+        return (this.credits);
     }
 
     // Loose a life. Return 'true' if still some left.
@@ -22,8 +26,11 @@ class Player {
         return (false);
     }
 
-    addScore(score) {
-        this.score += score;
+    addCredits(score) {
+        if (0 < score) {
+            this.score += score;
+        }
+        this.credits += score;
     }
 
 }

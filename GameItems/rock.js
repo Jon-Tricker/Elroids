@@ -149,13 +149,16 @@ class Rock extends NonShipItem {
 
       // Create a pair of compositions.
       let newComp = this.composition.split();
-
-      new Rock(newSize, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, this.composition)
+      if (0 < this.composition.getValue()) {
+        new Rock(newSize, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, this.composition);
+      }
 
       speedRatio = 1 - speedRatio;
       bang.multiplyScalar(-1);
 
-      new Rock(newSize, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, newComp);
+      if (0 < newComp.getValue()) {
+        new Rock(newSize, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, newComp);
+      }
     } else {
       this.composition.mineralize(this.location, this.speed, this.mass / 2, this.game);
     }
