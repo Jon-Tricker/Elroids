@@ -9,7 +9,6 @@ import NonShipItem from './nonShipItem.js';
 import Universe from '../universe.js';
 import Ship from '../Ship/ship.js'
 import Texture from '../Utils/texture.js'
-import { ModelViewProjectionNode } from 'three/examples/jsm/nodes/Nodes.js';
 
 
 const ROTATE_RATE = 0.1;    // r/s
