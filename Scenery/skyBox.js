@@ -142,7 +142,7 @@ class SkyBox extends THREE.Group {
 
   // Dynamic image creation.
   createDataMaterialArray(width, height) {
-    let texture = new StarFieldTexture(width, height);
+    let texture = new StarFieldTexture(width, height).getTexture();
     let textures = [];
     for (let i = 0; i < 6; i++) {
       textures.push(texture);

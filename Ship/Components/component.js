@@ -73,21 +73,42 @@ class Component  {
     }
     
     getRepairCost(percent) {
-        let toDo = percent;
-        if (100 - this.status < percent) {
-            toDo = 100 - this.status;
+        let maxRepair = 100;
+        if (null == this.ship.dockedWith) {
+            maxRepair = 50;
         }
 
-        let cost = this.cost * toDo/100;
+        let toDo = percent;
+        if (maxRepair - this.status < percent) {
+            toDo = maxRepair - this.status;
+        }
+
+        let cost = this.cost * toDo/100; 
+        
+        if (null == this.ship.dockedWith) {
+            cost *= 2;
+        }
+
+        if (0 > cost) {
+            cost = 0;
+        }
+
         return(cost);
     }
 
     repair(percent) {
-        if (percent + this.status > 100) {
-            percent = 100 - this.status;
+        let maxRepair = 100;
+        if (null == this.ship.dockedWith) {
+            maxRepair = 50;
         }
 
-        this.status += percent;
+        if (percent + this.status > maxRepair) {
+            percent = maxRepair - this.status;
+        }
+
+        if (0 < percent) {
+            this.status += percent;
+        }          
     }
 }
 

@@ -6,8 +6,8 @@ const MAX_ROTATION_RATE = 0.5;    // R/s
 
 class NonShipItem extends Item {
 
-    constructor(locationX, locationY, locationZ, speedX, speedY, speedZ, game, size, mass, hitPoints, owner) {
-        super(locationX, locationY, locationZ, speedX, speedY, speedZ, game, size, mass, hitPoints, owner);
+    constructor(locationX, locationY, locationZ, speedX, speedY, speedZ, game, size, mass, hitPoints, owner, immobile) {
+        super(locationX, locationY, locationZ, speedX, speedY, speedZ, game, size, mass, hitPoints, owner, immobile);
     }
 
     // Take damage to self.

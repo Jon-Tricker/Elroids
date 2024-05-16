@@ -31,6 +31,7 @@
 			targets ... fix</LI>
 		<LI>Sometimes control keys seem to get stuck (keyboard.js) ... Think this is when the debugger is used and it
 			consumes some of the event..</LI>
+		<LI>Sometimes station 'jumps' if shot.</LI>
 		<LI>Fix audio to use THREE.PositionalAudio (Item.js.playSound()). I tried but cant get the listener to stay
 			stuck to the camera in all cases. Maybe add it to the Ship instead. Fell back on manually reducing volume
 			wih distance (and living without correct stereo).</LI>
@@ -43,13 +44,16 @@
 	<UL>
 		<LI>Add space station:
 			<UL>
-				<LI>Docking.</LI>
 				<LI>Trade.</LI>
 			</UL>
 		</LI>
 		<LI>Extend menu syetem to have extra controls necessary for trading.</LI>
 		<LI>Add 'cargo bay' component.</LI>
+		<LI>Improve space staion graphics.</LI>
+		<LI>Improve space station landing bay internal graphics.</LI>
+		<LI>Make docking more difficult.</LI>
 	</UL>
+	<P>Revisit 'repairs' maths. Currently not quite right is >1 component in set.</P>
 
 	<H3>V3.x Ship upgrades:</H3><P>Add conponent sub classes:</P>
 	<UL>
@@ -77,10 +81,9 @@
 				<LI>Improve 'vision through' wrap to take account of camera direction (i.e. dont just use
 					Universe.handleWrap()). i.e. allow rocks to be seen at full universe width not half.</LI>
 				<LI>Improve 'collision detection' mechanism (Item.detectCollision()). Although, for now, the 'cylinder
-					Vs sphere' bounding check seems to be doing good service.
+					Vs sphere' bounding check seems to be doing good service.</LI>
 					<UL>
-						<LI>Use ray tracing. This may not work because need to detect collision throughout the movement
-							phase. So would need to do many raytracing comparisons during each phase.</LI>
+						<LI>For ship/station interaction once an rough aproximation to a collision is detected it is confirmed using Ray tracing (Item.isPointInside()). Maybe extend to ray trace all the corners of the Items bounding box.</LI>
 						<LI>Carve the universe into 'regions'. So don't have the square law issue of checking collisions
 							between everything and 'everthing else'.</LI>
 					</UL>
@@ -134,7 +137,7 @@
 		<UL>
 			<LI>Add mouse controls.</LI>
 			<LI>Make radar zoomable.</LI>
-			<LI>Add joystick/tablet controls (maybe via on screen buttons reproducing keyboard keys). Maybe use tilt sensor for movement.S</LI>
+			<LI>Add joystick/tablet controls (maybe via on screen buttons reproducing keyboard keys). Maybe use tilt sensor for movement.</LI>
 		</UL>
 		</LI>
 

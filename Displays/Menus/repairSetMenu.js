@@ -8,6 +8,15 @@ class RepairSetMenu {
 
         doc += "<P>"
 
+        if (null == ship.dockedWith) {
+            doc += "<P HIGHLIGHT=\"true\">Not docked:</P>";
+            doc += "<UL>";
+            doc += "<LI>\tCosts doubled.</LI>";
+            doc += "<LI>\tCannot repair above 50%.</LI>";
+            doc += "</UL>";
+            doc += "<P></P>";
+        }
+
         let tab = new MenuTable();
 
         let heads = new Array();
@@ -27,8 +36,10 @@ class RepairSetMenu {
 
                 row.push(set.name);
                 row.push(status);
-                row.push("<button type=\"button\" onclick=\"RepairSetMenu.onRepairClick(this.display.game.ship, cursor, 10)\">" + set.getRepairCost(10) + "</button>");
-                row.push("<button type=\"button\" onclick=\"RepairSetMenu.onRepairClick(this.display.game.ship, cursor, 100)\">" + set.getRepairCost(100) + "</button>");
+                row.push(RepairSetMenu.getButtonText(set, 10));
+                row.push(RepairSetMenu.getButtonText(set, 100));
+                // row.push("<button type=\"button\" onclick=\"RepairSetMenu.onRepairClick(this.display.game.ship, cursor, 10)\">" + set.getRepairCost(10) + "</button>");
+                // row.push("<button type=\"button\" onclick=\"RepairSetMenu.onRepairClick(this.display.game.ship, cursor, 100)\">" + set.getRepairCost(100) + "</button>");
 
                 tab.addRow(row);
             }
@@ -39,6 +50,16 @@ class RepairSetMenu {
         doc += "</P>"
 
         return (doc);
+    }
+
+    static getButtonText(set, percent) {
+        let cost = set.getRepairCost(percent)
+
+        if(0 == cost) {
+            return("<button type=\"button\" onclick=\"RepairSetMenu.onRepairClick(this.display.game.ship, cursor, 0)\">N/A</button>");
+        } else {
+            return("<button type=\"button\" onclick=\"RepairSetMenu.onRepairClick(this.display.game.ship, cursor, " + percent +")\">" + cost + "</button>");
+        }
     }
 
     static onRepairClick(ship, cursor, percent) {

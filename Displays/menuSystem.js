@@ -8,6 +8,8 @@ import * as THREE from 'three';
 import Terminal from './terminal.js';
 import helpMenu from './Menus/helpMenu.js';
 import topMenu from './Menus/topMenu.js';
+import aboutMenu from './Menus/aboutMenu.js';
+import dockedMenu from './Menus/dockedMenu.js';
 import { gameMenu } from './Menus/gameMenu.js'
 import { GameInternalsMenu } from './Menus/gameMenu.js'
 import repairMenu from './Menus/repairMenu.js';
@@ -55,7 +57,11 @@ class MenuSystem {
 
     constructor(display) {
         this.display = display;
-        this.pushMenu(topMenu);
+        if (null != display.game.ship.dockedTo()) {
+            this.pushMenu(dockedMenu);
+        } else {
+            this.pushMenu(topMenu);
+        }
     }
 
     pushMenu(menu) {
@@ -153,10 +159,18 @@ class MenuSystem {
             this.targetCursor.x = 0;
         }
         let selected = this.targetCursor.equals(cursor);
-        this.display.terminal.println("\tExit", selected);
-        if (selected && this.isClicked(keyboard)) {
-            this.display.game.togglePaused();
-            return;
+        if (null == this.display.game.ship.dockedTo()) {
+            this.display.terminal.println("\tExit", selected);  
+            if (selected && this.isClicked(keyboard)) {
+                this.display.game.togglePaused();
+                return;
+            }
+        } else {
+            this.display.terminal.println("\tUndock", selected);
+            if (selected && this.isClicked(keyboard)) {
+                this.display.game.ship.undock();
+                return;
+            }
         }
 
         this.maxYCursor = cursor.y;

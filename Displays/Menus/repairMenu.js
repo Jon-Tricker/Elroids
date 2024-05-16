@@ -5,6 +5,7 @@
 let repairMenu = "\
 <BODY>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Ship Repair Menu</P>\
+<P></P>\
 <script src=\"RepairSetMenu\" params=\"this.display.game.ship\"></script>\
 </BODY>"
 

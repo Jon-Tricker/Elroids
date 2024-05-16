@@ -16,6 +16,7 @@ import BasicHull from './Components/Hulls/basicHull.js';
 import ComponentSets from './Components/componentSets.js';
 import DumbMissileWeapon from './Components/Weapons/dumbMissileWeapon.js';
 import Mineral from "../GameItems/mineral.js";
+import Station from "../GameItems/station.js";
 
 // Create ship material.
 const shipMaterial = new THREE.MeshStandardMaterial(
@@ -91,6 +92,8 @@ class Ship extends Item {
     weaponSet;
 
     engineSoundOn = false;
+
+    dockedWith = null;
 
     constructor(height, width, length, locationX, locationY, locationZ, game) {
         super(locationX, locationY, locationZ, 0, 0, 0, game, length);
@@ -309,10 +312,10 @@ class Ship extends Item {
     }
 
     setEngineSound(state) {
-        if (true == state) { 
+        if (true == state) {
             this.playSound("roar", 0.5, true);
-        } else {   
-            this.stopSound("roar");  
+        } else {
+            this.stopSound("roar");
         }
         this.engineSoundOn = state;
     }
@@ -376,64 +379,69 @@ class Ship extends Item {
     }
 
     animate(date, keyboard) {
-        // Handle movement keys
-        if (keyboard.getState(" ")) {
-            this.accelerate();
-        } else {
-            this.setFlameState(false);
-        }
 
-        if (keyboard.getState("?") || keyboard.getState("/")) {
-            this.deceletarte();
-        }
-
-        if (!keyboard.getState(" ") && !keyboard.getState("?") && !keyboard.getState("/") && this.engineSoundOn) {
-            this.setEngineSound(false);
-        }
-
-        if (keyboard.getState("<") || keyboard.getState(",")) {
-            this.rollL();
-        } else {
-            if (keyboard.getState(">") || keyboard.getState(".")) {
-                this.rollR();
+        if (null == this.dockedWith) {
+            // Handle movement keys
+            if (keyboard.getState(" ")) {
+                this.accelerate();
             } else {
-                this.rollRate = 0;
+                this.setFlameState(false);
             }
-        }
 
-        if (keyboard.getState("S") || keyboard.getState("s")) {
-            this.climb();
-        } else {
-            if (keyboard.getState("X") || keyboard.getState("x")) {
-                this.dive();
+            if (keyboard.getState("?") || keyboard.getState("/")) {
+                this.deceletarte();
+            }
+
+            if (!keyboard.getState(" ") && !keyboard.getState("?") && !keyboard.getState("/") && this.engineSoundOn) {
+                this.setEngineSound(false);
+            }
+
+            if (keyboard.getState("<") || keyboard.getState(",")) {
+                this.rollL();
             } else {
-                this.pitchRate = 0;
+                if (keyboard.getState(">") || keyboard.getState(".")) {
+                    this.rollR();
+                } else {
+                    this.rollRate = 0;
+                }
             }
-        }
 
-        if (keyboard.getState("Z") || keyboard.getState("z")) {
-            this.yawL();
-        } else {
-            if (keyboard.getState("C") || keyboard.getState("c")) {
-                this.yawR();
+            if (keyboard.getState("S") || keyboard.getState("s")) {
+                this.climb();
             } else {
-                this.yawRate = 0;
+                if (keyboard.getState("X") || keyboard.getState("x")) {
+                    this.dive();
+                } else {
+                    this.pitchRate = 0;
+                }
             }
-        }
 
-        // if (keyboard.getClearState("M") || keyboard.getClearState("m")) { 
-        if (keyboard.getState("M") || keyboard.getState("m")) {
-            this.weaponSet.fire(this.getOrientation(), date);
-        }
+            if (keyboard.getState("Z") || keyboard.getState("z")) {
+                this.yawL();
+            } else {
+                if (keyboard.getState("C") || keyboard.getState("c")) {
+                    this.yawR();
+                } else {
+                    this.yawRate = 0;
+                }
+            }
 
-        this.moveItem(true);
-        this.moveMesh();
+            // if (keyboard.getClearState("M") || keyboard.getClearState("m")) { 
+            if (keyboard.getState("M") || keyboard.getState("m")) {
+                this.weaponSet.fire(this.getOrientation(), date);
+            }
+
+            this.moveItem(true);
+            this.moveMesh();
+        }
     }
 
     // Move mesh in graphics space. Will be relative to ship position.
+    /*
     moveMesh() {
         this.position.set(this.location.x, this.location.y, this.location.z);
     }
+    */
 
     // Take damage to self.
     // Ships get re-spawned so do not destruct.
@@ -450,6 +458,8 @@ class Ship extends Item {
 
         if (this.hullSet.getAverageStatus() <= 0) {
             this.playSound('scream');
+            this.setEngineSound(false);
+            
             // new Explosion(this.size, this);
             this.game.shipDestroyed(that);
         } else {
@@ -500,12 +510,73 @@ class Ship extends Item {
     }
 
     handleCollision(that) {
+        // Can't get hit while docked.
+        if (null != this.dockedWith) {
+            return (false)
+        }
+
         if (that instanceof Mineral) {
             return (this.mineralPickup(that));
         }
-        super.handleCollision(that);
+
+        if (that instanceof Station) {
+            if (that.collideWithShip(this)) {
+                return;
+            }
+        }
+
+        return (super.handleCollision(that));
     }
 
+    dock(station) {
+        this.game.displays.terminal.playSound("poweroff", 0.5);
+
+        this.dockedWith = station;
+        this.setSpeed(new THREE.Vector3(0, 0, 0));
+
+        // While docked move with station.
+        station.add(this);
+
+        // Move to the centre of the bay. Use station relative coordinates.
+        this.location = station.bayMesh.position.clone();
+        // this.moveMesh();
+
+        // Rotate to face exit.
+        this.rotation.set(0, 0, Math.PI);
+
+        this.game.displays.terminalEnable(true);
+    }
+
+    undock() {
+        this.game.displays.terminal.playSound("poweron", 0.5);
+        if (this.game.paused) {
+            this.game.togglePaused();
+        } else {
+            this.game.displays.terminalEnable(false);
+        }
+
+        this.dockedWith.remove(this);
+
+        // Move back to univeral coordinates.
+        let launchPos = this.dockedWith.getLaunchPoint();
+        this.location = this.dockedWith.localToWorld(launchPos);
+        this.moveMesh();
+
+        // Rotate to face away from exit.
+        this.rotation.set(this.dockedWith.rotation.x, this.dockedWith.rotation.y, this.dockedWith.rotation.z + Math.PI);
+
+        this.dockedWith = null;
+
+        // It appears that, having been part of another group, 'this' needs to be added back to the scene. 
+        // Otherwise camera cannot see it's mesh.
+        this.game.getScene().add(this);
+
+        this.moveItem(false);
+    }
+
+    dockedTo() {
+        return (this.dockedWith);
+    }
 }
 
 export default Ship;

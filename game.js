@@ -24,11 +24,12 @@ import MyCamera from './Scenery/myCamera.js'
 import Displays from './Displays/displays.js'
 import Keyboard from "./keyboard.js";
 import Mineral from "./GameItems/mineral.js";
+import Station from "./GameItems/station.js";
 import { MineralTypes } from './GameItems/minerals.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "1.11";
+const VERSION = "2.0";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -58,7 +59,7 @@ class Game {
     maxSaucerCount = 5;
 
     paused = false;
-    
+
 
     constructor(maxRockCount, rockStyle, safe, player, soundOn) {
 
@@ -90,6 +91,7 @@ class Game {
         this.createRocks(maxRockCount);
         this.createShip();
         this.createSaucers();
+        this.createStation();
 
         // Now we have a ship. Switch to it's camera
         this.scene.setCamera(MyCamera.PILOT);
@@ -99,10 +101,13 @@ class Game {
     }
 
     createShip() {
-        this.ship = new Ship(5, 10, 20, 0, 0, 0, this);
         if (this.testMode) {
+            this.ship = new Ship(5, 10, 20, 0, 0, 0, this);
+
             // Do some damage
             this.ship.compSets.takeDamage(1);
+        } else {
+            this.ship = new Ship(5, 10, 20, -200, 100, 0, this);
         }
     }
 
@@ -131,6 +136,15 @@ class Game {
         return (this.player);
     }
 
+    createStation() {
+        if (this.testMode) {
+            new Station(1100, 0, 0, this, null);
+            // new Station(200, 0, 0, this, null);
+        } else {
+            new Station(0, 0, 0, this, null);
+        }
+    }
+
     createSaucers() {
         if (this.testMode) {
             // New saucer
@@ -138,9 +152,9 @@ class Game {
             new SaucerWanderer(400, 100, -50, this, null, false);
             new SaucerShooter(300, 100, -50, this, null, true);
             new SaucerHunter(300, 200, -50, this, null, true);
-            new SaucerRam(1000, 100, 200, this, null, true);
-            new SaucerPirate(1500, 100, -50, this, null, true);
-            this.motherSaucer = new SaucerMother(600, 100, -50, this, null, true);
+            new SaucerRam(1000, 200, 200, this, null, true);
+            new SaucerPirate(1500, 200, -50, this, null, true);
+            this.motherSaucer = new SaucerMother(1000, 100, -50, this, null, true);
         } else {
             // First mother ship always in safe mode.
             this.createMotherSaucer(true);
@@ -271,7 +285,7 @@ class Game {
 
     togglePaused() {
         this.paused = !this.paused;
-        this.displays.teminalEnable(this.paused);
+        this.displays.terminalEnable(this.paused);
     }
 
     animate(date) {

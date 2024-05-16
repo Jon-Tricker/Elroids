@@ -58,6 +58,7 @@ class ComponentSet extends Array {
 
     getRepairCost(percent) {
         let cost = 0;
+
         for (let comp of this) {
             cost += comp.getRepairCost(percent);
         }

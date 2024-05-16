@@ -114,7 +114,7 @@ class Displays {
     }
 
     // Set terminal state.
-    teminalEnable(state) {
+    terminalEnable(state) {
         this.terminalIsOn = state;
         if (state) {
             this.menuSystem = new MenuSystem(this);
@@ -214,7 +214,11 @@ class Displays {
 
         let ship = this.game.ship;
         this.statusCtx.strokeText("Position:", this.status.width * 0.1, this.status.height * 0.9 - this.pt);
-        this.statusCtx.strokeText( this.printNum(ship.location.x) + "," +this.printNum(ship.location.y) + "," + this.printNum(ship.location.z), this.status.width * 0.1, this.status.height * 0.9);
+        if (null == ship.dockedWith) {
+            this.statusCtx.strokeText(this.printNum(ship.location.x) + "," + this.printNum(ship.location.y) + "," + this.printNum(ship.location.z), this.status.width * 0.1, this.status.height * 0.9);
+        } else {
+            this.statusCtx.strokeText("Docked", this.status.width * 0.1, this.status.height * 0.9);
+        }
         this.statusCtx.strokeText("Speed:" + this.printNum(ship.speed.length()) + " m/s.", this.status.width * 0.7, this.status.height * 0.9 - this.pt);
         this.statusCtx.strokeText("Hull status:" + this.printNum(ship.hullSet[0].status) + "%", this.status.width * 0.7, this.status.height * 0.9);
         if (this.hudIsOn) {

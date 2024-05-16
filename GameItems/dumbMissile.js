@@ -25,7 +25,7 @@ class DumbMissile extends Missile {
   constructor(direction, owner) {
     super(direction, owner, MISSILE_DAMAGE, COLOUR, missileMaterial);
 
-    this.playSound('pew', 0.5); 
+    this.playSound('pew', 0.2); 
   }
 }
 

@@ -1,14 +1,14 @@
 // In game 'Objects'. But the word 'Object' is overloaded ... so call them 'Items'.
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2024.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
 import Universe from '../universe.js';
 import ItemBoundary from './itemBoundary.js';
-import BugError from "../GameErrors/bugError.js"
-import Ship from "../Ship/ship.js"
+import BugError from "../GameErrors/bugError.js";
+import Ship from "../Ship/ship.js";
 
 const COLOUR = "#FFFFFF"
 
@@ -37,8 +37,12 @@ class Item extends THREE.Group {
     // Create and attch once when first used.
     sounds = new Map();
 
+    // Set if can't be moved.
+    // Can still rotate.
+    immobile = false;
+
     // Construct with optional mass
-    constructor(locationX, locationY, locationZ, speedX, speedY, speedZ, game, size, mass, hitPoints, owner) {
+    constructor(locationX, locationY, locationZ, speedX, speedY, speedZ, game, size, mass, hitPoints, owner, immobile) {
         super();
         this.location = new THREE.Vector3(locationX, locationY, locationZ);
         this.setSpeed(new THREE.Vector3(speedX, speedY, speedZ));
@@ -63,6 +67,10 @@ class Item extends THREE.Group {
             this.owner = null;
         } else {
             this.owner = owner;
+        } 
+        
+        if (immobile !== undefined) {
+            this.immobile = immobile;
         }
 
         // Set default boundary
@@ -92,11 +100,13 @@ class Item extends THREE.Group {
     // Set speed/
     // Do frame rate division only one.
     setSpeed(speed) {
-        if (speed.length() > 5000) {
-            throw (new BugError("Something too fast " + speed.length()));
+        if (!this.immobile) {
+            if (speed.length() > 5000) {
+                throw (new BugError("Something too fast " + speed.length()));
+            }
+            this.speed = speed.clone();
+            this.speedFrame = speed.clone().divideScalar(Universe.getAnimateRate())
         }
-        this.speed = speed.clone();
-        this.speedFrame = speed.clone().divideScalar(Universe.getAnimateRate())
     }
 
     getLocation() {
@@ -145,12 +155,15 @@ class Item extends THREE.Group {
             this.detectCollisions();
         }
 
-        this.location.addVectors(this.location, this.speedFrame);
+        if (!this.immobile) {
 
-        // Move boundary object.
-        this.boundary.moveTo(this.location);
+            this.location.addVectors(this.location, this.speedFrame);
 
-        Universe.handleWrap(this.location);
+            // Move boundary object.
+            this.boundary.moveTo(this.location);
+
+            Universe.handleWrap(this.location);
+        }
     }
 
 
@@ -161,6 +174,8 @@ class Item extends THREE.Group {
     // 
     // Collides if a cylinder, described by our boundary over the next move, intersects with the target.
     // Fortunatly this can be handled by determining if the vector of the next move is closer to the targets location than the sum of the radii.
+    //
+    // This cheap 'aproximate' detection. If true, and in cases where it matters, a more expensive check will be done using ray tracing.
     detectCollisions() {
         // Things that don't move don't hit things
         if (0 == this.speed.length()) {
@@ -206,10 +221,10 @@ class Item extends THREE.Group {
 
                     // Don't collide with self.
                     if (this != that) {
-                        this.handleCollision(that);
-
-                        // Only collode with one thing per frame.
-                        return (true);
+                        if (this.handleCollision(that)) {
+                            // Only collide with one thing per frame.
+                            return (true);
+                        }
                     }
                 }
             }
@@ -217,42 +232,68 @@ class Item extends THREE.Group {
         return (false);
     }
 
+    // Accurate detection of if a point is inside our mesh.
+    //
+    // Returns first mech encountered or null.
+    // 
+    // Expensive so only use once detectCollisions() has indicated that we are resonably close.
+    //
+    // Does a line from the point to outside intersect with our mesh and odd number of times?
+    //
+    // FOR THIS TO WORK ALL MATERIALS USED IN 'this' MUST BE DOUBLE SIDED (side: THREE.DoubleSide)
+    isPointInside(point) {
+        let raycaster = new THREE.Raycaster()
+
+        // A ray from ship and a bit longer than station diameter.
+        // Otherwise may not come out the other side.
+        raycaster.set(point, new THREE.Vector3(this.size * 10, this.size * 10, this.size * 10))
+
+        let intersects = raycaster.intersectObject(this);
+
+        if (intersects.length % 2 === 1) {
+            return (intersects[0].object);
+        } else {
+            return (null);
+        }
+    }
+
     // Separate two overlapping objects.
     separateFrom(that) {
 
-        let relLoc = this.getRelativeLocation(that.location);
-        while (0 == relLoc.length()) {
-            relLoc.add(this.game.createRandomVector(1));
+        // Make sure speeds differ
+        let spd = this.speed.clone();
+        spd.sub(that.speed);
+        if (1 > spd.length()) {
+            spd = this.speed.clone();
+            spd.add(new THREE.Vector3(1, 1, 1));
+            this.setSpeed(spd);
+
+            spd = that.speed.clone();
+            spd.add(new THREE.Vector3(-1, -1, -1));
+            that.setSpeed(spd);
         }
 
-        // Split should really be based on relative masses but use size for now.
-        let totalSize = this.getBoundary().getSize() + that.getBoundary().getSize();
-        if (totalSize > relLoc.length()) {
-
-            relLoc = relLoc.normalize();
-            relLoc.multiplyScalar(2);
-
-            let delta = relLoc.clone();
-            delta.multiplyScalar(this.getBoundary().getSize());
-            this.location.sub(delta);
-
-            delta = relLoc.clone();
-            delta.multiplyScalar(that.getBoundary().getSize());
-            that.location.add(delta)
+        let totalSize = (this.getBoundary().getSize() + that.getBoundary().getSize()) * 1.5;
+        while (this.getRelativeLocation(that.location).length() < totalSize) {
+            this.moveItem(false);
+            that.moveItem(false);
         }
     }
 
     // Handle collision physics
-    // SInce we already have everything as x,y,z components hopefully can avoid any messy 'trig'.
+    // Since we already have everything as x,y,z components hopefully can avoid any messy 'trig'.
+    // Return true if actually collided.
     handleCollision(that) {
+
+        this.transferMomentum(that);
 
         // If overlapping separate ... even if one of us is about to be destroyed.
         this.separateFrom(that);
 
-        this.transferMomentum(that);
-
         // Do any damage
         this.collideWith(that);
+
+        return (true);
     }
 
     transferMomentum(that) {
@@ -365,15 +406,15 @@ class Item extends THREE.Group {
     // Return true if we could do what the game requires.
     playSound(name, volume, loop) {
         if (!this.game.soundOn) {
-            return(false);
-        }         
-        
+            return (false);
+        }
+
         let list = Universe.getListener();
         if ((undefined == list)) {
             // Dont have a listener yet ... give up. without loading
             return (false);
         }
-      
+
 
         // We are going to play a sound. Get the buffer.
         let sound = this.sounds.get(name);
@@ -382,9 +423,9 @@ class Item extends THREE.Group {
             let buffer = Universe.sounds.get(name);
             if (null == buffer) {
                 // Buffer not yet loaded into Univese
-                return(false);
+                return (false);
             }
-        
+
             sound = new THREE.Audio(list);
             sound.setBuffer(buffer);
             sound.stop();
@@ -394,7 +435,7 @@ class Item extends THREE.Group {
 
         if (undefined == volume) {
             volume = 1;
-        }   
+        }
 
         // Fiddle volume to fall off with distance.
         //
@@ -406,10 +447,10 @@ class Item extends THREE.Group {
         // Probably want to hear it as if on the ship even if the camera is elsewhere.
         let rel = this.getRelativeLocation(this.game.ship.location);
         let dist = rel.length();
-        volume = volume / (2 ** (dist/AUDIO_HALF_DIST));
+        volume = volume / (2 ** (dist / AUDIO_HALF_DIST));
         if (volume < 0.01) {
             // Too quiet
-            return(true);
+            return (true);
         }
 
         sound.setVolume(volume);
@@ -431,7 +472,7 @@ class Item extends THREE.Group {
         pos = this.game.scene.camera.children[0].position;
         console.log("camera list " + pos.x + " " + pos.y + " " + pos.z);
         */
-        
+
         if (undefined != loop) {
             sound.setLoop(loop);
         }
@@ -444,7 +485,7 @@ class Item extends THREE.Group {
         return (true)
     }
 
-    stopSound(name) { 
+    stopSound(name) {
         let sound = this.sounds.get(name);
         if (undefined != sound) {
             sound.stop();

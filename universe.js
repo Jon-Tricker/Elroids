@@ -48,6 +48,8 @@ class Universe {
         ["click", null],
         ["anvil", null],
         ["roar", null],
+        ["poweron", null],
+        ["poweroff", null],
         ["scream", null]
     ]);
 

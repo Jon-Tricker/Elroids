@@ -85,7 +85,7 @@ class Mineral extends NonShipItem {
           return(that.mineralPickup(this));
       }
 
-      super.handleCollision(that);
+      return(super.handleCollision(that));
   }
   
 }

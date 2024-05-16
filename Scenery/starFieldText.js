@@ -1,5 +1,6 @@
 // Texture for a dynamically created star field
 import * as THREE from 'three';
+import Texture from '../Utils/texture.js';
 
 // Colours with the most common first.
 const starColours = [new THREE.Color(0xF0F0F0), new THREE.Color(0xF0F000), new THREE.Color(0xF08000), new THREE.Color(0xF00000), new THREE.Color(0x0000F0)];
@@ -7,7 +8,7 @@ const BACKGROUND = new THREE.Color('black');
 
 const MAX_SIZE = 1024;
 
-class StarFieldTexture extends THREE.DataTexture {
+class StarFieldTexture extends Texture {
 
   constructor(width, height) {
     if (height > MAX_SIZE) {
@@ -18,60 +19,45 @@ class StarFieldTexture extends THREE.DataTexture {
       width = MAX_SIZE;
     }
 
-    let data = StarFieldTexture.createData(width, height);
+    super(width, height);
 
-    super(data, width, height);
-    this.needsUpdate = true;
+    this.createData();
   }
 
-  // Static because we need to call it before super();
-  static createData(width, height) {
-
-    let size = width * height;
-    let data = new Uint8Array(4 * size);
+  createData() {
+    let size = this.height * this.width;
 
     // Paint background.
     let colour = BACKGROUND;
-    let r = Math.floor(colour.r * 255);
-    let g = Math.floor(colour.g * 255);
-    let b = Math.floor(colour.b * 255);
-    for (let i = 0; i < size; i++) {
-      let stride = i * 4;
-      data[stride] = r;
-      data[stride + 1] = g;
-      data[stride + 2] = b;
-      data[stride + 3] = 255;
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        this.setPixel(x, y, colour)
+      }
     }
 
     // Add stars
-    for (let i = 0; i < size/5000; i++) {
-      let x =  Math.floor(Math.random() * width);
-      let y =  Math.floor(Math.random() * height);
-      let stride = (x * width + y) * 4;
+    for (let i = 0; i < size / 5000; i++) {
+      let x = Math.floor(Math.random() * this.width);
+      let y = Math.floor(Math.random() * this.height);
 
       // Work out a colour
       colour = StarFieldTexture.randomColour();
-      
+
       let brightness = Math.random() * 255;
+      colour.r = Math.floor(colour.r * brightness);
+      colour.g = Math.floor(colour.g * brightness);
+      colour.b = Math.floor(colour.b * brightness);
 
-      let r = Math.floor(colour.r * brightness);
-      let g = Math.floor(colour.g * brightness);
-      let b = Math.floor(colour.b * brightness);
-
-      data[stride] = r;
-      data[stride + 1] = g;
-      data[stride + 2] = b;
+      this.setPixel(x, y, colour);
     }
-
-    return (data);
   }
 
-  // Generate weighted random colours
+  // Generate weighted random colour.
   static randomColour() {
     let rnd = Math.random();
     let offset = Math.floor((rnd * rnd * rnd) * starColours.length);
     let colour = starColours[offset];
-    return(colour);
+    return (colour);
   }
 
 }
