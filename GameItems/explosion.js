@@ -49,7 +49,7 @@ class Explosion extends Item {
 
     this.add(explosionMesh);
 
-    this.playSound('explosion', this.maxSize/(MAX_SIZE * 2));
+    this.playSound('explosion', this.maxSize/(MAX_SIZE * 3));
   }  
   
   // Don't check collisions with explosions

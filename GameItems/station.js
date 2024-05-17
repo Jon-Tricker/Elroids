@@ -9,6 +9,7 @@ import NonShipItem from './nonShipItem.js';
 import Universe from '../universe.js';
 import Ship from '../Ship/ship.js'
 import Texture from '../Utils/texture.js'
+import PlateTexture from '../Utils/plateTexture.js';
 
 
 const ROTATE_RATE = 0.1;    // r/s
@@ -27,8 +28,8 @@ const BAY_DEPTH = 40;
 const BAY_TEXTURE_SIZE = 21;
 
 const TUBE_RADIUS = 10;
-const TORUS_RADIUS = Math.sqrt(BOX_WIDTH * BOX_WIDTH + BOX_HEIGHT * BOX_HEIGHT) / 2 + TUBE_RADIUS / 2;
-const STATION_SIZE = TORUS_RADIUS + TUBE_RADIUS; // m
+const TORUS_RADIUS = Math.sqrt(BOX_WIDTH * BOX_WIDTH + BOX_HEIGHT * BOX_HEIGHT) * 0.75  + TUBE_RADIUS;
+const STATION_SIZE = TORUS_RADIUS + TUBE_RADIUS * 2; // m
 
 const MAX_DOCKING_SPEED = 10; // m/s
 
@@ -41,6 +42,7 @@ const STATION_MATERIAL = new THREE.MeshStandardMaterial(
         opacity: 1,
         side: THREE.DoubleSide,
         metalness: 0.75,
+        transparent: false
     }
 )
 
@@ -68,6 +70,11 @@ class Station extends NonShipItem {
             this.rotateX(Math.random() * Math.PI);
             this.rotateZ(Math.random() * Math.PI);
         }
+
+        let text =  new PlateTexture().getTexture();
+        STATION_MATERIAL.map = text;
+        STATION_MATERIAL.bumpMap = text;
+        STATION_MATERIAL.needsUpdate = true;
     }
 
     destruct() {
@@ -105,40 +112,56 @@ class Station extends NonShipItem {
         let rightMesh = new THREE.Mesh(leftGeom, STATION_MATERIAL);
         let backMesh = new THREE.Mesh(backGeom, STATION_MATERIAL);
 
-        topMesh.castShadow = true;
-        topMesh.receiveShadow = true;
-        botMesh.castShadow = true;
-        botMesh.receiveShadow = true;
-        leftMesh.castShadow = true;
-        leftMesh.receiveShadow = true;
-        rightMesh.castShadow = true;
-        rightMesh.receiveShadow = true;
-        backMesh.castShadow = true;
-        backMesh.receiveShadow = true;
-
         topMesh.position.set(0, 0, (BAY_HEIGHT + topThick) / 2);
         botMesh.position.set(0, 0, -((BAY_HEIGHT + topThick) / 2));
         leftMesh.position.set(0, ((BAY_WIDTH + leftThick) / 2), 0);
         rightMesh.position.set(0, -((BAY_WIDTH + leftThick) / 2), 0);
         backMesh.position.set((BOX_DEPTH - backThick) / 2, 0, 0);
 
-        this.add(topMesh);
-        this.add(botMesh);
-        this.add(leftMesh);
-        this.add(rightMesh);
-        this.add(backMesh);
+        this.addMesh(topMesh);
+        this.addMesh(botMesh);
+        this.addMesh(leftMesh);
+        this.addMesh(rightMesh);
+        this.addMesh(backMesh);
 
         // Landing bay.
         this.setupBay();
 
-        // Tube
+        // Torus
         let tubeGeom = new THREE.TorusGeometry(TORUS_RADIUS, TUBE_RADIUS);
         let tubeMesh = new THREE.Mesh(tubeGeom, STATION_MATERIAL);
-        tubeMesh.castShadow = true;
-        tubeMesh.receiveShadow = true;
         tubeMesh.rotateY(Math.PI / 2)
+        this.addMesh(tubeMesh);
 
-        this.add(tubeMesh);
+        // Tubes
+        let height = TORUS_RADIUS - BOX_WIDTH/2;
+
+        let topTubeGeom = new THREE.CylinderGeometry(TUBE_RADIUS/2, TUBE_RADIUS/2, height); 
+        let topTubeMesh = new THREE.Mesh(topTubeGeom, STATION_MATERIAL);
+        topTubeMesh.position.set(0, (height + BOX_WIDTH)/2, 0);
+        this.addMesh(topTubeMesh);
+
+        let botTubeMesh = new THREE.Mesh(topTubeGeom, STATION_MATERIAL);
+        botTubeMesh.position.set(0, -(height + BOX_WIDTH)/2, 0);
+        this.addMesh(botTubeMesh);
+        
+        height = TORUS_RADIUS - BOX_HEIGHT/2;
+        let leftTubeGeom = new THREE.CylinderGeometry(TUBE_RADIUS/2, TUBE_RADIUS/2, height); 
+        let leftTubeMesh = new THREE.Mesh(leftTubeGeom, STATION_MATERIAL);
+        leftTubeMesh.rotateX(Math.PI / 2);
+        leftTubeMesh.position.set(0, 0, (height + BOX_HEIGHT)/2);
+        this.addMesh(leftTubeMesh);  
+        
+        let rightTubeMesh = new THREE.Mesh(leftTubeGeom, STATION_MATERIAL);
+        rightTubeMesh.rotateX(Math.PI / 2);
+        rightTubeMesh.position.set(0, 0, -(height + BOX_HEIGHT)/2);
+        this.addMesh(rightTubeMesh);
+    }
+
+    addMesh(mesh) {
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        this.add(mesh);
     }
 
     setupBay() {
@@ -156,8 +179,10 @@ class Station extends NonShipItem {
                 // Most faces opaque and textured.
                 if (0 == i) {
                     material.map = textureBack;
+                    // material.bumpMap = textureBack;
                 } else {
                     material.map = textureSide;
+                    // material.bumpMap = textureSide;
                 }
                 material.transparent = false;
             } else {
@@ -171,17 +196,15 @@ class Station extends NonShipItem {
         }
 
         // A cube that fits, just inside, the hole in the central box.
-        let bayGeom = new THREE.BoxGeometry(BAY_DEPTH - 0.5, BAY_WIDTH - 0.5, BAY_HEIGHT - 0.5);
+        let bayGeom = new THREE.BoxGeometry(BAY_DEPTH - 1, BAY_WIDTH - 1, BAY_HEIGHT - 1);
         bayGeom.computeVertexNormals();
 
         this.bayMesh = new THREE.Mesh(bayGeom, materials);
-        this.bayMesh.castShadow = true;
-        this.bayMesh.receiveShadow = true;
 
         this.bayMesh.position.set(-(BOX_DEPTH - BAY_DEPTH + 1) / 2, 0, 0);
 
         // this.add(this.parkPoint);
-        this.add(this.bayMesh);
+        this.addMesh(this.bayMesh);
     }
 
     // Get a point outside the station volume to launch ship from.
