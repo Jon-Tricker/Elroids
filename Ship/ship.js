@@ -12,7 +12,9 @@ import EngineSet from './Components/Engines/engineSet.js';
 import BasicEngine from './Components/Engines/basicEngine.js';
 import HullSet from './Components/Hulls/hullSet.js';
 import WeaponSet from './Components/Weapons/weaponSet.js';
+import BaySet from './Components/Bays/baySet.js';
 import BasicHull from './Components/Hulls/basicHull.js';
+import BasicBay from './Components/Bays/basicBay.js';
 import ComponentSets from './Components/componentSets.js';
 import DumbMissileWeapon from './Components/Weapons/dumbMissileWeapon.js';
 import Mineral from "../GameItems/mineral.js";
@@ -90,6 +92,7 @@ class Ship extends Item {
     engineSet;
     hullSet;
     weaponSet;
+    baySet;
 
     engineSoundOn = false;
 
@@ -123,11 +126,15 @@ class Ship extends Item {
         this.weaponSet = new WeaponSet(this, 1);
         this.weaponSet.add(new DumbMissileWeapon(this));
 
+        this.baySet = new BaySet(this, 1);
+        this.baySet.add(new BasicBay(this));
+
         // Build set of all componets sets
         this.compSets = new ComponentSets();
         this.compSets.add(this.engineSet);
         this.compSets.add(this.hullSet);
         this.compSets.add(this.weaponSet);
+        this.compSets.add(this.baySet);
 
 
         // Add in weight of all components.
@@ -437,11 +444,10 @@ class Ship extends Item {
     }
 
     // Move mesh in graphics space. Will be relative to ship position.
-    /*
     moveMesh() {
         this.position.set(this.location.x, this.location.y, this.location.z);
     }
-    */
+    
 
     // Take damage to self.
     // Ships get re-spawned so do not destruct.

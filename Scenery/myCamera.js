@@ -127,25 +127,32 @@ class MyCamera extends THREE.PerspectiveCamera {
     }
 
     updatePosition(ship) {
-
-        //console.log("cam" + this.rotation.x + " " + this.rotation.y + " " + this.rotation.z)
-        //console.log("ship" + this.ship.rotation.x + " " + this.ship.rotation.y + " " + this.ship.rotation.z)
         switch (this.type) {
             case MyCamera.STANDOFF:
                 // Adjust loation
-                this.position.setX(this.ship.position.x - MyCamera.STANDOFF_DIST);
-                this.position.setY(this.ship.position.y - MyCamera.STANDOFF_DIST);
-                this.position.setZ(this.ship.position.z - MyCamera.STANDOFF_DIST);
+                let loc = this.ship.location.clone();
+
+                if (null != this.ship.dockedWith) {
+                    // If docked ship locarion will be relative to dock.
+                    this.ship.dockedWith.localToWorld(loc);
+                }
+
+                //this.ship.localToWorld(loc);
+                this.position.setX(loc.x - MyCamera.STANDOFF_DIST);
+                this.position.setY(loc.y - MyCamera.STANDOFF_DIST);
+                this.position.setZ(loc.z - MyCamera.STANDOFF_DIST);
 
                 // Look at the ship
-                this.lookAt(this.ship.position);
+                this.lookAt(loc);
                 break;
 
             case MyCamera.CHASE:
+            case MyCamera.PILOT:
                 // Nothing to do. Our camera is part of the ship and moves with it.
                 break;
 
             case MyCamera.FIXED:
+                // Nothing to do.
             default:
                 break;
         }

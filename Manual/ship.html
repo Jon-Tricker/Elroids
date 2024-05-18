@@ -20,29 +20,23 @@
 </P>
 
 	<H2>Ship internals</H2>
-	<P>The ship is made up of a number of 'components' (Engines, weapons etc.)</P>
+	<P>The ship is made up of a number of <A HREF="./components.html">'components'</A> (Engines, weapons etc.)</P>
 	<P>Each component starts with a number of 'hit points' indicating how tough it is. It also has a 'status' indicating the percentage of these hit points that remain.</P>
 	<P>This does mean that, technically, a compoent can have a non integer (maxHP * status) number of hit points.</P>
 
 	<H2>Taking damage</H2>
-	<P>When the ship is damaged the damage distributed randomly between it's components. Their 'status' percentage is reduced.</P>
-	<P>Some components loose performance as status decreases.</P>
-	<P>Others, e.g. weapons, may malfunction if status is < 50%.</P>
-	<P>If the hull's status drops to 0% the ship is destroyed and it's GAME OVER.</P>
-
-	<H2>Speed</H2> 
-	<P>Acceleration is dependant on engine status.</P>
-	<P>Maximum speed is dependant on hull status. If pushed any harder ship would shake itself apart.</P>
+	<P>When the ship is damaged it is distributed randomly between the ships components. Their 'status' (percentage) is reduced.</P>
+	<P>For details of how status loss effects each component type see <A HREF="./components.html"> 'components'</A> page.</P>
 
 	<H2>Repairing damage</H2>
 	<P>Damage can be repaired via the menu system. There is a cost, in credits, for this dependand on the components original cost and how much damage needs to be repaired.</P>
-	<P>There is only so much that can be patched up with glue and baling twine! If the ship is not docked at a <A HREF="./stations.html">station:</A></P>
+	<P>There is only so much that can be patched up, in flight, with glue and baling twine! If the ship is not docked at a <A HREF="./stations.html">station:</A></P>
 	<UL>
 		<LI>Repair costs are doubled.</LI>
 		<LI>It is not possible to repair above 50%.</LI>
 	</UL>
 	<P>Damage for a class of components can be repaired either 10% at a time or all in on go.</P>
-	<P>If you do not have enough credits the damage will only be partially repaired.</P>
+	<P>If you do not have enough credits damage will only be partially repaired.</P>
 
 </BODY>
 </HTML>

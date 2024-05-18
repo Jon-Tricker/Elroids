@@ -140,7 +140,7 @@ class Rock extends NonShipItem {
   split() {
     let newSize = Math.floor(this.rockSize / 2);
 
-    if (1 < newSize) {
+    if (2 < newSize) {
       // Create a pair of repacements.
       let speedRatio = Math.random();
 

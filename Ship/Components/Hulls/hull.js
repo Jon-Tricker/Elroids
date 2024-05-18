@@ -7,7 +7,7 @@ class Hull extends Component {
     ramDamage;
     maxSpeed;
 
-    constructor(name, mass, cost, maxHp, ramDamage, maxSpeed, ship) {
+    constructor(name, mass, cost, maxHp, ship, ramDamage, maxSpeed) {
         super(name, mass, cost, maxHp, ship);
         this.ramDamage = ramDamage;
         this.maxSpeed = maxSpeed;

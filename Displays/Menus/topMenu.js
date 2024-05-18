@@ -8,7 +8,7 @@ let topMenu = "\
 <P ALIGN=\"CENTER\"> ====== E    </P>\
 <P ALIGN=\"CENTER\"> === EEEEEE</P>\
 <P></P>\
-<P ALIGN=\"CENTER\">Welcome to the 'VenusTech 100' ship control terminal.\n </P>\
+<P ALIGN=\"CENTER\">'VenusTech 100' (TM) ship control terminal.\n </P>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Game Paused</P>\
 <P></P>\
 <P ALIGN=\"CENTER\">\t... Press 'p' to continue.\n </P>\
@@ -17,7 +17,7 @@ let topMenu = "\
     <LI><A HREF=\"helpMenu\">Menu controls help screen.</A></LI>\
     <LI><A HREF=\"repairMenu\">Ship Repair Menu.</A></LI>\
     <LI><A HREF=\"componentsMenu\">Ship Components/Upgrade Menu.</A></LI>\
-    <LI><A HREF=\"componentsMenu\">Ship Components/Upgrade Menu.</A></LI>\
+    <LI><A HREF=\"gameMenu\">Game Configuration Menu.</A></LI>\
     <LI><A HREF=\"aboutMenu\">About \"Elroids\".</A></LI>\
 </UL>\
 </BODY>"
