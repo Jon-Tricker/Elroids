@@ -50,7 +50,8 @@ class Universe {
         ["roar", null],
         ["poweron", null],
         ["poweroff", null],
-        ["scream", null]
+        ["scream", null],
+        ["thud", null]
     ]);
 
 

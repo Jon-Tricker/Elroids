@@ -502,8 +502,10 @@ class Ship extends Item {
     // Pick up a mineral.
     // Return true if successful.
     mineralPickup(mineral) {
-        this.game.displays.addMessage("Loaded " + mineral.type.name + " ( " + Math.floor(mineral.mass) + " t, " + mineral.getValue() + "  Cr)");
-        this.addCredits(mineral.getValue());
+        let mass = Math.ceil(mineral.mass);
+        this.game.displays.addMessage("Loaded " + mineral.type.name + " " + mass + "(t)");
+        this.playSound('thud');
+        this.loadMineral(mineral.type , mass);
         mineral.destruct();
         return (true);
     }
@@ -582,6 +584,35 @@ class Ship extends Item {
 
     dockedTo() {
         return (this.dockedWith);
+    }
+
+    loadMineral(mineral, mass) {
+        this.baySet.loadMineral(mineral, mass);
+    }
+    
+    // Return mass unloaded.
+    unloadMineral(mineral, mass) {
+        return(this.baySet.unloadMineral(mineral, mass));
+    }
+
+    // Get minerals curently in bay.
+    getMinerals() {
+        return(this.baySet.minerals);
+    }
+
+    sellMineral(mineral, mass) {
+        let value = mineral.value * mass;
+        this.unloadMineral(mineral, mass);
+        this.addCredits(value);
+        // this.game.displays.addMessage("Sold " + mineral.name + " for  " + value + " Cr");
+    }
+
+    getCargoCapacity() {
+        return(this.baySet.capacity)
+    }
+
+    getContentMass() {
+        return(this.baySet.getContentMass())
     }
 }
 

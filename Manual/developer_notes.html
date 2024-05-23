@@ -31,31 +31,25 @@
 			targets ... fix</LI>
 		<LI>Sometimes control keys seem to get stuck (keyboard.js) ... Think this is when the debugger is used and it
 			consumes some of the event..</LI>
-		<LI>Fix audio to use THREE.PositionalAudio (Item.js.playSound()). I tried but cant get the listener to stay
-			stuck to the camera in all cases. Maybe add it to the Ship instead. Fell back on manually reducing volume
-			wih distance (and living without correct stereo).</LI>
+		<LI>There is a bug in the test game where one of the test rocks is 'stuck' in the station ... investigate.</LI>
 	</UL>
 
 	<H2>ToDos (In some sort of priority order)</H2>
 
 	<H3>V2.x Trade game (in progress)</H3>
-	<P>Add trading minerals.</P>
-	<UL>
-		<LI>Extend 'docked' menu syetem to have controls necessary for trading.</LI>
-		<LI>Add 'cargo bay' component.</LI>
-	</UL>
 	<P>Improve space station landing bay graphics.</P>
 	<P>Make docking more difficult.</P>
-	<P>Revisit 'repairs' maths. Currently not quite right is >1 component in set.</P>
+	<P>Revisit 'repairs' maths. Currently not quite right if >1 component in set.</P>
 
-	<H3>V3.x Ship upgrades:</H3><P>Add conponent sub classes:</P>
+	<H3>V3.x Ship upgrades:</H3>
+	<P>Add 'plug in' mini control panels for ship components.</P>
+	<P>Add conponent sub classes:</P>
 	<UL>
 		<LI>Weapon beam</LI>
 		<LI>Thrusters (directional control)</LI>
 		<LI>Targeting computer</LI>
 		<LI>Docking computer</LI>
 		<LI>Range finder</LI>
-		<LI>Cargo bay</LI>
 	</UL>
 	<P>Add component purchace menu (when docked).</P>
 
@@ -67,10 +61,10 @@
 	</UL>
 	</UL>
 
-	<H3>Economics game</H3>
-	<P>Add non minral trade goods (requires multiple systems/stations.</P>
+	<H3>V6.x Economics game</H3>
+	<P>Add non mineral trade goods (requires multiple systems/stations.</P>
 
-	<H3>General 'good stuff' ... Post V5.0</H3>
+	<H3>General 'good stuff' ... Post V6.0</H3>
 	<UL>
 		<LI>Game mechanics:
 			<UL>
@@ -97,7 +91,7 @@
 			<LI>Re-work menue system as real HTML with style sheets to control look and feel. Back end to communicating
 				via HTTP with a, localy implemeneted in the client, 'HTML server'. </LI>
 		</UL>
-		<LI>Add 'plug in' mini control panels for ship components.</LI>
+		<LI>Add 'crafting' ship components/trade goods out of minerals.</LI>
 		</LI>
 
 		<LI>Code:</LI>
@@ -108,6 +102,9 @@
 			<LI>Make saucers more 'shiny'. Probably involves MeshPhongMaterial ... but for me that just comes out white.
 			</LI>
 			<LI>Add extra vt100 features (e.g. block graphics) to ship control terminal.</LI>
+			<LI>Fix audio to use THREE.PositionalAudio (Item.js.playSound()). I tried but cant get the listener to stay
+				stuck to the camera in all cases. Maybe add it to the Ship instead. Fell back on manually reducing volume
+				wih distance (and living without correct stereo).</LI>
 		</UL>
 
 		<LI>Additional features:

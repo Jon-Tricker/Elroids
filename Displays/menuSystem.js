@@ -16,6 +16,8 @@ import repairMenu from './Menus/repairMenu.js';
 import componentsMenu from './Menus/componentsMenu.js';
 import ComponentSetMenu from './Menus/componentSetMenu.js';
 import RepairSetMenu from './Menus/repairSetMenu.js';
+import { cargoMenu } from './Menus/cargoMenu.js';
+import { CargoMenu } from './Menus/cargoMenu.js';
 import Universe from '../universe.js';
 
 // Result of printing a child element.

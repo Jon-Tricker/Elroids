@@ -208,6 +208,8 @@ class MineralType {
   }
 }
 
+// Mineral types.
+// 1st item is valueless.
 const MineralTypes = new Array(
   new MineralType("potch", new THREE.Color(0x808080), 0.6, 10, 1, 0),
   new MineralType("iron", new THREE.Color(0xB06000), 0.3, 15, 0.5, 20),

@@ -38,8 +38,6 @@ class RepairSetMenu {
                 row.push(status);
                 row.push(RepairSetMenu.getButtonText(set, 10));
                 row.push(RepairSetMenu.getButtonText(set, 100));
-                // row.push("<button type=\"button\" onclick=\"RepairSetMenu.onRepairClick(this.display.game.ship, cursor, 10)\">" + set.getRepairCost(10) + "</button>");
-                // row.push("<button type=\"button\" onclick=\"RepairSetMenu.onRepairClick(this.display.game.ship, cursor, 100)\">" + set.getRepairCost(100) + "</button>");
 
                 tab.addRow(row);
             }
