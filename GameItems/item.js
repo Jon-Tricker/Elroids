@@ -50,7 +50,6 @@ class Item extends THREE.Group {
         this.size = size;
         this.owner = owner;
 
-
         if (mass === undefined) {
             this.mass = 0;
         } else {
@@ -67,8 +66,8 @@ class Item extends THREE.Group {
             this.owner = null;
         } else {
             this.owner = owner;
-        } 
-        
+        }
+
         if (immobile !== undefined) {
             this.immobile = immobile;
         }
@@ -81,6 +80,21 @@ class Item extends THREE.Group {
 
         // Add self to graphics scene.
         game.getScene().add(this);
+
+        // Deal with situation where Item created inside another Item.
+        /*
+        if (null != this.getBoundary()) {
+            for (let that of Universe.itemList) {
+                if (that != this) {
+                    if (null != that.getBoundary()) {
+                        if (this.getBoundary().intersects(that.getBoundary())) {
+                            this.separateFrom(that);
+                        }
+                    }
+                }
+            }
+        }
+        */
     }
 
 
@@ -179,10 +193,15 @@ class Item extends THREE.Group {
     detectCollisions() {
         // Things that don't move don't hit things
         if (0 == this.speed.length()) {
-            return;
+            return (false);
         }
 
         let thisBoundary = this.getBoundary();
+
+        if (null == thisBoundary) {
+            // Not checking collisions
+            return;
+        }
 
         // Create line for move.
         let move = new THREE.Line3(Universe.originVector, this.speedFrame);
