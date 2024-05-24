@@ -19,7 +19,7 @@ class CargoMenu {
         doc += "<P>"
 
         doc += "<P>Total capacity " + ship.getCargoCapacity() + "(t)</P>"
-        doc += "<P>Current load " + ship.getContentMass() + "(t)</P>"
+        doc += "<P>Current load " + (ship.getTotalMass() - ship.getMass()) + "(t)</P>"
         doc += "<P></P>"
 
         if (minerals.size == 0) {

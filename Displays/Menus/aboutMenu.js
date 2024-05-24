@@ -1,8 +1,6 @@
 let aboutMenu = "\
 <BODY>\
 <P></P>\
-<!-- <P>Some text <A HREF=\"testMenu\">Ship Maintenance/Upgrade Menu.</A> more text <A HREF=\"helpMenu\">Menu controls help screen.</A> final text</P> -->\
-<P ALIGN=\"CENTER\"> =============== EEEEEE</P>\
 <P ALIGN=\"CENTER\"> ============ E    </P>\
 <P ALIGN=\"CENTER\"> ========= EEEEEE</P>\
 <P ALIGN=\"CENTER\"> ====== E    </P>\

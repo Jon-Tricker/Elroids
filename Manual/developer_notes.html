@@ -31,7 +31,7 @@
 			targets ... fix</LI>
 		<LI>Sometimes control keys seem to get stuck (keyboard.js) ... Think this is when the debugger is used and it
 			consumes some of the event..</LI>
-		<LI>Somtimes after undocking there is a small green square near the 'position' indicator ... left over part of the terminal?</LI>
+		<LI>Somtimes after undocking there is a small green square near the 'position' indicator ... it's the bottom of the cursor when terminal overflows?</LI>
 	</UL>
 
 	<H2>ToDos (In some sort of priority order)</H2>
@@ -92,6 +92,7 @@
 				via HTTP with a, localy implemeneted in the client, 'HTML server'. </LI>
 		</UL>
 		<LI>Add 'crafting' ship components/trade goods out of minerals.</LI>
+		<LI>Add 'compass' for station location.</LI>
 		</LI>
 
 		<LI>Code:</LI>
@@ -105,6 +106,7 @@
 			<LI>Fix audio to use THREE.PositionalAudio (Item.js.playSound()). I tried but cant get the listener to stay
 				stuck to the camera in all cases. Maybe add it to the Ship instead. Fell back on manually reducing volume
 				wih distance (and living without correct stereo).</LI>
+			<LI>Make crater texture proceduraly generated (less download).</LI>
 		</UL>
 
 		<LI>Additional features:
@@ -112,7 +114,7 @@
 				<LI>Add 'lock' to cross hairs. Colour change and display range when allingned with a target.</LI>
 				<LI>Add upgrades to ship (as purchaces):
 					<UL>
-						<LI>Homeing missile + Missile lock.</LI>
+						<LI>Homing missile + Missile lock.</LI>
 						<LI>Proximity missiles (mainly for use by the bad guys).</LI>
 						<LI>'Elite style' (over heating) beam weapon.</LI>
 						<LI>Shields.</LI>

@@ -82,7 +82,6 @@ class Item extends THREE.Group {
         game.getScene().add(this);
 
         // Deal with situation where Item created inside another Item.
-        /*
         if (null != this.getBoundary()) {
             for (let that of Universe.itemList) {
                 if (that != this) {
@@ -94,7 +93,6 @@ class Item extends THREE.Group {
                 }
             }
         }
-        */
     }
 
 
@@ -139,7 +137,7 @@ class Item extends THREE.Group {
 
     // Push item. Thrust in kN, mass in Tonnes. This should work without scaling.
     thrust(thrust, direction, maxspeed) {
-        let accRate = thrust / this.getMass();
+        let accRate = thrust / this.getTotalMass();
         direction = direction.normalize();
 
         let newSpeed = this.speed.clone();
@@ -157,7 +155,13 @@ class Item extends THREE.Group {
         that.takeDamage(0, this);
     }
 
+    // Get base, unladen, mass.
     getMass() {
+        return (this.mass);
+    }
+
+    // Get mass including any contents.
+    getTotalMass() {
         return (this.mass);
     }
 
@@ -294,8 +298,13 @@ class Item extends THREE.Group {
 
         let totalSize = (this.getBoundary().getSize() + that.getBoundary().getSize()) * 1.5;
         while (this.getRelativeLocation(that.location).length() < totalSize) {
-            this.moveItem(false);
-            that.moveItem(false);
+            if (!(this instanceof Ship))  {
+                this.moveItem(false);
+            }   
+            
+            if (!(that instanceof Ship))  {
+                that.moveItem(false);
+            }
         }
     }
 
@@ -329,8 +338,8 @@ class Item extends THREE.Group {
         }
 
         // Get masses
-        let m1 = this.getMass();
-        let m2 = that.getMass();
+        let m1 = this.getTotalMass();
+        let m2 = that.getTotalMass();
         if (0 == (m1 + m2)) {
             console.log("Cant transfer momentum between massless objects.");
         } else {

@@ -12,10 +12,10 @@ import aboutMenu from './Menus/aboutMenu.js';
 import dockedMenu from './Menus/dockedMenu.js';
 import { gameMenu } from './Menus/gameMenu.js'
 import { GameInternalsMenu } from './Menus/gameMenu.js'
-import repairMenu from './Menus/repairMenu.js';
-import componentsMenu from './Menus/componentsMenu.js';
-import ComponentSetMenu from './Menus/componentSetMenu.js';
-import RepairSetMenu from './Menus/repairSetMenu.js';
+import { repairMenu } from './Menus/repairMenu.js';
+import { componentsMenu } from './Menus/componentsMenu.js';
+import { ComponentMenu } from './Menus/componentsMenu.js';
+import { RepairMenu } from './Menus/repairMenu.js';
 import { cargoMenu } from './Menus/cargoMenu.js';
 import { CargoMenu } from './Menus/cargoMenu.js';
 import Universe from '../universe.js';
@@ -33,19 +33,6 @@ class TableData {
 }
 
 class MenuSystem {
-    // Menus as 'pig' XML. 
-    //
-    // Either define here or import from other files.
-    static commerceMenu = " \
-    <BODY> \
-    <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Commerce Menu</P> \
-    <P ALIGN=\"CENTER\">Eventually these options will only be available when docked at a station.</P> \
-    <P>\n</P> \
-    <P ALIGN=\"CENTER\">To be done (TBD).</P> \
-    <UL> \
-    </UL> \
-    </BODY> \
-    "
 
     display;
 
@@ -162,7 +149,7 @@ class MenuSystem {
         }
         let selected = this.targetCursor.equals(cursor);
         if (null == this.display.game.ship.dockedTo()) {
-            this.display.terminal.println("\tExit", selected);  
+            this.display.terminal.println("\tExit", selected);
             if (selected && this.isClicked(keyboard)) {
                 this.display.game.togglePaused();
                 return;
@@ -335,7 +322,7 @@ class MenuSystem {
                             }
                         }
                     }
-                    
+
                     eval(action + ";");
                 }
                 break;
@@ -360,7 +347,7 @@ class MenuSystem {
                 // Pad if necessary
                 while (op.width < tableData.colWidths[tableData.colNumber]) {
                     this.display.terminal.print(" ", highlight, centered);
-                    op.width ++;
+                    op.width++;
                 }
                 tableData.colNumber++;
                 break;

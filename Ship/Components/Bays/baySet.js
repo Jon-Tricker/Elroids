@@ -13,6 +13,9 @@ class BaySet extends ComponentSet {
     // Mineral contents
     minerals = new Map();
 
+    // Mass of contents
+    contentMass = 0;
+
     constructor(ship, slots) {
         super("Cargo bays", ship, slots);
         this.recalc();
@@ -25,12 +28,20 @@ class BaySet extends ComponentSet {
         for (let bay of this) {
             this.capacity += bay.getCapacity();
         }
+
+        // Ugly but minerals in not initialized when recalc called from super.constructor.
+        if (undefined != this.minerals) {
+            this.contentMass = 0;
+            for (let [key, value] of this.minerals) {
+                this.contentMass += value;
+            }
+        }
     }
 
     loadMineral(mineral, mass) {
 
         // Load it all.
-        if(this.minerals.has(mineral)) {
+        if (this.minerals.has(mineral)) {
             // Update entry for this mineral type.
             this.minerals.set(mineral, this.minerals.get(mineral) + mass)
         } else {
@@ -38,8 +49,12 @@ class BaySet extends ComponentSet {
             this.minerals.set(mineral, mass);
         }
 
+        this.recalc();
+
         // Dump any overspill.
         this.level();
+
+        this.recalc();
     }
 
     // Dump any overspill
@@ -49,18 +64,18 @@ class BaySet extends ComponentSet {
             this.ship.game.displays.addMessage("Bay full. Dumping surplus " + spaceReqd + "(t)");
         }
 
-        while(0 <  (spaceReqd = this.getContentMass() - this.capacity)) {
+        while (0 < (spaceReqd = this.getContentMass() - this.capacity)) {
             // Find cheapest
             let cheapest = null;
             let cost = null;
             for (let [key, value] of this.minerals) {
-                if ((null == cost) || (key.value < cost) ) {
+                if ((null == cost) || (key.value < cost)) {
                     cheapest = key;
                     cost = key.value;
                 }
             }
 
-            if(this.minerals.get(cheapest) < spaceReqd) {
+            if (this.minerals.get(cheapest) < spaceReqd) {
                 // Not enough.
                 spaceReqd -= this.minerals.get(cheapest);
                 this.dumpMineral(cheapest, this.minerals.get(cheapest));
@@ -83,17 +98,19 @@ class BaySet extends ComponentSet {
         this.unloadMineral(mineral, mass);
 
         // Make mineral 
-        new Mineral(mass, this.ship.location.x, this.ship.location.y, this.ship.location.y, 0, 0, 0, this.ship.game, mineral);
+        let min = new Mineral(mass, this.ship.location.x, this.ship.location.y, this.ship.location.y, this.ship.speed.x * 0.9, this.ship.speed.y * 0.9, this.ship.speed.z * 0.9, this.ship.game, mineral);
+
+        min.separateFrom(this.ship);
     }
 
     // Unload a mineral.
     // Return amount unloaded.
-    unloadMineral(mineral, mass) {  
+    unloadMineral(mineral, mass) {
         // Deduct from cargo.
-        if(!this.minerals.has(mineral)) {
-            throw(new GameError("No such mineral in bay."))
+        if (!this.minerals.has(mineral)) {
+            throw (new GameError("No such mineral in bay."))
         }
-        
+
         let available = this.minerals.get(mineral);
         if (available < mass) {
             mass = available;
@@ -107,28 +124,14 @@ class BaySet extends ComponentSet {
             this.minerals.delete(mineral);
         }
 
-        return(mass);
-    }
+        this.recalc();
 
-    getMass() {
-        // Mass of the bays
-        let mass = super.getMass();
-        
-        // Add mass of the contents.
-        mass +- this.getContentMass();
-
-        return(mass);
+        return (mass);
     }
 
     // Get total current mass of contents.
-    getContentMass () { 
-        let currentMass = 0;
-
-        for (let [key, value] of this.minerals) {
-            currentMass += value;
-        }
-
-        return(currentMass);
+    getContentMass() {
+        return (this.contentMass);
     }
 }
 

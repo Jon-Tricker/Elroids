@@ -611,8 +611,8 @@ class Ship extends Item {
         return(this.baySet.capacity)
     }
 
-    getContentMass() {
-        return(this.baySet.getContentMass())
+    getTotalMass() {
+        return(this.mass + this.baySet.getContentMass())
     }
 }
 
