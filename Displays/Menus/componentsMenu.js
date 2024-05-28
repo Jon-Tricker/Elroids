@@ -6,12 +6,10 @@ import MenuTable from './menuTable.js';
 let componentsMenu = "\
 <BODY>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Ship Components/Upgrades Menu</P>\
-<script src=\"ComponentMenu\" params=\"this.display.game.ship\"></script>\
+<script src=\"ComponentsMenu\" params=\"this.display.game.ship\"></script>\
 </BODY>"
 
-
-
-class ComponentMenu {
+class ComponentsMenu {
 
     static printMenu(ship) {
         let sets = ship.compSets;
@@ -49,4 +47,4 @@ class ComponentMenu {
     }
 }
 
-export { componentsMenu, ComponentMenu};
+export { componentsMenu, ComponentsMenu};

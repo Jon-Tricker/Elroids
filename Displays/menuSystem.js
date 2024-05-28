@@ -14,7 +14,7 @@ import { gameMenu } from './Menus/gameMenu.js'
 import { GameInternalsMenu } from './Menus/gameMenu.js'
 import { repairMenu } from './Menus/repairMenu.js';
 import { componentsMenu } from './Menus/componentsMenu.js';
-import { ComponentMenu } from './Menus/componentsMenu.js';
+import { ComponentsMenu } from './Menus/componentsMenu.js';
 import { RepairMenu } from './Menus/repairMenu.js';
 import { cargoMenu } from './Menus/cargoMenu.js';
 import { CargoMenu } from './Menus/cargoMenu.js';
@@ -246,6 +246,8 @@ class MenuSystem {
             case "TR":
             case "p":
             case "P":
+            case "br":
+            case "BR":
                 lfReqd = true;
                 break;
 

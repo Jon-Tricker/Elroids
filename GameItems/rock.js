@@ -11,8 +11,6 @@ import FacitRockGeometry from '../facitRockGeometry.js'
 import { MineralType, MineralComponent, Composition } from './minerals.js';
 import Ship from '../Ship/ship.js'
 
-const SPLIT_VIOLENCE = 2;
-
 // Type of rock graphics
 const ROCK_STYLE_SPHERE = 0;
 const ROCK_STYLE_FACIT = 1;
@@ -140,31 +138,35 @@ class Rock extends NonShipItem {
   split() {
     let newSize = Math.floor(this.rockSize / 2);
 
-    if (2 < newSize) {
-      // Create a pair of repacements.
-      let speedRatio = Math.random();
-
-      // Some ramdom violence based on size of impact.
-      let bang = new THREE.Vector3((Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, (Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, Math.random() * (SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE);
-
-      // Create a pair of compositions.
-      let newComp = this.composition.split();
-      if (0 < this.composition.getValue()) {
-        new Rock(newSize, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, this.composition);
-      }
-
-      speedRatio = 1 - speedRatio;
-      bang.multiplyScalar(-1);
-
-      if (0 < newComp.getValue()) {
-        new Rock(newSize, this.location.x, this.location.y, this.location.z, this.speed.x * speedRatio + bang.x, this.speed.y * speedRatio + bang.y, this.speed.z * speedRatio + bang.z, this.game, newComp);
-      }
-    } else {
-      this.composition.mineralize(this.location, this.speed, this.mass / 2, this.game);
-    }
+    let loc = this.location.clone();
+    let spd = this.speed.clone();
 
     this.destruct();
 
+
+    if (2 < newSize) {
+
+      // Create a pair of compositions.
+      let newComp = this.composition.split();
+
+      // Sort out how to split speed.
+      let ratio = new THREE.Vector3(1, 1, 1);
+      let ratio2 = new THREE.Vector3(1, 1, 1);
+      if ((0 != this.composition.getValue()) && (0 != newComp.getValue())) {
+        ratio = new THREE.Vector3(Math.random(), Math.random(), Math.random());
+        ratio2 = new THREE.Vector3(1, 1, 1).sub(ratio);
+      }
+
+      if (0 < this.composition.getValue()) {
+        new Rock(newSize, loc.x, loc.y, loc.z, spd.x * ratio.x, spd.y * ratio.y, spd.z * ratio.z, this.game, this.composition);
+      }
+
+      if (0 < newComp.getValue()) {
+        new Rock(newSize, loc.x, loc.y, loc.z, spd.x * ratio2.x, spd.y * ratio2.y, spd.z * ratio2.z, this.game, newComp);
+      }
+    } else {
+      this.composition.mineralize(loc, spd, this.mass / 2, this.game);
+    }
   }
 
   doDamage(that) {
