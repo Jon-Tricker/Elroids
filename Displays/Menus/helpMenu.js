@@ -7,10 +7,10 @@ let helpMenu = " \
 <P>\t\">\" - Cursor right.</P>\
 <P>\t\"&lt;\" - Cursor left.</P>\
 <P>\t\"M\" - Select current cursor item.</P>\
-<P></P>\
+<BR />\
 <P>For more details see on line manual:</P>\
 <P>\thttps://www.tricker.uk/Elroids/Manual/index.html</P>\
-<P></P>\
+<BR />\
 </BODY>\
 "
 

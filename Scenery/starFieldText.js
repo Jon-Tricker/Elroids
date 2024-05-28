@@ -19,7 +19,7 @@ class StarFieldTexture extends Texture {
       width = MAX_SIZE;
     }
 
-    super(width, height);
+    super(width, height, BACKGROUND);
 
     this.createData();
   }
@@ -27,21 +27,13 @@ class StarFieldTexture extends Texture {
   createData() {
     let size = this.height * this.width;
 
-    // Paint background.
-    let colour = BACKGROUND;
-    for (let x = 0; x < this.width; x++) {
-      for (let y = 0; y < this.height; y++) {
-        this.setPixel(x, y, colour)
-      }
-    }
-
     // Add stars
     for (let i = 0; i < size / 5000; i++) {
       let x = Math.floor(Math.random() * this.width);
       let y = Math.floor(Math.random() * this.height);
 
       // Work out a colour
-      colour = StarFieldTexture.randomColour();
+      let colour = StarFieldTexture.randomColour();
 
       let brightness = Math.random() * 255;
       colour.r = Math.floor(colour.r * brightness);

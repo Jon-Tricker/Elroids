@@ -20,7 +20,7 @@ class CargoMenu {
 
         doc += "<P>Total capacity " + ship.getCargoCapacity() + "(t)</P>"
         doc += "<P>Current load " + (ship.getTotalMass() - ship.getMass()) + "(t)</P>"
-        doc += "<P></P>"
+        doc += "<BR />"
 
         if (minerals.size == 0) {
             doc += "<P>No minerals.</P>"
@@ -65,7 +65,7 @@ class CargoMenu {
 
             if (null != ship.dockedWith) {
                 doc += "Sell all <button type=\"button\" onclick=\"CargoMenu.onSellClick(this.display.game.ship)\">" + totalValue + "</button>";
-                doc += "<P></P>";
+                doc += "<BR />";
             }
         }
 

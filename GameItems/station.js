@@ -9,6 +9,7 @@ import NonShipItem from './nonShipItem.js';
 import Universe from '../universe.js';
 import Ship from '../Ship/ship.js'
 import Texture from '../Utils/texture.js'
+import BoxSides from '../Utils/boxSides.js'
 import PlateTexture from '../Utils/plateTexture.js';
 
 
@@ -28,7 +29,7 @@ const BAY_DEPTH = 40;
 const BAY_TEXTURE_SIZE = 21;
 
 const TUBE_RADIUS = 10;
-const TORUS_RADIUS = Math.sqrt(BOX_WIDTH * BOX_WIDTH + BOX_HEIGHT * BOX_HEIGHT) * 0.75  + TUBE_RADIUS;
+const TORUS_RADIUS = Math.sqrt(BOX_WIDTH * BOX_WIDTH + BOX_HEIGHT * BOX_HEIGHT) * 0.75 + TUBE_RADIUS;
 const STATION_SIZE = TORUS_RADIUS + TUBE_RADIUS * 2; // m
 
 const MAX_DOCKING_SPEED = 10; // m/s
@@ -48,7 +49,7 @@ const STATION_MATERIAL = new THREE.MeshStandardMaterial(
 
 const BAY_MATERIAL = new THREE.MeshStandardMaterial(
     {
-        color:  BAY_COLOUR,
+        color: BAY_COLOUR,
         roughness: 0.75,
         transparent: true,
         opacity: 1,
@@ -71,7 +72,7 @@ class Station extends NonShipItem {
             this.rotateZ(Math.random() * Math.PI);
         }
 
-        let text =  new PlateTexture().getTexture();
+        let text = new PlateTexture().getTexture();
         STATION_MATERIAL.map = text;
         STATION_MATERIAL.bumpMap = text;
         STATION_MATERIAL.needsUpdate = true;
@@ -134,27 +135,27 @@ class Station extends NonShipItem {
         this.addMesh(tubeMesh);
 
         // Tubes
-        let height = TORUS_RADIUS - BOX_WIDTH/2;
+        let height = TORUS_RADIUS - BOX_WIDTH / 2;
 
-        let topTubeGeom = new THREE.CylinderGeometry(TUBE_RADIUS/2, TUBE_RADIUS/2, height); 
+        let topTubeGeom = new THREE.CylinderGeometry(TUBE_RADIUS / 2, TUBE_RADIUS / 2, height);
         let topTubeMesh = new THREE.Mesh(topTubeGeom, STATION_MATERIAL);
-        topTubeMesh.position.set(0, (height + BOX_WIDTH)/2, 0);
+        topTubeMesh.position.set(0, (height + BOX_WIDTH) / 2, 0);
         this.addMesh(topTubeMesh);
 
         let botTubeMesh = new THREE.Mesh(topTubeGeom, STATION_MATERIAL);
-        botTubeMesh.position.set(0, -(height + BOX_WIDTH)/2, 0);
+        botTubeMesh.position.set(0, -(height + BOX_WIDTH) / 2, 0);
         this.addMesh(botTubeMesh);
-        
-        height = TORUS_RADIUS - BOX_HEIGHT/2;
-        let leftTubeGeom = new THREE.CylinderGeometry(TUBE_RADIUS/2, TUBE_RADIUS/2, height); 
+
+        height = TORUS_RADIUS - BOX_HEIGHT / 2;
+        let leftTubeGeom = new THREE.CylinderGeometry(TUBE_RADIUS / 2, TUBE_RADIUS / 2, height);
         let leftTubeMesh = new THREE.Mesh(leftTubeGeom, STATION_MATERIAL);
         leftTubeMesh.rotateX(Math.PI / 2);
-        leftTubeMesh.position.set(0, 0, (height + BOX_HEIGHT)/2);
-        this.addMesh(leftTubeMesh);  
-        
+        leftTubeMesh.position.set(0, 0, (height + BOX_HEIGHT) / 2);
+        this.addMesh(leftTubeMesh);
+
         let rightTubeMesh = new THREE.Mesh(leftTubeGeom, STATION_MATERIAL);
         rightTubeMesh.rotateX(Math.PI / 2);
-        rightTubeMesh.position.set(0, 0, -(height + BOX_HEIGHT)/2);
+        rightTubeMesh.position.set(0, 0, -(height + BOX_HEIGHT) / 2);
         this.addMesh(rightTubeMesh);
     }
 
@@ -165,25 +166,19 @@ class Station extends NonShipItem {
     }
 
     setupBay() {
-        let textureBack = this.createBayTexture(BAY_TEXTURE_SIZE, BAY_TEXTURE_SIZE, true);
-        let textureSide = this.createBayTexture(BAY_TEXTURE_SIZE, BAY_TEXTURE_SIZE, false);
 
         // Differing textures on different internal faces.
         // I don't think this quite works as billed. However, after a lot of tinkering, the following achieves the required result.
         let materials = new Array();
-        for (let i = 0; i < 6; i++) {
+        for (let side = 0; side < BoxSides.SIDE_COUNT; side++) {
             let material = BAY_MATERIAL.clone();
             material.side = THREE.DoubleSide;
 
-            if (1 != i) {
+            let texture;
+            if (side != BoxSides.BACK) {
                 // Most faces opaque and textured.
-                if (0 == i) {
-                    material.map = textureBack;
-                    // material.bumpMap = textureBack;
-                } else {
-                    material.map = textureSide;
-                    // material.bumpMap = textureSide;
-                }
+                texture = this.createBayTexture(BAY_TEXTURE_SIZE, BAY_TEXTURE_SIZE, side);
+                material.map = texture;
                 material.transparent = false;
             } else {
                 // 'Front' face is just transparent.
@@ -213,34 +208,87 @@ class Station extends NonShipItem {
         let point = this.bayMesh.position.clone();
         // point.x -= BAY_DEPTH;
         point.x -= STATION_SIZE;
-        return(point);
+        return (point);
     }
 
-    createBayTexture(width, height, isBack) {
-        let text = new Texture(width, height);
+    createBayTexture(width, height, side) {
+        let baseCol = new THREE.Color('black');
+        switch (side) {
+            case BoxSides.BOTTOM:
+                baseCol = new THREE.Color('darkGrey');
+                break;
 
-        // Paint background.
-        let colour = new THREE.Color('black');
-        for (let x = 0; x < width; x++) {
-            for (let y = 0; y < height; y++) {
-                text.setPixel(x, y, colour);
-            }
+            case BoxSides.TOP:
+                baseCol = new THREE.Color('lightGrey');
+                break;
+
+            default:
+                break;
         }
 
-        // Paint lines
-        colour = new THREE.Color('white');   // Allow background to show through.
-        for (let x = 0; x < width; x++) {
-            text.setPixel(x, 0, colour);
-            if (isBack) {
-                text.setPixel(x, Math.floor(height / 2), colour);
-            }
-            text.setPixel(x, height - 1, colour);
-        }
+        let text = new Texture(width, height, baseCol);
 
+
+        // Paint edgelines
+        let whiteCol = new THREE.Color('white');   // Allow background to show through.
+        for (let x = 0; x < width; x++) {
+            text.setPixel(x, 0, whiteCol);
+            text.setPixel(x, height - 1, whiteCol);
+        }
         for (let y = 0; y <= height; y++) {
-            text.setPixel(0, y, colour);
-            text.setPixel(Math.floor(width / 2), y, colour);
-            text.setPixel(width - 1, y, colour);
+            text.setPixel(0, y, whiteCol);
+            text.setPixel(width - 1, y, whiteCol);
+        }
+
+        // Paint guide lines.   
+        let redCol = new THREE.Color('red');
+        let greenCol = new THREE.Color('green');
+        let col = null;
+        switch (side) {
+            case BoxSides.FRONT:
+                col = whiteCol;
+                break;
+
+            case BoxSides.BACK:
+            case BoxSides.LEFT:
+            case BoxSides.RIGHT:
+            default:
+                break
+        }
+
+        if (null != col) {
+            for (let x = 0; x < width; x++) {
+                text.setPixel(x, Math.floor(height / 2), col);
+            }
+        }
+
+        col = null;
+        switch (side) {
+            case BoxSides.FRONT:
+            case BoxSides.TOP:
+            //case BoxSides.BOTTOM:
+                col = whiteCol;
+                break;
+
+            case BoxSides.BACK:
+                break;
+
+            // Left and right are swaped when looking at the inside of a box.
+            case BoxSides.RIGHT:
+                col = redCol;
+                break;
+            case BoxSides.LEFT:
+                col = greenCol;
+                break;
+
+            default:
+                break
+        }
+
+        if (null != col) {
+            for (let y = 0; y <= height - 1; y++) {
+                text.setPixel(Math.floor(width / 2), y, col);
+            }
         }
 
         let texture = text.getTexture();
@@ -260,10 +308,10 @@ class Station extends NonShipItem {
 
     handleCollision(that) {
         if (that instanceof Ship) {
-            return(this.collideWithShip(that));
+            return (this.collideWithShip(that));
         }
 
-        return(super.handleCollision(that));
+        return (super.handleCollision(that));
     }
 
     // Handle special case of colliding with ship.
@@ -280,7 +328,7 @@ class Station extends NonShipItem {
         // ToDo : Probably should be from every vertex of the ship mesh but WTF?
         let obj = this.isPointInside(ship.location);
         if (null != obj) {
-            
+
             // If inside bay handle docking.
             if (this.bayMesh == obj) {
 

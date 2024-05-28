@@ -151,6 +151,7 @@ class MenuSystem {
         if (null == this.display.game.ship.dockedTo()) {
             this.display.terminal.println("\tExit", selected);
             if (selected && this.isClicked(keyboard)) {
+                this.display.terminalEnable(false);
                 this.display.game.togglePaused();
                 return;
             }

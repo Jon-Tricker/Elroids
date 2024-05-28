@@ -6,7 +6,7 @@ let gameMenu = "\
 <BODY>\
     <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Game control Menu</P>\
     <script src=\"GameInternalsMenu\" params=\"this.display.game\"></script>\
-    <P></P>\
+    <BR />\
 </BODY>"
 
 

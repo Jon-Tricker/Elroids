@@ -29,7 +29,7 @@ import { MineralTypes } from './GameItems/minerals.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "2.6";
+const VERSION = "2.7";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -296,7 +296,9 @@ class Game {
 
     togglePaused() {
         this.paused = !this.paused;
-        this.displays.terminalEnable(this.paused);
+        if (null == this.getShip().dockedWith) {
+            this.displays.terminalEnable(this.paused);
+        }
     }
 
     animate(date) {

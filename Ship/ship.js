@@ -329,7 +329,7 @@ class Ship extends Item {
 
     deceletarte() {
         let newSpeed = this.speed.clone();
-        if ((this.speed.length() / Universe.getAnimateRate()) > this.engineSet.getDecRate()) {
+        if ((this.speed.length() / Universe.getAnimateRate()) > (this.engineSet.getDecRate()/Universe.getAnimateRate())) {
             // Slow down in all directions.
             newSpeed.multiplyScalar(1 - (this.engineSet.getDecRate() / Universe.getAnimateRate()));
         } else {
@@ -444,9 +444,11 @@ class Ship extends Item {
     }
 
     // Move mesh in graphics space. Will be relative to ship position.
+    /*
     moveMesh() {
         this.position.set(this.location.x, this.location.y, this.location.z);
     }
+    */
     
 
     // Take damage to self.
@@ -559,9 +561,9 @@ class Ship extends Item {
         this.game.displays.terminal.playSound("poweron", 0.5);
         if (this.game.paused) {
             this.game.togglePaused();
-        } else {
-            this.game.displays.terminalEnable(false);
         }
+        
+        this.game.displays.terminalEnable(false);
 
         this.dockedWith.remove(this);
 

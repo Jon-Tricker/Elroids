@@ -6,7 +6,7 @@ import MenuTable from './menuTable.js';
 let repairMenu = "\
 <BODY>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Ship Repair Menu</P>\
-<P></P>\
+<BR />\
 <script src=\"RepairMenu\" params=\"this.display.game.ship\"></script>\
 </BODY>"
 

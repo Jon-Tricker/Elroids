@@ -18,7 +18,7 @@ class ComponentsMenu {
         doc += "<P>"
 
         doc += "<P>Unladen mass " + ship.mass + "(t)</P>";
-        doc += "<P></P>";
+        doc += "<BR />";
 
         for (let set of sets) {
             if (set.length > 0) {
@@ -36,7 +36,7 @@ class ComponentsMenu {
                     tab.addRow(comp.getValues());
                 }
                 doc += tab.toString();
-                doc += "<P></P>";
+                doc += "<BR />";
             }
         }
 

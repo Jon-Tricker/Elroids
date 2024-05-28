@@ -16,7 +16,7 @@ class Texture {
 
     data;
 
-    constructor(width, height) {
+    constructor(width, height, colour) {
         if (undefined != width) {
             this.width = width;
         }
@@ -26,6 +26,15 @@ class Texture {
         }
 
         this.data = new Uint8Array(4 * this.width * this.height);
+
+        // If given a base colour paint it.
+        if (undefined != colour) {
+            for (let x = 0; x < width; x++) {
+                for (let y = 0; y < height; y++) {
+                    this.setPixel(x, y, colour);
+                }
+            }
+        }
     }
 
     setPixel(x, y, colour) {

@@ -283,6 +283,14 @@ class Item extends THREE.Group {
     // Separate two overlapping objects.
     separateFrom(that) {
 
+        /*
+        console.log("B4 this " + this.position.x + " " + this.position.y + " " + this.position.z + " " + this.location.x + " " + this.location.y + " " + this.location.z);
+        console.log("B4 that " + that.position.x + " " + that.position.y + " " + that.position.z + " " + that.location.x + " " + that.location.y + " " + that.location.z);
+        let camera = this.game.getScene().getCamera();
+        console.log("B4 camera " + camera.position.x + " " + camera.position.y + " " + camera.position.z);
+        */
+
+
         // Make sure speeds differ
         let spd = this.speed.clone();
         spd.sub(that.speed);
@@ -298,14 +306,18 @@ class Item extends THREE.Group {
 
         let totalSize = (this.getBoundary().getSize() + that.getBoundary().getSize()) * 1.5;
         while (this.getRelativeLocation(that.location).length() < totalSize) {
-            if (!(this instanceof Ship))  {
-                this.moveItem(false);
-            }   
-            
-            if (!(that instanceof Ship))  {
+            this.moveItem(false);
+            // Don't let things push the ship around.
+            if (!(that instanceof Ship)) {
                 that.moveItem(false);
             }
-        }
+        }  
+
+        /*
+        console.log("After this " + this.position.x + " " + this.position.y + " " + this.position.z + " " + this.location.x + " " + this.location.y + " " + this.location.z);
+        console.log("After that " + that.position.x + " " + that.position.y + " " + that.position.z + " " + that.location.x + " " + that.location.y + " " + that.location.z);
+        console.log("After camera " + camera.position.x + " " + camera.position.y + " " + camera.position.z);
+        */
     }
 
     // Handle collision physics
