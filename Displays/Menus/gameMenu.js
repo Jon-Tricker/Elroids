@@ -2,9 +2,12 @@
 //
 // Arguments must be in a form that is in scope when eval()ed by MenuSystem.
 
+import GameError from '../../GameErrors/gameError.js';
+
 let gameMenu = "\
 <BODY>\
     <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Game control Menu</P>\
+    <BR />\
     <script src=\"GameInternalsMenu\" params=\"this.display.game\"></script>\
     <BR />\
 </BODY>"
@@ -16,6 +19,7 @@ class GameInternalsMenu {
         let doc = "";
 
         doc += "<P>";
+        doc += "<BR />"
 
         doc += "<P>Rocks: count=" + game.rockCount + ", Max count=" + game.maxRockCount + "(ish)</P>";
         doc += "<P>Saucers: Mother count=" + game.motherSaucerCount + ", Count=" + game.saucerCount + ", Max count=" + game.maxSaucerCount + "</P>";

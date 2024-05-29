@@ -4,12 +4,15 @@
 
 // Sits on top of the emulated terminal.
 
+// Most of these are needed event though greyed out.
 import * as THREE from 'three';
 import Terminal from './terminal.js';
 import helpMenu from './Menus/helpMenu.js';
 import topMenu from './Menus/topMenu.js';
 import aboutMenu from './Menus/aboutMenu.js';
 import dockedMenu from './Menus/dockedMenu.js';
+import { errorMenu } from './Menus/errorMenu.js';
+import { ErrorMenu } from './Menus/errorMenu.js';
 import { gameMenu } from './Menus/gameMenu.js'
 import { GameInternalsMenu } from './Menus/gameMenu.js'
 import { repairMenu } from './Menus/repairMenu.js';
@@ -19,6 +22,7 @@ import { RepairMenu } from './Menus/repairMenu.js';
 import { cargoMenu } from './Menus/cargoMenu.js';
 import { CargoMenu } from './Menus/cargoMenu.js';
 import Universe from '../universe.js';
+import GameError from '../GameErrors/gameError.js';
 
 // Result of printing a child element.
 class ElementResult {
@@ -41,6 +45,9 @@ class MenuSystem {
     // Cursor and line count start from '1'. '0' means there are no selectable lines (or rows) yet ... don't display a cursor.
     targetCursor;           // Target position of cursor in parent menu
     maxYCursor = 0;
+
+    // Ugly variable used for passing 'last error' argument.
+    lastError = null;
 
     static parser = new DOMParser();
 
@@ -326,7 +333,20 @@ class MenuSystem {
                         }
                     }
 
-                    eval(action + ";");
+                    try {
+                        eval(action + ";");
+                    }
+                    
+                    catch (e) {
+                        if (e instanceof GameError) {
+                            // Display it
+                            this.lastError = e;
+                            this.pushMenu(errorMenu);
+                        } else {
+                            // Pass it on
+                            throw (e);
+                        }
+                    }
                 }
                 break;
 

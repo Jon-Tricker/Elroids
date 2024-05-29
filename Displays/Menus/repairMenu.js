@@ -2,6 +2,7 @@
 //
 // Arguments must be in a form that is in scope when eval()ed by MenuSystem.
 import MenuTable from './menuTable.js';
+import GameError from '../../GameErrors/gameError.js';
 
 let repairMenu = "\
 <BODY>\
@@ -64,19 +65,26 @@ class RepairMenu {
         let cost = set.getRepairCost(percent)
 
         if(0 == cost) {
-            return("<button type=\"button\" onclick=\"RepairMenu.onRepairClick(this.display.game.ship, cursor, 0)\">N/A</button>");
+            return("<button type=\"button\" onclick=\"RepairMenu.onRepairClick(this.display.game.ship, cursor, null)\">N/A</button>");
         } else {
             return("<button type=\"button\" onclick=\"RepairMenu.onRepairClick(this.display.game.ship, cursor, " + percent +")\">" + cost + "</button>");
         }
     }
 
     static onRepairClick(ship, cursor, percent) {
+
+        if(null == percent) {
+            throw(new GameError("Repair not available."))
+        }
+
         let sets = ship.compSets;   
         let setNumber = 0;
         for (let set of sets) {
             if (set.length > 0) { 
                 if (setNumber == cursor.y) {
-                    set.repair(percent);
+                    if (!set.repair(percent)) {
+                        throw(new GameError("Repair incomplete."))
+                    }
                     break;
                 } else {
                     setNumber ++;
