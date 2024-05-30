@@ -57,7 +57,7 @@ class Compass extends DarkPanel {
 
         let closestRpLen = closestRp.length();
 
-        console.log("RP " + closestRp.x + " " + closestRp.y + " " + closestRp.z);
+        // console.log("RP " + closestRp.x + " " + closestRp.y + " " + closestRp.z);
 
         // Plot dot.
 
