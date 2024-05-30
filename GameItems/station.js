@@ -60,6 +60,9 @@ const BAY_MATERIAL = new THREE.MeshStandardMaterial(
 
 class Station extends NonShipItem {
 
+    // List of all stations
+    static stationList = new Set();
+
     bayMesh;
 
     constructor(locationX, locationY, locationZ, game, owner) {
@@ -76,14 +79,21 @@ class Station extends NonShipItem {
         STATION_MATERIAL.map = text;
         STATION_MATERIAL.bumpMap = text;
         STATION_MATERIAL.needsUpdate = true;
+
+        Station.stationList.add(this);
     }
 
     destruct() {
         super.destruct();
+        Station.stationList.delete(this);
     }
 
     getClass() {
         return ("Station");
+    }
+
+    static getStationList() {
+        return(Station.stationList);
     }
 
     getRadarColour() {

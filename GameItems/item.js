@@ -10,7 +10,7 @@ import ItemBoundary from './itemBoundary.js';
 import BugError from "../GameErrors/bugError.js";
 import Ship from "../Ship/ship.js";
 
-const COLOUR = "#FFFFFF"
+const COLOUR = "#FFFFFF";
 
 // Distance for audio volume to half
 const AUDIO_HALF_DIST = 500;

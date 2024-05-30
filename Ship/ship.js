@@ -444,11 +444,9 @@ class Ship extends Item {
     }
 
     // Move mesh in graphics space. Will be relative to ship position.
-    /*
     moveMesh() {
         this.position.set(this.location.x, this.location.y, this.location.z);
     }
-    */
     
 
     // Take damage to self.

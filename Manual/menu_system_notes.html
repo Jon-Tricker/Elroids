@@ -13,18 +13,24 @@
 </HEAD>
 <H1>Introduction to the Menu System (Experimental!)</H1>
 
-<P>The system had a simple, VT100 like, terminal (terminal.js).  menuSystem.js is an, extramly primative, 'web browser' that displays pages on the terminal..</P>
+<P>The system had a simple, VT100 like, terminal (terminal.js).  menuSystem.js is an, extreamly primative, 'web browser' that displays pages on the terminal.</P>
 
-<P>The menus are defined as a, much simplified, XHTML pages. This is at an early stage of development. If you think you can improve it feel free to do so. However please re-test/update existing menus so they still work.</P>
+<P>The terminal is invoked:</P>
+<UL>
+	<LI>When the game is paused.</LI>
+	<LI>When the ship is docked.</LI>
+</UL>
 
-<P>Each page consists of a static XHTML 'document'. These can be either inline or imported from a separte file.</P>
+<P>The menus are defined as a, much simplified, XHTML pages.</P>
 
 <P>Menus are handled as a 'stack'. It is possible to go 'back' to previously veiwed menus.</P>
 
+<P>This is all at an early stage of development. If you think you can improve it feel free to do so. However please re-test/update existing menus so they still work.</P>
+
 <H2>Why???</H2>
-<P>Well 1st because it's fun.</P>
-<P>2nd eventually the game may be ported to non-keyboard device. So, whtever the menu system looks like, the interface needs to be accessible via just the flight contols (whatever they are on each system). 
-i.e must be driven by 'left', 'right', 'up', 'down' and 'select' ... NOT a mouse or other system dependant UI. </P>
+<P>Well 'because it's fun'.</P>
+<P>Also eventually the game may be ported to non-keyboard device. So, whtever the menu system looks like, the interface needs to be accessible via just the flight contols (whatever they are on each system). 
+i.e. 'left', 'right', 'up', 'down' and 'select' ... NOT mouse or other system dependant UIs. </P>
 
 <H2>Structure</H2>
 
@@ -48,7 +54,7 @@ i.e must be driven by 'left', 'right', 'up', 'down' and 'select' ... NOT a mouse
 			<LI>ToDo ... Multiple entries on each line with 'left' and 'right' selection.</LI>
 		</UL>
 	</LI>
-	<LI>'script' tags. These invoke methods on the 'local' (not 'remote' like real HTML) machine that generate dynaamic pages.</LI>
+	<LI>'script' tags (see below).</LI>
 </UL>
 
 <P>All text can have the following attibutes.</P>
@@ -56,6 +62,16 @@ i.e must be driven by 'left', 'right', 'up', 'down' and 'select' ... NOT a mouse
 	<LI>HIGHLIGHT - Display in reverse video.</LI>
 	<LI>CENTER - Center on the screen. May not work if text contains control characters.</LI>
 </UL>
+
+<H3>'Scripts'</H3> 
+<P>Scripts invoke methods on the 'local' (not 'remote' like real HTML) machine that generate dynaamic pages.</P>
+<P>They are executed (eval()ed) in the context if the MenuSystem. So have access to it's members and imports.</P>
+<P>The script can have parameters. Again these are in the context of the MenuSystem and should be variable that are availabe to it.</P>
+
+<H3>Error handling</H3>
+<P>Errors with class GameError are in game error conditions . These are caught and an error handling menu is bought up.</P>
+<P>GameErrors should be thrown by scripts if they detect in game errors. (e.g. Out of money etc.) </P>
+<P>Other errors relate to code issues. So are rethrown for normal handling.</P>
 
 <P>Default 'Back' and 'Exit' items are automatically added to every menu.</P>
 </BODY>

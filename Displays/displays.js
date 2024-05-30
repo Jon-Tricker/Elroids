@@ -1,11 +1,15 @@
 // Game and ship display overlays.
 import Radar from "./radar.js";
+import Compass from "./compass.js";
 import Universe from '../universe.js'
 import Terminal from './terminal.js'
 import MenuSystem from './menuSystem.js'
 
 const PAD_LENGTH = 5;
 const DEFAULT_DURATION = 2000;
+
+const DEFAULT_COLOUR = "red";
+const DEFAULT_TERM_COLOUR = "lightgreen";
 
 class Message {
     text;
@@ -27,8 +31,10 @@ class Displays {
     msgCtx;
     terminalCtx;
 
-    height;
+    // Text sizes. Everything else will be scaled relative to this.
+    textHeight;
     pt;
+
     game;
 
     status;
@@ -45,6 +51,7 @@ class Displays {
     menuSystem;
 
     radar;
+    compass;
 
     // Game control variables.
 
@@ -67,28 +74,29 @@ class Displays {
 
         let terminalDoc = document.querySelector('.terminalclass');
         let terminalCtx = terminalDoc.getContext("2d");
-        this.terminal = new Terminal(this.game, terminalCtx, terminalDoc, "lightgreen");
+        this.terminal = new Terminal(this.game, terminalCtx, terminalDoc, DEFAULT_TERM_COLOUR);
 
-        this.radar = new Radar(this.game, this.statusCtx, "red");
+        this.radar = new Radar(this.game, this.statusCtx, DEFAULT_COLOUR);
+        this.compass = new Compass(this.game, this.statusCtx, DEFAULT_COLOUR, this);
 
         this.resize();
     }
 
     resize() {
-        this.height = window.innerHeight * 0.05;
-        if (this.height < 10) {
-            this.height = 10;
+        this.textHeight = window.innerHeight * 0.05;
+        if (this.textHeight < 10) {
+            this.textHeight = 10;
         }
-        this.pt = this.height * 0.8;
+        this.pt = this.textHeight * 0.8;
 
         this.controls.width = window.innerWidth;
-        this.controls.height = this.height;
+        this.controls.height = this.textHeight;
 
         this.hud.width = window.innerWidth;
         this.hud.height = window.innerHeight;
 
         this.status.width = window.innerWidth;
-        this.status.height = this.height * 5;
+        this.status.height = this.textHeight * 5;
 
         this.msg.width = window.innerWidth;
         this.msg.height = window.innerHeight;
@@ -96,6 +104,7 @@ class Displays {
         this.terminal.resize(window.innerWidth, window.innerHeight);
 
         this.radar.resize(this.status.width, this.status.height);
+        this.compass.resize(this.status.width, this.status.height);
 
         this.controlsCtx.strokeStyle = "yellow";
         this.controlsCtx.font = this.pt + "px serif";
@@ -154,7 +163,7 @@ class Displays {
         this.controlsCtx.globalAlpha = 1;
         this.controlsCtx.fillStyle = this.defaultColour;
 
-        this.controlsCtx.strokeText("V" + this.game.getVersion() + "    Score:" + this.printNum(this.game.player.getScore()) + "    Credits:" + this.printNum(this.game.player.getCredits()) + "    Frame rate:" + this.printNum(Universe.getActualAnimateRate()) + "/s", 20, this.height * 0.9);
+        this.controlsCtx.strokeText("V" + this.game.getVersion() + "    Score:" + this.printNum(this.game.player.getScore()) + "    Credits:" + this.printNum(this.game.player.getCredits()) + "    Frame rate:" + this.printNum(Universe.getActualAnimateRate()) + "/s", 20, this.textHeight * 0.9);
     }
 
     hudEnable(state) {
@@ -187,12 +196,12 @@ class Displays {
         let ctx = this.hudCtx;
         ctx.clearRect(0, 0, this.hud.width, this.hud.height);
         if (this.hudIsOn) {
-            let left = this.hud.width / 2 - this.height;
-            let top = this.hud.height / 2 - this.height;
-            let right = left + this.height * 2;
-            let bottom = top + this.height * 2;
-            let len = this.height / 2;
-            ctx.strokeRect(left, top, this.height * 2, this.height * 2);
+            let left = this.hud.width / 2 - this.textHeight;
+            let top = this.hud.height / 2 - this.textHeight;
+            let right = left + this.textHeight * 2;
+            let bottom = top + this.textHeight * 2;
+            let len = this.textHeight / 2;
+            ctx.strokeRect(left, top, this.textHeight * 2, this.textHeight * 2);
 
             ctx.beginPath();
             ctx.moveTo(left - len, top - len);
@@ -215,7 +224,7 @@ class Displays {
         let ship = this.game.ship;
         this.statusCtx.strokeText("Position:", this.status.width * 0.1, this.status.height * 0.9 - this.pt);
         if (null == ship.dockedWith) {
-            this.statusCtx.strokeText(this.printNum(ship.location.x) + "," + this.printNum(ship.location.y) + "," + this.printNum(ship.location.z), this.status.width * 0.1, this.status.height * 0.9);
+            this.statusCtx.strokeText(this.printNum(ship.location.x) + "," + this.printNum(ship.location.y) + "," + this.printNum(ship.location.z), this.status.width * 0.05, this.status.height * 0.9);
         } else {
             this.statusCtx.strokeText("Docked", this.status.width * 0.1, this.status.height * 0.9);
         }
@@ -223,6 +232,7 @@ class Displays {
         this.statusCtx.strokeText("Hull status:" + this.printNum(ship.hullSet[0].status) + "%", this.status.width * 0.7, this.status.height * 0.9);
         if (this.hudIsOn) {
             this.radar.animate();
+            this.compass.animate();
         }
     }
 

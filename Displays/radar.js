@@ -18,16 +18,15 @@ class Radar extends DarkPanel {
     animate() {
         super.animate();
 
+        this.ctx.beginPath();
+
         // All the interrnals are dashed.
         this.ctx.setLineDash([4, 16]);
 
         // Elipse
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.x, this.height / 2);
-
+        //this.ctx.moveTo(this.x, this.height / 2);
         // Top curve
         // this.ctx.bezierCurveTo(this.x, 0, this.x + this.width, 0, this.x + this.width, this.height / 2);
-
         // Bottom curve
         // this.ctx.bezierCurveTo(this.x + this.width, this.height, this.x, this.height, this.x, this.height / 2);
 
