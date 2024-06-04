@@ -1,6 +1,7 @@
 // Game and ship display overlays.
 import Radar from "./radar.js";
 import Compass from "./compass.js";
+import ComponentDisplays from "./Components/componentDisplays.js";
 import Universe from '../universe.js'
 import Terminal from './terminal.js'
 import MenuSystem from './menuSystem.js'
@@ -50,8 +51,10 @@ class Displays {
     terminal;
     menuSystem;
 
+    // Sub displays.
     radar;
     compass;
+    compDisplays;
 
     // Game control variables.
 
@@ -77,9 +80,10 @@ class Displays {
         this.terminal = new Terminal(this.game, terminalCtx, terminalDoc, DEFAULT_TERM_COLOUR);
 
         this.radar = new Radar(this.game, this.statusCtx, DEFAULT_COLOUR);
-        this.compass = new Compass(this.game, this.statusCtx, DEFAULT_COLOUR, this);
+        this.compass = new Compass(this.game, this.statusCtx, DEFAULT_COLOUR);
+        this.compDisplays = new ComponentDisplays(this.game, this.statusCtx, DEFAULT_COLOUR, this);
 
-        this.resize();
+        // this.resize();
     }
 
     resize() {
@@ -105,6 +109,7 @@ class Displays {
 
         this.radar.resize(this.status.width, this.status.height);
         this.compass.resize(this.status.width, this.status.height);
+        this.compDisplays.resize(this.status.width, this.status.height);
 
         this.controlsCtx.strokeStyle = "yellow";
         this.controlsCtx.font = this.pt + "px serif";
@@ -222,17 +227,12 @@ class Displays {
         this.statusCtx.clearRect(0, 0, this.status.width, this.status.height);
 
         let ship = this.game.ship;
-        this.statusCtx.strokeText("Position:", this.status.width * 0.1, this.status.height * 0.9 - this.pt);
-        if (null == ship.dockedWith) {
-            this.statusCtx.strokeText(this.printNum(ship.location.x) + "," + this.printNum(ship.location.y) + "," + this.printNum(ship.location.z), this.status.width * 0.05, this.status.height * 0.9);
-        } else {
-            this.statusCtx.strokeText("Docked", this.status.width * 0.1, this.status.height * 0.9);
-        }
-        this.statusCtx.strokeText("Speed:" + this.printNum(ship.speed.length()) + " m/s.", this.status.width * 0.7, this.status.height * 0.9 - this.pt);
+      
         this.statusCtx.strokeText("Hull status:" + this.printNum(ship.hullSet[0].status) + "%", this.status.width * 0.7, this.status.height * 0.9);
         if (this.hudIsOn) {
             this.radar.animate();
             this.compass.animate();
+            this.compDisplays.animate();
         }
     }
 

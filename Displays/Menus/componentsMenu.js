@@ -22,7 +22,7 @@ class ComponentsMenu {
 
         for (let set of sets) {
             if (set.length > 0) {
-                doc += "<P>" + set.name + " (Slots = " + set.getSlots() + ")" + "</P>"
+                doc += "<P>" + set.plural + " (Slots = " + set.getSlots() + ")" + "</P>"
 
                 let tab = new MenuTable();
 

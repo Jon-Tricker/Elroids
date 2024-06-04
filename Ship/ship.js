@@ -444,6 +444,8 @@ class Ship extends Item {
     }
 
     // Move mesh in graphics space. Will be relative to ship position.
+    //
+    // Appear to need a simple version here. IF WE USE SUPER VERSION RADAR BECOMES DETACHED DURING WRAP. Not quite sure why.
     moveMesh() {
         this.position.set(this.location.x, this.location.y, this.location.z);
     }

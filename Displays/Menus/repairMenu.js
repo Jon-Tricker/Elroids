@@ -45,7 +45,7 @@ class RepairMenu {
 
                 let row = new Array();
 
-                row.push(set.name);
+                row.push(set.plural);
                 row.push(status);
                 row.push(RepairMenu.getButtonText(set, 10));
                 row.push(RepairMenu.getButtonText(set, 100));

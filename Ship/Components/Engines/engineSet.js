@@ -8,7 +8,7 @@ class EngineSet extends ComponentSet {
     decRate;
 
     constructor(ship, slots) {
-        super("Engines", ship, slots);
+        super("Engines", "Engine", ship, slots);
         this.recalc();
     }
 

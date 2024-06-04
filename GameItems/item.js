@@ -444,6 +444,9 @@ class Item extends THREE.Group {
 
     // Play a sound optional volume (0 - 1) and loop if it is to repeat.
     // Return true if we could do what the game requires.
+    //
+    // 3D location should be from the Item. However I could not get positional listeners to work.
+    // So for now simple 'mono' with volume reduced by distance.
     playSound(name, volume, loop) {
         if (!this.game.soundOn) {
             return (false);
@@ -494,24 +497,6 @@ class Item extends THREE.Group {
         }
 
         sound.setVolume(volume);
-
-        /*
-        let pos = this.position;
-        console.log("this " + pos.x + " " + pos.y + " " + pos.z);
-        let listener = Universe.getListener();
-        pos = listener.position;
-        console.log("list " + pos.x + " " + pos.y + " " + pos.z);
-        pos = list.getWorldPosition(new THREE.Vector3(0,0,0));
-        console.log("list world " + pos.x + " " + pos.y + " " + pos.z);
-        pos = sound.position;
-        console.log("sound " + pos.x + " " + pos.y + " " + pos.z);
-        pos = this.game.scene.camera.position;
-        console.log("camera " + pos.x + " " + pos.y + " " + pos.z);
-        pos = this.game.scene.camera.getWorldPosition(new THREE.Vector3(0,0,0));
-        console.log("camera world " + pos.x + " " + pos.y + " " + pos.z);
-        pos = this.game.scene.camera.children[0].position;
-        console.log("camera list " + pos.x + " " + pos.y + " " + pos.z);
-        */
 
         if (undefined != loop) {
             sound.setLoop(loop);

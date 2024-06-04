@@ -6,14 +6,19 @@ import GameError from '../../GameErrors/gameError.js'
 
 class ComponentSet extends Array {
 
-    name;
+    plural;
+    singular;
+
     totalMass = 0;      // Tonnes
     slots = 0;
     ship;
+    set;
 
-    constructor(name, ship, slots) {
+    constructor(plural, singular, ship, slots) {
         super();
-        this.name = name;
+        this.plural = plural;
+        this.singular = singular;
+
         this.slots = slots;
         this.ship = ship;
 
@@ -30,9 +35,11 @@ class ComponentSet extends Array {
 
     add(comp) {
         if (this.slots <= this.size) {
-            throw (new GameError("No free this.slots in " + this.name + " list."));
+            throw (new GameError("No free this.slots in " + this.plural + " list."));
         }
         super.push(comp)
+
+        comp.setSet(this);
 
         this.recalc();
     }

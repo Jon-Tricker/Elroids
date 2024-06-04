@@ -61,7 +61,7 @@ class MyScene extends THREE.Scene {
     this.renderer.shadowMap.enabled = true;
 
     // Initially no ship so use the fixed camera.
-    this.setCamera(MyCamera.FIXED);
+    this.setCamera(MyCamera.DUMMY);
 
     // ... and render
     this.renderer.render(this, this.camera);
@@ -106,6 +106,10 @@ class MyScene extends THREE.Scene {
       case MyCamera.PILOT:
         this.camera = this.game.getShip().getPilotCamera();
         this.game.displays.hudEnable(true);
+        break;
+
+      case MyCamera.DUMMY:
+        this.camera = new MyCamera(this.sizes, type, null);
         break;
 
       default:

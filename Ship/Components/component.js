@@ -11,6 +11,7 @@ class Component  {
     status;     // % of maxHp. May result in non integer number of HPs.
 
     ship;
+    set;
 
     constructor(name, mass, cost, maxHp, ship) {
         this.ship = ship;
@@ -19,6 +20,15 @@ class Component  {
         this.cost = cost;
         this.maxHp = maxHp;
         this.status = 100;
+    }
+
+    // Set when added to a set.
+    setSet(set) {
+        this.set = set;
+    }
+
+    getSet() {
+        return(this.set);
     }
 
     // Get ordered collumn headings.

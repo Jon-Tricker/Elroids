@@ -29,7 +29,7 @@ import { MineralTypes } from './GameItems/minerals.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "3.0";
+const VERSION = "3.1";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -79,9 +79,6 @@ class Game {
 
         Rock.setRockStyle(rockStyle);
 
-        // Create displays
-        this.displays = new Displays(this);
-
         // Create the scene
         this.scene = new MyScene(this, (0 == maxRockCount));
 
@@ -92,6 +89,10 @@ class Game {
         this.createShip();
         this.createSaucers();
         this.createStation();
+
+        // Create displays
+        this.displays = new Displays(this);
+        this.displays.resize();
 
         // Now we have a ship. Switch to it's camera
         this.scene.setCamera(MyCamera.PILOT);
@@ -240,7 +241,7 @@ class Game {
         // Create it close so we can find it.
         if (safe) {
             loc = this.ship.location.clone();
-            let offset = 500;
+            let offset = 1000;
             loc.x += offset;
             loc.y += offset / 2;
             Universe.handleWrap(loc);

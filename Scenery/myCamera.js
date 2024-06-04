@@ -15,6 +15,8 @@ class MyCamera extends THREE.PerspectiveCamera {
     static STANDOFF = 2;
     // At a fixed point in space
     static FIXED = 3;
+    // Minimal camera used during game bootstrap.
+    static DUMMY = 3;
 
     static STANDOFF_DIST = 200;
 
@@ -39,6 +41,8 @@ class MyCamera extends THREE.PerspectiveCamera {
                 break;
             case MyCamera.FIXED:
                 this.createFixed();
+                break;
+            case MyCamera.DUMMY:
                 break;
 
             default:
@@ -152,7 +156,7 @@ class MyCamera extends THREE.PerspectiveCamera {
                 break;
 
             case MyCamera.FIXED:
-                // Nothing to do.
+            // Nothing to do.
             default:
                 break;
         }

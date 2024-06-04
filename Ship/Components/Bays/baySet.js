@@ -17,7 +17,7 @@ class BaySet extends ComponentSet {
     contentMass = 0;
 
     constructor(ship, slots) {
-        super("Cargo bays", ship, slots);
+        super("Cargo bays","Cargo bay", ship, slots);
         this.recalc();
     }
 

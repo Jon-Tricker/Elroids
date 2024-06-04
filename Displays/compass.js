@@ -1,7 +1,7 @@
 // Compass screen
 import Universe from '../universe.js'
 import * as THREE from 'three';
-import DarkPanel from './darkPanel.js';
+import DarkPanel from './Utils/darkPanel.js';
 import Station from '../GameItems/station.js';
 
 const SCALE = 0.05;
@@ -13,18 +13,13 @@ class Compass extends DarkPanel {
     game;
     radius;
 
-    // Display to which we are related
-    displays;
-
-    constructor(game, ctx, defaultColour, displays) {
-        super(ctx, defaultColour);
+    constructor(game, ctx, defaultColour) {
+        super(ctx, defaultColour, true);
         this.game = game;
-        this.displays = displays;
     }
 
     animate() {
         super.animate();
-
 
         this.ctx.beginPath();
 
@@ -39,7 +34,6 @@ class Compass extends DarkPanel {
         let thisship = this.game.ship;
 
         for (let station of stations) {
-
             let relPos = station.location.clone();
 
             // Handle wrap round relative to ship.
@@ -57,17 +51,13 @@ class Compass extends DarkPanel {
 
         let closestRpLen = closestRp.length();
 
-        // console.log("RP " + closestRp.x + " " + closestRp.y + " " + closestRp.z);
-
-        // Plot dot.
-
         // Check if behind
         let colour = "white";
         if (0 > closestRp.x) {
             colour = "red";
         }
 
-        // Work out size
+        // Work out dot size
         let size = this.radius / 10;
         if (RANGE > closestRpLen) {
             size = (this.radius/2) * (RANGE - closestRpLen) / RANGE;
@@ -85,34 +75,31 @@ class Compass extends DarkPanel {
         }
         pos.multiplyScalar(this.radius - size);
 
-
-
+        // Plot dot.
         this.ctx.beginPath();
         this.ctx.fillStyle = colour;
-
         this.ctx.arc(pos.x + this.x + this.width / 2, pos.y + this.y + this.height / 2, size, 0, 2 * Math.PI);
-
         this.ctx.fill();
-
     }
 
     resize(parentWidth, parentHeight) {
 
-        this.width = parentWidth * SCALE;
-        if (this.width > parentHeight / 3) {
-            this.width = parentHeight / 3;
+        let width = parentWidth * SCALE;
+        if (width > parentHeight / 4) {
+            width = parentHeight / 4;
         }
 
         // It's square
-        if (this.width > parentHeight) {
-            this.width = parentHeight;
+        if (width > parentHeight) {
+            width = parentHeight;
         }
-        this.height = this.width;
 
-        this.x = this.displays.radar.x - this.width;
-        this.y = parentHeight - this.height;
+        let x = this.game.displays.radar.x + this.game.displays.radar.width - width;
+        let y = 0;
 
-        this.radius = (this.width - 2) / 2;
+        super.resize(width, width, x, y);
+
+        this.radius = (width - 2) / 2;
     }
 
 }

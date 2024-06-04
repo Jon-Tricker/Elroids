@@ -3,7 +3,7 @@
 // Let's take a modern GUI and reduce it to a 'corestore punk' interface so the younglings can learn what it was like :-).
 
 import * as THREE from 'three';
-import DarkPanel from './darkPanel.js';
+import DarkPanel from './Utils/darkPanel.js';
 import Universe from '../universe.js'
 
 // Scale factor relative to parent.
@@ -36,13 +36,10 @@ class Terminal extends DarkPanel {
     flashDue = FLASH_FREQUENCY;
 
     // Non positional sounds.
-    // Tried for ages to use ship.playSound() but with PositionalAudio objects sounds seem to move with the ship while listener remains at origin ...
-    //    ... even when this is not the case for sounds actually produced by the ship.
-    // Anyhow for terminal use non positional instead.
     sounds = new Map();
 
     constructor(game, ctx, doc, defaultColour) {
-        super(ctx, defaultColour);
+        super(ctx, defaultColour, true);
         this.game = game;
         this.doc = doc;
 
@@ -59,23 +56,22 @@ class Terminal extends DarkPanel {
             height = width * 3 / 4;
         }
 
+        let x = (parentWidth - width) / 2;
+        let y = (parentHeight - height) / 2;
+        super.resize(width, height, x, y);
+
+        
         this.doc.width = parentWidth;
         this.doc.height = parentHeight;
 
-        this.width = width;
-        this.x = (parentWidth - this.width) / 2;
-        this.height = height;
-        this.y = (parentHeight - this.height) / 2;
-
         // Set up border
-        this.border = new THREE.Vector2(this.width * 0.02, this.height * 0.02);
+        this.border = new THREE.Vector2(width * 0.02, height * 0.02);
 
         // Calculate individual character sizes for the above monospaced font.
         // Numbers here are a bit 'trial and error'.
-        this.pt = new THREE.Vector2((this.width - (2 * this.border.x)) / TEXT_COLS, (this.height - (2 * this.border.y)) / TEXT_ROWS);
+        this.pt = new THREE.Vector2((width - (2 * this.border.x)) / TEXT_COLS, (height - (2 * this.border.y)) / TEXT_ROWS);
         this.ctx.font = this.pt.y * 3 / 4 + "px monospace";
         this.decenderHt = this.pt.y * 0.2;
-
     }
 
     animate(date, keyboard) {

@@ -1,7 +1,7 @@
 // Radar screen
 import Universe from '../universe.js'
 import * as THREE from 'three';
-import DarkPanel from './darkPanel.js';
+import DarkPanel from './Utils/darkPanel.js';
 
 const RANGE = 1500;     // m
 const FLAG_SIZE = 5;
@@ -11,7 +11,7 @@ class Radar extends DarkPanel {
     showMissiles = false;
 
     constructor(game, ctx, defaultColour) {
-        super(ctx, defaultColour);
+        super(ctx, defaultColour, true);
         this.game = game;
     }
 
@@ -123,13 +123,15 @@ class Radar extends DarkPanel {
     }
 
     resize(parentWidth, parentHeight) {
-        this.y = 0;
-        this.width = parentWidth * 0.4;
-        if (this.width > 2 * parentHeight) {
-            this.width = 2 * parentHeight;
+        let y = 0;
+        let width = parentWidth * 0.4;
+        if (width > 2 * parentHeight) {
+            width = 2 * parentHeight;
         }
-        this.x = (parentWidth - this.width) / 2;
-        this.height = parentHeight;
+        let x = (parentWidth - width) / 2;
+        let height = parentHeight;
+
+        super.resize(width, height, x, y);
     }
 
     // Convert relative to screen.
