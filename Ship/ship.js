@@ -8,63 +8,9 @@ import * as THREE from 'three';
 import Item from '../GameItems/item.js';
 import MyCamera from '../Scenery/myCamera.js';
 import Universe from '../universe.js'
-import EngineSet from './Components/Engines/engineSet.js';
-import BasicEngine from './Components/Engines/basicEngine.js';
-import HullSet from './Components/Hulls/hullSet.js';
-import WeaponSet from './Components/Weapons/weaponSet.js';
-import BaySet from './Components/Bays/baySet.js';
 import BasicHull from './Components/Hulls/basicHull.js';
-import BasicBay from './Components/Bays/basicBay.js';
-import ComponentSets from './Components/componentSets.js';
-import DumbMissileWeapon from './Components/Weapons/dumbMissileWeapon.js';
 import Mineral from "../GameItems/mineral.js";
 import Station from "../GameItems/station.js";
-
-// Create ship material.
-const shipMaterial = new THREE.MeshStandardMaterial(
-    {
-        color: "#B0B0B0",
-        roughness: 0.2,
-        opacity: 1,
-        // map: texture,
-        // roughnessMap: texture,
-        // bumpMap: texture,
-        metalness: 0.8,
-    }
-)
-
-// Create engine material.
-const engineMaterial = new THREE.MeshStandardMaterial(
-    {
-        color: "#202020",
-        //color: "#ffffff",
-        roughness: 0.9,
-        opacity: 1,
-        // map: texture,
-        // roughnessMap: texture,
-        // bumpMap: texture,
-        metalness: 0.1,
-        side: THREE.DoubleSide,
-    }
-)
-
-// Create flame material.
-const flameMaterial = new THREE.MeshStandardMaterial(
-    {
-        // TODO ... Seems to loose the color when made transparent.
-        color: "yellow",
-        roughness: 0.9,
-
-        // Full transprent when off.
-        transparent: true,
-        opacity: 0,
-
-        // map: texture,
-        // roughnessMap: texture,
-        // bumpMap: texture,
-        metalness: 0.1,
-    }
-)
 
 // Slightly damped attitude contols to allow fine adjustment.
 const ROTATE_RATE_DELTA = 0.125;        // r/s
@@ -108,34 +54,18 @@ class Ship extends Item {
         this.width = width;
         this.shipLength = length;
 
-        this.setupMesh();
-
         this.buildShip();
+
+        this.setupMesh();
 
         this.createCameras();
     }
 
     // Build/Rebuild ship components.
     buildShip() {
-        this.engineSet = new EngineSet(this, 1);
-        this.engineSet.add(new BasicEngine(this));
-
-        this.hullSet = new HullSet(this, 1);
-        this.hullSet.add(new BasicHull(this));
-
-        this.weaponSet = new WeaponSet(this, 1);
-        this.weaponSet.add(new DumbMissileWeapon(this));
-
-        this.baySet = new BaySet(this, 1);
-        this.baySet.add(new BasicBay(this));
-
-        // Build set of all componets sets
-        this.compSets = new ComponentSets();
-        this.compSets.add(this.engineSet);
-        this.compSets.add(this.hullSet);
-        this.compSets.add(this.weaponSet);
-        this.compSets.add(this.baySet);
-
+        // Create hull
+        // Will also create all other components, for that hull type, and add them to our components sets.
+        new BasicHull(this);
 
         // Add in weight of all components.
         this.mass = this.compSets.calculateMass();
@@ -168,127 +98,8 @@ class Ship extends Item {
     }
 
     setupMesh() {
-        let ratio = 2 / 1.5;
-
-        // Save a few 'this.'s
-        let length = this.shipLength;
-        let height = this.height;
-        let width = this.width;
-
-        let vertices = new Float32Array([
-            length, 0, 0, // v0 nose
-            -length, width * ratio, height * ratio,// v1 left fin top
-            -length, width * 2, 0, // v2 left fin mid
-            -length, width * ratio, -height * ratio,// v3 left fin bottom
-            -length * 0.5, width, height,// v4 cemtre left top
-            -length * 0.5, width, -height, // v5 center left bottom
-            -length * 0.5, -width, height, // v6 cemter right top
-            -length * 0.5, -width, -height,// v7 center right bottom
-            -length, -width * ratio, height * ratio,// v8  right fin top
-            -length, -width * 2, 0,// v9 right fin mid
-            -length, -width * ratio, -height * ratio,// v10 right fin bottom
-            -length * 0.5, width, 0, // v11 centre left mid
-            -length * 0.5, -width, 0, // v12 centre right mid
-        ]);
-
-        let indices = [
-            0, 2, 1, // left fin top
-            0, 3, 2, // left fin bottom
-            0, 4, 6,// center top
-            0, 7, 5,// centre bottom
-            0, 8, 9, // rt fin top
-            0, 9, 10,// rt fin bottom
-            5, 6, 4, // back plate A
-            6, 5, 7,// back plate B
-            1, 2, 11,// fin left inner top A
-            11, 4, 1,// fin left inner top B
-            3, 11, 2,// fin left inner bottom A
-            11, 3, 5,// fin left inner bottom B
-            8, 12, 9,// fin right inner top A
-            12, 8, 6,// fin right inner top B
-            10, 9, 12,// fin right inner bottom A
-            12, 7, 10,// fin right inner top bottom
-
-        ];
-
-        let bodyGeometry = new THREE.BufferGeometry();
-
-        bodyGeometry.setIndex(indices);
-        bodyGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-
-        // compute vertex normals
-        bodyGeometry.computeVertexNormals();
-
-        let bodyMesh = new THREE.Mesh(bodyGeometry, shipMaterial);
-
-        bodyMesh.castShadow = true;
-        bodyMesh.receiveShadow = true;
-
-        // Add the engine cone
-        var engineWidth = width;
-        if (height < width) {
-            engineWidth = height;
-        }
-        let engineGeometry = new THREE.ConeGeometry(engineWidth, length, 20, 1, true);
-
-        // compute vertex normals
-        engineGeometry.computeVertexNormals();
-        let engineMesh = new THREE.Mesh(engineGeometry, engineMaterial);
-
-        // Mount engine
-        engineMesh.rotateZ(-Math.PI / 2);
-        engineMesh.position.set(-length * 0.25, 0, height * .25);
-
-        engineMesh.castShadow = true;
-        engineMesh.receiveShadow = true;
-
-        var thrusterWidth = engineWidth * 0.5;
-        let thrusterGeometry = new THREE.ConeGeometry(thrusterWidth, length / 2, 10, 1, true);
-
-        // compute vertex normals
-        thrusterGeometry.computeVertexNormals();
-        let thrusterMaterialL = engineMaterial.clone();
-        thrusterMaterialL.color.setHex(0x800000);
-        let thrusterMeshL = new THREE.Mesh(thrusterGeometry, thrusterMaterialL);
-
-        // Mount engine
-        thrusterMeshL.rotateZ(-Math.PI / 2);
-        thrusterMeshL.position.set(-length * 0.5, width * 0.75, height * -.25);
-
-        thrusterMeshL.castShadow = true;
-        thrusterMeshL.receiveShadow = true;
-
-
-        let thrusterMaterialR = engineMaterial.clone();
-        thrusterMaterialR.color.setHex(0x008000);
-        let thrusterMeshR = new THREE.Mesh(thrusterGeometry, thrusterMaterialR);
-
-        // Mount engine
-        thrusterMeshR.rotateZ(-Math.PI / 2);
-        thrusterMeshR.position.set(-length * 0.5, -width * 0.75, height * -.25);
-
-        thrusterMeshR.castShadow = true;
-        thrusterMeshR.receiveShadow = true;
-
-        // Add the flame cone
-        let flameGeometry = new THREE.ConeGeometry(engineWidth * 0.75, length, 20, 1, false);
-
-        // compute vertex normals
-        flameGeometry.computeVertexNormals();
-        this.flameMesh = new THREE.Mesh(flameGeometry, flameMaterial);
-
-        // Position flame
-        this.flameMesh.rotateZ(Math.PI / 2);
-        this.flameMesh.position.set(-length, 0, height * .25);
-
-
-        // Create the group
-        this.add(bodyMesh);
-        this.add(engineMesh);
-        this.add(thrusterMeshL);
-        this.add(thrusterMeshR);
-
-        this.add(this.flameMesh);
+        let mesh = this.hullSet[0].getMesh();
+        this.add(mesh);
     }
 
     accelerate() {
@@ -296,25 +107,12 @@ class Ship extends Item {
 
         let thrust = this.engineSet.getThrust();
         if (0 < thrust) {
-            this.setFlameState(true);
+            this.hullSet[0].setFlameState(true);
             this.setEngineSound(true);
             this.thrust(thrust, xDirection, this.hullSet.getMaxSpeed());
         } else {
-            this.setFlameState(false);
+            this.hullSet[0].setFlameState(false);
             this.setEngineSound(false);
-        }
-    }
-
-    setFlameState(state) {
-        if (state) {
-            if (flameMaterial.transparent) {
-                flameMaterial.transparent = false;
-                flameMaterial.color = "red";
-            }
-        } else {
-            if (!flameMaterial.transparent) {
-                flameMaterial.transparent = true;
-            }
         }
     }
 
@@ -392,7 +190,7 @@ class Ship extends Item {
             if (keyboard.getState(" ")) {
                 this.accelerate();
             } else {
-                this.setFlameState(false);
+                this.hullSet[0].setFlameState(false);
             }
 
             if (keyboard.getState("?") || keyboard.getState("/")) {
@@ -606,7 +404,6 @@ class Ship extends Item {
         let value = mineral.value * mass;
         this.unloadMineral(mineral, mass);
         this.addCredits(value);
-        // this.game.displays.addMessage("Sold " + mineral.name + " for  " + value + " Cr");
     }
 
     getCargoCapacity() {

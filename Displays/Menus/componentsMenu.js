@@ -29,11 +29,15 @@ class ComponentsMenu {
                 let printHeads = true;
                 for (let comp of set) {
                     if (printHeads) {
-                        tab.addHeadings(comp.getHeadings());
+                        let heads = (comp.getHeadings());
+                        heads.push("Show");
+                        tab.addHeadings(heads);
                         printHeads = false;
                     }
 
-                    tab.addRow(comp.getValues());
+                    let vals = comp.getValues();
+                    vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onEnableClick(this.display.game.ship, cursor)\">" + comp.displayPanel + "</button>");
+                    tab.addRow(vals);
                 }
                 doc += tab.toString();
                 doc += "<BR />";
@@ -45,6 +49,25 @@ class ComponentsMenu {
         return (doc);
 
     }
+
+    static onEnableClick(ship, cursor) {
+        let compNumber = 0;
+        for (let set of ship.compSets) {
+            for (let comp of set) {
+                if (compNumber == cursor.y) {
+                    comp.displayPanel = !comp.displayPanel;
+
+                    // Re-layout displays.
+                    ship.game.displays.compDisplays.recalc(true);
+
+                    // All done
+                    return;
+                } else {
+                    compNumber++;
+                }
+            }
+        }
+    }
 }
 
-export { componentsMenu, ComponentsMenu};
+export { componentsMenu, ComponentsMenu };

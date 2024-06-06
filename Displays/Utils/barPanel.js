@@ -42,7 +42,13 @@ class BarPanel extends Panel {  // Text sizes. Everything else will be scaled re
 
         // Work out width of fixed size bits.
         this.titleWidth = this.ctx.measureText(this.title).width;
-        this.unitsWidth = this.ctx.measureText("" + this.max + "/" + this.max + " (" + this.units + ")").width;
+        if (this.titleWidth < (width/5)){
+            this.titleWidth = width/5;
+        }
+        this.unitsWidth = this.ctx.measureText("" + this.max + "/" + this.max + " (" + this.units + ")").width; 
+        if (this.unitsWidth < (width/5)){
+            this.unitsWidth = width/5;
+        }
 
         this.ctx.font = oldFont;
 
@@ -92,7 +98,11 @@ class BarPanel extends Panel {  // Text sizes. Everything else will be scaled re
         this.ctx.globalAlpha = DarkPanel.DARKNESS;
 
         // Bar 
-        let barWidth = barMaxWidth * (this.value / this.max) - 2 * this.lineWidth;
+        val = this.value;
+        if (val > this.max) {
+            val = this.max;
+        }
+        let barWidth = barMaxWidth * (val / this.max) - 2 * this.lineWidth;
         this.ctx.fillRect(this.x + this.titleWidth + this.lineWidth, this.y + this.lineWidth * 3, barWidth, this.height - this.lineWidth * 6);
 
         this.ctx.fillStyle = oldColour;

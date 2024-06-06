@@ -18,7 +18,7 @@ class MenuTable {
     addHeadings(heads) {
         this.headers = heads;
         for (let head of heads) {
-            this.widths.push(head.length + 2)
+            this.widths.push(head.length + 1)
         }
     }
 

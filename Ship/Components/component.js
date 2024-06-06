@@ -1,6 +1,7 @@
 // Base class for the components that make up a ship.
 
 // For now ships are made of components. Other things are just 'lumps'.
+import ComponentDisplay from "../../Displays/Components/componentDisplay.js";
 
 class Component  {
 
@@ -12,6 +13,9 @@ class Component  {
 
     ship;
     set;
+
+    // Set if componentDisplay to be shown.
+    displayPanel = false;
 
     constructor(name, mass, cost, maxHp, ship) {
         this.ship = ship;
@@ -29,6 +33,11 @@ class Component  {
 
     getSet() {
         return(this.set);
+    }
+
+    // Return the display panel for this component.
+    getDisplay(ctx, defaultColour) {
+        return(new ComponentDisplay(this.ship.game, ctx, defaultColour, this));
     }
 
     // Get ordered collumn headings.

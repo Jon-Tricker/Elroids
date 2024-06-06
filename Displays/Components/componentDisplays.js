@@ -1,24 +1,23 @@
 // Manager for ComponentDisplays.
-import * as THREE from 'three';
-import ComponentDisplay from "./componentDisplay.js";
 import ShipCompDisplay from "./shipCompDisplay.js";
 
 class ComponentDisplays extends Set {
 
     displays;
+    parentWidth;
+    parentHeight;
 
-    constructor(game, ctx, defaultColour, displays) {
+    ctx;
+    defaultColour;
+
+    constructor(ctx, defaultColour, displays) {
         super();
+        this.defaultColour = defaultColour;
+        this.ctx = ctx;
         this.displays = displays;
-        this.add(new ShipCompDisplay(game, ctx, defaultColour));
-        this.add(new ComponentDisplay(game, ctx, defaultColour, game.ship.hullSet[0]), displays);
-    }
 
-    add(disp) {
-        super.add(disp);
-        // this.resize();
+        this.recalc(true);
     }
-
 
     animate() {
         for (let disp of this) {
@@ -27,12 +26,35 @@ class ComponentDisplays extends Set {
     }
 
     resize(parentWidth, parentHeight, x, y) {
+        this.parentWidth = parentWidth;
+        this.parentHeight = parentHeight;
+
+        this.recalc(false);
+    }
+
+    // Re-calculate the layout.
+    recalc(reCreate) {
+        if (reCreate) {
+            // Delete any existing displays
+            this.clear();
+
+            // Create new displays
+            this.add(new ShipCompDisplay(this.displays.game, this.ctx, this.defaultColour));
+            for (let set of this.displays.game.ship.compSets) {
+                for (let comp of set) {
+                    if (comp.displayPanel) {
+                        this.add(comp.getDisplay(this.ctx, this.defaultColour));
+                    }
+                }
+            }
+        }
+
+        // Lay out displays.
         let left = true;
-        let rowHeight = parentHeight/4;
+        let rowHeight = this.parentHeight / 4;
         let rowNumber = 0;
 
         for (let disp of this) {
-
             let x;
             let y;
             let width;
@@ -47,7 +69,7 @@ class ComponentDisplays extends Set {
             } else {
                 x = this.displays.radar.x + this.displays.radar.width;
                 y = rowHeight * (3 - rowNumber);
-                width = parentWidth - x;
+                width = this.parentWidth - x;
                 height = rowHeight;
             }
 

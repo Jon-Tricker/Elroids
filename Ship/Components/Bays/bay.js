@@ -1,6 +1,7 @@
 // Base class for cargo bays
 
 import Component from '../component.js'
+import BayDisplay from "../../../Displays/Components/bayDisplay.js";
 
 class Bay extends Component {
 
@@ -9,6 +10,11 @@ class Bay extends Component {
     constructor(name, mass, cost, maxHp, ship, capacity) {
         super(name, mass, cost, maxHp, ship);
         this.capacity = capacity;
+    }  
+    
+    // Return the display panel for this component.
+    getDisplay(ctx, defaultColour) {
+        return(new BayDisplay(this.ship.game, ctx, defaultColour, this));
     }
 
     getCapacity() {

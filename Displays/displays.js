@@ -81,7 +81,7 @@ class Displays {
 
         this.radar = new Radar(this.game, this.statusCtx, DEFAULT_COLOUR);
         this.compass = new Compass(this.game, this.statusCtx, DEFAULT_COLOUR);
-        this.compDisplays = new ComponentDisplays(this.game, this.statusCtx, DEFAULT_COLOUR, this);
+        this.compDisplays = new ComponentDisplays(this.statusCtx, DEFAULT_COLOUR, this);
 
         // this.resize();
     }
@@ -227,8 +227,7 @@ class Displays {
         this.statusCtx.clearRect(0, 0, this.status.width, this.status.height);
 
         let ship = this.game.ship;
-      
-        this.statusCtx.strokeText("Hull status:" + this.printNum(ship.hullSet[0].status) + "%", this.status.width * 0.7, this.status.height * 0.9);
+        
         if (this.hudIsOn) {
             this.radar.animate();
             this.compass.animate();
