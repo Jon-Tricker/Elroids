@@ -36,6 +36,16 @@ class TableData {
     currentCol = 0;
 }
 
+class Menu {
+    menu;
+    cursor;
+
+    constructor(menu, cursor) {
+        this.menu = menu;
+        this.cursor = cursor;
+    }
+}
+
 class MenuSystem {
 
     display;
@@ -43,7 +53,7 @@ class MenuSystem {
     menuStack = new Array();
 
     // Cursor and line count start from '1'. '0' means there are no selectable lines (or rows) yet ... don't display a cursor.
-    targetCursor;           // Target position of cursor in parent menu
+    targetCursor = new THREE.Vector2(0, 0);           // Target position of cursor in parent menu
     maxYCursor = 0;
 
     // Ugly variable used for passing 'last error' argument.
@@ -60,8 +70,9 @@ class MenuSystem {
         }
     }
 
-    pushMenu(menu) {
-        this.menuStack.push(menu);
+    pushMenu(menu) { 
+        this.targetCursor = new THREE.Vector2(0, 0);  
+        this.menuStack.push(new Menu(menu, this.targetCursor));
         this.resetMenu();
     }
 
@@ -73,7 +84,7 @@ class MenuSystem {
     }
 
     resetMenu() {
-        this.targetCursor = new THREE.Vector2(0, 0);
+        this.targetCursor = this.menuStack[this.menuStack.length - 1].cursor;
         this.maxYCursor = 0;
     }
 
@@ -81,7 +92,7 @@ class MenuSystem {
 
         this.display.terminal.clearScreen();
 
-        let doc = MenuSystem.parser.parseFromString(this.menuStack[this.menuStack.length - 1], "text/xml");
+        let doc = MenuSystem.parser.parseFromString(this.menuStack[this.menuStack.length - 1].menu, "text/xml");
 
         this.liCount = 0;
 

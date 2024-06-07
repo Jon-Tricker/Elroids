@@ -22,7 +22,7 @@ class ComponentsMenu {
 
         for (let set of sets) {
             if (set.length > 0) {
-                doc += "<P>" + set.plural + " (Slots = " + set.getSlots() + ")" + "</P>"
+                doc += "<P>" + set.plural + " (Slots = " + set.getSlots() + ")" + "</P>";
 
                 let tab = new MenuTable();
 
@@ -30,13 +30,13 @@ class ComponentsMenu {
                 for (let comp of set) {
                     if (printHeads) {
                         let heads = (comp.getHeadings());
-                        heads.push("Show");
+                        heads.push("Display");
                         tab.addHeadings(heads);
                         printHeads = false;
                     }
 
                     let vals = comp.getValues();
-                    vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onEnableClick(this.display.game.ship, cursor)\">" + comp.displayPanel + "</button>");
+                    vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onEnableClick(this.display.game.ship, cursor)\">" + ComponentsMenu.onOff(comp.displayPanel) + "</button>");
                     tab.addRow(vals);
                 }
                 doc += tab.toString();
@@ -48,6 +48,13 @@ class ComponentsMenu {
 
         return (doc);
 
+    }
+
+    static onOff(bool) {
+        if(bool) {
+            return("On");
+        }
+        return("Off");
     }
 
     static onEnableClick(ship, cursor) {

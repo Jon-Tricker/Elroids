@@ -19,7 +19,7 @@ class BarPanel extends Panel {  // Text sizes. Everything else will be scaled re
 
     constructor(ctx, defaultColour, hasBorder, title, units, max, invertColour) {
         super(ctx, defaultColour, hasBorder);
-        this.title = "    " + title + " ";
+        this.title = title;
         this.units = units;
         this.max = max;
         this.invertColour = invertColour;

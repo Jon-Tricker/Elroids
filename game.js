@@ -29,7 +29,7 @@ import { MineralTypes } from './GameItems/minerals.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "3.3";
+const VERSION = "3.4";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -113,10 +113,6 @@ class Game {
                 let type = 1 + Math.floor(Math.random() * (MineralTypes.length - 1));
                 this.ship.loadMineral(MineralTypes[type], i);
             }
-            
-            // this.ship.loadMineral(MineralTypes[1], 2);
-            // this.ship.loadMineral(MineralTypes[3], 1);
-
         } else {
             this.ship = new Ship(5, 10, 20, -200, 100, 0, this);
         }
