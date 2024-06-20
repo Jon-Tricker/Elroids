@@ -14,8 +14,6 @@ const TEXT_ROWS = 24;
 
 const TAB_WIDTH = 4;
 
-const FLASH_FREQUENCY = 100;
-
 class Terminal extends DarkPanel {
 
     doc;
@@ -33,16 +31,29 @@ class Terminal extends DarkPanel {
     // Write cursor.
     cursor = new THREE.Vector2(0, 0);
 
-    flashDue = FLASH_FREQUENCY;
-
     // Non positional sounds.
     sounds = new Map();
 
-    constructor(game, ctx, doc, defaultColour) {
+    // Line in buffer to display from.
+    firstLine;
+
+    // Size of windoe.
+    rows = TEXT_ROWS;
+    cols = TEXT_COLS;
+
+    constructor(game, ctx, doc, defaultColour, rows, cols) {
         super(ctx, defaultColour, true);
         this.game = game;
         this.doc = doc;
+        this.firstLine = 0;
 
+        if (undefined != rows) {
+            this.rows = rows;
+        }
+
+        if (undefined != cols) {
+            this.cols = cols;
+        }
     }
 
     resize(parentWidth, parentHeight) {
@@ -60,7 +71,7 @@ class Terminal extends DarkPanel {
         let y = (parentHeight - height) / 2;
         super.resize(width, height, x, y);
 
-        
+
         this.doc.width = parentWidth;
         this.doc.height = parentHeight;
 
@@ -69,7 +80,7 @@ class Terminal extends DarkPanel {
 
         // Calculate individual character sizes for the above monospaced font.
         // Numbers here are a bit 'trial and error'.
-        this.pt = new THREE.Vector2((width - (2 * this.border.x)) / TEXT_COLS, (height - (2 * this.border.y)) / TEXT_ROWS);
+        this.pt = new THREE.Vector2((width - (2 * this.border.x)) / this.cols, (height - (2 * this.border.y)) / this.rows);
         this.ctx.font = this.pt.y * 3 / 4 + "px monospace";
         this.decenderHt = this.pt.y * 0.2;
     }
@@ -81,14 +92,6 @@ class Terminal extends DarkPanel {
         // this.displayGrid();
 
         this.displayBuffer(this.lineBuffer)
-
-        // Flash cursor
-        if (this.flashDue-- < 0) {
-            this.flashDue = FLASH_FREQUENCY
-        }
-        if (this.flashDue < FLASH_FREQUENCY / 2) {
-            this.highlightCell(this.cursor.x, this.cursor.y)
-        }
     }
 
     // Print a line into the buffer
@@ -109,7 +112,7 @@ class Terminal extends DarkPanel {
 
         // Not going to work if any control characters. For that pass a space separated string.
         if (centered) {
-            this.cursor.x = Math.floor((TEXT_COLS - text.length) / 2);
+            this.cursor.x = Math.floor((this.cols - text.length) / 2);
         }
 
 
@@ -164,19 +167,12 @@ class Terminal extends DarkPanel {
     }
 
     // Linefeed
-    linefeed() {
-        if (TEXT_ROWS > this.cursor.y) {
-            // Move cursor down.
-            this.cursor.y++;
-        } else {
-            // Shift buffer up.
-            this.lineBuffer.shift()
+    // For now pages are of unlimited size so buffer can grow until cleared.
+    linefeed() {// Add new row
+        this.lineBuffer.push(new Array());
 
-            // Add new row
-            this.lineBuffer.push(new Array());
-
-            // Leave cursor where it is.
-        }
+        // Move cursor down.
+        this.cursor.y++;
     }
 
     // Get row for current cursor position.
@@ -202,7 +198,7 @@ class Terminal extends DarkPanel {
         row.push(cell);
 
         // Handle row wrap
-        if (TEXT_COLS < this.cursor.x++) {
+        if (this.cols < this.cursor.x++) {
             this.cursor.y++;
             this.cursor.x = 0;
         }
@@ -214,11 +210,17 @@ class Terminal extends DarkPanel {
         this.cursor.y = 0;
     }
 
+    // Clear screen and reset scroll
+    resetScreen() {
+        this.clearScreen();
+        this.firstLine = 0;
+    }
+
     displayBuffer(buf) {
-        for (let line = 0; line < buf.length; line++) {
+        for (let line = this.firstLine; (line < this.firstLine + this.rows) && (buf.length > line); line++) {
             let row = buf[line];
             for (let col = 0; col < row.length; col++) {
-                this.displayCell(row[col], col, line);
+                this.displayCell(row[col], col, line - this.firstLine);
             }
         }
     }
@@ -241,12 +243,12 @@ class Terminal extends DarkPanel {
     }
 
     displayGrid() {
-        for (let i = 0; i < TEXT_COLS + 1; i++) {
+        for (let i = 0; i < this.cols + 1; i++) {
             this.ctx.moveTo(this.x + this.border.x + this.pt.x * i, this.y + this.border.y);
             this.ctx.lineTo(this.x + this.border.x + this.pt.x * i, this.y - this.border.y + this.height);
         }
 
-        for (let i = 0; i < TEXT_ROWS + 1; i++) {
+        for (let i = 0; i < this.rows + 1; i++) {
             this.ctx.moveTo(this.x + this.border.x, this.y + this.border.y + this.pt.y * i);
             this.ctx.lineTo(this.x - this.border.x + this.width, this.y + this.border.y + this.pt.y * i);
         }
@@ -266,6 +268,31 @@ class Terminal extends DarkPanel {
         this.ctx.fillRect(loc.x, loc.y, this.pt.x + 1, this.pt.y + 1);
     }
 
+    scrollDown() {
+        if (this.lineBuffer.length > this.firstLine + this.rows) {
+            this.firstLine++;
+        }
+    }
+
+    scrollUp() {
+        if (0 < this.firstLine) {
+            this.firstLine--;
+        }
+    }
+    
+    scrollToCurrent() {
+        // If Y cursor outside current scroll window.
+        if ((this.cursor.y < this.firstLine) || (this.cursor.y > this.firstLine + this.rows)) {
+            // Put cursor line in centre of scroll.
+            this.firstLine = this.cursor.y - this.rows/2;
+            if (0 > this.firstLine) {
+                this.firstLine = 0;
+            }
+        }
+    }
+
+    // Simple non-directional sound.
+    // Unlike sounds emited by Items which may be 3D.
     playSound(name, volume, loop) {
         if (!this.game.soundOn) {
             return (false);

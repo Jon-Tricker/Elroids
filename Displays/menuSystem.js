@@ -70,8 +70,8 @@ class MenuSystem {
         }
     }
 
-    pushMenu(menu) { 
-        this.targetCursor = new THREE.Vector2(0, 0);  
+    pushMenu(menu) {
+        this.targetCursor = new THREE.Vector2(0, 0);
         this.menuStack.push(new Menu(menu, this.targetCursor));
         this.resetMenu();
     }
@@ -86,6 +86,8 @@ class MenuSystem {
     resetMenu() {
         this.targetCursor = this.menuStack[this.menuStack.length - 1].cursor;
         this.maxYCursor = 0;
+
+        this.display.terminal.resetScreen();
     }
 
     animate(date, keyboard) {
@@ -117,14 +119,22 @@ class MenuSystem {
             }
         }
 
-        if (keyboard.getClearState("<") || keyboard.getClearState(",")) {
+        if (keyboard.getClearState("Z") || keyboard.getClearState("z")) {
             if (this.targetCursor.x > 0) {
                 this.targetCursor.x--;
             }
         }
 
-        if (keyboard.getClearState(">") || keyboard.getClearState(".")) {
+        if (keyboard.getClearState("C") || keyboard.getClearState("c")) {
             this.targetCursor.x++;
+        }
+
+        if (keyboard.getClearState("<") || keyboard.getClearState(",")) {
+            this.display.terminal.scrollUp();
+        }
+
+        if (keyboard.getClearState(">") || keyboard.getClearState(".")) {
+            this.display.terminal.scrollDown();
         }
     }
 
@@ -154,9 +164,12 @@ class MenuSystem {
             }
             let selected = this.targetCursor.equals(cursor);
             this.display.terminal.println("\tBack", selected);
-            if (selected && this.isClicked(keyboard)) {
-                this.popMenu();
-                return;
+            if (selected) {
+                this.display.terminal.scrollToCurrent();
+                if (this.isClicked(keyboard)) {
+                    this.popMenu();
+                    return;
+                }
             }
             cursor.y++;
         }
@@ -179,6 +192,9 @@ class MenuSystem {
                 this.display.game.ship.undock();
                 return;
             }
+        }
+        if (selected) {
+            this.display.terminal.scrollToCurrent();
         }
 
         this.maxYCursor = cursor.y;
@@ -347,7 +363,7 @@ class MenuSystem {
                     try {
                         eval(action + ";");
                     }
-                    
+
                     catch (e) {
                         if (e instanceof GameError) {
                             // Display it
@@ -404,6 +420,13 @@ class MenuSystem {
                 if (this.targetCursor.x > result.selectableCount) {
                     this.targetCursor.x = result.selectableCount;
                 }
+            }
+        }
+
+        // If necessary scroll to element just printed.
+        if (selectable) {
+            if (this.targetCursor.equals(cursor)) {
+                this.display.terminal.scrollToCurrent();
             }
         }
 

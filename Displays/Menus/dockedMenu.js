@@ -6,8 +6,9 @@ let dockedMenu = "\
 <BR />\
 <P ALIGN=\"CENTER\">\t... Press 'p' to also pause/unpause.\n </P>\
 <P ALIGN=\"CENTER\">\t... Select 'Undock' to undock.\n </P>\
-<P ALIGN=\"CENTER\">Control with navigation controls ... (\"S\" - Up, \"X\" - Down, <BR />\
-\t... \"&lt;\" - Left, \"&gt;\" - Right, \"M\" - Select, \"P\" - Unpause).\n</P>\
+<P ALIGN=\"CENTER\">Control with navigation controls ... <BR />\
+(\"S\" - Up, \"X\" - Down, \"Z\" - Left, \"C\" - Right, <BR />\
+\"&lt;\" - Scroll up, \"&gt;\" - Scroll down, \"M\" - Select).\n</P>\
 <UL>\
     <LI><A HREF=\"helpMenu\">Menu controls help screen.</A></LI>\
     <LI><A HREF=\"cargoMenu\">Cargo bay</A></LI>\

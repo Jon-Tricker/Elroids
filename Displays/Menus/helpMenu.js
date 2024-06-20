@@ -4,8 +4,10 @@ let helpMenu = " \
 <P ALIGN=\"CENTER\">\nBased on ship controls. Hopefully eventually usable without keyboard.\n</P>\
 <P>\t\"S\" - Cursor up.</P>\
 <P>\t\"X\" - Cursor down.</P>\
-<P>\t\">\" - Cursor right.</P>\
-<P>\t\"&lt;\" - Cursor left.</P>\
+<P>\t\"C\" - Cursor right.</P>\
+<P>\t\"Z\" - Cursor left.</P>\
+<P>\t\"&gt;\" - Scroll down.</P>\
+<P>\t\"&lt;\" - Scroll up.</P>\
 <P>\t\"M\" - Select current cursor item.</P>\
 <BR />\
 <P>For more details see on line manual:</P>\

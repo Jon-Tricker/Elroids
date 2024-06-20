@@ -127,7 +127,7 @@ class Ship extends Item {
 
     deceletarte() {
         let newSpeed = this.speed.clone();
-        if ((this.speed.length() / Universe.getAnimateRate()) > (this.engineSet.getDecRate()/Universe.getAnimateRate())) {
+        if ((this.speed.length() / Universe.getAnimateRate()) > (this.engineSet.getDecRate() / Universe.getAnimateRate())) {
             // Slow down in all directions.
             newSpeed.multiplyScalar(1 - (this.engineSet.getDecRate() / Universe.getAnimateRate()));
         } else {
@@ -247,7 +247,7 @@ class Ship extends Item {
     moveMesh() {
         this.position.set(this.location.x, this.location.y, this.location.z);
     }
-    
+
 
     // Take damage to self.
     // Ships get re-spawned so do not destruct.
@@ -265,7 +265,7 @@ class Ship extends Item {
         if (this.hullSet.getAverageStatus() <= 0) {
             this.playSound('scream');
             this.setEngineSound(false);
-            
+
             // new Explosion(this.size, this);
             this.game.shipDestroyed(that);
         } else {
@@ -305,7 +305,7 @@ class Ship extends Item {
         let mass = Math.ceil(mineral.mass);
         this.game.displays.addMessage("Loaded " + mineral.type.name + " " + mass + "(t)");
         this.playSound('thud');
-        this.loadMineral(mineral.type , mass);
+        this.loadMineral(mineral.type, mass);
         mineral.destruct();
         return (true);
     }
@@ -360,7 +360,7 @@ class Ship extends Item {
         if (this.game.paused) {
             this.game.togglePaused();
         }
-        
+
         this.game.displays.terminalEnable(false);
 
         this.dockedWith.remove(this);
@@ -389,15 +389,15 @@ class Ship extends Item {
     loadMineral(mineral, mass) {
         this.baySet.loadMineral(mineral, mass);
     }
-    
+
     // Return mass unloaded.
     unloadMineral(mineral, mass) {
-        return(this.baySet.unloadMineral(mineral, mass));
+        return (this.baySet.unloadMineral(mineral, mass));
     }
 
     // Get minerals curently in bay.
     getMinerals() {
-        return(this.baySet.minerals);
+        return (this.baySet.minerals);
     }
 
     sellMineral(mineral, mass) {
@@ -407,11 +407,11 @@ class Ship extends Item {
     }
 
     getCargoCapacity() {
-        return(this.baySet.capacity)
+        return (this.baySet.capacity)
     }
 
     getTotalMass() {
-        return(this.mass + this.baySet.getContentMass())
+        return (this.mass + this.baySet.getContentMass())
     }
 }
 

@@ -10,8 +10,9 @@ let topMenu = "\
 <P ALIGN=\"CENTER\">'VenusTech 100' (TM) ship control terminal.\n </P>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Game Paused</P>\
 <BR />\
-<P ALIGN=\"CENTER\">Control with navigation controls ... (\"S\" - Up, \"X\" - Down, <BR />\
-\t... \"&lt;\" - Left, \"&gt;\" - Right, \"M\" - Select, \"P\" - Unpause).\n</P>\
+<P ALIGN=\"CENTER\">Control with navigation controls ... <BR />\
+(\"S\" - Up, \"X\" - Down, \"Z\" - Left, \"C\" - Right, <BR />\
+\"&lt;\" - Scroll up, \"&gt;\" - Scroll down, \"M\" - Select, \"P\" - Unpause).\n</P>\
 <UL>\
     <LI><A HREF=\"helpMenu\">Menu controls help screen.</A></LI>\
     <LI><A HREF=\"cargoMenu\">Cargo bay</A></LI>\
