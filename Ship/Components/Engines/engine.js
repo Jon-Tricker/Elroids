@@ -2,6 +2,12 @@
 
 import Component from '../component.js'
 
+const DESCRIPTION = "Engines provide 'thrust' to accelerate the ship.\n" +
+                    "The ship accelerates (according to F=ma) up to it's maxmum speed.\n" +
+                    "If an engine is damaged it produces less thrust.\n" +
+                    "The ships total thrust is the sum of all it's engine thrusts."
+                    "For the moment 'deceleration' is 'magic' ...  Engines are not required."
+
 class Engine extends Component {
 
     thrust;         // kN
@@ -13,6 +19,10 @@ class Engine extends Component {
         super(name, mass, cost, maxHp, ship);
         this.thrust = thrust;
         this.decRate = decRate;
+    }
+
+    getDescription() {
+        return (DESCRIPTION);
     }
 
     getThrust() {

@@ -4,7 +4,7 @@ let errorMenu = "\
 <BODY>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Error!</P>\
 <BR />\
-<script src=\"ErrorMenu\" params=\"this.lastError\"></script>\
+<script src=\"ErrorMenu\" error=\"this.lastError\"></script>\
 </BODY>"
 
 class ErrorMenu {

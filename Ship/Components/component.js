@@ -1,7 +1,7 @@
 // Base class for the components that make up a ship.
 
 // For now ships are made of components. Other things are just 'lumps'.
-import ComponentDisplay from "../../Displays/Components/componentDisplay.js";
+import ComponentDisplay from "../../Displays/Components/componentDisplay.js"; 
 
 class Component  {
 
@@ -14,6 +14,8 @@ class Component  {
     ship;
     set;
 
+   
+
     // Set if componentDisplay to be shown.
     displayPanel = false;
 
@@ -24,6 +26,10 @@ class Component  {
         this.cost = cost;
         this.maxHp = maxHp;
         this.status = 100;
+    }
+
+    getDescription() {
+        throw (new BugError("No description for default component."))
     }
 
     // Set when added to a set.

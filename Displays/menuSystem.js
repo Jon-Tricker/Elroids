@@ -4,7 +4,7 @@
 
 // Sits on top of the emulated terminal.
 
-// Most of these are needed event though greyed out.
+// Since they are dynamically loaded most of the imports, below, are needed (even though greyed out).
 import * as THREE from 'three';
 import Terminal from './terminal.js';
 import helpMenu from './Menus/helpMenu.js';
@@ -18,11 +18,13 @@ import { GameInternalsMenu } from './Menus/gameMenu.js'
 import { repairMenu } from './Menus/repairMenu.js';
 import { componentsMenu } from './Menus/componentsMenu.js';
 import { ComponentsMenu } from './Menus/componentsMenu.js';
+import { ComponentDetailsMenu } from './Menus/componentsMenu.js';
 import { RepairMenu } from './Menus/repairMenu.js';
 import { cargoMenu } from './Menus/cargoMenu.js';
 import { CargoMenu } from './Menus/cargoMenu.js';
 import Universe from '../universe.js';
 import GameError from '../GameErrors/gameError.js';
+import BugError from '../GameErrors/bugError.js';
 
 // Result of printing a child element.
 class ElementResult {
@@ -36,13 +38,17 @@ class TableData {
     currentCol = 0;
 }
 
-class Menu {
+class PushedMenu {
     menu;
     cursor;
 
-    constructor(menu, cursor) {
+    // Optional arguments if this is a script.
+    args;
+
+    constructor(menu, cursor, args) {
         this.menu = menu;
         this.cursor = cursor;
+        this.args = args;
     }
 }
 
@@ -72,7 +78,7 @@ class MenuSystem {
 
     pushMenu(menu) {
         this.targetCursor = new THREE.Vector2(0, 0);
-        this.menuStack.push(new Menu(menu, this.targetCursor));
+        this.menuStack.push(new PushedMenu(menu, this.targetCursor));
         this.resetMenu();
     }
 
@@ -81,6 +87,25 @@ class MenuSystem {
             this.menuStack.pop();
         }
         this.resetMenu()
+    }
+
+    // Push a script (dynamically generated with an argument list menu), as if it was a static menu.
+    // Variable length argument list read from this functions 'arguments' variable.
+    pushScript() {
+
+        if (0 == arguments.length) {
+            throw (new BugError("No script name given."));
+        }
+
+        // Remove script name from arguments.
+        let script = arguments[0];
+        let args = new Array();
+        for (var i = 1; i < arguments.length; i++) {
+          args.push(arguments[i]);
+        }
+        this.targetCursor = new THREE.Vector2(0, 0);
+        this.menuStack.push(new PushedMenu(script, this.targetCursor, args));
+        this.resetMenu();
     }
 
     resetMenu() {
@@ -94,7 +119,18 @@ class MenuSystem {
 
         this.display.terminal.clearScreen();
 
-        let doc = MenuSystem.parser.parseFromString(this.menuStack[this.menuStack.length - 1].menu, "text/xml");
+        // Get current menu.
+        let menu = this.menuStack[this.menuStack.length - 1];
+        let text;
+        if (undefined == menu.args) {
+            // Static menu.
+            text = menu.menu;
+        } else {
+            // Dynamically created menu (with 0 or more arguments).
+            text = menu.menu.printMenu.apply(this, menu.args);
+        }
+
+        let doc = MenuSystem.parser.parseFromString(text, "text/xml");
 
         this.liCount = 0;
 
@@ -298,14 +334,19 @@ class MenuSystem {
             case "SCRIPT":
                 // Invoke script and print output output
                 let scriptName = child.attributes.src;
-                let params = child.attributes.params;
 
                 let op = "";
-                if (undefined == params) {
+                if (1 == child.attributes.length) {
                     op = eval(scriptName.nodeValue).printMenu();
                 } else {
-                    // ToDo : Handle variable numbers of arguments.
-                    op = eval(scriptName.nodeValue).printMenu(eval(params.nodeValue));
+                    // Build up arg list.
+                    let args = new Array();
+                    // Don't include src.
+                    for (let i = 1; i < child.attributes.length; i++) {
+                        args.push(eval(child.attributes[i].nodeValue));
+                    }
+
+                    op = eval(scriptName.nodeValue).printMenu.apply(this, args);
                 }
 
                 let childDoc = MenuSystem.parser.parseFromString(op, "text/xml");
@@ -327,7 +368,7 @@ class MenuSystem {
                         }
                     }
                     if (null == linkName) {
-                        console.log("No HREF in link.")
+                        throw new BugError("No HREF in link.");
                     } else {
                         if (undefined == MenuSystem[linkName]) {
                             // Get imported

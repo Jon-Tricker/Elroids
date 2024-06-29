@@ -8,7 +8,7 @@ let repairMenu = "\
 <BODY>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Ship Repair Menu</P>\
 <BR />\
-<script src=\"RepairMenu\" params=\"this.display.game.ship\"></script>\
+<script src=\"RepairMenu\" ship=\"this.display.game.ship\"></script>\
 </BODY>"
 
 class RepairMenu {

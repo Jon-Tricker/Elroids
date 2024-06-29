@@ -13,10 +13,16 @@ import BaySet from '../Bays/baySet.js';
 import DumbMissileWeapon from '../Weapons/dumbMissileWeapon.js';
 import BasicBay from '../Bays/basicBay.js';
 
+const DESCRIPTION = "A small hull used for scouts and light freighters.";
+
 class BasicHull extends Hull {
 
     constructor(ship) {
         super("GP1", 50, 1000, 3, ship, 5, 200);
+    } 
+
+    getDescription() {
+        return (super.getDescription() + "\n\n'" + this.name + "' is " + DESCRIPTION.toLowerCase());
     }
 
     buildShip() {

@@ -11,6 +11,14 @@ import Component from '../component.js'
 import HullSet from '../Hulls/hullSet.js';
 import ComponentSets from '../componentSets.js';
 
+const DESCRIPTION = "Each ship had one 'hull'.\n" +
+                    "The hull has 'slots' into which other components can be fitted.\n" +
+                    "The ships maximum speed in determined by it's hull type.\n" +
+                    "    i.e. the hull can only withstand a certain amount of stress.\n" +
+                    "If the hull is damage maximum speed is reduced.\n" +
+                    "If hull status reaches 0% the ship is destroyed.";
+
+
 class Hull extends Component {
 
     flameMaterial;
@@ -73,6 +81,10 @@ class Hull extends Component {
         this.flameMaterial = Hull.baseFlameMaterial.clone();
         this.displayPanel = true;
         this.buildShip();
+    }
+
+    getDescription() {
+        return (DESCRIPTION);
     }
 
     // Build a ship for this hull type.

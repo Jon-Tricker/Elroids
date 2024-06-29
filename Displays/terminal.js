@@ -41,6 +41,9 @@ class Terminal extends DarkPanel {
     rows = TEXT_ROWS;
     cols = TEXT_COLS;
 
+    // Maximum number of lines in buffer.
+    maxBufLines = 200;
+
     constructor(game, ctx, doc, defaultColour, rows, cols) {
         super(ctx, defaultColour, true);
         this.game = game;
@@ -171,8 +174,16 @@ class Terminal extends DarkPanel {
     linefeed() {// Add new row
         this.lineBuffer.push(new Array());
 
-        // Move cursor down.
-        this.cursor.y++;
+        if (this.lineBuffer.length < this.maxBufLines) {
+            // Move cursor down.
+            this.cursor.y++;
+        } else {
+            // Move buffer up.
+            this.lineBuffer.shift();
+            if (0 < this.firstLine) {
+                this.firstLine--;
+            }
+        }
     }
 
     // Get row for current cursor position.

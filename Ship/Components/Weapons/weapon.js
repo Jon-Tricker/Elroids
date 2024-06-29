@@ -3,6 +3,8 @@ import Universe from '../../../universe.js';
 import Component from '../component.js';
 import GameError from "../../../GameErrors/gameError.js";
 
+const DESCRIPTION = "'Weapons' are used for damaging things."
+
 class Weapon extends Component {
     fireRate;   // Per second
     fireLast = Universe.getTime();
@@ -16,6 +18,10 @@ class Weapon extends Component {
         if (undefined != maxAmmo) {
             this.maxAmmo = maxAmmo;
         }
+    }
+
+    getDescription() {
+        return (DESCRIPTION);
     }
 
     // Target may be a direction or an Item.

@@ -7,7 +7,7 @@ import MenuTable from './menuTable.js';
 let cargoMenu = "\
 <BODY>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Cargo Menu</P>\
-<script src=\"CargoMenu\" params=\"this.display.game.ship\"></script>\
+<script src=\"CargoMenu\" ship=\"this.display.game.ship\"></script>\
 </BODY>"
 
 class CargoMenu {
