@@ -42,14 +42,6 @@ class HullSet extends ComponentSet {
         return(this.totalRamDamage);
     }
 
-    add(hull) {
-        if (0 == this.length) {
-            super.add(hull);
-            this.recalc();
-        } else {
-            console.log("Only one hull permitted.")
-        }
-    }
 }
 
 export default HullSet;

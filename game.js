@@ -26,10 +26,14 @@ import Keyboard from "./keyboard.js";
 import Mineral from "./GameItems/mineral.js";
 import Station from "./GameItems/station.js";
 import { MineralTypes } from './GameItems/minerals.js';
+import ComponentSets from './Ship/Components/componentSets.js';
+import PurchaseList from './Ship/Components/purchaseList.js';
+import MediumBay from './Ship/Components/Bays/mediumBay.js';
+import DumbMissileWeapon from './Ship/Components/Weapons/dumbMissileWeapon.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "4.1";
+const VERSION = "4.2";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -60,6 +64,7 @@ class Game {
 
     paused = false;
 
+    purchaseList = new PurchaseList();
 
     constructor(maxRockCount, rockStyle, safe, player, soundOn) {
 
@@ -88,11 +93,13 @@ class Game {
         this.createRocks(maxRockCount);
         this.createShip();
         this.createSaucers();
-        this.createStation();
 
         // Create displays
         this.displays = new Displays(this);
         this.displays.resize();
+        
+        // this.createStation();
+        this.createStation(this.ship);
 
         // Now we have a ship. Switch to it's camera
         this.scene.setCamera(MyCamera.PILOT);
@@ -106,13 +113,16 @@ class Game {
             this.ship = new Ship(5, 10, 20, 0, 0, 0, this);
 
             // Do some damage
-            this.ship.compSets.takeDamage(1);
+            this.ship.hull.compSets.takeDamage(1);
 
             // Add some minerals to the cargo.
             for (let i = 1; i < 3; i++) {
                 let type = 1 + Math.floor(Math.random() * (MineralTypes.length - 1));
                 this.ship.loadMineral(MineralTypes[type], i);
             }
+
+            // Add some components to cargo.
+            this.ship.loadComponent(new DumbMissileWeapon(this.ship))
         } else {
             this.ship = new Ship(5, 10, 20, -200, 100, 0, this);
         }
@@ -144,12 +154,18 @@ class Game {
         return (this.player);
     }
 
-    createStation() {
+    createStation(ship) {
+        let station;
         if (this.testMode) {
-            new Station(1100, 0, 0, this, null);
+            station = new Station(1100, 0, 0, this, null);
             // new Station(200, 0, 0, this, null);
         } else {
-            new Station(0, 0, 0, this, null);
+            station = new Station(0, 0, 0, this, null);
+        }
+
+        // Doc a ship if given.
+        if ((undefined != ship) && this.testMode) {
+            ship.dock(station);
         }
     }
 

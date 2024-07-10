@@ -30,14 +30,15 @@
 			targets ... fix</LI>
 		<LI>Sometimes control keys seem to get stuck (keyboard.js) ... Think this is when the debugger is used and it
 			consumes some of the event..</LI>
+		<LI>First key click gets ignored.</LI>
 		<LI>If going fast enough can fly through station. Hit it but get kicked out the far side.</LI>
+		<LI>Menu system/cursors only just works. Requies carefully 'tuned' menu pages.</LI>
 	</UL>
 
 	<H2>ToDos (In some sort of priority order)</H2>
 
 	<H3>V4.x Ship upgrades game: (In progress)</H3>
-	<P>Add component purchace menu (when docked).</P>
-	<P>Revisit 'repairs' maths. Currently not quite right if >1 component in set.</P>
+	<P>Revisit 'repairs' maths. Currently not quite right if >1 slot in set.</P>
 	<P>Add conponent sub classes:</P>
 	<UL>
 		<LI>Weapon beam</LI>
@@ -46,7 +47,7 @@
 		<LI>Docking computer. Then make docking more difficult.</LI>
 		<LI>Range finder</LI>
 	</UL>
-	<P>Make 'ram damage' proportional to ships mass.</P>
+	<P>Make 'ram damage' proportional to ships speed and mass.</P>
 
 	<H3>V5.x Extend Universe</H3>
 	<UL>
@@ -144,6 +145,7 @@
 				<LI>Add save/load ... not sure how on a web based game.</LI>
 				<LI>Maybe collision damage should be proportional to mass and relative speed of colliding object. Common
 					for all items apart from 'rock on rock' impacts.</LI>
+				<LI>Make parts lists at station a genuine list (variable availability and costs) rather than a 'catalog'.</LI>
 				<LI>Revisit inline 'ToDos'.</LI>
 			</UL>
 		</LI>
@@ -172,7 +174,7 @@
 	</UL>
 
 	<H2>Units and dimensions</H2>
-	<P>This project was coded with arbitary units of distance/mass. I have since modified it to use something resembling
+	<P>This project was coded with arbitary units of distance, mass and time. I have since modified it to use something resembling
 		SI.</P>
 	<UL>
 		<LI>Distance is in Meters.</LI>
@@ -194,7 +196,7 @@
 			only be points of light in the distance. For playability everything is moved closer together. (Excuse:
 			StarTrek/Wars battles where ships engage a few hundred meters apart and travelling at a few 10s of kph.)
 		</LI>
-		<LI>Ship 'braking' doesn't have real physics equivalent ... but it's useful for game play.</LI>
+		<LI>Ship 'braking' doesn't have physical equivalent ... but it's useful for game play.</LI>
 		<LI>At present angular momentum is not conserved (for anything) ... If it were ship contol would be difficult.</LI>
 	</UL>
 

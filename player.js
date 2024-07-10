@@ -26,11 +26,11 @@ class Player {
         return (false);
     }
 
-    addCredits(score) {
-        if (0 < score) {
-            this.score += score;
+    addCredits(credits) {
+        if (0 < credits) {
+            this.score += credits;
         }
-        this.credits += score;
+        this.credits += credits;
     }
 
 }

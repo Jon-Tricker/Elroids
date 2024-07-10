@@ -40,7 +40,7 @@ class ComponentDisplays extends Set {
 
             // Create new displays
             this.add(new ShipCompDisplay(this.displays.game, this.ctx, this.defaultColour));
-            for (let set of this.displays.game.ship.compSets) {
+            for (let set of this.displays.game.ship.hull.compSets) {
                 for (let comp of set) {
                     if (comp.displayPanel) {
                         this.add(comp.getDisplay(this.ctx, this.defaultColour));

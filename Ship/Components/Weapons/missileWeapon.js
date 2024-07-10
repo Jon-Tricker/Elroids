@@ -2,7 +2,7 @@
 import Weapon from './weapon.js';
 
 const DESCRIPTION = "'Missile weapons' fire physical projectiles.\n" +
-                    "The missles vary in effect, speed and lifetime.\n" +
+                    "The missiles vary in effect, speed and lifetime.\n" +
                     "If a missile weapon is damaged it may fail to fire."
 
 class MissileWeapon extends Weapon {

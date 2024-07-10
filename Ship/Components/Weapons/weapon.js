@@ -80,6 +80,10 @@ class Weapon extends Component {
         }
         return (vals);
     }
+
+    getTargetSet(ship) {
+        return(ship.hull.compSets.weaponSet);
+    }
 }
 
 export default Weapon;

@@ -33,12 +33,7 @@ class Ship extends Item {
     yawRate = 0;
     rollRate = 0;
 
-    // Ship components
-    compSets;
-    engineSet;
-    hullSet;
-    weaponSet;
-    baySet;
+    hull;
 
     engineSoundOn = false;
 
@@ -65,10 +60,10 @@ class Ship extends Item {
     buildShip() {
         // Create hull
         // Will also create all other components, for that hull type, and add them to our components sets.
-        new BasicHull(this);
+        this.hull = new BasicHull(this);
 
         // Add in weight of all components.
-        this.mass = this.compSets.calculateMass();
+        this.mass = this.hull.compSets.getMass();
     }
 
     createCameras() {
@@ -98,20 +93,20 @@ class Ship extends Item {
     }
 
     setupMesh() {
-        let mesh = this.hullSet[0].getMesh();
+        let mesh = this.hull.getMesh();
         this.add(mesh);
     }
 
     accelerate() {
         let xDirection = this.getOrientation();
 
-        let thrust = this.engineSet.getThrust();
+        let thrust = this.hull.compSets.engineSet.getThrust();
         if (0 < thrust) {
-            this.hullSet[0].setFlameState(true);
+            this.hull.setFlameState(true);
             this.setEngineSound(true);
-            this.thrust(thrust, xDirection, this.hullSet.getMaxSpeed());
+            this.thrust(thrust, xDirection, this.hull.compSets.hullSet.getMaxSpeed());
         } else {
-            this.hullSet[0].setFlameState(false);
+            this.hull.setFlameState(false);
             this.setEngineSound(false);
         }
     }
@@ -127,9 +122,9 @@ class Ship extends Item {
 
     deceletarte() {
         let newSpeed = this.speed.clone();
-        if ((this.speed.length() / Universe.getAnimateRate()) > (this.engineSet.getDecRate() / Universe.getAnimateRate())) {
+        if ((this.speed.length() / Universe.getAnimateRate()) > (this.hull.compSets.engineSet.getDecRate() / Universe.getAnimateRate())) {
             // Slow down in all directions.
-            newSpeed.multiplyScalar(1 - (this.engineSet.getDecRate() / Universe.getAnimateRate()));
+            newSpeed.multiplyScalar(1 - (this.hull.compSets.engineSet.getDecRate() / Universe.getAnimateRate()));
         } else {
             // Stop
             newSpeed.multiplyScalar(0);
@@ -190,7 +185,7 @@ class Ship extends Item {
             if (keyboard.getState(" ")) {
                 this.accelerate();
             } else {
-                this.hullSet[0].setFlameState(false);
+                this.hull.setFlameState(false);
             }
 
             if (keyboard.getState("?") || keyboard.getState("/")) {
@@ -233,7 +228,7 @@ class Ship extends Item {
 
             // if (keyboard.getClearState("M") || keyboard.getClearState("m")) { 
             if (keyboard.getState("M") || keyboard.getState("m")) {
-                this.weaponSet.fire(this.getOrientation(), date);
+                this.hull.compSets.weaponSet.fire(this.getOrientation(), date);
             }
 
             this.moveItem(true);
@@ -260,9 +255,9 @@ class Ship extends Item {
         this.game.displays.addMessage(msg);
 
         // Dont call 'super'. We want to re-use the same ship. So don't want it to destruct.
-        this.compSets.takeDamage(hits);
+        this.hull.compSets.takeDamage(hits);
 
-        if (this.hullSet.getAverageStatus() <= 0) {
+        if (this.hull.compSets.hullSet.getAverageStatus() <= 0) {
             this.playSound('scream');
             this.setEngineSound(false);
 
@@ -296,7 +291,12 @@ class Ship extends Item {
     // Ships do some dameage when they ram things.
     // Todo: Maybe should be based on mass and speed.
     doDamage(that) {
-        that.takeDamage(this.hullSet.getRamDamage(), this);
+        that.takeDamage(this.hull.compSets.hullSet.getRamDamage(), this);
+    }
+
+    // Get cargo bay
+    getBays() {
+        return(this.hull.compSets.baySet);
     }
 
     // Pick up a mineral.
@@ -310,11 +310,25 @@ class Ship extends Item {
         return (true);
     }
 
+    // Load component into bay.
+    loadComponent(comp) {
+        this.hull.compSets.baySet.loadComponent(comp);
+    }
+    
+    // Unload component from bay.
+    unloadComponent(comp) {
+
+    }
+
     addCredits(score) {
         this.game.player.addCredits(score);
         if (0 < score) {
             this.playSound('coin');
         }
+    }
+
+    getCredits() {
+        return (this.game.player.getCredits()); 
     }
 
     handleCollision(that) {
@@ -387,17 +401,12 @@ class Ship extends Item {
     }
 
     loadMineral(mineral, mass) {
-        this.baySet.loadMineral(mineral, mass);
+        this.hull.compSets.baySet.loadMineral(mineral, mass);
     }
 
     // Return mass unloaded.
     unloadMineral(mineral, mass) {
-        return (this.baySet.unloadMineral(mineral, mass));
-    }
-
-    // Get minerals curently in bay.
-    getMinerals() {
-        return (this.baySet.minerals);
+        return (this.hull.compSets.baySet.unloadMineral(mineral, mass));
     }
 
     sellMineral(mineral, mass) {
@@ -407,11 +416,11 @@ class Ship extends Item {
     }
 
     getCargoCapacity() {
-        return (this.baySet.capacity)
+        return (this.hull.compSets.baySet.capacity)
     }
 
     getTotalMass() {
-        return (this.mass + this.baySet.getContentMass())
+        return (this.mass + this.hull.compSets.baySet.getContentMass())
     }
 }
 

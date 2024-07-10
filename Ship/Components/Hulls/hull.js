@@ -8,8 +8,8 @@
 
 import * as THREE from 'three';
 import Component from '../component.js'
-import HullSet from '../Hulls/hullSet.js';
 import ComponentSets from '../componentSets.js';
+import GameError from '../../../GameErrors/gameError.js';
 
 const DESCRIPTION = "Each ship had one 'hull'.\n" +
                     "The hull has 'slots' into which other components can be fitted.\n" +
@@ -22,6 +22,9 @@ const DESCRIPTION = "Each ship had one 'hull'.\n" +
 class Hull extends Component {
 
     flameMaterial;
+
+    // Components in hull.
+    compSets;
 
     // Create ship material.
     static shipMaterial = new THREE.MeshStandardMaterial(
@@ -80,7 +83,11 @@ class Hull extends Component {
         this.maxSpeed = maxSpeed;
         this.flameMaterial = Hull.baseFlameMaterial.clone();
         this.displayPanel = true;
-        this.buildShip();
+
+        // If we have a ship ... rather than just a hull (e.g. in a parts list).
+        if (undefined != ship) {
+            this.buildShip();
+        }
     }
 
     getDescription() {
@@ -88,18 +95,12 @@ class Hull extends Component {
     }
 
     // Build a ship for this hull type.
-    buildShip() {
-        // All hulls have a single HullSet slot for themself.
-        this.ship.hullSet = new HullSet(this.ship, 1);
-        this.ship.hullSet.add(this); 
-
+    buildShip(hullSlots, engineSlots, weaponSlots, baySlots) {
         // Build set of all componets sets.
         // Order effects order in which component display panels are displayed.
-        this.ship.compSets = new ComponentSets();
-        this.ship.compSets.add(this.ship.hullSet);
-        this.ship.compSets.add(this.ship.engineSet);
-        this.ship.compSets.add(this.ship.weaponSet);
-        this.ship.compSets.add(this.ship.baySet);
+        // All hulls have a single HullSet slot for themself.
+        this.compSets = new ComponentSets(this.ship, hullSlots, engineSlots, weaponSlots, baySlots)
+        this.compSets.hullSet.add(this); 
     }
 
     setFlameState(state) {
@@ -132,8 +133,20 @@ class Hull extends Component {
         return(vals);
     }
 
+    unmount() {
+        throw (new GameError("Can't unmount hulls."))
+    } 
+    
+    sell() {
+        throw (new GameError("Can't sell hulls."))
+    }
+
     getMaxSpeed() {
         return (Math.ceil(this.maxSpeed * this.status/100));
+    } 
+    
+    getTargetSet(ship) {
+        return(ship.hull.compSets.hullSet);
     }
 }
 

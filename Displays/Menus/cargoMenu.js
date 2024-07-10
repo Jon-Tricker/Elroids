@@ -3,6 +3,8 @@
 // Arguments must be in a form that is in scope when eval()ed by MenuSystem.
 
 import MenuTable from './menuTable.js';
+import BugError from '../../GameErrors/bugError.js';
+import { ComponentsMenu } from './componentsMenu.js';
 
 let cargoMenu = "\
 <BODY>\
@@ -13,7 +15,6 @@ let cargoMenu = "\
 class CargoMenu {
 
     static printMenu(ship) {
-        let minerals = ship.getMinerals();
         let doc = "";
 
         doc += "<P>"
@@ -22,9 +23,26 @@ class CargoMenu {
         doc += "<P>Current load " + (ship.getTotalMass() - ship.getMass()) + "(t)</P>"
         doc += "<BR />"
 
+        doc += CargoMenu.displayMinerals(ship);
+
+        doc += "<BR />";
+
+        doc += CargoMenu.displayComponents(ship);
+
+        doc += "</P>"
+
+        return (doc);
+    }
+
+    static displayMinerals(ship) {
+        let doc = "";
+        let minerals = ship.getBays().minerals;
+
         if (minerals.size == 0) {
-            doc += "<P>No minerals.</P>"
+            doc += "<P>No minerals.</P>";
         } else {
+            let totalValue = 0;
+
             doc += "<P>Minerals</P>"
 
             let tab = new MenuTable();
@@ -42,7 +60,6 @@ class CargoMenu {
 
             tab.addHeadings(heads);
 
-            let totalValue = 0;
             for (let [mineral, mass] of minerals) {
                 let row = new Array();
 
@@ -61,27 +78,104 @@ class CargoMenu {
                 tab.addRow(row);
             }
             doc += tab.toString();
-            doc += "<P></P>";
 
             if (null != ship.dockedWith) {
-                doc += "Sell all <button type=\"button\" onclick=\"CargoMenu.onSellClick(this.display.game.ship)\">" + totalValue + "</button>";
+                doc += "<BR />";
+                doc += "<P>Sell all minerals <button type=\"button\" onclick=\"CargoMenu.onSellMineralClick(this.display.game.ship)\">" + totalValue + "</button></P>";
                 doc += "<BR />";
             }
-        }
 
-        doc += "</P>"
+        }
 
         return (doc);
 
     }
 
-    static getButtonText(mineral, mass) {
-        let value = mineral.value * mass;
-        return ("<button type=\"button\" onclick=\"CargoMenu.onSellClick(this.display.game.ship, cursor, " + mass + ")\">" + value + "</button>");
+    static displayComponents(ship) {
+        let doc = "";
+        let tab = new MenuTable();
+
+        let comps = ship.getBays().components;
+        if (0 == comps.size) {
+            doc += "<P>No components.</P>"
+        } else {
+            doc += "<P>Components</P>"
+
+            let heads = new Array();
+            heads.push("Name");
+            heads.push("Mass(t)");
+            heads.push("Details");
+            if (null != ship.dockedWith) {
+                heads.push("Mount");
+                heads.push("Sell");
+            }
+            tab.addHeadings(heads);
+
+            for (let comp of comps) {
+                let vals = new Array();
+                vals.push(comp.name);
+                vals.push(comp.mass);
+                vals.push("<button type=\"button\" onclick=\"CargoMenu.onDetailsClick(this, cursor)\">Show</button>");
+                if (null != ship.dockedWith) {
+                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onMountCompClick(this, cursor)\">Mount</button>");
+                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellCompClick(this, cursor)\">" + comp.getCurrentValue() + "</button>");
+                }
+                tab.addRow(vals);
+            }
+            doc += tab.toString();
+        }
+        return (doc);
     }
 
-    static onSellClick(ship, cursor, mass) {
-        let minerals = ship.getMinerals();
+    static getButtonText(mineral, mass) {
+        let value = mineral.value * mass;
+        return ("<button type=\"button\" onclick=\"CargoMenu.onSellMineralClick(this.display.game.ship, cursor, " + mass + ")\">" + value + "</button>");
+    }
+
+    static onDetailsClick(menuSystem, cursor) {
+        let ship = menuSystem.display.game.ship;
+        let comp = CargoMenu.getCompForCursor(ship, cursor);
+        ComponentsMenu.displayDetails(menuSystem, comp);
+    }
+
+    static getCompForCursor(ship, cursor) {
+        let compNumber = 0;
+
+        if (null != ship.dockedWith) {
+            if (0 < ship.getBays().minerals.size) {
+                // Skip minerals
+                compNumber += ship.getBays().minerals.size;
+
+                // Skip sell all
+                compNumber++;
+            }
+        }
+
+        let comps = ship.getBays().components;
+        for (let comp of comps) {
+            if (compNumber == cursor.y) {
+                return (comp);
+            } else {
+                compNumber++;
+            }
+        }
+        throw (new BugError("No component at cursor."));
+    }  
+    
+    static onMountCompClick(menuSystem, cursor) {
+        let ship = menuSystem.display.game.ship;
+        let comp = CargoMenu.getCompForCursor(ship, cursor);
+        comp.mount(ship, false);
+    }
+
+    static onSellCompClick(menuSystem, cursor) {
+        let ship = menuSystem.display.game.ship;
+        let comp = CargoMenu.getCompForCursor(ship, cursor);
+        comp.sell();
+    }
+
+    static onSellMineralClick(ship, cursor, mass) {
+        let minerals = ship.getBays().minerals;
         let index = 0;
         for (let [key, value] of minerals) {
             if (undefined === cursor) {

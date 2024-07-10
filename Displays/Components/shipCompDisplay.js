@@ -16,7 +16,7 @@ class ShipCompDisplay extends DarkPanel {
         this.ship = game.ship;
 
         this.add(new TextPanel(ctx, defaultColour, false));
-        this.speedPanel = new BarPanel(ctx, defaultColour, false, "Speed", "(m/s)", this.ship.hullSet.getMaxSpeed(), false);
+        this.speedPanel = new BarPanel(ctx, defaultColour, false, "Speed", "(m/s)", this.ship.hull.compSets.hullSet.getMaxSpeed(), false);
         this.add(this.speedPanel);
     }
 
@@ -41,7 +41,7 @@ class ShipCompDisplay extends DarkPanel {
             this.subPanels[0].setText("Ship - Docked");
         }
 
-        this.speedPanel.setMax(this.ship.hullSet.getMaxSpeed());
+        this.speedPanel.setMax(this.ship.hull.compSets.hullSet.getMaxSpeed());
         this.speedPanel.setValue(Math.floor(this.ship.speed.length()));
     }
 

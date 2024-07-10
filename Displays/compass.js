@@ -33,6 +33,10 @@ class Compass extends DarkPanel {
         let closestRp = null;
         let thisship = this.game.ship;
 
+        if (null != thisship.dockedWith) {
+            return;
+        }
+
         for (let station of stations) {
             let relPos = station.location.clone();
 

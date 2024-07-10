@@ -19,6 +19,8 @@ import { repairMenu } from './Menus/repairMenu.js';
 import { componentsMenu } from './Menus/componentsMenu.js';
 import { ComponentsMenu } from './Menus/componentsMenu.js';
 import { ComponentDetailsMenu } from './Menus/componentsMenu.js';
+import { purchaseMenu } from './Menus/purchaseMenu.js';
+import { PurchaseMenu } from './Menus/purchaseMenu.js';
 import { RepairMenu } from './Menus/repairMenu.js';
 import { cargoMenu } from './Menus/cargoMenu.js';
 import { CargoMenu } from './Menus/cargoMenu.js';
@@ -60,12 +62,18 @@ class MenuSystem {
 
     // Cursor and line count start from '1'. '0' means there are no selectable lines (or rows) yet ... don't display a cursor.
     targetCursor = new THREE.Vector2(0, 0);           // Target position of cursor in parent menu
+    // Total number of lines.
     maxYCursor = 0;
+    // Total number of selectables in currently selected line.
+    maxXCursor = 0;
 
     // Ugly variable used for passing 'last error' argument.
     lastError = null;
 
     static parser = new DOMParser();
+
+    // Log some detail
+    log = false;
 
     constructor(display) {
         this.display = display;
@@ -101,7 +109,7 @@ class MenuSystem {
         let script = arguments[0];
         let args = new Array();
         for (var i = 1; i < arguments.length; i++) {
-          args.push(arguments[i]);
+            args.push(arguments[i]);
         }
         this.targetCursor = new THREE.Vector2(0, 0);
         this.menuStack.push(new PushedMenu(script, this.targetCursor, args));
@@ -183,6 +191,10 @@ class MenuSystem {
     }
 
     printDoc(doc, keyboard) {
+        if (this.log) {
+            console.log("Start doc");
+        }
+
         // this.dumpXmlDoc(doc)
 
         // Cursor to first field
@@ -190,9 +202,9 @@ class MenuSystem {
 
         let tableData = new TableData();
 
-        this.printChild(doc.children[0], keyboard, cursor, false, false, tableData);
+        this.printChildren(doc.children[0], keyboard, cursor, false, false, tableData);
 
-        // Add default 'back' and 'exit' selection.
+        // Add default 'back' and 'exit/undock' selection.
         if (this.menuStack.length > 1) {
             cursor.x = 0;
             if (this.targetCursor.y == cursor.y) {
@@ -236,9 +248,21 @@ class MenuSystem {
         this.maxYCursor = cursor.y;
     }
 
+    // Print the child elements
+    printChildren(parent, keyboard, cursor, highlight, centered, tableData) {
+        let result = new ElementResult();
+        for (let child of parent.childNodes) {
+            let op = this.printChild(child, keyboard, cursor, highlight, centered, tableData);
+            result.selectableCount += op.selectableCount;
+            result.width += op.width;
+        }
+
+        return (result);
+    }
+
+
     // Do the specifics for each child element type.
     // Returns number of selectable items within child.
-    // ToDo. Really should be driven of a table mappinng tag to 'features'.
     printChild(child, keyboard, cursor, highlight, centered, tableData) {
         let result = new ElementResult();
 
@@ -260,26 +284,12 @@ class MenuSystem {
             }
         }
 
-        // Is this element selectable?
-        let selectable = false;
-        switch (child.nodeName) {
-            // Selectable items on line.
-            case "input":
-            case "INPUT":
-            case "button":
-            case "BUTTON":
-            case "a":
-            case "A":
-                selectable = true;
-                break;
-
-            default:
-                break
-        }
-
+        let selectable = this.isSelectable(child.nodeName);
         if (selectable) {
             result.selectableCount++;
         }
+
+        let lfReqd = this.isLfReqd(child.nodeName);
 
         // handle table related stuff.
         switch (child.nodeName) {
@@ -298,87 +308,27 @@ class MenuSystem {
                 break;
         }
 
-
         // Are we the element at target cursor?
         let clicked = false;
-        if (selectable && this.targetCursor.equals(cursor)) {
+        if (this.targetCursor.equals(cursor) && selectable) {
             highlight = !highlight;
             if (this.isClicked(keyboard)) {
                 clicked = true;
             }
         }
 
-        // In some cases print a line feed.
-        let lfReqd = false;
-        switch (child.nodeName) {
-            case "li":
-            case "LI":
-            case "tr":
-            case "TR":
-            case "p":
-            case "P":
-            case "br":
-            case "BR":
-                lfReqd = true;
-                break;
-
-            default:
-                break
-        }
-
-        // console.log(child.tagName + " " + this.boundedCursor.x + " " + + this.boundedCursor.y + " " + cursor.x + " " + cursor.y + " " + clicked + " " + highlight)
-
         // Print/activate child.
         switch (child.nodeName) {
             case "script":
             case "SCRIPT":
-                // Invoke script and print output output
-                let scriptName = child.attributes.src;
-
-                let op = "";
-                if (1 == child.attributes.length) {
-                    op = eval(scriptName.nodeValue).printMenu();
-                } else {
-                    // Build up arg list.
-                    let args = new Array();
-                    // Don't include src.
-                    for (let i = 1; i < child.attributes.length; i++) {
-                        args.push(eval(child.attributes[i].nodeValue));
-                    }
-
-                    op = eval(scriptName.nodeValue).printMenu.apply(this, args);
-                }
-
-                let childDoc = MenuSystem.parser.parseFromString(op, "text/xml");
-                result.selectableCount += this.printChild(childDoc, keyboard, cursor, false, false, tableData);
-
+                let op = this.runScript(child, keyboard, cursor, tableData);
+                result.selectableCount += op.selectableCount;
                 break;
 
             case "a":
             case "A":
                 if (clicked) {
-                    let linkName = null;
-
-                    for (let i = 0; i < child.attributes.length; i++) {
-                        let attrib = child.attributes[i];
-                        if (attrib.specified) {
-                            if (attrib.name === "HREF") {
-                                linkName = attrib.value;
-                            }
-                        }
-                    }
-                    if (null == linkName) {
-                        throw new BugError("No HREF in link.");
-                    } else {
-                        if (undefined == MenuSystem[linkName]) {
-                            // Get imported
-                            // They say eval is evil. But I can't find a better way.
-                            this.pushMenu(eval(linkName));
-                        } else {
-                            // Gen local.
-                            this.pushMenu(MenuSystem[linkName]);
-                        }
-                    }
+                    this.followLink(child);
                 }
                 break;
 
@@ -390,31 +340,7 @@ class MenuSystem {
             case "button":
             case "BUTTON":
                 if (clicked) {
-                    let action = null;
-
-                    for (let i = 0; i < child.attributes.length; i++) {
-                        let attrib = child.attributes[i];
-                        if (attrib.specified) {
-                            if (attrib.name === "onclick") {
-                                action = attrib.value;
-                            }
-                        }
-                    }
-
-                    try {
-                        eval(action + ";");
-                    }
-
-                    catch (e) {
-                        if (e instanceof GameError) {
-                            // Display it
-                            this.lastError = e;
-                            this.pushMenu(errorMenu);
-                        } else {
-                            // Pass it on
-                            throw (e);
-                        }
-                    }
+                    this.clickButton(child, cursor);
                 }
                 break;
 
@@ -457,10 +383,8 @@ class MenuSystem {
 
         // If this is the current line limit X cursor to available item count.
         if (this.targetCursor.y == cursor.y) {
-            if (result.selectableCount > 0) {
-                if (this.targetCursor.x > result.selectableCount) {
-                    this.targetCursor.x = result.selectableCount;
-                }
+            if (this.targetCursor.x > this.maxXCursor) {
+                this.targetCursor.x = this.maxXCursor;
             }
         }
 
@@ -471,32 +395,146 @@ class MenuSystem {
             }
         }
 
-        // If there was anything selectable also move cursor.
-        if (result.selectableCount > 0) {
-            if (lfReqd) {
+        // If there was anything selectable in children also move cursor.
+        if (lfReqd) {
+            if (result.selectableCount > 0) {
+                // Remember number of elements in line.
+                if (this.targetCursor.y == cursor.y) {
+                    if (this.maxXCursor <= result.selectableCount) {
+                        this.maxXCursor = result.selectableCount - 1;
+                    }
+                }
+
+                // Next selectable line.
                 cursor.y++;
                 cursor.x = 0;
                 result.selectableCount = 0;
-            } else {
-                if (selectable) {
-                    cursor.x++;
-                }
             }
+        }
+
+        // If just the parent selectable add it to line.
+        if (selectable) {
+            cursor.x++;
+        }
+
+        if (this.log) {
+            console.log("elem " + child.nodeName + " selectable " + selectable + " lfReqd " + lfReqd + " cur.x " + cursor.x + " cur.y " + cursor.y + " targ.x " + this.targetCursor.x + " targ.y " + this.targetCursor.y + " res sel " + result.selectableCount);
         }
 
         return (result);
     }
 
-    // Print the child element
-    printChildren(parent, keyboard, cursor, highlight, centered, tableData) {
-        let result = new ElementResult();
-        for (let child of parent.childNodes) {
-            let op = this.printChild(child, keyboard, cursor, highlight, centered, tableData);
-            result.selectableCount += op.selectableCount;
-            result.width += op.width;
+    // Run a script
+    runScript(script, keyboard, cursor, tableData) {
+        let scriptName = script.attributes.src;
+
+        let op = "";
+        if (1 == script.attributes.length) {
+            op = eval(scriptName.nodeValue).printMenu();
+        } else {
+            // Build up arg list.
+            let args = new Array();
+            // Don't include src.
+            for (let i = 1; i < script.attributes.length; i++) {
+                args.push(eval(script.attributes[i].nodeValue));
+            }
+
+            op = eval(scriptName.nodeValue).printMenu.apply(this, args);
         }
 
-        return (result);
+        let childDoc = MenuSystem.parser.parseFromString(op, "text/xml");
+        return (this.printChild(childDoc, keyboard, cursor, false, false, tableData));
+    }
+
+    // Folow a link
+    followLink(link) {
+        let linkName = null;
+
+        for (let i = 0; i < link.attributes.length; i++) {
+            let attrib = link.attributes[i];
+            if (attrib.specified) {
+                if (attrib.name === "HREF") {
+                    linkName = attrib.value;
+                }
+            }
+        }
+
+        if (null == linkName) {
+            throw new BugError("No HREF in link.");
+        } else {
+            if (undefined == MenuSystem[linkName]) {
+                // Get imported
+                // They say eval is evil. But I can't find a better way.
+                this.pushMenu(eval(linkName));
+            } else {
+                // Gen local.
+                this.pushMenu(MenuSystem[linkName]);
+            }
+        }
+    }
+
+    // Click a button
+    clickButton(button, cursor) {
+        let action = null;
+
+        for (let i = 0; i < button.attributes.length; i++) {
+            let attrib = button.attributes[i];
+            if (attrib.specified) {
+                if (attrib.name === "onclick") {
+                    action = attrib.value;
+                }
+            }
+        }
+
+        try {
+            eval(action + ";");
+        }
+
+        catch (e) {
+            if (e instanceof GameError) {
+                // Display it
+                this.lastError = e;
+                this.pushMenu(errorMenu);
+            } else {
+                // Pass it on
+                throw (e);
+            }
+        }
+    }
+
+    // Is element selectable?
+    isSelectable(nodeName) {
+        switch (nodeName) {
+            case "input":
+            case "INPUT":
+            case "button":
+            case "BUTTON":
+            case "a":
+            case "A":
+                return (true);
+
+            default:
+                break
+        }
+        return (false);
+    }
+
+    isLfReqd(nodeName) {
+        switch (nodeName) {
+            case "li":
+            case "LI":
+            case "tr":
+            case "TR":
+            case "p":
+            case "P":
+            case "br":
+            case "BR":
+                return (true);
+
+            default:
+                break
+        }
+        return (false);
     }
 
     // ToDo : Remove.

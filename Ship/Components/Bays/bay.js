@@ -2,6 +2,7 @@
 
 import Component from '../component.js'
 import BayDisplay from "../../../Displays/Components/bayDisplay.js";
+import GameError from '../../../GameErrors/gameError.js';
 
 const DESCRIPTION = "'Cargo bays' contain minerals and trade goods.\n" +
                     "Each bay can contain a certain maximum mass.\n" +
@@ -41,6 +42,21 @@ class Bay extends Component {
         let vals = super.getValues();
         vals.push(this.capacity);
         return(vals);
+    } 
+    
+    unmount() {
+        if ((undefined != this.set) && (1 >= this.set.size)) {
+            throw (new GameError("Can't unmount last bay ... nowhere to put it."));
+        }
+        super.unmount();
+    } 
+    
+    sell() {
+        throw (new GameError("Can't sell bays."))
+    }
+
+    getTargetSet(ship) {
+        return(ship.hull.compSets.baySet);
     }
 }
 

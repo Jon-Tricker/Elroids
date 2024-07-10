@@ -3,7 +3,7 @@
 import ComponentSet from '../componentSet.js'
 import GameError from "../../../GameErrors/gameError.js"
 import Mineral from "../../../GameItems/mineral.js";
-
+import ComponentSets from '../componentSets.js';
 
 class BaySet extends ComponentSet {
 
@@ -11,13 +11,22 @@ class BaySet extends ComponentSet {
     capacity;
 
     // Mineral contents
-    minerals = new Map();
+    minerals;
+
+    // Stored compoenents. 
+    components;
 
     // Mass of contents
     contentMass = 0;
 
     constructor(ship, slots) {
-        super("Cargo bays","Cargo bay", ship, slots);
+        super("Cargo bays", "Cargo bay", ship, slots);
+
+        // Could be a ComponentSet. But that contains a BaySet so we get a circular depndancy.
+        // Since these components are not going to be used don't need full functionality so store in a simple set.
+        this.components = new Set();
+
+        this.minerals = new Map();
         this.recalc();
     }
 
@@ -35,7 +44,17 @@ class BaySet extends ComponentSet {
             for (let [key, value] of this.minerals) {
                 this.contentMass += value;
             }
+
+            this.contentMass += this.getComponentsMass();
         }
+    }
+
+    getComponentsMass() {
+        let mass = 0;
+        for (let comp of this.components) {
+            mass += comp.mass;
+        }
+        return (mass);
     }
 
     loadMineral(mineral, mass) {
@@ -64,7 +83,7 @@ class BaySet extends ComponentSet {
             this.ship.game.displays.addMessage("Bay full. Dumping surplus " + spaceReqd + "(t)");
         }
 
-        while (0 < (spaceReqd = this.getContentMass() - this.capacity)) {
+        while ((this.minerals.size > 0) && (0 < (spaceReqd = this.getContentMass() - this.capacity))) {
             // Find cheapest
             let cheapest = null;
             let cost = null;
@@ -85,6 +104,42 @@ class BaySet extends ComponentSet {
                 return;
             }
         }
+
+        // Not enough minerals. Dump some other cargo.
+        while ((0 < this.getComponentsMass()) && (0 < (spaceReqd = this.getContentMass() - this.capacity))) {
+            // Find cheapest component. 
+            let cheapest = null;
+            for (let comp of this.components) {
+                if ((null == cheapest) || (comp.cost < cheapest.cost)) {
+                    cheapest = comp;
+                }
+            }
+
+            // Delete it and let it get CGed.
+            spaceReqd -= cheapest.getMass();
+            this.components.delete(cheapest);
+        }
+    }
+
+    loadComponent(comp) {
+        if(comp.mass > (this.capacity - this.getContentMass())) {
+            throw (new GameError("Not enough capacity in bay."))
+        }
+
+        // If it's part of something remove it.
+        if(undefined != comp.set){
+            comp.set.delete(comp);
+            comp.setSet(undefined);
+        }
+        
+        this.components.add(comp);
+        
+        this.recalc();
+
+        // Dump any overspill.
+        this.level();
+
+        this.recalc();
     }
 
     takeDamage(hits, that) {

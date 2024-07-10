@@ -51,7 +51,8 @@ class Universe {
         ["poweron", null],
         ["poweroff", null],
         ["scream", null],
-        ["thud", null]
+        ["thud", null],
+        ["saw", null]
     ]);
 
 
@@ -173,8 +174,6 @@ class Universe {
             }
         }
     }
-
-
 }
 
 export default Universe;

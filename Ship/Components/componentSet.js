@@ -1,10 +1,8 @@
 // Base list class for the components that make up a ship.
-//
-// Need random access and fixed order so not a JS 'set'
 
 import GameError from '../../GameErrors/gameError.js'
 
-class ComponentSet extends Array {
+class ComponentSet extends Set {
 
     plural;
     singular;
@@ -14,6 +12,7 @@ class ComponentSet extends Array {
     ship;
     set;
 
+    // If slots is undefined can have an unlimited number of components.
     constructor(plural, singular, ship, slots) {
         super();
         this.plural = plural;
@@ -34,10 +33,10 @@ class ComponentSet extends Array {
     }
 
     add(comp) {
-        if (this.slots <= this.size) {
-            throw (new GameError("No free this.slots in " + this.plural + " list."));
+        if ((undefined != this.slots) && (this.slots <= this.size)) {
+            throw (new GameError("No free slots in " + this.plural + " list."));
         }
-        super.push(comp)
+        super.add(comp)
 
         comp.setSet(this);
 
@@ -45,12 +44,7 @@ class ComponentSet extends Array {
     }
 
     delete(comp) {
-        for (i = 0; i < this.length; i++) {
-            if (this[i] == comp) {
-                this.splice(i, 1);
-                break;
-            }
-        }
+        super.delete(comp);
         
         this.recalc();
     }
@@ -69,7 +63,7 @@ class ComponentSet extends Array {
         for (let comp of this) {
             cost += comp.getRepairCost(percent);
         }
-        cost /= this.length;
+        cost /= this.size;
 
         return (Math.floor(cost));
     }
@@ -80,21 +74,34 @@ class ComponentSet extends Array {
             status += comp.status;
         }
 
-        status = Math.floor(status / this.length);
+        status = Math.floor(status / this.size);
 
         return (status);
     }
 
     takeDamage(hits) {
         // Damage a random comp.
-        let index = Math.floor(Math.random() * this.length);
-        let comp = this[index];
+        let comp = this.getRandomElement();
         if (comp.status > 0) {
             let taken = comp.takeDamage(hits)
             this.recalc();
             return (taken);
         } else {
             return(0);
+        }
+    }
+
+    // Return a random element of the set.
+    // This is a bit inefficient but is rarely used and, in general, we would rather have Sets and Sets ... not Arrays.
+    getRandomElement() {
+        let index = Math.floor(Math.random() * this.size);
+
+        let i = 0;
+        for (let comp of this) {
+            if (i == index) {
+                return(comp);
+            }
+            i++;
         }
     }
 

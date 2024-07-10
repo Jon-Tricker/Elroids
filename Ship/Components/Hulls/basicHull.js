@@ -6,10 +6,7 @@
 
 import * as THREE from 'three';
 import Hull from './hull.js'
-import EngineSet from '../Engines/engineSet.js';
 import BasicEngine from '../Engines/basicEngine.js';
-import WeaponSet from '../Weapons/weaponSet.js';
-import BaySet from '../Bays/baySet.js';
 import DumbMissileWeapon from '../Weapons/dumbMissileWeapon.js';
 import BasicBay from '../Bays/basicBay.js';
 
@@ -26,18 +23,13 @@ class BasicHull extends Hull {
     }
 
     buildShip() {
-        // Do custom stuff for this hull
-        this.ship.engineSet = new EngineSet(this.ship, 1);
-        this.ship.engineSet.add(new BasicEngine(this.ship));
-
-        this.ship.weaponSet = new WeaponSet(this.ship, 1);
-        this.ship.weaponSet.add(new DumbMissileWeapon(this.ship));
-
-        this.ship.baySet = new BaySet(this.ship, 1);
-        this.ship.baySet.add(new BasicBay(this.ship));
-
         // Do stuff common for all hulls.
-        super.buildShip();
+        super.buildShip(1, 1, 1, 1);
+
+        // Do custom stuff for this hull
+        this.compSets.engineSet.add(new BasicEngine(this.ship));
+        this.compSets.weaponSet.add(new DumbMissileWeapon(this.ship));
+        this.compSets.baySet.add(new BasicBay(this.ship));
     }
 
     getMesh() {

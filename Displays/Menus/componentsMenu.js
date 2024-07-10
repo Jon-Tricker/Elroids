@@ -1,6 +1,4 @@
-// Menu with a script.
-//
-// Arguments must be in a form that is in scope when eval()ed by MenuSystem.
+// Component details menu.
 import MenuTable from './menuTable.js';
 import BugError from '../../GameErrors/bugError.js';
 
@@ -10,15 +8,10 @@ let componentsMenu = "\
 <script src=\"ComponentsMenu\" ship=\"this.display.game.ship\"></script>\
 </BODY>"
 
-let testMenu = "\
-<BODY>\
-<P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Test Menu</P>\
-</BODY>"
-
 class ComponentsMenu {
 
     static printMenu(ship) {
-        let sets = ship.compSets;
+        let sets = ship.hull.compSets;
         let doc = "";
 
         doc += "<P>"
@@ -27,7 +20,7 @@ class ComponentsMenu {
         doc += "<BR />";
 
         for (let set of sets) {
-            if (set.length > 0) {
+            if (set.size > 0) {
                 doc += "<P>" + set.plural + " (Slots = " + set.getSlots() + ")" + "</P>";
 
                 let tab = new MenuTable();
@@ -41,6 +34,10 @@ class ComponentsMenu {
                         heads.push("Status(%)");
                         heads.push("Details");
                         heads.push("Display");
+                        if (null != ship.dockedWith) {
+                            heads.push("Unmount");
+                            heads.push("Sell");
+                        }
                         tab.addHeadings(heads);
                         printHeads = false;
                     }
@@ -50,7 +47,11 @@ class ComponentsMenu {
                     vals.push(comp.mass);
                     vals.push(comp.status);
                     vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onDetailsClick(this, cursor)\">Show</button>");
-                    vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onEnableClick(this.display.game.ship, cursor)\">" + ComponentsMenu.onOff(comp.displayPanel) + "</button>");
+                    vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onEnableClick(this, cursor)\">" + ComponentsMenu.onOff(comp.displayPanel) + "</button>");
+                    if (null != ship.dockedWith) {
+                        vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onUnmountClick(this, cursor)\">Unmount</button>");
+                        vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, cursor)\">" + comp.getCurrentValue() + "</button>");
+                    }
                     tab.addRow(vals);
                 }
                 doc += tab.toString();
@@ -71,7 +72,20 @@ class ComponentsMenu {
         return ("Off");
     }
 
-    static onEnableClick(ship, cursor) {
+    static onUnmountClick(menuSystem, cursor) {
+        let ship = menuSystem.display.game.ship;
+        let comp = ComponentsMenu.getCompForCursor(ship, cursor);
+        comp.unmount();
+    }
+    
+    static onSellClick(menuSystem, cursor) {
+        let ship = menuSystem.display.game.ship;
+        let comp = ComponentsMenu.getCompForCursor(ship, cursor);
+        comp.sell();
+    }
+
+    static onEnableClick(menuSystem, cursor) {
+        let ship = menuSystem.display.game.ship;
         let comp = ComponentsMenu.getCompForCursor(ship, cursor);
         comp.displayPanel = !comp.displayPanel;
 
@@ -82,12 +96,16 @@ class ComponentsMenu {
     static onDetailsClick(menuSystem, cursor) {
         let ship = menuSystem.display.game.ship;
         let comp = ComponentsMenu.getCompForCursor(ship, cursor);
+        this.displayDetails(menuSystem, comp);
+    }
+
+    static displayDetails(menuSystem, comp){
         menuSystem.pushScript(ComponentDetailsMenu, comp);
     }
 
     static getCompForCursor(ship, cursor) {
         let compNumber = 0;
-        for (let set of ship.compSets) {
+        for (let set of ship.hull.compSets) {
             for (let comp of set) {
                 if (compNumber == cursor.y) {
                     return (comp);

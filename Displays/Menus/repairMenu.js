@@ -14,7 +14,7 @@ let repairMenu = "\
 class RepairMenu {
 
     static printMenu(ship) {
-        let sets = ship.compSets;
+        let sets = ship.hull.compSets;
         let doc = "";
 
         doc += "<P>"
@@ -39,7 +39,7 @@ class RepairMenu {
         tab.addHeadings(heads);
 
         for (let set of sets) {
-            if (set.length > 0) {
+            if (set.size > 0) {
 
                 let status = set.getAverageStatus();
 
@@ -77,10 +77,10 @@ class RepairMenu {
             throw(new GameError("Repair not available."))
         }
 
-        let sets = ship.compSets;   
+        let sets = ship.hull.compSets;   
         let setNumber = 0;
         for (let set of sets) {
-            if (set.length > 0) { 
+            if (set.size > 0) { 
                 if (setNumber == cursor.y) {
                     if (!set.repair(percent)) {
                         throw(new GameError("Repair incomplete."))

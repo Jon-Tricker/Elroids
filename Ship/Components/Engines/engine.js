@@ -40,6 +40,10 @@ class Engine extends Component {
         vals.push(this.thrust);
         return(vals);
     }
+
+    getTargetSet(ship) {
+        return(ship.hull.compSets.engineSet);
+    }
 }
 
 export default Engine;
