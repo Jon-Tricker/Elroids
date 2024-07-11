@@ -23,7 +23,7 @@ class Item extends THREE.Group {
     location;
     originalMaterial;
     game;
-    mass;               // tonnes
+    massA;               // tonnes
     hitPoints;
     owner;
 

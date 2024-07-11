@@ -71,7 +71,7 @@ class PurchaseMenu {
     
     static onMountClick(menuSystem, cursor) {
         let game = menuSystem.display.game;
-        let comp = PurchaseMenu.getCompForCursor(this, cursor);
+        let comp = PurchaseMenu.getCompForCursor(game, cursor);
         let ship = game.ship;
 
         comp.mount(ship, true);

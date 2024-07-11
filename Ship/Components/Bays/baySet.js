@@ -3,7 +3,6 @@
 import ComponentSet from '../componentSet.js'
 import GameError from "../../../GameErrors/gameError.js"
 import Mineral from "../../../GameItems/mineral.js";
-import ComponentSets from '../componentSets.js';
 
 class BaySet extends ComponentSet {
 
@@ -24,7 +23,7 @@ class BaySet extends ComponentSet {
 
         // Could be a ComponentSet. But that contains a BaySet so we get a circular depndancy.
         // Since these components are not going to be used don't need full functionality so store in a simple set.
-        this.components = new Set();
+        this.components = new ComponentSet("Components", "Component", ship);
 
         this.minerals = new Map();
         this.recalc();

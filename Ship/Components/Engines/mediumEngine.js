@@ -1,13 +1,13 @@
-// Basic engine
+// Medium engine
 
 import Engine from './engine.js'
 
-const DESCRIPTION = "A small, low thrust, engine.";
+const DESCRIPTION = "Medium power engine.";
 
-class BasicEngine extends Engine {
+class MediumEngine extends Engine {
 
     constructor(set) {
-        super("Natphart1", 5, 1000, 2, set, 4000, 0.9);
+        super("Pootle7", 10, 2000, 2, set, 6000, 0.9);
     }
 
     getDescription() {
@@ -15,4 +15,4 @@ class BasicEngine extends Engine {
     }
 }
 
-export default BasicEngine;
+export default MediumEngine;

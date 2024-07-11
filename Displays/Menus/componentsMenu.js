@@ -16,7 +16,7 @@ class ComponentsMenu {
 
         doc += "<P>"
 
-        doc += "<P>Unladen mass " + ship.mass + "(t)</P>";
+        doc += "<P>Unladen mass " + ship.getMass() + "(t)</P>";
         doc += "<BR />";
 
         for (let set of sets) {

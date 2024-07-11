@@ -11,25 +11,23 @@ class Component {
     cost;       // Credits.
     maxHp;
     status;     // % of maxHp. May result in non integer number of HPs.
-
-    ship;
     set;
 
     // Set if componentDisplay to be shown.
     displayPanel = false;
 
-    constructor(name, mass, cost, maxHp, ship) {
-        this.ship = ship;
+    constructor(name, mass, cost, maxHp, set) {
         this.name = name;
         this.mass = mass;
         this.cost = cost;
         this.maxHp = maxHp;
+        this.set = set;
         this.status = 100;
     }
 
     clone() {
         log.console("Cloning raw component ... Dubious!")
-        return(new Component(this.name, this.mass, this.cost, this.maxHp, this.ship));
+        return (new Component(this.name, this.mass, this.cost, this.maxHp, this.getShip()));
     }
 
     getDescription() {
@@ -53,7 +51,7 @@ class Component {
 
     // Return the display panel for this component.
     getDisplay(ctx, defaultColour) {
-        return (new ComponentDisplay(this.ship.game, ctx, defaultColour, this));
+        return (new ComponentDisplay(this.getShip().game, ctx, defaultColour, this));
     }
 
     // Get ordered collumn headings.
@@ -83,6 +81,10 @@ class Component {
         return (this.maxHp);
     }
 
+    getShip() {
+        return(this.set.getShip());
+    }
+
     mount(ship, alsoBuy) {
         // Check that we can we afford it.
         if (alsoBuy) {
@@ -94,7 +96,7 @@ class Component {
         // Work out which set this comp goes into.
         let set = this.getTargetSet(ship);
 
-        // Add to set. Will throw if no free slots.
+        // Temporarily add to set. Will throw if no free slots.
         set.add(this);
 
         // Now we have added complete financial transaction. 
@@ -112,14 +114,19 @@ class Component {
         } else {
             // Make copy of purchace menu item.
             // Seems to work ... but not sure why.
-            comp = new this.constructor(ship);
+            comp = new this.constructor(this.getSet());
         }
 
-        this.ship.game.displays.terminal.playSound("anvil", 0.5);
+        if (undefined != ship.game.displays) {
+            ship.game.displays.terminal.playSound("anvil", 0.5);
+        }
 
-        // Add to ship.
-        comp.ship = ship;
+        // Remove temp from set add and add the real one set.
+        set.delete(this);
+        set.add(comp);
         comp.setSet(set);
+
+        return(comp);
     }
 
     unmount() {
@@ -130,32 +137,40 @@ class Component {
         // Remove from current mount point/set.
         this.set.delete(this);
         this.setSet(undefined);
-        this.ship.game.displays.terminal.playSound("saw");
+        this.getShip().game.displays.terminal.playSound("saw");
 
         // Remove display (if present).
         this.displayPanel = false;
-        this.ship.game.displays.compDisplays.recalc(true);
+        this.getShip().game.displays.compDisplays.recalc(true);
 
         // Put in ships bay
-        this.ship.getBays().components.add(this);
+        this.getShip().getBays().components.add(this);
     }
 
     // Buy from purchace list.
-    buy(ship) {
+    buy(ship, isFree) {
+        if (undefined === isFree) {
+            isFree = false;
+        }
+
         // Check that we can we afford it.
-        if (this.getCurrentValue() > ship.getCredits()) {
+        if ((!isFree) && (this.getCurrentValue() > ship.getCredits())) {
             throw (new GameError("Not enough credits."));
         }
 
         // Make copy of purchace menu item.
         // Seems to work ... but not sure why.
-        let comp = new this.constructor(ship);
+        let comp = new this.constructor(this.getSet());
 
         // Put it in bay. 
         ship.hull.compSets.baySet.loadComponent(comp);
-        
+
         // Now we have added complete financial transaction. 
-        ship.addCredits(-this.getCurrentValue());
+        if (!isFree) {
+            ship.addCredits(-this.getCurrentValue());
+        }
+
+        return(comp);
     }
 
     sell() {
@@ -170,10 +185,10 @@ class Component {
 
         // Remove display (if present).
         this.displayPanel = false;
-        this.ship.game.displays.compDisplays.recalc(true);
+        this.getShip().game.displays.compDisplays.recalc(true);
 
         // Add value to wallet.
-        this.ship.addCredits(this.getCurrentValue());
+        this.getShip().addCredits(this.getCurrentValue());
 
         // Allow to go out of scope and GC
     }
@@ -204,7 +219,7 @@ class Component {
 
     getRepairCost(percent) {
         let maxRepair = 100;
-        if (null == this.ship.dockedWith) {
+        if (null == this.getShip().dockedWith) {
             maxRepair = 50;
         }
 
@@ -215,7 +230,7 @@ class Component {
 
         let cost = this.cost * toDo / 100;
 
-        if (null == this.ship.dockedWith) {
+        if (null == this.getShip().dockedWith) {
             cost *= 2;
         }
 
@@ -228,7 +243,7 @@ class Component {
 
     repair(percent) {
         let maxRepair = 100;
-        if (null == this.ship.dockedWith) {
+        if (null == this.getShip().dockedWith) {
             maxRepair = 50;
         }
 

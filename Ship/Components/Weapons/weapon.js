@@ -12,8 +12,8 @@ class Weapon extends Component {
     maxAmmo;    // 0 = unlimited
     ammo;       // If maxAmmo defined
 
-    constructor(name, mass, cost, maxHp, ship, fireRate, maxAmmo) {
-        super(name, mass, cost, maxHp, ship);
+    constructor(name, mass, cost, maxHp, set, fireRate, maxAmmo) {
+        super(name, mass, cost, maxHp, set);
         this.fireRate = fireRate;
         if (undefined != maxAmmo) {
             this.maxAmmo = maxAmmo;

@@ -14,8 +14,8 @@ class Bay extends Component {
 
     capacity;    
 
-    constructor(name, mass, cost, maxHp, ship, capacity) {
-        super(name, mass, cost, maxHp, ship);
+    constructor(name, mass, cost, maxHp, set, capacity) {
+        super(name, mass, cost, maxHp, set);
         this.capacity = capacity;
     }  
 
@@ -25,7 +25,7 @@ class Bay extends Component {
     
     // Return the display panel for this component.
     getDisplay(ctx, defaultColour) {
-        return(new BayDisplay(this.ship.game, ctx, defaultColour, this));
+        return(new BayDisplay(this.getShip().game, ctx, defaultColour, this));
     }
 
     getCapacity() {
@@ -52,7 +52,9 @@ class Bay extends Component {
     } 
     
     sell() {
-        throw (new GameError("Can't sell bays."))
+        if ((undefined != this.set) && (1 >= this.set.size)) {
+            throw (new GameError("Can't sell last bay ... nowhere to put things."))
+        }
     }
 
     getTargetSet(ship) {

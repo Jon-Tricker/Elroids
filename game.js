@@ -26,14 +26,13 @@ import Keyboard from "./keyboard.js";
 import Mineral from "./GameItems/mineral.js";
 import Station from "./GameItems/station.js";
 import { MineralTypes } from './GameItems/minerals.js';
-import ComponentSets from './Ship/Components/componentSets.js';
 import PurchaseList from './Ship/Components/purchaseList.js';
-import MediumBay from './Ship/Components/Bays/mediumBay.js';
 import DumbMissileWeapon from './Ship/Components/Weapons/dumbMissileWeapon.js';
+import BasicBay from './Ship/Components/Bays/basicBay.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "4.2";
+const VERSION = "4.3";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -79,7 +78,8 @@ class Game {
             this.testMode = true;
 
             // Give us some cash
-            player.addCredits(1234);
+            //player.addCredits(1234);
+            player.addCredits(105);
         }
 
         Rock.setRockStyle(rockStyle);
@@ -97,7 +97,7 @@ class Game {
         // Create displays
         this.displays = new Displays(this);
         this.displays.resize();
-        
+
         // this.createStation();
         this.createStation(this.ship);
 
@@ -122,7 +122,13 @@ class Game {
             }
 
             // Add some components to cargo.
-            this.ship.loadComponent(new DumbMissileWeapon(this.ship))
+            let comp = new DumbMissileWeapon().buy(this.ship, true);
+            comp.takeDamage(1);
+
+            // Add another cargo bay
+            let bay = new BasicBay();
+            bay = bay.mount(this.ship, true);
+            bay.takeDamage(1);
         } else {
             this.ship = new Ship(5, 10, 20, -200, 100, 0, this);
         }

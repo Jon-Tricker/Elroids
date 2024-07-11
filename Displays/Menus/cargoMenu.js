@@ -82,7 +82,6 @@ class CargoMenu {
             if (null != ship.dockedWith) {
                 doc += "<BR />";
                 doc += "<P>Sell all minerals <button type=\"button\" onclick=\"CargoMenu.onSellMineralClick(this.display.game.ship)\">" + totalValue + "</button></P>";
-                doc += "<BR />";
             }
 
         }
@@ -104,6 +103,7 @@ class CargoMenu {
             let heads = new Array();
             heads.push("Name");
             heads.push("Mass(t)");
+            heads.push("Status(%)");
             heads.push("Details");
             if (null != ship.dockedWith) {
                 heads.push("Mount");
@@ -115,6 +115,7 @@ class CargoMenu {
                 let vals = new Array();
                 vals.push(comp.name);
                 vals.push(comp.mass);
+                vals.push(comp.status);
                 vals.push("<button type=\"button\" onclick=\"CargoMenu.onDetailsClick(this, cursor)\">Show</button>");
                 if (null != ship.dockedWith) {
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onMountCompClick(this, cursor)\">Mount</button>");

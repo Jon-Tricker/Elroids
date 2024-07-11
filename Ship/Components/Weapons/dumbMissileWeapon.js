@@ -8,8 +8,8 @@ const DESCRIPTION = "A cheap launcher that fires unguided missiles.";
 
 class DumbMissileWeapon extends MissileWeapon {
 
-    constructor(ship) {
-        super("DML1", 3, 3000, 2, ship, FIRE_RATE);
+    constructor(set) {
+        super("DML1", 3, 3000, 2, set, FIRE_RATE);
     }
 
     getDescription() {
@@ -19,7 +19,7 @@ class DumbMissileWeapon extends MissileWeapon {
     fire(target, date) {
         if (this.isReady(date)) {
             super.fire(target, date);
-            new DumbMissile(target, this.ship);
+            new DumbMissile(target, this.getShip());
         }
     }
 

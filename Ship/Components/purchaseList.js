@@ -4,6 +4,7 @@ import MediumBay from "./Bays/mediumBay.js";
 import ComponentSets from "./componentSets.js";
 import BasicEngine from "./Engines/basicEngine.js";
 import DumbMissileWeapon from "./Weapons/dumbMissileWeapon.js";
+import MediumEngine from "./Engines/mediumEngine.js";
 
 class PurchaseList extends ComponentSets {
 
@@ -12,6 +13,7 @@ class PurchaseList extends ComponentSets {
 
         // this.hullSet.add(new BasicHull());
         this.engineSet.add(new BasicEngine());
+        this.engineSet.add(new MediumEngine());
         this.weaponSet.add(new DumbMissileWeapon());
         this.baySet.add(new BasicBay());
         this.baySet.add(new MediumBay());

@@ -14,22 +14,22 @@ const DESCRIPTION = "A small hull used for scouts and light freighters.";
 
 class BasicHull extends Hull {
 
-    constructor(ship) {
-        super("GP1", 50, 1000, 3, ship, 5, 200);
+    constructor(set) {
+        super("GP1", 50, 1000, 3, set, 5, 200);
     } 
 
     getDescription() {
         return (super.getDescription() + "\n\n'" + this.name + "' is " + DESCRIPTION.toLowerCase());
     }
 
-    buildShip() {
+    buildShip(ship) {
         // Do stuff common for all hulls.
-        super.buildShip(1, 1, 1, 1);
+        super.buildShip(ship, 1, 1, 1, 2);
 
         // Do custom stuff for this hull
-        this.compSets.engineSet.add(new BasicEngine(this.ship));
-        this.compSets.weaponSet.add(new DumbMissileWeapon(this.ship));
-        this.compSets.baySet.add(new BasicBay(this.ship));
+        this.compSets.engineSet.add(new BasicEngine());
+        this.compSets.weaponSet.add(new DumbMissileWeapon());
+        this.compSets.baySet.add(new BasicBay());
     }
 
     getMesh() {
@@ -37,9 +37,9 @@ class BasicHull extends Hull {
         let ratio = 2 / 1.5;
 
         // Save a few 'this.'s
-        let length = this.ship.shipLength;
-        let height = this.ship.height;
-        let width = this.ship.width;
+        let length = this.getShip().shipLength;
+        let height = this.getShip().height;
+        let width = this.getShip().width;
 
         let vertices = new Float32Array([
             length, 0, 0, // v0 nose

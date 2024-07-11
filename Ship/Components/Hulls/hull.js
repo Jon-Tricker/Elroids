@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import Component from '../component.js'
 import ComponentSets from '../componentSets.js';
 import GameError from '../../../GameErrors/gameError.js';
+import Ship from '../../ship.js';
 
 const DESCRIPTION = "Each ship had one 'hull'.\n" +
                     "The hull has 'slots' into which other components can be fitted.\n" +
@@ -77,17 +78,12 @@ class Hull extends Component {
 
     mesh = new THREE.Group();
 
-    constructor(name, mass, cost, maxHp, ship, ramDamage, maxSpeed) {
-        super(name, mass, cost, maxHp, ship);
+    constructor(name, mass, cost, maxHp, set, ramDamage, maxSpeed) {
+        super(name, mass, cost, maxHp, set);
         this.ramDamage = ramDamage;
         this.maxSpeed = maxSpeed;
         this.flameMaterial = Hull.baseFlameMaterial.clone();
         this.displayPanel = true;
-
-        // If we have a ship ... rather than just a hull (e.g. in a parts list).
-        if (undefined != ship) {
-            this.buildShip();
-        }
     }
 
     getDescription() {
@@ -95,12 +91,13 @@ class Hull extends Component {
     }
 
     // Build a ship for this hull type.
-    buildShip(hullSlots, engineSlots, weaponSlots, baySlots) {
+    buildShip(ship, hullSlots, engineSlots, weaponSlots, baySlots) {
         // Build set of all componets sets.
         // Order effects order in which component display panels are displayed.
         // All hulls have a single HullSet slot for themself.
-        this.compSets = new ComponentSets(this.ship, hullSlots, engineSlots, weaponSlots, baySlots)
-        this.compSets.hullSet.add(this); 
+        this.compSets = new ComponentSets(ship, hullSlots, engineSlots, weaponSlots, baySlots);
+        this.set = this.compSets.hullSet;
+        this.set.add(this); 
     }
 
     setFlameState(state) {

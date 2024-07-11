@@ -7,10 +7,9 @@ class ComponentSet extends Set {
     plural;
     singular;
 
-    totalMass = 0;      // Tonnes
+    mass = 0;      // Tonnes
     slots = 0;
     ship;
-    set;
 
     // If slots is undefined can have an unlimited number of components.
     constructor(plural, singular, ship, slots) {
@@ -26,9 +25,9 @@ class ComponentSet extends Set {
 
     // Recalculate any composite variables.
     recalc() { 
-        this.totalMass = 0;   
+        this.mass = 0;   
         for (let comp of this) {
-            this.totalMass += comp.mass;
+            this.mass += comp.mass;
         }
     }
 
@@ -50,11 +49,15 @@ class ComponentSet extends Set {
     }
 
     getMass() {
-        return (this.totalMass);
+        return (this.mass);
     }
 
     getSlots() {
         return (this.slots);
+    }
+
+    getShip() {
+        return (this.ship);
     }
 
     getRepairCost(percent) {
@@ -63,7 +66,6 @@ class ComponentSet extends Set {
         for (let comp of this) {
             cost += comp.getRepairCost(percent);
         }
-        cost /= this.size;
 
         return (Math.floor(cost));
     }
@@ -106,38 +108,34 @@ class ComponentSet extends Set {
     }
 
     // Repair a given amount.
-    // Reduce score.
-    // Return true if fully successful.
     repair(percent) {
-        let cost = this.getRepairCost(percent);
         let allDone = true;
-
-        if (0 == cost) {
-            return(true);
-        }
-
-        // Can we afford it
-        if (cost > this.ship.game.player.getCredits()) {
-            percent = Math.floor(this.ship.game.player.getCredits() * percent / cost);
-            cost = this.ship.game.player.getCredits();
-            allDone = false;
-        }
+        let someDone = false;
 
         // Do repair
         for (let comp of this) {
-            comp.repair(percent);
+            // Can we afford it?
+            let cost = comp.getRepairCost(percent)
+            if (this.ship.game.player.getCredits() < cost) {
+                percent = Math.ceil(this.ship.game.player.getCredits() * percent / cost);
+                comp.repair(percent);
+                this.ship.addCredits(-this.ship.game.player.getCredits());
+                allDone = false;
+                someDone = true;
+                break;
+            } else {
+                comp.repair(percent);
+                someDone = true;
+                this.ship.addCredits(-cost);
+            }
         }
 
-        if (allDone) {
+        if (someDone) {
             this.ship.game.displays.terminal.playSound("anvil", 0.5);
         }
-
-        // Bill player.
-        this.ship.addCredits(-cost);
-
         this.recalc();
 
-        return (allDone);
+        return(allDone);
     }
 
     getCurrentHp() {

@@ -61,10 +61,12 @@ class Ship extends Item {
         // Create hull
         // Will also create all other components, for that hull type, and add them to our components sets.
         this.hull = new BasicHull(this);
+        this.hull.buildShip(this);
 
         // Add in weight of all components.
-        this.mass = this.hull.compSets.getMass();
+        this.mass = this.getMass();
     }
+
 
     createCameras() {
         let sizes = {
@@ -419,8 +421,12 @@ class Ship extends Item {
         return (this.hull.compSets.baySet.capacity)
     }
 
+    getMass() {
+        return(this.hull.compSets.getMass());
+    }
+
     getTotalMass() {
-        return (this.mass + this.hull.compSets.baySet.getContentMass())
+        return (this.getMass() + this.hull.compSets.baySet.getContentMass())
     }
 }
 
