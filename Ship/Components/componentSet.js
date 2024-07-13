@@ -24,8 +24,8 @@ class ComponentSet extends Set {
     }
 
     // Recalculate any composite variables.
-    recalc() { 
-        this.mass = 0;   
+    recalc() {
+        this.mass = 0;
         for (let comp of this) {
             this.mass += comp.mass;
         }
@@ -44,7 +44,7 @@ class ComponentSet extends Set {
 
     delete(comp) {
         super.delete(comp);
-        
+
         this.recalc();
     }
 
@@ -89,7 +89,7 @@ class ComponentSet extends Set {
             this.recalc();
             return (taken);
         } else {
-            return(0);
+            return (0);
         }
     }
 
@@ -101,7 +101,7 @@ class ComponentSet extends Set {
         let i = 0;
         for (let comp of this) {
             if (i == index) {
-                return(comp);
+                return (comp);
             }
             i++;
         }
@@ -115,18 +115,23 @@ class ComponentSet extends Set {
         // Do repair
         for (let comp of this) {
             // Can we afford it?
-            let cost = comp.getRepairCost(percent)
-            if (this.ship.game.player.getCredits() < cost) {
-                percent = Math.ceil(this.ship.game.player.getCredits() * percent / cost);
-                comp.repair(percent);
-                this.ship.addCredits(-this.ship.game.player.getCredits());
-                allDone = false;
-                someDone = true;
-                break;
-            } else {
-                comp.repair(percent);
-                someDone = true;
-                this.ship.addCredits(-cost);
+            let cost = comp.getRepairCost(percent);
+            if (0 < cost) {
+                if (this.ship.game.player.getCredits() < cost) {
+                    allDone = false;
+                    percent = Math.ceil(this.ship.game.player.getCredits() * percent / cost);
+                    if (0 >= percent) {
+                        break;
+                    }
+                    comp.repair(percent);
+                    this.ship.addCredits(-this.ship.game.player.getCredits());
+                    someDone = true;
+                    break;
+                } else {
+                    comp.repair(percent);
+                    someDone = true;
+                    this.ship.addCredits(-cost);
+                }
             }
         }
 
@@ -135,7 +140,7 @@ class ComponentSet extends Set {
         }
         this.recalc();
 
-        return(allDone);
+        return (allDone);
     }
 
     getCurrentHp() {
@@ -143,7 +148,7 @@ class ComponentSet extends Set {
         for (let comp of this) {
             hp += comp.getCurrentHp()
         }
-        return(hp);
+        return (hp);
     }
 }
 

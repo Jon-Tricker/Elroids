@@ -107,7 +107,7 @@ class Component {
         // If it is in a bay remove it.
         let comp;
         if (!alsoBuy) {
-            if (this.ship.getBays().components.has(this)) {
+            if (ship.getBays().components.has(this)) {
                 ship.getBays().components.delete(this);
             }
             comp = this;

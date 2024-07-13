@@ -18,7 +18,6 @@ class CargoMenu {
         let doc = "";
 
         doc += "<P>"
-
         doc += "<P>Total capacity " + ship.getCargoCapacity() + "(t)</P>"
         doc += "<P>Current load " + (ship.getTotalMass() - ship.getMass()) + "(t)</P>"
         doc += "<BR />"

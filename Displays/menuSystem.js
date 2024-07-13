@@ -64,8 +64,6 @@ class MenuSystem {
     targetCursor = new THREE.Vector2(0, 0);           // Target position of cursor in parent menu
     // Total number of lines.
     maxYCursor = 0;
-    // Total number of selectables in currently selected line.
-    maxXCursor = 0;
 
     // Ugly variable used for passing 'last error' argument.
     lastError = null;
@@ -195,6 +193,8 @@ class MenuSystem {
             console.log("Start doc");
         }
 
+        this.maxYCursor = 0;
+
         // this.dumpXmlDoc(doc)
 
         // Cursor to first field
@@ -226,6 +226,7 @@ class MenuSystem {
         if (this.targetCursor.y == cursor.y) {
             this.targetCursor.x = 0;
         }
+
         let selected = this.targetCursor.equals(cursor);
         if (null == this.display.game.ship.dockedTo()) {
             this.display.terminal.println("\tExit", selected);
@@ -285,9 +286,6 @@ class MenuSystem {
         }
 
         let selectable = this.isSelectable(child.nodeName);
-        if (selectable) {
-            result.selectableCount++;
-        }
 
         let lfReqd = this.isLfReqd(child.nodeName);
 
@@ -381,11 +379,8 @@ class MenuSystem {
             this.display.terminal.print("\n", false, false);
         }
 
-        // If this is the current line limit X cursor to available item count.
-        if (this.targetCursor.y == cursor.y) {
-            if (this.targetCursor.x > this.maxXCursor) {
-                this.targetCursor.x = this.maxXCursor;
-            }
+        if (this.log) {
+            console.log("elem " + child.nodeName + " selectable " + selectable + " lfReqd " + lfReqd + " cur.x " + cursor.x + " cur.y " + cursor.y + " targ.x " + this.targetCursor.x + " targ.y " + this.targetCursor.y + " res sel " + result.selectableCount);
         }
 
         // If necessary scroll to element just printed.
@@ -395,13 +390,19 @@ class MenuSystem {
             }
         }
 
+        if (selectable) {
+            if (this.targetCursor.y == cursor.y) {
+                cursor.x++;
+            }
+            result.selectableCount++;
+        }
+
         // If there was anything selectable in children also move cursor.
         if (lfReqd) {
-            if (result.selectableCount > 0) {
-                // Remember number of elements in line.
+            if ((result.selectableCount > 0)) {
                 if (this.targetCursor.y == cursor.y) {
-                    if (this.maxXCursor <= result.selectableCount) {
-                        this.maxXCursor = result.selectableCount - 1;
+                    if (this.targetCursor.x > cursor.x - 1) {
+                        this.targetCursor.x = cursor.x - 1 ;
                     }
                 }
 
@@ -410,15 +411,6 @@ class MenuSystem {
                 cursor.x = 0;
                 result.selectableCount = 0;
             }
-        }
-
-        // If just the parent selectable add it to line.
-        if (selectable) {
-            cursor.x++;
-        }
-
-        if (this.log) {
-            console.log("elem " + child.nodeName + " selectable " + selectable + " lfReqd " + lfReqd + " cur.x " + cursor.x + " cur.y " + cursor.y + " targ.x " + this.targetCursor.x + " targ.y " + this.targetCursor.y + " res sel " + result.selectableCount);
         }
 
         return (result);
