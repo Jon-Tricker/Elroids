@@ -16,7 +16,7 @@ class PurchaseMenu {
         let doc = "";
 
         doc += "<P>"
-        
+
         for (let set of sets) {
             if (set.size > 0) {
                 doc += "<P>" + set.plural + "</P>";
@@ -29,8 +29,13 @@ class PurchaseMenu {
                         let heads = new Array();
                         heads.push("Name");
                         heads.push("Details");
-                        heads.push("Buy (Cr)");
-                        heads.push("Mount (Cr)");
+                        if (set != sets.hullSet) {
+                            heads.push("Buy (Cr)");
+                            heads.push("Mount (Cr)");
+                        } else {
+                            heads.push("Upgrade (Cr)");
+                        }
+
                         tab.addHeadings(heads);
                         printHeads = false;
                     }
@@ -38,8 +43,12 @@ class PurchaseMenu {
                     let vals = new Array();
                     vals.push(comp.name);
                     vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onDetailsClick(this, cursor)\">Show</button>");
-                    vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onBuyClick(this, cursor)\">" + comp.getCurrentValue() + "</button>");
-                    vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onMountClick(this, cursor)\">" + comp.getCurrentValue() + "</button>");
+                    if (set != sets.hullSet) {
+                        vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onBuyClick(this, cursor)\">" + comp.getCurrentValue() + "</button>");
+                        vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onMountClick(this, cursor)\">" + comp.getCurrentValue() + "</button>");
+                    } else {
+                        vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onUpgradeClick(this, cursor)\">" + comp.getUpgradeCost(game.ship) + "</button>");
+                    }
                     tab.addRow(vals);
                 }
                 doc += tab.toString();
@@ -52,8 +61,8 @@ class PurchaseMenu {
 
         return (doc);
 
-    }   
-    
+    }
+
     static onDetailsClick(menuSystem, cursor) {
         let game = menuSystem.display.game;
         let comp = PurchaseMenu.getCompForCursor(game, cursor);
@@ -67,14 +76,22 @@ class PurchaseMenu {
         let ship = game.ship;
 
         comp.buy(ship);
-    } 
-    
+    }
+
     static onMountClick(menuSystem, cursor) {
         let game = menuSystem.display.game;
         let comp = PurchaseMenu.getCompForCursor(game, cursor);
         let ship = game.ship;
 
         comp.mount(ship, true);
+    }
+    
+    static onUpgradeClick(menuSystem, cursor) {
+        let game = menuSystem.display.game;
+        let comp = PurchaseMenu.getCompForCursor(game, cursor);
+        let ship = game.ship;
+
+        comp.upgrade(ship);
     }
 
     static getCompForCursor(game, cursor) {

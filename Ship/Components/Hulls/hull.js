@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import Component from '../component.js'
 import ComponentSets from '../componentSets.js';
 import GameError from '../../../GameErrors/gameError.js';
-import Ship from '../../ship.js';
+import BugError from '../../../GameErrors/bugError.js';
 
 const DESCRIPTION = "Each ship had one 'hull'.\n" +
                     "The hull has 'slots' into which other components can be fitted.\n" +
@@ -73,14 +73,12 @@ class Hull extends Component {
         }
     )
 
-    ramDamage;
     maxSpeed;
 
     mesh = new THREE.Group();
 
-    constructor(name, mass, cost, maxHp, set, ramDamage, maxSpeed) {
+    constructor(name, mass, cost, maxHp, set, maxSpeed) {
         super(name, mass, cost, maxHp, set);
-        this.ramDamage = ramDamage;
         this.maxSpeed = maxSpeed;
         this.flameMaterial = Hull.baseFlameMaterial.clone();
         this.displayPanel = true;
@@ -91,13 +89,21 @@ class Hull extends Component {
     }
 
     // Build a ship for this hull type.
-    buildShip(ship, hullSlots, engineSlots, weaponSlots, baySlots) {
+    buildSets(hullSlots, engineSlots, weaponSlots, baySlots) {
         // Build set of all componets sets.
         // Order effects order in which component display panels are displayed.
         // All hulls have a single HullSet slot for themself.
-        this.compSets = new ComponentSets(ship, hullSlots, engineSlots, weaponSlots, baySlots);
+        if (1 != hullSlots) {
+            throw (new BugError("Can only build a ship with a single hull."));
+        }
+        // INitially dont know ship.
+        this.compSets = new ComponentSets(null, hullSlots, engineSlots, weaponSlots, baySlots);
         this.set = this.compSets.hullSet;
         this.set.add(this); 
+    }
+
+    buildShip(ship) {
+        this.compSets.ship = ship;
     }
 
     setFlameState(state) {
@@ -118,14 +124,12 @@ class Hull extends Component {
 
     getHeadings() {
         let heads = super.getHeadings();
-        heads.push("Ram damage(HP)");
         heads.push("Max speed(m/s)");
         return(heads);
     }
 
     getValues() {
         let vals = super.getValues();
-        vals.push(this.ramDamage);
         vals.push(this.maxSpeed);
         return(vals);
     }
@@ -136,6 +140,70 @@ class Hull extends Component {
     
     sell() {
         throw (new GameError("Can't sell hulls."))
+    }
+
+    // Upgrade existing hull to this.
+    upgrade(ship) {
+        // Check we can afford it.
+        let cost = this.getUpgradeCost(ship);
+        if (ship.game.player.getCredits() < cost) {
+            throw (new GameError("Not enough credits"));
+        }
+
+        // Check existing components will fit in this.
+        // Need to iterate both set of sets.
+        let thisIter = this.compSets.keys();
+        let thisCurs = thisIter.next()
+        let shipIter =  ship.hull.compSets.keys();
+        let shipCurs = shipIter.next()
+        while ((!thisCurs.done) && (!shipCurs.done)) {
+            if (thisCurs.value.slots < shipCurs.value.size) {
+                throw(new GameError ("Not enough slots in " + shipCurs.value.plural + ". Unmount/Sell something first."));
+            }
+            thisCurs = thisIter.next()
+            shipCurs = shipIter.next()
+        }
+
+        // Move compomemt sets into this.
+        thisIter = this.compSets.keys();
+        thisCurs = thisIter.next()
+        shipIter =  ship.hull.compSets.keys();
+        shipCurs = shipIter.next()
+        while ((!thisCurs.done) && (!shipCurs.done)) {
+            let thisSet = thisCurs.value;
+            thisSet.clear();
+            for (let comp of shipCurs.value) {
+                thisSet.add(comp);
+            }
+            thisCurs = thisIter.next()
+            shipCurs = shipIter.next()
+        }
+
+        // Fiddle hull sets set.
+        this.compSets.hullSet.clear();
+        this.compSets.hullSet.add(this);
+
+        // Set ship to use this hull. Old one will go out of scope and GC.
+        this.compSets.ship = ship;
+        ship.setHull(this);
+
+        // Recalculate
+        this.set.recalc();
+
+        // Charge acount.
+        if (ship.game.player.addCredits(-cost));
+    }
+
+    getUpgradeCost(ship) {
+        let oldHull = ship.hull;
+        let cost = Math.floor((this.cost * this.status/100) - (oldHull.cost * oldHull.status/100));
+
+        // Half price on trade ins.
+        if (0 > cost) {
+            cost /= 2;
+        }
+    
+        return (cost);
     }
 
     getMaxSpeed() {

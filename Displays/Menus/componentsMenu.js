@@ -4,7 +4,7 @@ import BugError from '../../GameErrors/bugError.js';
 
 let componentsMenu = "\
 <BODY>\
-<P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Ship Components/Upgrades Menu</P>\
+<P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Ship Components Menu</P>\
 <script src=\"ComponentsMenu\" ship=\"this.display.game.ship\"></script>\
 </BODY>"
 
@@ -49,8 +49,13 @@ class ComponentsMenu {
                     vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onDetailsClick(this, cursor)\">Show</button>");
                     vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onEnableClick(this, cursor)\">" + ComponentsMenu.onOff(comp.displayPanel) + "</button>");
                     if (null != ship.dockedWith) {
-                        vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onUnmountClick(this, cursor)\">Unmount</button>");
-                        vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, cursor)\">" + comp.getCurrentValue() + "</button>");
+                        if (sets.hullSet == set) {
+                            vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onUnmountClick(this, cursor)\">N/A</button>");
+                            vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, cursor)\">N/A</button>");
+                        } else {
+                            vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onUnmountClick(this, cursor)\">Unmount</button>");
+                            vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, cursor)\">" + comp.getCurrentValue() + "</button>");
+                        }
                     }
                     tab.addRow(vals);
                 }
@@ -77,7 +82,7 @@ class ComponentsMenu {
         let comp = ComponentsMenu.getCompForCursor(ship, cursor);
         comp.unmount();
     }
-    
+
     static onSellClick(menuSystem, cursor) {
         let ship = menuSystem.display.game.ship;
         let comp = ComponentsMenu.getCompForCursor(ship, cursor);
@@ -99,7 +104,7 @@ class ComponentsMenu {
         this.displayDetails(menuSystem, comp);
     }
 
-    static displayDetails(menuSystem, comp){
+    static displayDetails(menuSystem, comp) {
         menuSystem.pushScript(ComponentDetailsMenu, comp);
     }
 
@@ -140,6 +145,29 @@ class ComponentDetailsMenu {
         doc += tab.toString();
 
         doc += "<BR />";
+
+        // If it's a hull show slots.
+        if (comp.set == comp.set.sets.hullSet) {
+            tab = new MenuTable();
+
+            heads = new Array();
+            heads.push("Slots");
+            for (let set of comp.set.sets) {
+                heads.push(set.plural);
+            }
+            tab.addHeadings(heads);
+
+            vals = new Array();
+            vals.push("");
+            for (let set of comp.set.sets) {
+                vals.push(set.slots);
+            }
+            tab.addRow(vals);
+
+            doc += tab.toString();
+    
+            doc += "<BR />";
+        }
 
         doc += "<P>";
         doc += comp.getDescription();

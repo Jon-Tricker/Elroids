@@ -165,6 +165,11 @@ class Item extends THREE.Group {
         return (this.mass);
     }
 
+    // Damage (HP) when ramming.
+    getRamDamage() {
+        return(Math.ceil(this.speed.length() * this.getTotalMass()/1000));
+    }
+
     // Move item in universal space, Handle wrap round.
     // Optinally detect collisions.
     moveItem(detect) {

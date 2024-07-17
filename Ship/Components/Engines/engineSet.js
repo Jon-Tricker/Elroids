@@ -4,24 +4,9 @@ import ComponentSet from '../componentSet.js'
 
 class EngineSet extends ComponentSet {
 
-    // So we don't have to add up every time.
-    decRate;
-
-    constructor(ship, slots) {
-        super("Engines", "Engine", ship, slots);
+    constructor(sets, slots) {
+        super("Engines", "Engine", sets, slots);
         this.recalc();
-    }
-
-    recalc() {
-        super.recalc();
-
-        this.decRate = 0;
-        for (let engine of this) {
-            // Take best dec rate
-            if (engine.decRate > this.decRate) {
-                this.decRate = engine.decRate;
-            }
-        }
     }
 
     getThrust() {
@@ -30,10 +15,6 @@ class EngineSet extends ComponentSet {
             thrust += engine.getThrust();
         }
         return (thrust);
-    }
-
-    getDecRate() {
-        return (this.decRate);
     }
 }
 

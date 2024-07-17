@@ -39,6 +39,8 @@ class Ship extends Item {
 
     dockedWith = null;
 
+    mesh;
+
     constructor(height, width, length, locationX, locationY, locationZ, game) {
         super(locationX, locationY, locationZ, 0, 0, 0, game, length);
 
@@ -67,6 +69,11 @@ class Ship extends Item {
         this.mass = this.getMass();
     }
 
+    // Upgrade the hull (and graphics).
+    setHull(hull) {
+        this.hull = hull;
+        this.setupMesh();
+    }
 
     createCameras() {
         let sizes = {
@@ -91,12 +98,16 @@ class Ship extends Item {
     }
 
     getCurrentHp() {
-        return (this.compSets.getCurrentHp());
+        return (this.hull.compSets.getCurrentHp());
     }
 
     setupMesh() {
-        let mesh = this.hull.getMesh();
-        this.add(mesh);
+        if (undefined != this.mesh) {
+            this.remove(this.mesh);
+        }
+
+        this.mesh = this.hull.getMesh();
+        this.add(this.mesh);
     }
 
     accelerate() {
@@ -123,17 +134,24 @@ class Ship extends Item {
     }
 
     deceletarte() {
-        let newSpeed = this.speed.clone();
-        if ((this.speed.length() / Universe.getAnimateRate()) > (this.hull.compSets.engineSet.getDecRate() / Universe.getAnimateRate())) {
-            // Slow down in all directions.
-            newSpeed.multiplyScalar(1 - (this.hull.compSets.engineSet.getDecRate() / Universe.getAnimateRate()));
-        } else {
+        if (1 > this.speed.length()) {
             // Stop
-            newSpeed.multiplyScalar(0);
-        }
-        this.setSpeed(newSpeed);
+            this.speed.multiplyScalar(0);
+            this.setEngineSound(false);
+            return;
+        }  
+        
+        // Thrust in opposite direction to speed.
+        let xDirection = this.speed.clone();
+        xDirection.multiplyScalar(-1);
 
-        this.setEngineSound(true);
+        let thrust = this.hull.compSets.engineSet.getThrust();
+        if (0 < thrust) {
+            this.setEngineSound(true);
+            this.thrust(thrust, xDirection, this.hull.compSets.hullSet.getMaxSpeed());
+        } else {
+            this.setEngineSound(false);
+        }
     }
 
     // In general to rotate. Asjust relative to our own axis.
@@ -293,7 +311,7 @@ class Ship extends Item {
     // Ships do some dameage when they ram things.
     // Todo: Maybe should be based on mass and speed.
     doDamage(that) {
-        that.takeDamage(this.hull.compSets.hullSet.getRamDamage(), this);
+        that.takeDamage(this.getRamDamage(), this);
     }
 
     // Get cargo bay

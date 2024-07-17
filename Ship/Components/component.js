@@ -2,6 +2,7 @@
 
 // For now ships are made of components. Other things are just 'lumps'.
 import ComponentDisplay from "../../Displays/Components/componentDisplay.js";
+import BugError from "../../GameErrors/bugError.js";
 import GameError from "../../GameErrors/gameError.js";
 
 class Component {
@@ -135,16 +136,17 @@ class Component {
         }
 
         // Remove from current mount point/set.
+        let ship = this.getShip();
         this.set.delete(this);
         this.setSet(undefined);
-        this.getShip().game.displays.terminal.playSound("saw");
+        ship.game.displays.terminal.playSound("saw");
 
         // Remove display (if present).
         this.displayPanel = false;
-        this.getShip().game.displays.compDisplays.recalc(true);
+        ship.game.displays.compDisplays.recalc(true);
 
         // Put in ships bay
-        this.getShip().getBays().components.add(this);
+        ship.getBays().components.add(this);
     }
 
     // Buy from purchace list.
@@ -191,6 +193,10 @@ class Component {
         this.getShip().addCredits(this.getCurrentValue());
 
         // Allow to go out of scope and GC
+    }
+
+    upgrade() {
+        throw (new BugError("Can only upgrade hulls."));
     }
 
     // Take damage 

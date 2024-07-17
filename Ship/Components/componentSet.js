@@ -9,16 +9,18 @@ class ComponentSet extends Set {
 
     mass = 0;      // Tonnes
     slots = 0;
-    ship;
+
+    // Group of sets that this a member of.
+    sets;
 
     // If slots is undefined can have an unlimited number of components.
-    constructor(plural, singular, ship, slots) {
+    constructor(plural, singular, sets, slots) {
         super();
         this.plural = plural;
         this.singular = singular;
 
         this.slots = slots;
-        this.ship = ship;
+        this.sets = sets;
 
         this.recalc();
     }
@@ -57,7 +59,7 @@ class ComponentSet extends Set {
     }
 
     getShip() {
-        return (this.ship);
+        return (this.sets.ship);
     }
 
     getRepairCost(percent) {
@@ -117,26 +119,26 @@ class ComponentSet extends Set {
             // Can we afford it?
             let cost = comp.getRepairCost(percent);
             if (0 < cost) {
-                if (this.ship.game.player.getCredits() < cost) {
+                if (this.sets.ship.game.player.getCredits() < cost) {
                     allDone = false;
-                    percent = Math.ceil(this.ship.game.player.getCredits() * percent / cost);
+                    percent = Math.ceil(this.sets.ship.game.player.getCredits() * percent / cost);
                     if (0 >= percent) {
                         break;
                     }
                     comp.repair(percent);
-                    this.ship.addCredits(-this.ship.game.player.getCredits());
+                    this.ship.addCredits(-this.sets.ship.game.player.getCredits());
                     someDone = true;
                     break;
                 } else {
                     comp.repair(percent);
                     someDone = true;
-                    this.ship.addCredits(-cost);
+                    this.sets.ship.addCredits(-cost);
                 }
             }
         }
 
         if (someDone) {
-            this.ship.game.displays.terminal.playSound("anvil", 0.5);
+            this.sets.ship.game.displays.terminal.playSound("anvil", 0.5);
         }
         this.recalc();
 

@@ -37,28 +37,39 @@
 
 	<H2>ToDos (In some sort of priority order)</H2>
 
-	<H3>V4.x Ship upgrades game: (In progress)</H3>
-	<P>Implement hull upgrades.</P>
-	<P>Add conponent sub classes:</P>
+	<H3>V5.x Extend Universe (In progress)</H3>
 	<UL>
-		<LI>Weapon beam</LI>
-		<LI>Thrusters (directional control)</LI>
-		<LI>Electronics ... including radar + HUD.</LI>
-		<LI>Docking computer. Then make docking more difficult.</LI>
-		<LI>Range finder</LI>
-	</UL>
-	<P>Make 'ram damage' proportional to ships speed and mass ... Relate HPs to an SI unit.</P>
-
-	<H3>V5.x Extend Universe</H3>
-	<UL>
-		<LI>Multiple systems (stations?).</LI>
-		<LI>Warp drive.</LI>
+		<LI>Multiple systems.</LI>
+		<LI>Warp point + warp space.</LI>
 		<LI>Galactic map.</LI>
+		<LI>Add warp point locator to compass.</LI>
 	</UL>
 	</UL>
 
 	<H3>V6.x Economics game</H3>
-	<P>Add non mineral trade goods (requires multiple systems/stations.</P>
+	<P>Add non mineral trade goods (requires multiple systems/stations.)</P>
+
+	<H3>V7.x Add extra ship components.</H3>
+	<UL>
+		<LI>'Elite style' (over heating) beam weapon.</LI>
+		<LI>Thrusters (directional control)</LI>
+		<LI>Electronics ... including:
+		<UL>
+			<LI>radar</LI>
+			<LI>HUD</LI>
+			<LI>Docking computer. Then make docking more difficult.</LI>
+			<LI>Range finder</LI>
+			<LI>Mineral detector</LI>
+			<LI>Missile lock.</LI>
+		</UL>
+		</LI>
+		<LI>Homing missile</LI>
+		<LI>Proximity missiles (mainly for use by the bad guys).</LI>
+		<LI>Shields.</LI>
+		<LI>Improved terminal (but keep VT100 as default).</LI>
+	</UL>
+
+	<H3>V 8.x Design better opposition.</H3>
 
 	<H3>Documentation.</H3>
 	<P>Add screen shot with various panels labled.</P>
@@ -73,7 +84,7 @@
 				<LI>Improve 'collision detection' mechanism (Item.detectCollision()). Although, for now, the 'cylinder
 					Vs sphere' bounding check seems to be doing good service.</LI>
 					<UL>
-						<LI>For ship/station interaction once an rough aproximation to a collision is detected it is confirmed using Ray tracing (Item.isPointInside()). Maybe extend to ray trace all the corners of the Items bounding box.</LI>
+						<LI>For ship/station interaction, once an rough aproximation to a collision is detected, it is confirmed using ray tracing (Item.isPointInside()). Maybe extend to ray trace all the corners of the Items bounding box.</LI>
 						<LI>Carve the universe into 'regions'. So don't have the square law issue of checking collisions
 							between everything and 'everthing else'.</LI>
 					</UL>
@@ -88,7 +99,7 @@
 			<LI>Current code for buttons and scripts is ugly. Works in the context of MenuSystem, where it is evaled,
 				rather than it's own. Good enough for a 'minimum feature set' but needs a re-work.</LI>
 			<LI>Currently buttons won't work on nested tables</LI>
-			<LI>Re-work menue system as real HTML with style sheets to control look and feel. Back end to communicating
+			<LI>Re-work menu system as real HTML with style sheets to control look and feel. Back end to communicating
 				via HTTP with a, localy implemeneted in the client, 'HTML server'. </LI>
 		</UL>
 		<LI>Add 'crafting' ship components/trade goods out of minerals.</LI>
@@ -98,6 +109,7 @@
 		<LI>Code:</LI>
 		<LI>Prettiness:</LI>
 		<UL>
+			<LI>Give different hull types differing physical apperance.</LI>
 			<LI>Create 'exploding ship' animation. (Exploding Mesh? Then it could also do rocks/saucers etc.)</LI>
 			<LI>Add surface texture to ship.</LI>
 			<LI>Make saucers more 'shiny'. Probably involves MeshPhongMaterial ... but for me that just comes out white.
@@ -111,17 +123,6 @@
 
 		<LI>Additional features:
 			<UL>
-				<LI>Add 'lock' to cross hairs. Colour change and display range when allingned with a target.</LI>
-				<LI>Add upgrades to ship (as purchaces):
-					<UL>
-						<LI>Homing missile + Missile lock.</LI>
-						<LI>Proximity missiles (mainly for use by the bad guys).</LI>
-						<LI>'Elite style' (over heating) beam weapon.</LI>
-						<LI>Shields.</LI>
-						<LI>Hypespace button. </LI>
-						<LI>Improved terminal (but keep VT100 as default).</LI>
-					</UL>
-				</LI>
 				<LI>Implement mother ships spawning more mother ships?</LI>
 			</UL>
 		</LI>
@@ -180,6 +181,7 @@
 		<LI>Distance is in Meters.</LI>
 		<LI>Mass is in Tonnes (1000KG).</LI>
 		<LI>Time is in seconds.</LI>
+		<LI>Damage (HPs) is an arbitary unit. However, from the 'ram damage' calculation we can conclude that its units are M kg m/s</LI>
 		<LI>Rocks have a mass equal to the cube of their size. i.e (assuming cubic rocks) a density of about 1
 			tonne/m^3. Probably should be a bit higher and related to their composition. However it will do for now.
 		</LI>
@@ -196,8 +198,8 @@
 			only be points of light in the distance. For playability everything is moved closer together. (Excuse:
 			StarTrek/Wars battles where ships engage a few hundred meters apart and travelling at a few 10s of kph.)
 		</LI>
-		<LI>Ship 'braking' doesn't have physical equivalent ... but it's useful for game play.</LI>
 		<LI>At present angular momentum is not conserved (for anything) ... If it were ship contol would be difficult.</LI>
+		<LI>Deceleration doesn't really make sense. Engines fire in a ramdom direction. But it is necessary for game play.</LI>
 	</UL>
 
 	<H2>Why not Typescript?</H2>

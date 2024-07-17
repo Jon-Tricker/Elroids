@@ -32,7 +32,7 @@ import BasicBay from './Ship/Components/Bays/basicBay.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "4.4";
+const VERSION = "4.5";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -78,8 +78,7 @@ class Game {
             this.testMode = true;
 
             // Give us some cash
-            player.addCredits(1234);
-            // player.addCredits(105);
+            player.addCredits(12345);
         }
 
         Rock.setRockStyle(rockStyle);

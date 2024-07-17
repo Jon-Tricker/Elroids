@@ -18,12 +18,12 @@ class BaySet extends ComponentSet {
     // Mass of contents
     contentMass = 0;
 
-    constructor(ship, slots) {
-        super("Cargo bays", "Cargo bay", ship, slots);
+    constructor(sets, slots) {
+        super("Cargo bays", "Cargo bay", sets, slots);
 
         // Could be a ComponentSet. But that contains a BaySet so we get a circular depndancy.
         // Since these components are not going to be used don't need full functionality so store in a simple set.
-        this.components = new ComponentSet("Components", "Component", ship);
+        this.components = new ComponentSet("Components", "Component", sets);
 
         this.minerals = new Map();
         this.recalc();

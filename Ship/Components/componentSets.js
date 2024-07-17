@@ -7,6 +7,8 @@ import BaySet from "./Bays/baySet.js";
 
 class ComponentSets extends Set {
 
+    ship;
+
     // Sub sets
     engineSet; 
     hullSet;
@@ -15,15 +17,16 @@ class ComponentSets extends Set {
 
     constructor(ship, hullSlots, engineSlots, weaponSlots, baySlots) {
         super();
+        this.ship = ship;
 
         // Create sets. Order will effect order in which status panels are displayed.
-        this.hullSet = new HullSet(ship, hullSlots);
+        this.hullSet = new HullSet(this, hullSlots);
         super.add(this.hullSet);
-        this.engineSet = new EngineSet(ship, engineSlots);
+        this.engineSet = new EngineSet(this, engineSlots);
         super.add(this.engineSet);
-        this.weaponSet = new WeaponSet(ship, weaponSlots);
+        this.weaponSet = new WeaponSet(this, weaponSlots);
         super.add(this.weaponSet);
-        this.baySet = new BaySet(ship, baySlots);
+        this.baySet = new BaySet(this, baySlots);
         super.add(this.baySet);
     }
 

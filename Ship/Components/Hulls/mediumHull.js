@@ -1,4 +1,4 @@
-// Basic hull
+// Medium hull
 //
 // Copyright (C) Jon Tricker 2023.
 // Released under the terms of the GNU Public licence (GPL)
@@ -10,13 +10,13 @@ import BasicEngine from '../Engines/basicEngine.js';
 import DumbMissileWeapon from '../Weapons/dumbMissileWeapon.js';
 import BasicBay from '../Bays/basicBay.js';
 
-const DESCRIPTION = "A small hull used for scouts and light freighters.";
+const DESCRIPTION = "A medium hull used for freighters.";
 
-class BasicHull extends Hull {
+class MediumHull extends Hull {
 
     constructor(set) {
-        super("GP1", 50, 1000, 3, set, 200);
-        super.buildSets(1, 1, 1, 2);
+        super("GP2", 50, 5000, 4, set, 250);
+        super.buildSets(1, 2, 2, 2);
     } 
 
     getDescription() {
@@ -100,64 +100,53 @@ class BasicHull extends Hull {
 
         // compute vertex normals
         engineGeometry.computeVertexNormals();
-        let engineMesh = new THREE.Mesh(engineGeometry, Hull.engineMaterial);
+
+        let engineMeshL = new THREE.Mesh(engineGeometry, Hull.engineMaterial);
 
         // Mount engine
-        engineMesh.rotateZ(-Math.PI / 2);
-        engineMesh.position.set(-length * 0.25, 0, height * .25);
+        engineMeshL.rotateZ(-Math.PI / 2);
+        engineMeshL.position.set(-length * 0.25, -width * 0.45, height * 0.25);
 
-        engineMesh.castShadow = true;
-        engineMesh.receiveShadow = true;
+        engineMeshL.castShadow = true;
+        engineMeshL.receiveShadow = true;  
 
-        var thrusterWidth = engineWidth * 0.5;
-        let thrusterGeometry = new THREE.ConeGeometry(thrusterWidth, length / 2, 10, 1, true);
-
-        // compute vertex normals
-        thrusterGeometry.computeVertexNormals();
-        let thrusterMaterialL = Hull.engineMaterial.clone();
-        thrusterMaterialL.color.setHex(0x800000);
-        let thrusterMeshL = new THREE.Mesh(thrusterGeometry, thrusterMaterialL);
+        let engineMeshR = new THREE.Mesh(engineGeometry, Hull.engineMaterial);
 
         // Mount engine
-        thrusterMeshL.rotateZ(-Math.PI / 2);
-        thrusterMeshL.position.set(-length * 0.5, width * 0.75, height * -.25);
+        engineMeshR.rotateZ(-Math.PI / 2);
+        engineMeshR.position.set(-length * 0.25, width * 0.45, height * 0.25);
 
-        thrusterMeshL.castShadow = true;
-        thrusterMeshL.receiveShadow = true;
-
-
-        let thrusterMaterialR = Hull.engineMaterial.clone();
-        thrusterMaterialR.color.setHex(0x008000);
-        let thrusterMeshR = new THREE.Mesh(thrusterGeometry, thrusterMaterialR);
-
-        // Mount engine
-        thrusterMeshR.rotateZ(-Math.PI / 2);
-        thrusterMeshR.position.set(-length * 0.5, -width * 0.75, height * -.25);
-
-        thrusterMeshR.castShadow = true;
-        thrusterMeshR.receiveShadow = true;
+        engineMeshR.castShadow = true;
+        engineMeshR.receiveShadow = true;
 
         // Add the flame cone
         let flameGeometry = new THREE.ConeGeometry(engineWidth * 0.75, length, 20, 1, false);
 
         // compute vertex normals
         flameGeometry.computeVertexNormals();
-        let flameMesh = new THREE.Mesh(flameGeometry, this.flameMaterial);
+
+        let flameMeshL = new THREE.Mesh(flameGeometry, this.flameMaterial);
 
         // Position flame
-        flameMesh.rotateZ(Math.PI / 2);
-        flameMesh.position.set(-length, 0, height * .25);
+        flameMeshL.rotateZ(Math.PI / 2);
+        flameMeshL.position.set(-length, -width * 0.45, height * 0.25); 
+        
+        let flameMeshR = new THREE.Mesh(flameGeometry, this.flameMaterial);
+
+        // Position flame
+        flameMeshR.rotateZ(Math.PI / 2);
+        flameMeshR.position.set(-length, width * 0.45, height * 0.25);
 
         // Create the group
         mesh.add(bodyMesh);
-        mesh.add(engineMesh);
-        mesh.add(thrusterMeshL);
-        mesh.add(thrusterMeshR);
+        mesh.add(engineMeshL);
+        mesh.add(engineMeshR);
 
-        mesh.add(flameMesh);
+        mesh.add(flameMeshL);
+        mesh.add(flameMeshR);
 
         return (mesh);
     }
 }
 
-export default BasicHull;
+export default MediumHull;
