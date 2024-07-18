@@ -3,7 +3,7 @@
 // Actually quite close to the ship (only just beyond the universe size). But moves with the ship. So perspective remains constant.
 
 import * as THREE from 'three';
-import StarFieldTexture from './starFieldText.js';
+import StarFieldTexture from '../Utils/starFieldText.js';
 import Universe from '../universe.js';
 
 // Sizes as percentage of sky box size.

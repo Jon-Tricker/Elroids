@@ -45,7 +45,7 @@ class Texture {
         this.data[offset + 2] = Math.floor(colour.b * 255);
 
         // Opacity.
-        this.data[offset + 3] = 0;
+        this.data[offset + 3] = 255;
     }
 
     getTexture() {

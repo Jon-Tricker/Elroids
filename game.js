@@ -29,10 +29,11 @@ import { MineralTypes } from './GameItems/minerals.js';
 import PurchaseList from './Ship/Components/purchaseList.js';
 import DumbMissileWeapon from './Ship/Components/Weapons/dumbMissileWeapon.js';
 import BasicBay from './Ship/Components/Bays/basicBay.js';
+import Wormhole from './GameItems/wormhole.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "4.5";
+const VERSION = "5.0";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -92,6 +93,7 @@ class Game {
         this.createRocks(maxRockCount);
         this.createShip();
         this.createSaucers();
+        this.createWormholes();
 
         // Create displays
         this.displays = new Displays(this);
@@ -170,7 +172,7 @@ class Game {
 
         // Doc a ship if given.
         if ((undefined != ship) && this.testMode) {
-            ship.dock(station);
+            // ship.dock(station);
         }
     }
 
@@ -242,6 +244,12 @@ class Game {
         let sz = Math.floor((Math.random() * MAX_ROCK_SIZE) + 10);
 
         new Rock(sz, loc.x, loc.y, loc.z, vx, vy, vz, this);
+    }
+
+    createWormholes() {
+        if (this.testMode) {
+            new Wormhole(500, 0, 150, this);
+        }
     }
 
     clearRespawnArea() {

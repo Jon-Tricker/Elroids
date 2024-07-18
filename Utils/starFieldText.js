@@ -1,6 +1,6 @@
 // Texture for a dynamically created star field
 import * as THREE from 'three';
-import Texture from '../Utils/texture.js';
+import Texture from './texture.js';
 
 // Colours with the most common first.
 const starColours = [new THREE.Color(0xF0F0F0), new THREE.Color(0xF0F000), new THREE.Color(0xF08000), new THREE.Color(0xF00000), new THREE.Color(0x0000F0)];
@@ -10,7 +10,12 @@ const MAX_SIZE = 1024;
 
 class StarFieldTexture extends Texture {
 
-  constructor(width, height) {
+  // Percent = the percentage of pixels to be stars.
+  constructor(width, height, percent) {
+    if (undefined == percent) {
+      percent = 0.02;
+    }
+
     if (height > MAX_SIZE) {
       height = MAX_SIZE;
     }
@@ -21,19 +26,19 @@ class StarFieldTexture extends Texture {
 
     super(width, height, BACKGROUND);
 
-    this.createData();
+    this.createData(percent);
   }
 
-  createData() {
+  createData(percent) {
     let size = this.height * this.width;
 
     // Add stars
-    for (let i = 0; i < size / 5000; i++) {
+    for (let i = 0; i < Math.ceil(size / (100/percent)); i++) {
       let x = Math.floor(Math.random() * this.width);
       let y = Math.floor(Math.random() * this.height);
 
       // Work out a colour
-      let colour = StarFieldTexture.randomColour();
+      let colour = this.randomColour();
 
       let brightness = Math.random() * 255;
       colour.r = Math.floor(colour.r * brightness);
@@ -45,10 +50,10 @@ class StarFieldTexture extends Texture {
   }
 
   // Generate weighted random colour.
-  static randomColour() {
+  randomColour() {
     let rnd = Math.random();
     let offset = Math.floor((rnd * rnd * rnd) * starColours.length);
-    let colour = starColours[offset];
+    let colour = starColours[offset].clone();
     return (colour);
   }
 
