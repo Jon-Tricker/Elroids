@@ -9,6 +9,8 @@ import NonShipItem from './nonShipItem.js';
 import Universe from '../universe.js';
 import Ship from '../Ship/ship.js';
 import StarFieldTexture from '../Utils/starFieldText.js';
+import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
 
 const RADIUS = 50;
 const HALO_RADIUS = 52;
@@ -53,17 +55,24 @@ const HALO_MATERIAL = new THREE.MeshStandardMaterial(
     }
 )
 
-
 class Wormhole extends NonShipItem {
 
     // List of all wormholes in current system.
     static holeList = new Set();
 
+
     galaxies = new Set;
 
-    constructor(locationX, locationY, locationZ, game) {
-        super(locationX, locationY, locationZ, 0, 0, 0, game, RADIUS * 2, MASS, HP, null, true);
+    // Textual label
+    name;
+    label;
 
+    holeMesh;
+    haloMesh;
+
+    constructor(locationX, locationY, locationZ, game, name) {
+        super(locationX, locationY, locationZ, 0, 0, 0, game, RADIUS * 2, MASS, HP, null, true);
+        this.name = name;
         this.setupMesh();
 
         for (let x = -1; x <= 1; x++) {
@@ -107,11 +116,27 @@ class Wormhole extends NonShipItem {
         holeGeom.computeVertexNormals();
         haloGeom.computeVertexNormals();
 
-        let holeMesh = new THREE.Mesh(holeGeom, HOLE_MATERIAL);
-        let haloMesh = new THREE.Mesh(haloGeom, HALO_MATERIAL);
+        this.holeMesh = new THREE.Mesh(holeGeom, HOLE_MATERIAL);
+        this.haloMesh = new THREE.Mesh(haloGeom, HALO_MATERIAL);
 
-        this.addMesh(holeMesh);
-        this.addMesh(haloMesh);
+        this.addMesh(this.holeMesh);
+        this.addMesh(this.haloMesh);
+
+        // Add textual label.
+        if (undefined != this.name) {
+            let labelDiv = document.createElement('div');
+            labelDiv.className = 'label';
+            labelDiv.textContent = this.name;
+            // labelDiv.style.backgroundColor = '#FFFFFF';
+            labelDiv.style.color = 'red';
+            // labelDiv.font-family = 'sans-serif';
+            // labelDiv.padding = '2px';
+
+            this.label = new CSS2DObject(labelDiv);
+            this.label.position.set(0, 0, 0);
+            this.add(this.label);
+            this.label.layers.set(0);
+        }
     }
 
     addMesh(mesh) {
@@ -139,13 +164,15 @@ class Wormhole extends NonShipItem {
     }
 
     animate() {
+
         // Move galaxies within
         for (let gal of this.galaxies) {
             gal.animate();
         }
 
         // Spin
-        this.rotateX(ROTATE_RATE / Universe.getAnimateRate());
+        this.holeMesh.rotateX(ROTATE_RATE / Universe.getAnimateRate());
+        this.haloMesh.rotateX(-ROTATE_RATE / Universe.getAnimateRate());
 
         // Kill any momentum obtained.
         this.setSpeed(Universe.originVector);

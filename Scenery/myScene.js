@@ -9,13 +9,20 @@ import MyCamera from './myCamera.js'
 import SkyBox from "./skyBox.js";
 import WrapBox from "./wrapBox.js";
 import Universe from "../universe.js";
+import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 
 class MyScene extends THREE.Scene {
 
   camera = null;
   light;
   ambientLight;
+
+  // Main 3D renderer
   renderer;
+
+  // Renderer for 2D labels
+  labelRenderer;
+
   sizes;
   game;
   myCanvas;
@@ -43,6 +50,13 @@ class MyScene extends THREE.Scene {
     this.renderer = new THREE.WebGLRenderer({ canvas });  // GL1?
     this.renderer.setSize(this.sizes.width, this.sizes.height);
 
+    // Create label renderer.
+    this.labelRenderer = new CSS2DRenderer({ canvas });
+		this.labelRenderer.setSize(this.sizes.width, this.sizes.height);
+		this.labelRenderer.domElement.style.position = 'absolute';
+		this.labelRenderer.domElement.style.top = '0px';
+    document.body.appendChild( this.labelRenderer.domElement );
+
     // Create static elements.
     let skyBoxSize = Universe.UNI_SIZE * 4;
     this.skyBox = new SkyBox(skyBoxSize, game, true);
@@ -64,7 +78,8 @@ class MyScene extends THREE.Scene {
     this.setCamera(MyCamera.DUMMY);
 
     // ... and render
-    this.renderer.render(this, this.camera);
+    // this.renderer.render(this, this.camera);
+    // this.labelRenderer.render(this, this.camera);
   }
 
   addLights() {
@@ -137,7 +152,8 @@ class MyScene extends THREE.Scene {
       this.getCamera().addListener(Universe.getListener());
     }
 
-    this.renderer.render(this, this.camera);
+    // this.renderer.render(this, this.camera);
+    // this.labelRenderer.render(this, this.camera);
   }
 
   addListener(list) {
@@ -154,8 +170,9 @@ class MyScene extends THREE.Scene {
     this.camera.aspect = this.sizes.width / this.sizes.height;
     this.camera.updateProjectionMatrix();
 
-    // Adjust renderer
+    // Adjust renderers
     this.renderer.setSize(this.sizes.width, this.sizes.height);
+    this.labelRenderer.setSize(this.sizes.width, this.sizes.height);
   }
 
   animate() {
@@ -169,6 +186,7 @@ class MyScene extends THREE.Scene {
 
     // Re-render
     this.renderer.render(this, this.camera);
+    this.labelRenderer.render(this, this.camera);
   }
 
 

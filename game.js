@@ -33,7 +33,7 @@ import Wormhole from './GameItems/wormhole.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "5.0";
+const VERSION = "5.1";
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -248,7 +248,7 @@ class Game {
 
     createWormholes() {
         if (this.testMode) {
-            new Wormhole(500, 0, 150, this);
+            new Wormhole(500, 100, 150, this, "Wormhole");
         }
     }
 
