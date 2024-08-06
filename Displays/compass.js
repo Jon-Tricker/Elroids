@@ -1,8 +1,6 @@
 // Compass screen
-import Universe from '../universe.js'
 import * as THREE from 'three';
 import DarkPanel from './Utils/darkPanel.js';
-import Station from '../GameItems/station.js';
 
 const SCALE = 0.05;
 
@@ -27,22 +25,24 @@ class Compass extends DarkPanel {
         this.ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.radius, 0, 2 * Math.PI);
         this.ctx.stroke();
 
-        // Find closest station.
-        let stations = Station.getStationList();
-        let closest = null;
-        let closestRp = null;
-        let thisship = this.game.ship;
+      
+        let thisship = this.getShip();
 
         if (null != thisship.dockedWith) {
             return;
         }
+
+        // Find closest station.
+        let stations = this.game.universe.system.getStations();
+        let closest = null;
+        let closestRp = null; 
 
         for (let station of stations) {
             let relPos = station.location.clone();
 
             // Handle wrap round relative to ship.
             relPos.sub(thisship.location);
-            Universe.handleWrap(relPos);
+            this.game.universe.handleWrap(relPos);
             if ((null == closest) || (relPos.length() < closest.length())) {
                 closest = station;
                 closestRp = relPos;
@@ -84,6 +84,10 @@ class Compass extends DarkPanel {
         this.ctx.fillStyle = colour;
         this.ctx.arc(pos.x + this.x + this.width / 2, pos.y + this.y + this.height / 2, size, 0, 2 * Math.PI);
         this.ctx.fill();
+    }
+
+    getShip() {
+        return(this.game.universe.system.ship);
     }
 
     resize(parentWidth, parentHeight) {

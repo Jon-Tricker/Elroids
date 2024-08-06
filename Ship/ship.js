@@ -7,10 +7,9 @@
 import * as THREE from 'three';
 import Item from '../GameItems/item.js';
 import MyCamera from '../Scenery/myCamera.js';
-import Universe from '../universe.js'
 import BasicHull from './Components/Hulls/basicHull.js';
 import Mineral from "../GameItems/mineral.js";
-import Station from "../GameItems/station.js";
+import Station from '../GameItems/System/station.js';
 
 // Slightly damped attitude contols to allow fine adjustment.
 const ROTATE_RATE_DELTA = 0.125;        // r/s
@@ -41,8 +40,8 @@ class Ship extends Item {
 
     mesh;
 
-    constructor(height, width, length, locationX, locationY, locationZ, game) {
-        super(locationX, locationY, locationZ, 0, 0, 0, game, length);
+    constructor(system, height, width, length, locationX, locationY, locationZ) {
+        super(system, locationX, locationY, locationZ, 0, 0, 0, length);
 
         this.originalPosition = new THREE.Vector3(locationX, locationY, locationZ);
 
@@ -62,7 +61,7 @@ class Ship extends Item {
     buildShip() {
         // Create hull
         // Will also create all other components, for that hull type, and add them to our components sets.
-        this.hull = new BasicHull(this);
+        this.hull = new BasicHull();
         this.hull.buildShip(this);
 
         // Add in weight of all components.
@@ -157,43 +156,43 @@ class Ship extends Item {
     // In general to rotate. Asjust relative to our own axis.
     // Positive is clockwise when looking at the origin. So needs to be reversed for roll and pitch when we a re looking away from origin.
     rollL() {
-        if (this.rollRate > -ROTATE_RATE_MAX / Universe.getAnimateRate()) {
-            this.rollRate -= ROTATE_RATE_DELTA / Universe.getAnimateRate();
+        if (this.rollRate > -ROTATE_RATE_MAX / this.getGame().getAnimateRate()) {
+            this.rollRate -= ROTATE_RATE_DELTA / this.getGame().getAnimateRate();
         }
         this.rotateX(this.rollRate);
     }
 
     rollR() {
-        if (this.rollRate < ROTATE_RATE_MAX / Universe.getAnimateRate()) {
-            this.rollRate += ROTATE_RATE_DELTA / Universe.getAnimateRate();
+        if (this.rollRate < ROTATE_RATE_MAX / this.getGame().getAnimateRate()) {
+            this.rollRate += ROTATE_RATE_DELTA / this.getGame().getAnimateRate();
         }
         this.rotateX(this.rollRate);
     }
 
     climb() {
-        if (this.pitchRate > -ROTATE_RATE_MAX / Universe.getAnimateRate()) {
-            this.pitchRate -= ROTATE_RATE_DELTA / Universe.getAnimateRate();
+        if (this.pitchRate > -ROTATE_RATE_MAX / this.getGame().getAnimateRate()) {
+            this.pitchRate -= ROTATE_RATE_DELTA / this.getGame().getAnimateRate();
         }
         this.rotateY(this.pitchRate);
     }
 
     dive() {
-        if (this.pitchRate < ROTATE_RATE_MAX / Universe.getAnimateRate()) {
-            this.pitchRate += ROTATE_RATE_DELTA / Universe.getAnimateRate();
+        if (this.pitchRate < ROTATE_RATE_MAX / this.getGame().getAnimateRate()) {
+            this.pitchRate += ROTATE_RATE_DELTA / this.getGame().getAnimateRate();
         }
         this.rotateY(this.pitchRate);
     }
 
     yawL() {
-        if (this.yawRate < ROTATE_RATE_MAX / Universe.getAnimateRate()) {
-            this.yawRate += ROTATE_RATE_DELTA / Universe.getAnimateRate();
+        if (this.yawRate < ROTATE_RATE_MAX / this.getGame().getAnimateRate()) {
+            this.yawRate += ROTATE_RATE_DELTA / this.getGame().getAnimateRate();
         }
         this.rotateZ(this.yawRate);
     }
 
     yawR() {
-        if (this.yawRate > -ROTATE_RATE_MAX / Universe.getAnimateRate()) {
-            this.yawRate -= ROTATE_RATE_DELTA / Universe.getAnimateRate();
+        if (this.yawRate > -ROTATE_RATE_MAX / this.getGame().getAnimateRate()) {
+            this.yawRate -= ROTATE_RATE_DELTA / this.getGame().getAnimateRate();
         }
         this.rotateZ(this.yawRate);
     }
@@ -272,7 +271,7 @@ class Ship extends Item {
             msg += "by " + that.getClass().toLowerCase();
         }
         msg += "!"
-        this.game.displays.addMessage(msg);
+        this.getGame().displays.addMessage(msg);
 
         // Dont call 'super'. We want to re-use the same ship. So don't want it to destruct.
         this.hull.compSets.takeDamage(hits);
@@ -319,11 +318,16 @@ class Ship extends Item {
         return(this.hull.compSets.baySet);
     }
 
+    // Get termnal (if active)
+    getTerminal() {
+        return(this.getGame().displays.terminal);
+    }
+
     // Pick up a mineral.
     // Return true if successful.
     mineralPickup(mineral) {
         let mass = Math.ceil(mineral.mass);
-        this.game.displays.addMessage("Loaded " + mineral.type.name + " " + mass + "(t)");
+        this.getGame().displays.addMessage("Loaded " + mineral.type.name + " " + mass + "(t)");
         this.playSound('thud');
         this.loadMineral(mineral.type, mass);
         mineral.destruct();
@@ -341,14 +345,14 @@ class Ship extends Item {
     }
 
     addCredits(score) {
-        this.game.player.addCredits(score);
+        this.getGame().player.addCredits(score);
         if (0 < score) {
             this.playSound('coin');
         }
     }
 
     getCredits() {
-        return (this.game.player.getCredits()); 
+        return (this.getGame().player.getCredits()); 
     }
 
     handleCollision(that) {
@@ -371,7 +375,7 @@ class Ship extends Item {
     }
 
     dock(station) {
-        this.game.displays.terminal.playSound("poweroff", 0.5);
+        this.getTerminal().playSound("poweroff", 0.5);
 
         this.dockedWith = station;
         this.setSpeed(new THREE.Vector3(0, 0, 0));
@@ -386,16 +390,18 @@ class Ship extends Item {
         // Rotate to face exit.
         this.rotation.set(0, 0, Math.PI);
 
-        this.game.displays.terminalEnable(true);
+        this.getGame().displays.terminalEnable(true);
     }
 
     undock() {
-        this.game.displays.terminal.playSound("poweron", 0.5);
-        if (this.game.paused) {
-            this.game.togglePaused();
+        let game = this.getGame();
+
+        this.getTerminal().playSound("poweron", 0.5);
+        if (game.paused) {
+            game.togglePaused();
         }
 
-        this.game.displays.terminalEnable(false);
+        game.displays.terminalEnable(false);
 
         this.dockedWith.remove(this);
 
@@ -411,7 +417,7 @@ class Ship extends Item {
 
         // It appears that, having been part of another group, 'this' needs to be added back to the scene. 
         // Otherwise camera cannot see it's mesh.
-        this.game.getScene().add(this);
+        game.getScene().add(this);
 
         this.moveItem(false);
     }
@@ -437,6 +443,10 @@ class Ship extends Item {
 
     getCargoCapacity() {
         return (this.hull.compSets.baySet.capacity)
+    }
+
+    getCargo() {
+        return (this.hull.compSets.baySet)
     }
 
     getMass() {

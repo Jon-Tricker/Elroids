@@ -15,6 +15,9 @@ class Engine extends Component {
     constructor(name, mass, cost, maxHp, set, thrust) {
         super(name, mass, cost, maxHp, set);
         this.thrust = thrust;
+        if (undefined != set) {
+            set.recalc();
+        }
     }
 
     getDescription() {

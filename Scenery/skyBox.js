@@ -3,6 +3,7 @@
 // Actually quite close to the ship (only just beyond the universe size). But moves with the ship. So perspective remains constant.
 
 import * as THREE from 'three';
+import Game from '../game.js';
 import StarFieldTexture from '../Utils/starFieldText.js';
 import Universe from '../universe.js';
 
@@ -33,8 +34,6 @@ const moonMaterial = new THREE.MeshStandardMaterial(
     roughness: 1,
     opacity: 1,
     emissive: 0,
-    map: Universe.getCraterTexture(),
-    bumpMap: Universe.getCraterTexture(),
     metalness: 1,
   }
 )
@@ -80,7 +79,14 @@ class SkyBox extends THREE.Group {
     this.size = size;
     this.game = game;
 
+    moonMaterial.map = Game.getCraterTexture(),
+    moonMaterial.bumpMap = Game.getCraterTexture(),
+
     this.setupMesh(gridOn);
+  }
+
+  getUniverse() {
+    return(this.game.universe);
   }
 
   setupMesh(gridOn) {
@@ -99,44 +105,43 @@ class SkyBox extends THREE.Group {
       this.add(sunMesh);
 
       // Same position as light.
-      // sunMesh.position.set(0, Universe.UNI_SIZE * 2, Universe.UNI_SIZE * 2);
-      sunMesh.position.set(0, 0, Universe.UNI_SIZE * 2);
+      let sz = this.getUniverse().systemSize;
+      // sunMesh.position.set(0, sz * 2, sz * 2);
+      sunMesh.position.set(0, 0, sz * 2);
 
       let moonCount = 2 + Math.floor(Math.random() * 3);
       for (let i = 0; i <= moonCount; i++) {
         let moonMesh = new Moon((1 + Math.floor(Math.random() * MAX_MOON_SIZE)) * this.size/100);
         this.add(moonMesh);
 
-        let position = this.game.createRandomVector(Universe.UNI_SIZE);
+        let position = this.game.createRandomVector(sz);
 
         // Stick it on a side where the sun isn't.
         switch (Math.floor(Math.random() * 5)) {
           case 0:
-            position.x = Universe.UNI_SIZE * 2;
+            position.x = sz * 2;
             break;
 
           case 1:
-            position.x = -Universe.UNI_SIZE * 2;
+            position.x = -sz * 2;
             break;
 
           case 2:
-            position.y = Universe.UNI_SIZE * 2;
+            position.y = sz * 2;
             break;
 
           case 3:
-            position.y = -Universe.UNI_SIZE * 2;
+            position.y = -sz * 2;
             break;
 
           case 4:
-            position.x = -Universe.UNI_SIZE * 2;
+            position.x = -sz * 2;
           default:
             break;
         }
 
         moonMesh.position.set(position.x, position.y, position.z);
       }
-
-
     }
   }
 

@@ -53,13 +53,13 @@ class Radar extends DarkPanel {
 
         let ship = this.game.getShip();
 
-        for (let item of Universe.itemList) {
+        for (let item of this.game.universe.system.items) {
 
             let relPos = item.location.clone();
 
             // Handle wrap round relative to ship.
             relPos.sub(ship.location);
-            Universe.handleWrap(relPos);
+            this.game.universe.handleWrap(relPos);
 
             // if not out of range.
             if (relPos.length() < RANGE) {

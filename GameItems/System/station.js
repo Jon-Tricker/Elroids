@@ -5,12 +5,12 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import NonShipItem from './nonShipItem.js';
-import Universe from '../universe.js';
-import Ship from '../Ship/ship.js'
-import Texture from '../Utils/texture.js'
-import BoxSides from '../Utils/boxSides.js'
-import PlateTexture from '../Utils/plateTexture.js';
+import NonShipItem from '../nonShipItem.js';
+import Universe from '../../universe.js';
+import Ship from '../../Ship/ship.js';
+import Texture from '../../Utils/texture.js';
+import BoxSides from '../../Utils/boxSides.js'
+import PlateTexture from '../../Utils/plateTexture.js';
 
 
 const ROTATE_RATE = 0.1;    // r/s
@@ -60,17 +60,14 @@ const BAY_MATERIAL = new THREE.MeshStandardMaterial(
 
 class Station extends NonShipItem {
 
-    // List of all stations
-    static stationList = new Set();
-
     bayMesh;
 
-    constructor(locationX, locationY, locationZ, game, owner) {
-        super(locationX, locationY, locationZ, 0, 0, 0, game, STATION_SIZE, STATION_MASS, STATION_HP, owner, true);
+    constructor(system, locationX, locationY, locationZ, owner) {
+        super(system, locationX, locationY, locationZ, 0, 0, 0, STATION_SIZE, STATION_MASS, STATION_HP, owner, true);
 
         this.setupMesh();
 
-        if (!game.testMode) {
+        if (!this.getGame().testMode) {
             this.rotateX(Math.random() * Math.PI);
             this.rotateZ(Math.random() * Math.PI);
         }
@@ -79,21 +76,14 @@ class Station extends NonShipItem {
         STATION_MATERIAL.map = text;
         STATION_MATERIAL.bumpMap = text;
         STATION_MATERIAL.needsUpdate = true;
-
-        Station.stationList.add(this);
     }
 
     destruct() {
         super.destruct();
-        Station.stationList.delete(this);
     }
 
     getClass() {
         return ("Station");
-    }
-
-    static getStationList() {
-        return(Station.stationList);
     }
 
     getRadarColour() {
@@ -366,7 +356,7 @@ class Station extends NonShipItem {
 
     animate() {
         // Spin
-        this.rotateX(ROTATE_RATE / Universe.getAnimateRate());
+        this.rotateX(ROTATE_RATE / this.getGame().getAnimateRate());
 
         // Kill any momentum obtained.
         this.setSpeed(Universe.originVector);

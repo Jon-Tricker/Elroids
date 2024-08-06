@@ -19,11 +19,9 @@ var rockStyle = scriptName.getAttribute('rockStyle');
 var soundOn = scriptName.getAttribute('soundOn');
 var safe = false;
 
-Universe.setSize(uniSize);
-
 // Create the game objects
-const player = new Player();
-const game = new Game(rockCount, rockStyle, safe, player, soundOn);
+// For the moment universe and system are the same size.
+const game = new Game(uniSize, uniSize, rockCount, rockStyle, safe, soundOn);
 
 // Add event listener on clicks.
 // It takes a while for auto repeat to kick in. Also we don't know how fast it will be. So
@@ -36,11 +34,11 @@ window.addEventListener('keydown', (event) => {
 
   // A bit mad but chrome want's all audio to be done as part of a user event.
   // So do it on first key click.
-  if (game.soundOn && (undefined == Universe.getListener())) {
-    Universe.loadSoundBuffers();
+  if (game.soundOn && (undefined == game.getListener())) {
+    game.loadSoundBuffers();
 
     let listener = new THREE.AudioListener();
-    Universe.setListener(listener);
+    game.setListener(listener);
     game.getScene().addListener(listener);
   }
 

@@ -7,6 +7,7 @@ import BaySet from "./Bays/baySet.js";
 
 class ComponentSets extends Set {
 
+    // Ship ... or may be purchace list.
     ship;
 
     // Sub sets
@@ -28,6 +29,10 @@ class ComponentSets extends Set {
         super.add(this.weaponSet);
         this.baySet = new BaySet(this, baySlots);
         super.add(this.baySet);
+    }
+
+    getGame() {
+        return (this.ship.getGame());
     }
 
     takeDamage(hits) {

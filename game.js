@@ -1,4 +1,4 @@
-// Game mechanics
+// Stuff that's common to the entire game.
 
 // Copyright (C) Jon Tricker 2023.
 // Released under the terms of the GNU Public licence (GPL)
@@ -6,41 +6,38 @@
 
 import * as THREE from 'three';
 
-import Ship from "./Ship/ship.js";
+import Universe from './universe.js';
 import Rock from "./GameItems/rock.js";
 import GameError from "./GameErrors/gameError.js"
 
-import SaucerWanderer from "./GameItems/Saucers/saucerWanderer.js";
-import SaucerShooter from "./GameItems/Saucers/saucerShooter.js";
-import SaucerStatic from "./GameItems/Saucers/saucerStatic.js";
-import SaucerMother from "./GameItems/Saucers/saucerMother.js";
-import SaucerRam from "./GameItems/Saucers/saucerRam.js";
-import SaucerHunter from "./GameItems/Saucers/saucerHunter.js";
-import SaucerPirate from "./GameItems/Saucers/saucerPirate.js";
 
-import Universe from './universe.js'
 import MyScene from './Scenery/myScene.js'
 import MyCamera from './Scenery/myCamera.js'
 import Displays from './Displays/displays.js'
 import Keyboard from "./keyboard.js";
-import Mineral from "./GameItems/mineral.js";
-import Station from "./GameItems/station.js";
-import { MineralTypes } from './GameItems/minerals.js';
 import PurchaseList from './Ship/Components/purchaseList.js';
-import DumbMissileWeapon from './Ship/Components/Weapons/dumbMissileWeapon.js';
-import BasicBay from './Ship/Components/Bays/basicBay.js';
-import Wormhole from './GameItems/wormhole.js';
+
+import Player from './player.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "5.1";
+const VERSION = "5.2";
 
-// Box to clear out arround respawn site.
-const RESPAWN_SIZE = 250;          // m
+
+const ANIMATE_RATE = 25;            // frames/second
+
+// Load textures once.
+const craterTexture = new THREE.TextureLoader().load("./Scenery/CraterTexture.gif");
+craterTexture.wrapS = THREE.RepeatWrapping;
+craterTexture.wrapT = THREE.RepeatWrapping;
+craterTexture.repeat.set(4, 4);
 
 class Game {
-    // Probably the wrong place for this.
-    ship;
+
+    // The one and only Universe object
+    universe;
+
+    // Objets related to game play.
     scene;
     displays;
     player;
@@ -49,27 +46,41 @@ class Game {
 
     rockStyle;
 
-    maxRockCount;
-    rockCount = 0;
-
     soundOn = false;
 
     testMode = false;
-
-    saucerCount = 0;
-    motherSaucerCount = 0;
-
+    
     // Gradually increasing saucer number limit.
     maxSaucerCount = 5;
 
     paused = false;
 
-    purchaseList = new PurchaseList();
+    purchaseList;
 
-    constructor(maxRockCount, rockStyle, safe, player, soundOn) {
+    // Audio plumbing.
+    static audioLoader = new THREE.AudioLoader();
+    static listener;
+
+    // Sounds buffer bank. Sounds written in once they are loaded.
+    static sounds = new Map([
+        ["pew", null],
+        ["explosion", null],
+        ["clang", null],
+        ["coin", null],
+        ["click", null],
+        ["anvil", null],
+        ["roar", null],
+        ["poweron", null],
+        ["poweroff", null],
+        ["scream", null],
+        ["thud", null],
+        ["saw", null]
+    ]);
+
+    constructor(uniSize, systemSize, maxRockCount, rockStyle, safe, soundOn) {
 
         this.safe = safe;
-        this.player = player;
+        this.player = new Player();
 
         if ((soundOn != null) && (soundOn.toLowerCase() == "true")) {
             this.soundOn = true;
@@ -79,28 +90,34 @@ class Game {
             this.testMode = true;
 
             // Give us some cash
-            player.addCredits(12345);
+            this.player.addCredits(12345);
         }
 
         Rock.setRockStyle(rockStyle);
 
+        // Create universe
+        this.universe = new Universe(this, uniSize, systemSize, maxRockCount);  
+
         // Create the scene
         this.scene = new MyScene(this, (0 == maxRockCount));
 
-        // Create items.
-        // Create ship first so it is 1st, for collision detection purposes,  in the item list.
-        this.maxRockCount = maxRockCount;
-        this.createRocks(maxRockCount);
-        this.createShip();
-        this.createSaucers();
-        this.createWormholes();
+        // Create shopping list.
+        this.purchaseList = new PurchaseList(this);     
+
+        // Now there is something to display it popuate the universe,
+        this.universe.populate();
 
         // Create displays
         this.displays = new Displays(this);
         this.displays.resize();
 
-        // this.createStation();
-        this.createStation(this.ship);
+        if (this.testMode) {
+            // Doc ship to first station.
+            for (let station of this.universe.system.stations ) {
+                // this.getShip().dock(station);
+                break;
+            }
+        }
 
         // Now we have a ship. Switch to it's camera
         this.scene.setCamera(MyCamera.PILOT);
@@ -109,32 +126,49 @@ class Game {
         this.loop();
     }
 
-    createShip() {
-        if (this.testMode) {
-            this.ship = new Ship(5, 10, 20, 0, 0, 0, this);
-
-            // Do some damage
-            this.ship.hull.compSets.takeDamage(1);
-
-            // Add some minerals to the cargo.
-            for (let i = 1; i < 3; i++) {
-                let type = 1 + Math.floor(Math.random() * (MineralTypes.length - 1));
-                this.ship.loadMineral(MineralTypes[type], i);
-            }
-
-            // Add some components to cargo.
-            let comp = new DumbMissileWeapon().buy(this.ship, true);
-            comp.takeDamage(1);
-
-            // Add another cargo bay
-            let bay = new BasicBay();
-            bay = bay.mount(this.ship, true);
-            bay.takeDamage(1);
-        } else {
-            this.ship = new Ship(5, 10, 20, -200, 100, 0, this);
-        }
-
+    static getCraterTexture() {
+        return (craterTexture);
     }
+
+    getSounds() {
+        return (Game.sounds);
+    }
+
+    getAnimateRate() {
+        // Return the achieved frame rate.
+        return (ANIMATE_RATE);
+    }
+
+    setListener(listener) {
+        Universe.listener = listener;
+    }
+
+    loadSoundBuffers() {
+        for (let [key, value] of Game.sounds) {
+            let path = "./Sounds/" + key + ".ogg";
+            Game.audioLoader.load(path, function (buffer) {
+                // Callback after loading.
+                Game.sounds.set(key, buffer);
+            });
+        }
+    }
+
+    getListener() {
+        return (Universe.listener);
+    }
+
+    getUniverse() {
+        return (this.universe);
+    }
+
+    getMaxRockVelocity() {
+        return (MAX_ROCK_VELOCITY);
+    }
+
+    getMaxRockSize() {
+        return (MAX_ROCK_SIZE);
+    }
+
 
     shipDestroyed() {
         if (this.player.killed()) {
@@ -142,9 +176,9 @@ class Game {
 
             this.clearRespawnArea();
 
-            this.ship.respawn();
+            this.getShip().respawn();
         } else {
-            this.ship.destruct();
+            this.getShip().destruct();
             this.displays.addMessage("Game Over! ... Refresh page to play again.", 0);
         }
     }
@@ -161,163 +195,44 @@ class Game {
         return (this.player);
     }
 
-    createStation(ship) {
-        let station;
-        if (this.testMode) {
-            station = new Station(1100, 0, 0, this, null);
-            // new Station(200, 0, 0, this, null);
-        } else {
-            station = new Station(0, 0, 0, this, null);
-        }
-
-        // Doc a ship if given.
-        if ((undefined != ship) && this.testMode) {
-            // ship.dock(station);
-        }
-    }
-
-    createSaucers() {
-        if (this.testMode) {
-            // New saucer
-            new SaucerStatic(200, 100, -50, this, false);
-            new SaucerWanderer(400, 100, -50, this, null, false);
-            new SaucerShooter(300, 100, -50, this, null, true);
-            new SaucerHunter(300, 200, -50, this, null, true);
-            new SaucerRam(1000, 200, 200, this, null, true);
-            new SaucerPirate(1500, 200, -50, this, null, true);
-            this.motherSaucer = new SaucerMother(1000, 100, -50, this, null, true);
-        } else {
-            // First mother ship always in safe mode.
-            this.createMotherSaucer(true);
-        }
-    }
-
-    createRocks(rockCount, rockStyle) {
-        if (this.testMode) {
-            // Create a few test rocks at set locations
-
-            // Horizontal colliders
-            new Rock(20, 100, 50, 0, 0, 0, 0, this);
-            new Rock(10, 100, -50, 10, 0, 25, 0, this);
-
-            // Big target
-            // new Rock(20, 100, 0, 0, 0, 0, 0, this);
-
-            // Small target
-            // new Rock(80, -100, 0, 0, 0, 0, 0, this);
-
-            // Row of rocks
-            for (let i = -Universe.UNI_SIZE; i < Universe.UNI_SIZE; i += 211) {
-                let sz = Math.abs(i % MAX_ROCK_SIZE);
-                if (sz != 0) {
-                    new Rock(sz, i, -100, 0, 0, 0, 0, this);
-                }
-            }
-
-            // Diagonal row of rocks.
-            /*
-            for (let i = 0; i < Universe.UNI_SIZE; i += 211) {
-                let sz = i % MAX_ROCK_SIZE;
-                new Rock(sz,  i, i, i, 0, 0, 0, this);
-            }
-            */
-
-            // And a sample mineral
-            new Mineral(100, 250, -10, 50, 0, 0, 0, this, MineralTypes[2]);
-            new Mineral(100, 500, 50, 50, 0, 0, 0, this, MineralTypes[3]);
-
-        } else {
-            // Create a bunch of random rocks
-            for (let r = 0; r <= rockCount; r++) {
-                let loc = new THREE.Vector3(Math.random() * Universe.UNI_SIZE * 2 - Universe.UNI_SIZE, Math.random() * Universe.UNI_SIZE * 2 - Universe.UNI_SIZE, Math.random() * Universe.UNI_SIZE * 2 - Universe.UNI_SIZE);
-                this.createRandomRock(loc);
-            }
-
-            this.clearRespawnArea();
-        }
-    }
-
-    createRandomRock(loc) {
-        let vx = (Math.random() * MAX_ROCK_VELOCITY * 2) - MAX_ROCK_VELOCITY;
-        let vy = (Math.random() * MAX_ROCK_VELOCITY * 2) - MAX_ROCK_VELOCITY;
-        let vz = (Math.random() * MAX_ROCK_VELOCITY * 2) - MAX_ROCK_VELOCITY;
-        let sz = Math.floor((Math.random() * MAX_ROCK_SIZE) + 10);
-
-        new Rock(sz, loc.x, loc.y, loc.z, vx, vy, vz, this);
-    }
-
-    createWormholes() {
-        if (this.testMode) {
-            new Wormhole(500, 100, 150, this, "Wormhole");
-        }
-    }
-
-    clearRespawnArea() {
-        Universe.clearBox(-RESPAWN_SIZE, -RESPAWN_SIZE, -RESPAWN_SIZE, RESPAWN_SIZE, RESPAWN_SIZE, RESPAWN_SIZE);
-    }
-
     createRandomVector(max) {
         return (new THREE.Vector3(Math.random() * max * 2 - max, Math.random() * max * 2 - max, Math.random() * max * 2 - max));
     }
 
-    createMotherSaucer(safe) {
-        let loc;
-
-        // Create it close so we can find it.
-        if (safe) {
-            loc = this.ship.location.clone();
-            let offset = 1000;
-            loc.x += offset;
-            loc.y += offset / 2;
-            Universe.handleWrap(loc);
-        } else {
-            loc = this.getFarAway(this.ship.location);
-        }
-        new SaucerMother(loc.x, loc.y, loc.z, this, null, safe);
-
-        this.motherSaucerCount++;
-
-        // Game gradually gets harder.
-        this.maxSaucerCount++;
-    }
 
     // Get a random location far away from ship. 
     //Let wrap calculation take care if too big.
     getFarAway(location) {
         let loc = location.clone();
 
-        let delta = this.createRandomVector(Universe.UNI_SIZE);
+        let delta = this.createRandomVector(this.universe.systemSize);
 
         // Move it to one edge of the universe.
+        let sz = this.universe.systemSize;
         switch (Math.floor(Math.random()) * 3) {
             case 0:
-                delta.x += Universe.UNI_SIZE;
+                delta.x += sz;
                 break;
 
             case 1:
-                delta.y += Universe.UNI_SIZE;
+                delta.y += sz;
                 break;
 
             case 2:
             default:
-                delta.z += Universe.UNI_SIZE;
+                delta.z += sz;
                 break;
         }
 
         loc.add(delta);
 
-        Universe.handleWrap(loc);
+        this.universe.handleWrap(loc);
 
         return (loc);
     }
 
-    removeMotherSaucer() {
-        // console.log("MS destoryed");
-        this.motherSaucerCount--;
-    }
-
     getShip() {
-        return (this.ship);
+        return (this.universe.system.ship);
     }
 
     togglePaused() {
@@ -327,31 +242,21 @@ class Game {
         }
     }
 
+    getSystem() {
+        return(this.universe.system);
+    }
+
     animate(date) {
-
-        // If necesarry top up rocks.
-        if (this.rockCount < this.maxRockCount) {
-            this.createRandomRock(this.getFarAway(this.ship.location));
-        }
-
         if (Keyboard.getClearState("P") || Keyboard.getClearState("p")) {
             this.togglePaused();
         }
 
         if (!this.paused) {
-            if (!this.testMode) {
-                // If mother saucer detroyed periodicaly re-create
-                if (0 == this.motherSaucerCount) {
-                    if ((Math.random() * 1000) < 1) {
-                        this.createMotherSaucer(this.safe);
-                    }
-                }
-            }
-
-            Universe.animate(date, Keyboard);
+            
+            this.universe.animate(date, Keyboard);
             this.scene.animate();
         }
-        this.displays.animate(Universe.getTime(), Keyboard);
+        this.displays.animate(this.universe.getTime(), Keyboard);
     }
 
     // Add animation loop to handle re-rendering.

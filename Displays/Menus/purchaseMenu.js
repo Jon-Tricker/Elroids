@@ -6,7 +6,7 @@ import { ComponentsMenu } from './componentsMenu.js';
 let purchaseMenu = "\
 <BODY>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Components Purchase Menu</P>\
-<script src=\"PurchaseMenu\" game=\"this.display.game\"></script>\
+<script src=\"PurchaseMenu\" game=\"this.getGame()\"></script>\
 </BODY>"
 
 class PurchaseMenu {
@@ -47,7 +47,7 @@ class PurchaseMenu {
                         vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onBuyClick(this, cursor)\">" + comp.getCurrentValue() + "</button>");
                         vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onMountClick(this, cursor)\">" + comp.getCurrentValue() + "</button>");
                     } else {
-                        vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onUpgradeClick(this, cursor)\">" + comp.getUpgradeCost(game.ship) + "</button>");
+                        vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onUpgradeClick(this, cursor)\">" + comp.getUpgradeCost(this.getShip()) + "</button>");
                     }
                     tab.addRow(vals);
                 }
@@ -64,32 +64,32 @@ class PurchaseMenu {
     }
 
     static onDetailsClick(menuSystem, cursor) {
-        let game = menuSystem.display.game;
+        let game = menuSystem.getGame();
         let comp = PurchaseMenu.getCompForCursor(game, cursor);
 
         ComponentsMenu.displayDetails(menuSystem, comp);
     }
 
     static onBuyClick(menuSystem, cursor) {
-        let game = menuSystem.display.game;
+        let game = menuSystem.getGame();
         let comp = PurchaseMenu.getCompForCursor(game, cursor);
-        let ship = game.ship;
+        let ship = game.getShip();
 
         comp.buy(ship);
     }
 
     static onMountClick(menuSystem, cursor) {
-        let game = menuSystem.display.game;
+        let game = menuSystem.getGame();
         let comp = PurchaseMenu.getCompForCursor(game, cursor);
-        let ship = game.ship;
+        let ship = game.getShip();
 
         comp.mount(ship, true);
     }
     
     static onUpgradeClick(menuSystem, cursor) {
-        let game = menuSystem.display.game;
+        let game = menuSystem.getGame();
         let comp = PurchaseMenu.getCompForCursor(game, cursor);
-        let ship = game.ship;
+        let ship = game.getShip();
 
         comp.upgrade(ship);
     }

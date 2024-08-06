@@ -1,5 +1,4 @@
 // Base class for weapons
-import Universe from '../../../universe.js';
 import Component from '../component.js';
 import GameError from "../../../GameErrors/gameError.js";
 
@@ -7,7 +6,7 @@ const DESCRIPTION = "'Weapons' are used for damaging things."
 
 class Weapon extends Component {
     fireRate;   // Per second
-    fireLast = Universe.getTime();
+    fireLast;   // Last firing time.
 
     maxAmmo;    // 0 = unlimited
     ammo;       // If maxAmmo defined
@@ -17,6 +16,9 @@ class Weapon extends Component {
         this.fireRate = fireRate;
         if (undefined != maxAmmo) {
             this.maxAmmo = maxAmmo;
+        }
+        if (undefined != set) {
+            set.recalc();
         }
     }
 
@@ -52,7 +54,7 @@ class Weapon extends Component {
             }
         }
 
-        if (date > this.fireLast + 1000 / this.fireRate) {
+        if ((undefined == this.fireLast) || (date > this.fireLast + 1000 / this.fireRate)) {
             return (true);
         }
         return (false);
@@ -82,7 +84,7 @@ class Weapon extends Component {
     }
 
     getTargetSet(ship) {
-        return(ship.hull.compSets.weaponSet);
+        return (ship.hull.compSets.weaponSet);
     }
 }
 

@@ -75,11 +75,19 @@ class MenuSystem {
 
     constructor(display) {
         this.display = display;
-        if (null != display.game.ship.dockedTo()) {
+        if (null != this.getShip().dockedTo()) {
             this.pushMenu(dockedMenu);
         } else {
             this.pushMenu(topMenu);
         }
+    }
+
+    getShip() {
+        return(this.display.getShip());
+    }
+
+    getGame() {
+        return(this.display.getGame());
     }
 
     pushMenu(menu) {
@@ -228,7 +236,7 @@ class MenuSystem {
         }
 
         let selected = this.targetCursor.equals(cursor);
-        if (null == this.display.game.ship.dockedTo()) {
+        if (null == this.getShip().dockedTo()) {
             this.display.terminal.println("\tExit", selected);
             if (selected && this.isClicked(keyboard)) {
                 this.display.terminalEnable(false);
@@ -238,7 +246,7 @@ class MenuSystem {
         } else {
             this.display.terminal.println("\tUndock", selected);
             if (selected && this.isClicked(keyboard)) {
-                this.display.game.ship.undock();
+                this.getShip().undock();
                 return;
             }
         }

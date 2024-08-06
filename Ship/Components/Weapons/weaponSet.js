@@ -17,7 +17,7 @@ class WeaponSet extends ComponentSet {
     fire(target, date) {
 
         if (undefined == date) {
-            date = Universe.getTime();
+            date = this.getUniverse().getTime();
         }
         
         for(let weapon of this) {

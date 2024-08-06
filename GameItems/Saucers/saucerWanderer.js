@@ -12,8 +12,8 @@ const MAX_SPEED = 200;
 
 class SaucerWanderer extends Saucer {
 
-    constructor(locationX, locationY, locationZ, game, owner, safe) {
-        super(SIZE, locationX, locationY, locationZ, game, MASS, COLOUR, owner, safe);
+    constructor(system, locationX, locationY, locationZ, owner, safe) {
+        super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
     }
 
     getMaxSpeed() {
@@ -21,7 +21,7 @@ class SaucerWanderer extends Saucer {
     }
     // Do navigation logic
     navigate() {
-        let delta = this.game.createRandomVector(2);    
+        let delta = this.getGame().createRandomVector(2);    
         
         let newSpeed = this.speed.clone();
         newSpeed.add(delta);

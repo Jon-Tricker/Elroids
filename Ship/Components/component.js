@@ -24,16 +24,31 @@ class Component {
         this.maxHp = maxHp;
         this.set = set;
         this.status = 100;
+
+        if (undefined != set) {
+            set.add(this);
+        }
     }
 
+    /*
     clone() {
         log.console("Cloning raw component ... Dubious!")
         return (new Component(this.name, this.mass, this.cost, this.maxHp, this.getShip()));
     }
+    */
 
     getDescription() {
         throw (new BugError("No description for default component."));
     }
+
+    getGame() {
+        return(this.set.sets.ship.system.universe.game);
+    }
+
+    getUniverse(){
+        return(this.set.sets.ship.system.universe);
+    }
+
 
     // Set when added to a set.
     setSet(set) {
@@ -52,7 +67,7 @@ class Component {
 
     // Return the display panel for this component.
     getDisplay(ctx, defaultColour) {
-        return (new ComponentDisplay(this.getShip().game, ctx, defaultColour, this));
+        return (new ComponentDisplay(this.getGame(), ctx, defaultColour, this));
     }
 
     // Get ordered collumn headings.
@@ -99,6 +114,7 @@ class Component {
 
         // Temporarily add to set. Will throw if no free slots.
         set.add(this);
+        set.delete(this);
 
         // Now we have added complete financial transaction. 
         if (alsoBuy) {
@@ -112,20 +128,18 @@ class Component {
                 ship.getBays().components.delete(this);
             }
             comp = this;
+
+            set.add(comp);
+            comp.setSet(set);
         } else {
             // Make copy of purchace menu item.
             // Seems to work ... but not sure why.
             comp = new this.constructor(this.getSet());
         }
 
-        if (undefined != ship.game.displays) {
-            ship.game.displays.terminal.playSound("anvil", 0.5);
+        if (undefined != ship.getGame().displays) {
+            ship.getTerminal().playSound("anvil", 0.5);
         }
-
-        // Remove temp from set add and add the real one set.
-        set.delete(this);
-        set.add(comp);
-        comp.setSet(set);
 
         return(comp);
     }
@@ -139,11 +153,11 @@ class Component {
         let ship = this.getShip();
         this.set.delete(this);
         this.setSet(undefined);
-        ship.game.displays.terminal.playSound("saw");
+        ship.getTerminal().playSound("saw");
 
         // Remove display (if present).
         this.displayPanel = false;
-        ship.game.displays.compDisplays.recalc(true);
+        ship.getGame().displays.compDisplays.recalc(true);
 
         // Put in ships bay
         ship.getBays().components.add(this);
@@ -162,7 +176,7 @@ class Component {
 
         // Make copy of purchace menu item.
         // Seems to work ... but not sure why.
-        let comp = new this.constructor(this.getSet());
+        let comp = new this.constructor();
 
         // Put it in bay. 
         ship.hull.compSets.baySet.loadComponent(comp);
@@ -187,7 +201,7 @@ class Component {
 
         // Remove display (if present).
         this.displayPanel = false;
-        this.getShip().game.displays.compDisplays.recalc(true);
+        this.getGame().displays.compDisplays.recalc(true);
 
         // Add value to wallet.
         this.getShip().addCredits(this.getCurrentValue());

@@ -4,174 +4,94 @@
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import * as THREE from 'three';
-
-// Load textures once.
-const craterTexture = new THREE.TextureLoader().load("./Scenery/CraterTexture.gif");
-craterTexture.wrapS = THREE.RepeatWrapping;
-craterTexture.wrapT = THREE.RepeatWrapping;
-craterTexture.repeat.set(4, 4);
-
-// Load sounds once.
-
-const ANIMATE_RATE = 25;  // frames/second
-
+import System from './GameItems/System/system.js';
 
 class Universe {
+    // Back reference to out parent.
+    game;
 
     // Univrese time. If animation stpped can be paused.
-    static universeTime = 0;
+    universeTime = 0;
 
     // Size of universe before wrap round. Total width will be twice this.
-    static UNI_SIZE;
+    uniSize;                        // Some large unit (light years?)
+
+    // Size of default system  before wrap round. Total width will be twice this.
+    systemSize;                     // m
+
+    nextAnimateTime = Date.now();
+    lastAnimateTime = Date.now();
+    actualAnimateRate = 0;
+
+    // List of systems.
+    systems = new Set();
+
+    // Current system
+    system;
 
     static CBRT_THREE = Math.cbrt(3);
-
-    // All items in the simulation.
-    static itemList = new Set();
-
-    static nextAnimateTime = Date.now();
-    static lastAnimateTime = Date.now();
-    static actualAmimateRate = ANIMATE_RATE;
-
     static originVector = new THREE.Vector3(0, 0, 0);
 
-    // Audio plumbing.
-    static audioLoader = new THREE.AudioLoader();
-    static listener;
+    constructor(game, uniSize, systemSize, maxRockCount) {
+        this.game = game;
+        this.uniSize = uniSize;
+        this.systemSize = systemSize; 
 
-    // Sounds buffer bank. Sounds written in once they are loaded.
-    static sounds = new Map([
-        ["pew", null],
-        ["explosion", null],
-        ["clang", null],
-        ["coin", null],
-        ["click", null],
-        ["anvil", null],
-        ["roar", null],
-        ["poweron", null],
-        ["poweroff", null],
-        ["scream", null],
-        ["thud", null],
-        ["saw", null]
-    ]);
-
-
-    static addItem(item) {
-        this.itemList.add(item);
+        // Create initial system
+        this.system = new System(this, this.systemSize, maxRockCount);
+        
+        this.actualAnimateRate = game.ANIMATE_RATE;
     }
 
-    static setListener(listener) {
-        Universe.listener = listener;
-    }
-
-    static loadSoundBuffers() {
-        for (let [key, value] of Universe.sounds) {
-            let path = "./Sounds/" + key + ".ogg";
-            Universe.audioLoader.load(path, function (buffer) {
-                // Callback after loading.
-                Universe.sounds.set(key, buffer);
-            });
-        }
-    }
-
-    static getListener() {
-        return (Universe.listener);
-    }
-
-    static getCraterTexture() {
-        return (craterTexture);
-    }
-
-    static getAnimateRate() {
-        // Return the achieved frame rate.
-        return (ANIMATE_RATE);
-
-        // TODO: I tried this ... the frame rate became lousey.
-        // return(this.actualAmimateRate);
-    }
-
-    static removeItem(item) {
-        this.itemList.delete(item);
-    }
-
-    // TODO. Horible hack.
-    static setSize(size) {
-        this.UNI_SIZE = size;
+    populate() {
+        this.system.populate();
+        this.systems.add(this.system);
     }
 
     // Animate all objects.
-    static animate(date, keyBoard) {
+    animate(date, keyBoard) {
         if (date >= this.nextAnimateTime) {
-            this.universeTime += 1000 / this.getActualAnimateRate();
-            this.nextAnimateTime = date + 1000 / this.getAnimateRate();
-
-            for (let item of Universe.itemList) {
-                item.animate(this.universeTime, keyBoard);
+            if (undefined != this.actualAnimateRate) {
+                this.universeTime += 1000 / this.actualAnimateRate;
             }
-            this.actualAmimateRate = 1000 / (date - this.lastAnimateTime);
+            this.nextAnimateTime = date + 1000 / this.game.getAnimateRate();
+
+            this.system.animate(this.universeTime, keyBoard);
+
+            this.actualAnimateRate = 1000 / (date - this.lastAnimateTime);
             this.lastAnimateTime = date;
         }
     }
 
-    static getActualAnimateRate() {
-        return (this.actualAmimateRate)
+    getActualAnimateRate() {
+        return (this.actualAnimateRate)
     }
 
-    static getTime() {
+    getTime() {
         return (this.universeTime);
     }
 
     // Checks and handles wrap round of a vector.
-    static handleWrap(vec) {
-        if (vec.x > Universe.UNI_SIZE) {
-            vec.x -= 2 * Universe.UNI_SIZE;
-        }
-        if (vec.x < -Universe.UNI_SIZE) {
-            vec.x += 2 * Universe.UNI_SIZE;
-        }
-        if (vec.y > Universe.UNI_SIZE) {
-            vec.y -= 2 * Universe.UNI_SIZE;
-        }
-        if (vec.y < -Universe.UNI_SIZE) {
-            vec.y += 2 * Universe.UNI_SIZE;
-        }
-        if (vec.z > Universe.UNI_SIZE) {
-            vec.z -= 2 * Universe.UNI_SIZE;
-        }
-        if (vec.z < -Universe.UNI_SIZE) {
-            vec.z += 2 * Universe.UNI_SIZE;
-        }
-    }
+    handleWrap(vec) {
+        let sz = this.systemSize;
 
-    // Move everything out of a box Could be more sophisticated.
-    static clearBox(xmin, ymin, zmin, xmax, ymax, zmax) {
-
-        let min = new THREE.Vector3(xmin, ymin, zmin);
-        let max = new THREE.Vector3(xmax, ymax, zmax);
-        let clearBox = new THREE.Box3(min, max);
-
-        for (let item of Universe.itemList) {
-            let thatBoundary = item.getBoundary();
-            if ((null != thatBoundary) && (thatBoundary.intersectsBox(clearBox))) {
-                // Bounce it far away.
-                if (item.location.x < 0) {
-                    item.location.x += Universe.UNI_SIZE;
-                } else {
-                    item.location.x -= Universe.UNI_SIZE;
-                }
-
-                if (item.location.y < 0) {
-                    item.location.y += Universe.UNI_SIZE;
-                } else {
-                    item.location.y -= Universe.UNI_SIZE;
-                }
-
-                if (item.location.z < 0) {
-                    item.location.z += Universe.UNI_SIZE;
-                } else {
-                    item.location.z -= Universe.UNI_SIZE;
-                }
-            }
+        if (vec.x > sz) {
+            vec.x -= 2 * sz;
+        }
+        if (vec.x < -sz) {
+            vec.x += 2 * sz;
+        }
+        if (vec.y > sz) {
+            vec.y -= 2 * sz;
+        }
+        if (vec.y < -sz) {
+            vec.y += 2 * sz;
+        }
+        if (vec.z > sz) {
+            vec.z -= 2 * sz;
+        }
+        if (vec.z < -sz) {
+            vec.z += 2 * sz;
         }
     }
 }

@@ -17,7 +17,7 @@ class MediumHull extends Hull {
     constructor(set) {
         super("GP2", 50, 5000, 4, set, 250);
         super.buildSets(1, 2, 2, 2);
-    } 
+    }
 
     getDescription() {
         return (super.getDescription() + "\n\n'" + this.name + "' is " + DESCRIPTION.toLowerCase());
@@ -28,9 +28,9 @@ class MediumHull extends Hull {
         super.buildShip(ship);
 
         // Do custom stuff for this hull
-        this.compSets.engineSet.add(new BasicEngine());
-        this.compSets.weaponSet.add(new DumbMissileWeapon());
-        this.compSets.baySet.add(new BasicBay());
+        new BasicEngine(this.compSets.engineSet);
+        new DumbMissileWeapon(this.compSets.weaponSet);
+        new BasicBay(this.compSets.baySet);
     }
 
     getMesh() {
@@ -108,7 +108,7 @@ class MediumHull extends Hull {
         engineMeshL.position.set(-length * 0.25, -width * 0.45, height * 0.25);
 
         engineMeshL.castShadow = true;
-        engineMeshL.receiveShadow = true;  
+        engineMeshL.receiveShadow = true;
 
         let engineMeshR = new THREE.Mesh(engineGeometry, Hull.engineMaterial);
 
@@ -129,8 +129,8 @@ class MediumHull extends Hull {
 
         // Position flame
         flameMeshL.rotateZ(Math.PI / 2);
-        flameMeshL.position.set(-length, -width * 0.45, height * 0.25); 
-        
+        flameMeshL.position.set(-length, -width * 0.45, height * 0.25);
+
         let flameMeshR = new THREE.Mesh(flameGeometry, this.flameMaterial);
 
         // Position flame

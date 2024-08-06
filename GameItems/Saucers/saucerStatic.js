@@ -13,8 +13,8 @@ const MASS = 100;
 class SaucerStatic extends Saucer {
     shootDue = 0;
 
-    constructor(locationX, locationY, locationZ, game, owner, safe) {
-        super(SIZE, locationX, locationY, locationZ, game, MASS, COLOUR, owner, safe);
+    constructor(system, locationX, locationY, locationZ, owner, safe) {
+        super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
     }
     
     // Do navigation logic

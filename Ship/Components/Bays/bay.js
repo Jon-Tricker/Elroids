@@ -17,6 +17,9 @@ class Bay extends Component {
     constructor(name, mass, cost, maxHp, set, capacity) {
         super(name, mass, cost, maxHp, set);
         this.capacity = capacity;
+        if (undefined != set) {
+            set.recalc();
+        }
     }  
 
     getDescription() {
@@ -55,6 +58,7 @@ class Bay extends Component {
         if ((undefined != this.set) && (1 >= this.set.size)) {
             throw (new GameError("Can't sell last bay ... nowhere to put things."))
         }
+        super.sell();
     }
 
     getTargetSet(ship) {

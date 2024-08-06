@@ -5,7 +5,7 @@ import BugError from '../../GameErrors/bugError.js';
 let componentsMenu = "\
 <BODY>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Ship Components Menu</P>\
-<script src=\"ComponentsMenu\" ship=\"this.display.game.ship\"></script>\
+<script src=\"ComponentsMenu\" ship=\"this.getShip()\"></script>\
 </BODY>"
 
 class ComponentsMenu {
@@ -78,28 +78,28 @@ class ComponentsMenu {
     }
 
     static onUnmountClick(menuSystem, cursor) {
-        let ship = menuSystem.display.game.ship;
+        let ship = menuSystem.getShip();
         let comp = ComponentsMenu.getCompForCursor(ship, cursor);
         comp.unmount();
     }
 
     static onSellClick(menuSystem, cursor) {
-        let ship = menuSystem.display.game.ship;
+        let ship = menuSystem.getShip();
         let comp = ComponentsMenu.getCompForCursor(ship, cursor);
         comp.sell();
     }
 
     static onEnableClick(menuSystem, cursor) {
-        let ship = menuSystem.display.game.ship;
+        let ship = menuSystem.getShip();
         let comp = ComponentsMenu.getCompForCursor(ship, cursor);
         comp.displayPanel = !comp.displayPanel;
 
         // Re-layout displays.
-        ship.game.displays.compDisplays.recalc(true);
+        ship.getGame().displays.compDisplays.recalc(true);
     }
 
     static onDetailsClick(menuSystem, cursor) {
-        let ship = menuSystem.display.game.ship;
+        let ship = menuSystem.getShip();
         let comp = ComponentsMenu.getCompForCursor(ship, cursor);
         this.displayDetails(menuSystem, comp);
     }

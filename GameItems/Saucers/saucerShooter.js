@@ -24,8 +24,8 @@ class SaucerShooter extends Saucer {
     moveDue = 0;
     targetLocation;
 
-    constructor(locationX, locationY, locationZ, game, owner, safe) {
-        super(SIZE, locationX, locationY, locationZ, game, MASS, COLOUR, owner, safe);
+    constructor(system, locationX, locationY, locationZ, owner, safe) {
+        super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
         this.createTargetLocation();
     } 
     
@@ -38,9 +38,9 @@ class SaucerShooter extends Saucer {
     }
     
     createTargetLocation() {
-        this.targetLocation = this.game.getShip().location.clone();
+        this.targetLocation = this.getShip().location.clone();
 
-        let offset = this.game.createRandomVector(STANDOFF_DISTANCE)
+        let offset = this.getGame().createRandomVector(STANDOFF_DISTANCE)
         this.targetLocation.add(offset);
     }
 
@@ -54,9 +54,10 @@ class SaucerShooter extends Saucer {
         let delta = targetSpeed.clone();
         delta.sub(this.speed);
 
-        if (delta.length() > MAX_ACC/Universe.getAnimateRate()) {
+        let ar = this.getGame().getAnimateRate();
+        if (delta.length() > MAX_ACC/ar) {
             delta.normalize;
-            delta.multiplyScalar(MAX_ACC/Universe.getAnimateRate());
+            delta.multiplyScalar(MAX_ACC/ar);
         }    
         
         let newSpeed = this.speed.clone();
@@ -77,10 +78,11 @@ class SaucerShooter extends Saucer {
                 this.shootDue = 0;
 
                 // Only fire if vaguley close enough.
-                let range = this.getRelativeLocation(this.game.getShip().location);
+                let game = this.getGame();
+                let range = this.getRelativeLocation(game.getShip().location);
                 range.multiplyScalar(-1);
                 if ((STANDOFF_DISTANCE * 2) > range.length()) {
-                    let direction = this.game.createRandomVector(2);
+                    let direction = game.createRandomVector(2);
                     new DumbMissile(direction, this);
                 }
             }

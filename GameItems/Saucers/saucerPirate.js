@@ -31,8 +31,8 @@ class SaucerPirate extends Saucer {
     farAway = null;
     shootDue = 0;
 
-    constructor(locationX, locationY, locationZ, game, owner, safe) {
-        super(SIZE, locationX, locationY, locationZ, game, MASS, COLOUR, owner, safe);
+    constructor(system, locationX, locationY, locationZ, owner, safe) {
+        super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
     }
 
     getClass() {
@@ -58,7 +58,8 @@ class SaucerPirate extends Saucer {
         if (0 < this.cargoMass) {
             // Run away
             if (null == this.farAway) {
-                this.farAway = this.game.getFarAway(this.game.getShip().location);
+                let game = this.getGame();
+                this.farAway = game.getFarAway(game.getShip().location);
             }
             targetLoc = this.farAway;
         } else {
@@ -86,9 +87,9 @@ class SaucerPirate extends Saucer {
     }
 
     createLoiterLocation() {
-        this.targetLocation = this.game.getShip().location.clone();
+        this.targetLocation = this.getGame().getShip().location.clone();
 
-        let offset = this.game.createRandomVector(STANDOFF_DISTANCE)
+        let offset = this.getGame().createRandomVector(STANDOFF_DISTANCE)
         this.targetLocation.add(offset);
 
         return(this.targetLocation);
@@ -102,7 +103,7 @@ class SaucerPirate extends Saucer {
                 if (this.shootDue++ >= SHOOT_FREQUENCY) {
 
                     // Only fire if vaguley close enough.
-                    let range = this.getRelativeLocation(this.game.getShip().location);
+                    let range = this.getRelativeLocation(this.getGame().getShip().location);
 
                     if (MAX_RANGE > range.length()) {
                         range.normalize();
@@ -118,7 +119,7 @@ class SaucerPirate extends Saucer {
     // null if none available.
     getTarget() {
         let maxValTarget = null;
-        for (let that of Universe.itemList) {
+        for (let that of this.system.items) {
             if (that instanceof Mineral) {
                 if ((null == maxValTarget) || (that.getValue() > maxValTarget.getValue())) {
                     maxValTarget = that;
@@ -140,7 +141,7 @@ class SaucerPirate extends Saucer {
         // If cargo on board make new mineral.
         this.cargoMass = Math.floor(this.cargoMass);
         if (0 < this.cargoMass) {
-            new Mineral(this.cargoMass, this.location.x, this.location.y, this.location.z, this.speed.x, this.speed.y, this.speed.z, this.game, this.cargoType);
+            new Mineral(this.cargoMass, this.location.x, this.location.y, this.location.z, this.speed.x, this.speed.y, this.speed.z, this.getGame(), this.cargoType);
         }
         super.destruct();
     }

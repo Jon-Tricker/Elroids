@@ -4,7 +4,7 @@
 
 import * as THREE from 'three';
 import DarkPanel from './Utils/darkPanel.js';
-import Universe from '../universe.js'
+import Game from '../game.js';
 
 // Scale factor relative to parent.
 const SCALE_FACTOR = 0.9;
@@ -309,7 +309,7 @@ class Terminal extends DarkPanel {
             return (false);
         }
 
-        let list = Universe.getListener();
+        let list = this.game.getListener();
         if ((undefined == list)) {
             // Dont have a listener yet ... give up. without loading
             return (false);
@@ -319,7 +319,7 @@ class Terminal extends DarkPanel {
         let sound = this.sounds.get(name);
         if (undefined == sound) {
             // Need to create/attach PositionalAudio for this Item.
-            let buffer = Universe.sounds.get(name);
+            let buffer = Game.sounds.get(name);
             if (null == buffer) {
                 // Buffer not yet loaded into Univese
                 return (false);

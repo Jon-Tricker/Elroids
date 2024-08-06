@@ -5,10 +5,10 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import NonShipItem from './nonShipItem.js';
-import Universe from '../universe.js';
-import Ship from '../Ship/ship.js';
-import StarFieldTexture from '../Utils/starFieldText.js';
+import NonShipItem from '../nonShipItem.js';
+import Universe from '../../universe.js';
+import Ship from '../../Ship/ship.js';
+import StarFieldTexture from '../../Utils/starFieldText.js';
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
 
@@ -56,11 +56,6 @@ const HALO_MATERIAL = new THREE.MeshStandardMaterial(
 )
 
 class Wormhole extends NonShipItem {
-
-    // List of all wormholes in current system.
-    static holeList = new Set();
-
-
     galaxies = new Set;
 
     // Textual label
@@ -70,8 +65,8 @@ class Wormhole extends NonShipItem {
     holeMesh;
     haloMesh;
 
-    constructor(locationX, locationY, locationZ, game, name) {
-        super(locationX, locationY, locationZ, 0, 0, 0, game, RADIUS * 2, MASS, HP, null, true);
+    constructor(system, locationX, locationY, locationZ, name) {
+        super(system, locationX, locationY, locationZ, 0, 0, 0, RADIUS * 2, MASS, HP, null, true);
         this.name = name;
         this.setupMesh();
 
@@ -80,28 +75,21 @@ class Wormhole extends NonShipItem {
                 for (let z = -1; z <= 1; z++) {
                     if ((Math.random() < 0.3)) {
                         let dir = new THREE.Vector3(x, y, z);
-                        let galaxy = new Galaxy(dir, game);
+                        let galaxy = new Galaxy(dir, this.getGame());
                         this.galaxies.add(galaxy);
                         this.add(galaxy);
                     }
                 }
             }
         }
-
-        Wormhole.holeList.add(this);
     }
 
     destruct() {
         super.destruct();
-        Wormhole.holeList.delete(this);
     }
 
     getClass() {
         return ("Wormhole");
-    }
-
-    static getHoleList() {
-        return (Wormhole.holeList);
     }
 
     getRadarColour() {
@@ -171,8 +159,9 @@ class Wormhole extends NonShipItem {
         }
 
         // Spin
-        this.holeMesh.rotateX(ROTATE_RATE / Universe.getAnimateRate());
-        this.haloMesh.rotateX(-ROTATE_RATE / Universe.getAnimateRate());
+        let ar = this.getGame().getAnimateRate();
+        this.holeMesh.rotateX(ROTATE_RATE / ar);
+        this.haloMesh.rotateX(-ROTATE_RATE / ar);
 
         // Kill any momentum obtained.
         this.setSpeed(Universe.originVector);
@@ -227,7 +216,7 @@ class Galaxy extends THREE.Group {
         // Initial randomization
         this.animate();
 
-        this.rotateRate.divideScalar(Universe.getAnimateRate() * 20);
+        this.rotateRate.divideScalar(game.getAnimateRate() * 20);
 
         let pos = dir.clone();
         pos.normalize();

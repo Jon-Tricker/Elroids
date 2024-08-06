@@ -82,6 +82,9 @@ class Hull extends Component {
         this.maxSpeed = maxSpeed;
         this.flameMaterial = Hull.baseFlameMaterial.clone();
         this.displayPanel = true;
+        if (undefined != set) {
+            set.recalc();
+        }
     }
 
     getDescription() {
@@ -96,10 +99,10 @@ class Hull extends Component {
         if (1 != hullSlots) {
             throw (new BugError("Can only build a ship with a single hull."));
         }
-        // INitially dont know ship.
+        // Initially dont know ship.
         this.compSets = new ComponentSets(null, hullSlots, engineSlots, weaponSlots, baySlots);
         this.set = this.compSets.hullSet;
-        this.set.add(this); 
+        this.compSets.hullSet.add(this);
     }
 
     buildShip(ship) {
@@ -146,7 +149,7 @@ class Hull extends Component {
     upgrade(ship) {
         // Check we can afford it.
         let cost = this.getUpgradeCost(ship);
-        if (ship.game.player.getCredits() < cost) {
+        if (ship.getGame().player.getCredits() < cost) {
             throw (new GameError("Not enough credits"));
         }
 
@@ -191,7 +194,7 @@ class Hull extends Component {
         this.set.recalc();
 
         // Charge acount.
-        if (ship.game.player.addCredits(-cost));
+        if (ship.getGame().player.addCredits(-cost));
     }
 
     getUpgradeCost(ship) {

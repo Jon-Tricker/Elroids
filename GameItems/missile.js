@@ -32,14 +32,13 @@ class Missile extends NonShipItem {
     let startLocation = owner.location.clone();
 
     // Launch at just missile speed.
-    super(startLocation.x, startLocation.y, startLocation.z, startSpeed.x, startSpeed.y, startSpeed.z, owner.game, MISSILE_SIZE / Universe.CBRT_THREE, MISSILE_MASS, 1, owner);
+    super(owner.system, startLocation.x, startLocation.y, startLocation.z, startSpeed.x, startSpeed.y, startSpeed.z, MISSILE_SIZE / Universe.CBRT_THREE, MISSILE_MASS, 1, owner);
 
     this.colour = colour;
     this.damage = damage;
-    this.expiryTime = Universe.getTime() + MISSILE_TTL;
+    this.expiryTime = this.getUniverse().getTime() + MISSILE_TTL;
 
     this.setupMesh(material);
-
 
     // Move it clear of parents new position. 
     let thatBoundary = owner.getBoundary()
@@ -60,7 +59,7 @@ class Missile extends NonShipItem {
   }
 
   getRadarColour() {
-    if (this.owner.game.displays.radar.showMissiles) {
+    if (this.getGame().displays.radar.showMissiles) {
       return (this.colour);
     } else {
       // Don't plot

@@ -2,7 +2,6 @@
 import Radar from "./radar.js";
 import Compass from "./compass.js";
 import ComponentDisplays from "./Components/componentDisplays.js";
-import Universe from '../universe.js'
 import Terminal from './terminal.js'
 import MenuSystem from './menuSystem.js'
 
@@ -84,6 +83,14 @@ class Displays {
         this.compDisplays = new ComponentDisplays(this.statusCtx, DEFAULT_COLOUR, this);
 
         // this.resize();
+    }
+
+    getGame() {
+        return(this.game);
+    }
+
+    getShip() {
+        return(this.getGame().getShip());
     }
 
     resize() {
@@ -168,7 +175,7 @@ class Displays {
         this.controlsCtx.globalAlpha = 1;
         this.controlsCtx.fillStyle = this.defaultColour;
 
-        this.controlsCtx.strokeText("V" + this.game.getVersion() + "    Score:" + this.printNum(this.game.player.getScore()) + "    Credits:" + this.printNum(this.game.player.getCredits()) + "    Frame rate:" + this.printNum(Universe.getActualAnimateRate()) + "/s", 20, this.textHeight * 0.9);
+        this.controlsCtx.strokeText("V" + this.game.getVersion() + "    Score:" + this.printNum(this.game.player.getScore()) + "    Credits:" + this.printNum(this.game.player.getCredits()) + "    Frame rate:" + this.printNum(this.game.universe.getActualAnimateRate()) + "/s", 20, this.textHeight * 0.9);
     }
 
     hudEnable(state) {
@@ -186,7 +193,7 @@ class Displays {
 
         let expiry;
         if (0 != duration) {
-            expiry = Universe.getTime() + duration;
+            expiry = this.game.universe.getTime() + duration;
         } else {
             expiry = 0;
         }

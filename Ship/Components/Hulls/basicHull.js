@@ -17,7 +17,7 @@ class BasicHull extends Hull {
     constructor(set) {
         super("GP1", 50, 1000, 3, set, 200);
         super.buildSets(1, 1, 1, 2);
-    } 
+    }
 
     getDescription() {
         return (super.getDescription() + "\n\n'" + this.name + "' is " + DESCRIPTION.toLowerCase());
@@ -28,9 +28,9 @@ class BasicHull extends Hull {
         super.buildShip(ship);
 
         // Do custom stuff for this hull
-        this.compSets.engineSet.add(new BasicEngine());
-        this.compSets.weaponSet.add(new DumbMissileWeapon());
-        this.compSets.baySet.add(new BasicBay());
+        new BasicEngine(this.compSets.engineSet);
+        new DumbMissileWeapon(this.compSets.weaponSet);
+        new BasicBay(this.compSets.baySet);
     }
 
     getMesh() {

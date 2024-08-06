@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import NonShipItem from './nonShipItem.js';
 import Universe from '../universe.js';
 import Ship from '../Ship/ship.js';
+import Item from './item.js';
 import Explosion from './explosion.js';
 
 const MAX_SIZE = 10;
@@ -21,7 +22,7 @@ class Mineral extends NonShipItem {
   type;
   expiryTime;
 
-  constructor(mass, locationX, locationY, locationZ, speedX, speedY, speedZ, game, type) {
+  constructor(system, mass, locationX, locationY, locationZ, speedX, speedY, speedZ, type) {
 
     let size = Math.floor(Math.cbrt(mass));
     if (size < 1) {
@@ -31,7 +32,7 @@ class Mineral extends NonShipItem {
       size = MAX_SIZE;
     }
 
-    super(locationX, locationY, locationZ, speedX, speedY, speedZ, game, size, mass, 1);
+    super(system, locationX, locationY, locationZ, speedX, speedY, speedZ, size, mass, 1);
 
     this.rotationRate = new THREE.Vector3(this.generateRotationRate(), this.generateRotationRate(), this.generateRotationRate());
 
@@ -39,7 +40,7 @@ class Mineral extends NonShipItem {
 
     this.setupMesh();
 
-    this.expiryTime = Universe.getTime() + TTL;
+    this.expiryTime = this.getUniverse().getTime() + TTL;
   }
 
   getRadarColour() {
@@ -67,9 +68,10 @@ class Mineral extends NonShipItem {
   }
 
   animate(date) {
-    this.rotateX(this.rotationRate.x / Universe.getAnimateRate());
-    this.rotateY(this.rotationRate.y / Universe.getAnimateRate());
-    this.rotateZ(this.rotationRate.z / Universe.getAnimateRate());
+    let ar = this.getGame().getAnimateRate();
+    this.rotateX(this.rotationRate.x / ar);
+    this.rotateY(this.rotationRate.y / ar);
+    this.rotateZ(this.rotationRate.z / ar);
 
     this.moveItem(true);
     this.moveMesh();

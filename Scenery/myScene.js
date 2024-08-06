@@ -8,7 +8,6 @@ import * as THREE from 'three';
 import MyCamera from './myCamera.js'
 import SkyBox from "./skyBox.js";
 import WrapBox from "./wrapBox.js";
-import Universe from "../universe.js";
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 
 class MyScene extends THREE.Scene {
@@ -52,18 +51,18 @@ class MyScene extends THREE.Scene {
 
     // Create label renderer.
     this.labelRenderer = new CSS2DRenderer({ canvas });
-		this.labelRenderer.setSize(this.sizes.width, this.sizes.height);
-		this.labelRenderer.domElement.style.position = 'absolute';
-		this.labelRenderer.domElement.style.top = '0px';
-    document.body.appendChild( this.labelRenderer.domElement );
+    this.labelRenderer.setSize(this.sizes.width, this.sizes.height);
+    this.labelRenderer.domElement.style.position = 'absolute';
+    this.labelRenderer.domElement.style.top = '0px';
+    document.body.appendChild(this.labelRenderer.domElement);
 
     // Create static elements.
-    let skyBoxSize = Universe.UNI_SIZE * 4;
+    let skyBoxSize = this.game.universe.systemSize * 4;
     this.skyBox = new SkyBox(skyBoxSize, game, true);
     this.add(this.skyBox);
 
     if (wrapBoxOn) {
-      let wrapBoxSize = Universe.UNI_SIZE * 2;
+      let wrapBoxSize = this.game.universe.systemSize * 2;
       this.wrapBox = new WrapBox(wrapBoxSize, true);
       this.add(this.wrapBox);
     }
@@ -78,8 +77,8 @@ class MyScene extends THREE.Scene {
     this.setCamera(MyCamera.DUMMY);
 
     // ... and render
-    // this.renderer.render(this, this.camera);
-    // this.labelRenderer.render(this, this.camera);
+    this.renderer.render(this, this.camera);
+    this.labelRenderer.render(this, this.camera);
   }
 
   addLights() {
@@ -88,7 +87,7 @@ class MyScene extends THREE.Scene {
     this.ambientLight = new THREE.AmbientLight(0xfffffff, 0.5);
 
     // Move light away from scene
-    this.light.position.set(0, 0, Universe.UNI_SIZE * 2);
+    this.light.position.set(0, 0, this.game.universe.systemSize * 2);
 
     // Enable shadows
     this.light.castShadow = true;
@@ -124,7 +123,7 @@ class MyScene extends THREE.Scene {
         break;
 
       case MyCamera.DUMMY:
-        this.camera = new MyCamera(this.sizes, type, null);
+        this.camera = new MyCamera(this.sizes, type, this.game.getShip());
         break;
 
       default:
@@ -148,8 +147,8 @@ class MyScene extends THREE.Scene {
       this.resizeCamera();
     })
 
-    if (undefined != Universe.getListener()) {
-      this.getCamera().addListener(Universe.getListener());
+    if (undefined != this.game.getListener()) {
+      this.getCamera().addListener(this.game.getListener());
     }
 
     // this.renderer.render(this, this.camera);
@@ -182,6 +181,8 @@ class MyScene extends THREE.Scene {
     if (!this.camera.getIsFixedLocation()) {
       // Move sky box with ship. So we never get closer to it.
       this.skyBox.position.set(this.game.getShip().position.x, this.game.getShip().position.y, this.game.getShip().position.z);
+    } else {
+      this.skyBox.position.set(this.camera.position.x, this.camera.position.y, this.camera.position.z);
     }
 
     // Re-render

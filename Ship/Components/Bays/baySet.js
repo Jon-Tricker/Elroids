@@ -1,5 +1,4 @@
 // Base list class for all cargo bays.
-
 import ComponentSet from '../componentSet.js'
 import GameError from "../../../GameErrors/gameError.js"
 import Mineral from "../../../GameItems/mineral.js";
@@ -79,7 +78,7 @@ class BaySet extends ComponentSet {
     level() {
         let spaceReqd = this.getContentMass() - this.capacity;
         if (0 < spaceReqd) {
-            this.sets.ship.game.displays.addMessage("Bay full. Dumping surplus " + spaceReqd + "(t)");
+            this.getGame().displays.addMessage("Bay full. Dumping surplus " + spaceReqd + "(t)");
         }
 
         while ((this.minerals.size > 0) && (0 < (spaceReqd = this.getContentMass() - this.capacity))) {
@@ -152,8 +151,8 @@ class BaySet extends ComponentSet {
         this.unloadMineral(mineral, mass);
 
         // Make mineral 
-        let ship = this.sets.ship;
-        let min = new Mineral(mass, ship.location.x, ship.location.y, ship.location.y, ship.speed.x * 0.9, ship.speed.y * 0.9, ship.speed.z * 0.9, ship.game, mineral);
+        let ship = this.getShip();
+        let min = new Mineral(this.sets.ship.system, mass, ship.location.x, ship.location.y, ship.location.y, ship.speed.x * 0.9, ship.speed.y * 0.9, ship.speed.z * 0.9, mineral);
 
         min.separateFrom(ship);
     }

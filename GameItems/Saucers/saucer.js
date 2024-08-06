@@ -34,8 +34,8 @@ class Saucer extends NonShipItem {
     // Safe mode ... leathality reduced.
     safe;
 
-    constructor(size, locationX, locationY, locationZ, game, mass, colour, owner, safe) {
-        super(locationX, locationY, locationZ, 0, 0, 0, game, size, mass, SAUCER_HP, owner);
+    constructor(system, size, locationX, locationY, locationZ, mass, colour, owner, safe) {
+        super(system, locationX, locationY, locationZ, 0, 0, 0, size, mass, SAUCER_HP, owner);
         this.colour = colour;
 
         let saucerMaterial = this.getDefaultMaterial().clone();
@@ -50,11 +50,11 @@ class Saucer extends NonShipItem {
             this.safe = safe;
         }
 
-        this.game.saucerCount++;
+        this.system.saucerCount++;
     }
 
     destruct() {
-        this.game.saucerCount--;
+        this.system.saucerCount--;
         super.destruct();
     }
 
@@ -118,10 +118,10 @@ class Saucer extends NonShipItem {
         let destroyed = super.takeDamage(hits, that);
 
         if (destroyed) {
-            if ((that.owner == this.game.ship) || (that == this.game.ship)) {
+            if ((that.owner == this.getShip()) || (that == this.getShip())) {
                 // Score it
-                this.game.ship.addCredits(this.getScore(), that);
-                this.game.displays.addMessage("Bounty " + this.getScore() + "  (Cr)");
+                this.getShip().addCredits(this.getScore(), that);
+                this.getGame().displays.addMessage("Bounty " + this.getScore() + "  (Cr)");
             }
         }
     }
@@ -137,7 +137,7 @@ class Saucer extends NonShipItem {
 
     animate() {
         // Spin
-        this.rotation.y += this.rotateRate / Universe.getAnimateRate();
+        this.rotation.y += this.rotateRate / this.getGame().getAnimateRate();
 
         // Lean towards direction of travel. Dont wobble.
         // TODO : Not really right but looks pretty ... feel free to improve.

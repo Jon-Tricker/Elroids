@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import Universe from '../universe.js';
 import ItemBoundary from './itemBoundary.js';
 import BugError from "../GameErrors/bugError.js";
-import Ship from "../Ship/ship.js";
+import Ship from '../Ship/ship.js';
 
 const COLOUR = "#FFFFFF";
 
@@ -22,8 +22,8 @@ class Item extends THREE.Group {
 
     location;
     originalMaterial;
-    game;
-    massA;               // tonnes
+    system;
+    mass;               // tonnes
     hitPoints;
     owner;
 
@@ -42,11 +42,11 @@ class Item extends THREE.Group {
     immobile = false;
 
     // Construct with optional mass
-    constructor(locationX, locationY, locationZ, speedX, speedY, speedZ, game, size, mass, hitPoints, owner, immobile) {
+    constructor(system, locationX, locationY, locationZ, speedX, speedY, speedZ, size, mass, hitPoints, owner, immobile) {
         super();
+        this.system = system;
         this.location = new THREE.Vector3(locationX, locationY, locationZ);
         this.setSpeed(new THREE.Vector3(speedX, speedY, speedZ));
-        this.game = game;
         this.size = size;
         this.owner = owner;
 
@@ -76,14 +76,14 @@ class Item extends THREE.Group {
         this.setBoundary(size);
 
         // Add self to the game universe
-        Universe.addItem(this);
+        this.system.addItem(this);
 
         // Add self to graphics scene.
-        game.getScene().add(this);
+        this.getGame().getScene().add(this);
 
         // Deal with situation where Item created inside another Item.
         if (null != this.getBoundary()) {
-            for (let that of Universe.itemList) {
+            for (let that of this.system.items) {
                 if (that != this) {
                     if (null != that.getBoundary()) {
                         if (this.getBoundary().intersects(that.getBoundary())) {
@@ -95,7 +95,10 @@ class Item extends THREE.Group {
         }
     }
 
-
+    getUniverse() {
+        return(this.system.universe);
+    }
+    
     getClass() {
         return (null);
     }
@@ -109,6 +112,14 @@ class Item extends THREE.Group {
         this.boundary = new ItemBoundary(this.location, size);
     }
 
+    getGame() {
+        return(this.system.universe.game);
+    }
+
+    getShip() {
+        return(this.system.ship);
+    }
+
     // Set speed/
     // Do frame rate division only one.
     setSpeed(speed) {
@@ -117,7 +128,7 @@ class Item extends THREE.Group {
                 throw (new BugError("Something too fast " + speed.length()));
             }
             this.speed = speed.clone();
-            this.speedFrame = speed.clone().divideScalar(Universe.getAnimateRate())
+            this.speedFrame = speed.clone().divideScalar(this.getGame().getAnimateRate())
         }
     }
 
@@ -131,8 +142,8 @@ class Item extends THREE.Group {
 
     destruct() {
         this.hitPoints = 0;
-        Universe.removeItem(this);
-        this.game.getScene().remove(this);
+        this.system.removeItem(this);
+        this.getGame().getScene().remove(this);
     }
 
     // Push item. Thrust in kN, mass in Tonnes. This should work without scaling.
@@ -141,7 +152,7 @@ class Item extends THREE.Group {
         direction = direction.normalize();
 
         let newSpeed = this.speed.clone();
-        newSpeed.addScaledVector(direction, accRate / Universe.getAnimateRate());
+        newSpeed.addScaledVector(direction, accRate / this.getGame().getAnimateRate());
 
         if (newSpeed.length() > maxspeed) {
             newSpeed = newSpeed.normalize().multiplyScalar(maxspeed);
@@ -185,7 +196,7 @@ class Item extends THREE.Group {
             // Move boundary object.
             this.boundary.moveTo(this.location);
 
-            Universe.handleWrap(this.location);
+            this.getUniverse().handleWrap(this.location);
         }
     }
 
@@ -215,7 +226,7 @@ class Item extends THREE.Group {
         // Create line for move.
         let move = new THREE.Line3(Universe.originVector, this.speedFrame);
 
-        for (let that of Universe.itemList) {
+        for (let that of this.system.items) {
 
             let thatBoundary = that.getBoundary();
 
@@ -223,7 +234,7 @@ class Item extends THREE.Group {
 
                 let relLocation = that.location.clone();
                 relLocation.sub(this.location);
-                Universe.handleWrap(relLocation);
+                this.getUniverse().handleWrap(relLocation);
 
                 // For the ship be generous ... has to go through windscreen.
                 let minDist = 0;
@@ -287,14 +298,6 @@ class Item extends THREE.Group {
 
     // Separate two overlapping objects.
     separateFrom(that) {
-
-        /*
-        console.log("B4 this " + this.position.x + " " + this.position.y + " " + this.position.z + " " + this.location.x + " " + this.location.y + " " + this.location.z);
-        console.log("B4 that " + that.position.x + " " + that.position.y + " " + that.position.z + " " + that.location.x + " " + that.location.y + " " + that.location.z);
-        let camera = this.game.getScene().getCamera();
-        console.log("B4 camera " + camera.position.x + " " + camera.position.y + " " + camera.position.z);
-        */
-
 
         // Make sure speeds differ
         let spd = this.speed.clone();
@@ -415,7 +418,7 @@ class Item extends THREE.Group {
     // Move mesh in graphics space. Will be relative to ship position.
     moveMesh() {
 
-        let camera = this.game.getScene().getCamera();
+        let camera = this.getGame().getScene().getCamera();
         if (camera.getIsFixedLocation()) {
             // Just plot it at it's location
             this.position.set(this.location.x, this.location.y, this.location.z);
@@ -435,7 +438,7 @@ class Item extends THREE.Group {
         let rel = loc.clone();
         rel.sub(this.location);
 
-        Universe.handleWrap(rel);
+        this.getUniverse().handleWrap(rel);
         return (rel);
     }
 
@@ -453,11 +456,11 @@ class Item extends THREE.Group {
     // 3D location should be from the Item. However I could not get positional listeners to work.
     // So for now simple 'mono' with volume reduced by distance.
     playSound(name, volume, loop) {
-        if (!this.game.soundOn) {
+        if (!this.getGame().soundOn) {
             return (false);
         }
 
-        let list = Universe.getListener();
+        let list = this.getGame().getListener();
         if ((undefined == list)) {
             // Dont have a listener yet ... give up. without loading
             return (false);
@@ -468,7 +471,7 @@ class Item extends THREE.Group {
         let sound = this.sounds.get(name);
         if (undefined == sound) {
             // Need to create/attach PositionalAudio for this Item.
-            let buffer = Universe.sounds.get(name);
+            let buffer = this.getGame().getSounds().get(name);
             if (null == buffer) {
                 // Buffer not yet loaded into Univese
                 return (false);
@@ -493,7 +496,7 @@ class Item extends THREE.Group {
         // ToDo : Fix back to PositionalAudio.
 
         // Probably want to hear it as if on the ship even if the camera is elsewhere.
-        let rel = this.getRelativeLocation(this.game.ship.location);
+        let rel = this.getRelativeLocation(this.getShip().location);
         let dist = rel.length();
         volume = volume / (2 ** (dist / AUDIO_HALF_DIST));
         if (volume < 0.01) {

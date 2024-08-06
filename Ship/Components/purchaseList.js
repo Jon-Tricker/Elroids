@@ -9,17 +9,25 @@ import BasicHull from "./Hulls/basicHull.js";
 import MediumHull from "./Hulls/mediumHull.js";
 
 class PurchaseList extends ComponentSets {
+    // Back reference to out parent.
+    game;
 
-    constructor() {
+    constructor(game) {
         super();
 
-        this.hullSet.add(new BasicHull());
-        this.hullSet.add(new MediumHull());
-        this.engineSet.add(new BasicEngine());
-        this.engineSet.add(new MediumEngine());
-        this.weaponSet.add(new DumbMissileWeapon());
-        this.baySet.add(new BasicBay());
-        this.baySet.add(new MediumBay());
+        this.game = game;
+
+        new BasicHull(this.hullSet);
+        new MediumHull(this.hullSet);
+        new BasicEngine(this.engineSet);
+        new MediumEngine(this.engineSet);
+        new DumbMissileWeapon(this.weaponSet);
+        new BasicBay(this.baySet);
+        new MediumBay(this.baySet);
+    }
+
+    getGame() {
+        return(this.game);
     }
 
 }

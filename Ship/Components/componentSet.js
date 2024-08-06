@@ -62,6 +62,14 @@ class ComponentSet extends Set {
         return (this.sets.ship);
     }
 
+    getUniverse() {
+        return(this.getShip().system.universe);
+    }
+
+    getGame() {
+        return(this.getUniverse().game);
+    }
+
     getRepairCost(percent) {
         let cost = 0;
 
@@ -115,30 +123,31 @@ class ComponentSet extends Set {
         let someDone = false;
 
         // Do repair
+        let ship = this.getShip();
         for (let comp of this) {
             // Can we afford it?
             let cost = comp.getRepairCost(percent);
             if (0 < cost) {
-                if (this.sets.ship.game.player.getCredits() < cost) {
+                if (ship.getCredits() < cost) {
                     allDone = false;
-                    percent = Math.ceil(this.sets.ship.game.player.getCredits() * percent / cost);
+                    percent = Math.ceil(ship.getCredits() * percent / cost);
                     if (0 >= percent) {
                         break;
                     }
                     comp.repair(percent);
-                    this.ship.addCredits(-this.sets.ship.game.player.getCredits());
+                    this.ship.addCredits(-ship.getCredits());
                     someDone = true;
                     break;
                 } else {
                     comp.repair(percent);
                     someDone = true;
-                    this.sets.ship.addCredits(-cost);
+                    ship.addCredits(-cost);
                 }
             }
         }
 
         if (someDone) {
-            this.sets.ship.game.displays.terminal.playSound("anvil", 0.5);
+            ship.getTerminal().playSound("anvil", 0.5);
         }
         this.recalc();
 

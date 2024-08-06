@@ -118,7 +118,7 @@
 			<LI>Fix audio to use THREE.PositionalAudio (Item.js.playSound()). I tried but cant get the listener to stay
 				stuck to the camera in all cases. Maybe add it to the Ship instead. Fell back on manually reducing volume
 				wih distance (and living without correct stereo).</LI>
-			<LI>Make crater texture proceduraly generated (less download).</LI>
+			<LI>Make crater and galaxy textures proceduraly generated (less download).</LI>
 			<LI>Add 'tunnel' graphics when going through wormholes.</LI>
 		</UL>
 
@@ -149,6 +149,41 @@
 					for all items apart from 'rock on rock' impacts.</LI>
 				<LI>Make parts lists at station a genuine list (variable availability and costs) rather than a 'catalog'.</LI>
 				<LI>Revisit inline 'ToDos'.</LI>
+			</UL>
+		</LI>
+	</UL>
+
+	<H2>Structure</H2>
+	<P>To level classes work something like</P>
+	<UL>
+		<LI>Game - Stuff related to game play. Not the simulated universe.
+			<UL>
+				<LI>Player - Stuff related to the current player.</LI>
+				<LI>MyScene - Stuff related to sound and graphics rendering.</LI>
+				<LI>Displays - Screen display graphics (Maybe should go under Ship).</LI>
+				<LI>Purchase list - Component shoping list.</LI>
+				<LI>Universe - Everything related to the in game universe.
+					<UL>
+						<LI>In game time keeping</LI>
+						<LI>List and positions of all star systems.</LI>
+						<LI>Pointer to 'current' star system.</LI>
+						<LI>System - Details about a specific start system. If not the 'current' system some data (e.g. rock locations) will be dicarded.
+							<UL>
+								<LI>Item - The game objects that can exist within a system. Can also be moved to other systems.
+									<UL>
+										<LI>Ship - The players ship.</LI>
+										<LI>NonShipItems - Other in came objects..</LI>
+									</UL>
+								</LI>
+								<LI>items - List of items.</LI>
+								<LI>stations - List of stations.</LI>
+								<LI>wormholes - List of wormholes</LI>
+							</UL>
+						</LI>
+						<LI>Hyperspace - A subclass of System.</LI>
+					</UL>
+				</LI>
+				<LI>Main animation loop.</LI>
 			</UL>
 		</LI>
 	</UL>
@@ -188,7 +223,12 @@
 	<P>This project was coded with arbitary units of distance, mass and time. I have since modified it to use something resembling
 		SI.</P>
 	<UL>
-		<LI>Distance is in Meters.</LI>
+		<LI>Distance:
+			<UL>
+				<LI>For short distance (within systems) is in Meters.</LI>
+				<LI>For long distance (between systems) is in some larger unit (lightyears?).</LI>
+			</UL> 
+		</LI>
 		<LI>Mass is in Tonnes (1000KG).</LI>
 		<LI>Time is in seconds.</LI>
 		<LI>Damage (HPs) is an arbitary unit. However, from the 'ram damage' calculation we can conclude that its units are M kg m/s</LI>

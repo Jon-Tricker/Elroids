@@ -8,7 +8,7 @@ let gameMenu = "\
 <BODY>\
     <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Game control Menu</P>\
     <BR />\
-    <script src=\"GameInternalsMenu\" game=\"this.display.game\"></script>\
+    <script src=\"GameInternalsMenu\" game=\"this.getGame()\"></script>\
     <BR />\
 </BODY>"
 
@@ -21,8 +21,8 @@ class GameInternalsMenu {
         doc += "<P>";
         doc += "<BR />"
 
-        doc += "<P>Rocks: count=" + game.rockCount + ", Max count=" + game.maxRockCount + "(ish)</P>";
-        doc += "<P>Saucers: Mother count=" + game.motherSaucerCount + ", Count=" + game.saucerCount + ", Max count=" + game.maxSaucerCount + "</P>";
+        doc += "<P>Rocks: count=" + game.getSystem().rockCount + ", Max count=" + game.getSystem().maxRockCount + "(ish)</P>";
+        doc += "<P>Saucers: Mother count=" + game.universe.system.motherSaucerCount + ", Count=" + game.getSystem().saucerCount + ", Max count=" + game.maxSaucerCount + "</P>";
 
         doc += "<P>Show missiles on radar <button type=\"button\" onclick=\"GameInternalsMenu.missileClick(this.display)\">" + game.displays.radar.showMissiles + "</button></P>";
         doc += "<P>Play sound <button type=\"button\" onclick=\"GameInternalsMenu.soundClick(this.display.game)\">" + game.soundOn + "</button></P>";

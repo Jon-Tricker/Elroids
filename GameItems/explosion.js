@@ -23,9 +23,8 @@ class Explosion extends Item {
   currentSize;
 
   constructor(maxSize, that) {
-
     // With same location and speed as exploding thing
-    super(that.location.x, that.location.y, that.location.z, that.speed.x, that.speed.y, that.speed.z, that.game);
+    super(that.system, that.location.x, that.location.y, that.location.z, that.speed.x, that.speed.y, that.speed.z);
 
     if (MAX_SIZE < this.maxSize) {
       this.maxSize = MAX_SIZE;
@@ -66,7 +65,7 @@ class Explosion extends Item {
       this.moveMesh();
       
       // Grow
-      this.currentSize += 250/Universe.getAnimateRate();
+      this.currentSize += 250/this.getGame().getAnimateRate();
     }
   }
 }

@@ -13,7 +13,7 @@ class ShipCompDisplay extends DarkPanel {
     constructor(game, ctx, defaultColour) {
         super(ctx, defaultColour, true);
         this.game = game;
-        this.ship = game.ship;
+        this.ship = game.getShip();
 
         this.add(new TextPanel(ctx, defaultColour, false));
         this.speedPanel = new BarPanel(ctx, defaultColour, false, "Speed", "(m/s)", this.ship.hull.compSets.hullSet.getMaxSpeed(), false);

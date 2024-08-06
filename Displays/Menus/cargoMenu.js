@@ -9,7 +9,7 @@ import { ComponentsMenu } from './componentsMenu.js';
 let cargoMenu = "\
 <BODY>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Cargo Menu</P>\
-<script src=\"CargoMenu\" ship=\"this.display.game.ship\"></script>\
+<script src=\"CargoMenu\" ship=\"this.getShip()\"></script>\
 </BODY>"
 
 class CargoMenu {
@@ -80,7 +80,7 @@ class CargoMenu {
 
             if (null != ship.dockedWith) {
                 doc += "<BR />";
-                doc += "<P>Sell all minerals <button type=\"button\" onclick=\"CargoMenu.onSellMineralClick(this.display.game.ship)\">" + totalValue + "</button></P>";
+                doc += "<P>Sell all minerals <button type=\"button\" onclick=\"CargoMenu.onSellMineralClick(this.getShip())\">" + totalValue + "</button></P>";
             }
 
         }
@@ -129,11 +129,11 @@ class CargoMenu {
 
     static getButtonText(mineral, mass) {
         let value = mineral.value * mass;
-        return ("<button type=\"button\" onclick=\"CargoMenu.onSellMineralClick(this.display.game.ship, cursor, " + mass + ")\">" + value + "</button>");
+        return ("<button type=\"button\" onclick=\"CargoMenu.onSellMineralClick(this.getShip(), cursor, " + mass + ")\">" + value + "</button>");
     }
 
     static onDetailsClick(menuSystem, cursor) {
-        let ship = menuSystem.display.game.ship;
+        let ship = menuSystem.getShip();
         let comp = CargoMenu.getCompForCursor(ship, cursor);
         ComponentsMenu.displayDetails(menuSystem, comp);
     }
@@ -163,13 +163,13 @@ class CargoMenu {
     }  
     
     static onMountCompClick(menuSystem, cursor) {
-        let ship = menuSystem.display.game.ship;
+        let ship = menuSystem.getShip();
         let comp = CargoMenu.getCompForCursor(ship, cursor);
         comp.mount(ship, false);
     }
 
     static onSellCompClick(menuSystem, cursor) {
-        let ship = menuSystem.display.game.ship;
+        let ship = menuSystem.getShip();
         let comp = CargoMenu.getCompForCursor(ship, cursor);
         comp.sell();
     }

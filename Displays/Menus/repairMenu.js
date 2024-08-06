@@ -8,7 +8,7 @@ let repairMenu = "\
 <BODY>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Ship Repair Menu</P>\
 <BR />\
-<script src=\"RepairMenu\" ship=\"this.display.game.ship\"></script>\
+<script src=\"RepairMenu\" ship=\"this.getShip()\"></script>\
 </BODY>"
 
 class RepairMenu {
@@ -65,9 +65,9 @@ class RepairMenu {
         let cost = set.getRepairCost(percent)
 
         if(0 == cost) {
-            return("<button type=\"button\" onclick=\"RepairMenu.onRepairClick(this.display.game.ship, cursor, null)\">N/A</button>");
+            return("<button type=\"button\" onclick=\"RepairMenu.onRepairClick(this.getShip(), cursor, null)\">N/A</button>");
         } else {
-            return("<button type=\"button\" onclick=\"RepairMenu.onRepairClick(this.display.game.ship, cursor, " + percent +")\">" + cost + "</button>");
+            return("<button type=\"button\" onclick=\"RepairMenu.onRepairClick(this.getShip(), cursor, " + percent +")\">" + cost + "</button>");
         }
     }
 

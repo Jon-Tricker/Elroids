@@ -27,7 +27,13 @@ class MyCamera extends THREE.PerspectiveCamera {
     listener;
 
     constructor(sizes, type, ship) {
-        super(45, sizes.width / sizes.height, 0.1, Universe.UNI_SIZE * 4 * Universe.CBRT_THREE);
+
+        let sz = 10000;          // Some random default value
+        if (undefined != ship) {
+            sz = ship.system.systemSize;
+        }
+
+        super(45, sizes.width / sizes.height, 0.1, sz * 4 * Universe.CBRT_THREE);
 
         switch (type) {
             case MyCamera.PILOT:

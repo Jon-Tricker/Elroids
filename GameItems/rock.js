@@ -6,6 +6,7 @@
 
 import * as THREE from 'three';
 import NonShipItem from './nonShipItem.js';
+import Game from '../game.js';
 import Universe from '../universe.js'
 import FacitRockGeometry from '../facitRockGeometry.js'
 import { MineralType, MineralComponent, Composition } from './minerals.js';
@@ -26,9 +27,9 @@ const BASE_ROCK_MATERIAL = new THREE.MeshStandardMaterial(
     color: RADAR_COLOUR,
     roughness: 0.5,
     opacity: 1,
-    map: Universe.getCraterTexture(),
+    map: Game.getCraterTexture(),
     // roughnessMap: texture,
-    bumpMap: Universe.getCraterTexture(),
+    bumpMap: Game.getCraterTexture(),
     metalness: 0,
   }
 )
@@ -43,12 +44,11 @@ class Rock extends NonShipItem {
 
   static rockStyle = Rock.ROCK_STYLE_SPHERE;
 
-  constructor(rockSize, locationX, locationY, locationZ, speedX, speedY, speedZ, game, composition) {
-    super(locationX, locationY, locationZ, speedX, speedY, speedZ, game, rockSize, rockSize * rockSize * rockSize, 1 + rockSize / 10);
+  constructor(system, rockSize, locationX, locationY, locationZ, speedX, speedY, speedZ, composition) {
+    super(system, locationX, locationY, locationZ, speedX, speedY, speedZ, rockSize, rockSize * rockSize * rockSize, 1 + rockSize / 10);
 
     this.rockSize = rockSize;
     this.originalHP = this.hitPoints;
-    this.game = game;
 
     this.rotationRate = new THREE.Vector3(this.generateRotationRate(), this.generateRotationRate(), this.generateRotationRate());
 
@@ -63,11 +63,11 @@ class Rock extends NonShipItem {
 
     this.setupMesh();
 
-    game.rockCount++;
+    system.rockCount++;
   }
 
   destruct() {
-    this.game.rockCount--;
+    this.system.rockCount--;
     super.destruct();
   }
 
@@ -86,7 +86,6 @@ class Rock extends NonShipItem {
   getRadarColour() {
     return (RADAR_COLOUR);
   }
-
 
   setupMesh() {
     let rockGeometry;
@@ -158,14 +157,14 @@ class Rock extends NonShipItem {
       }
 
       if (0 < this.composition.getValue()) {
-        new Rock(newSize, loc.x, loc.y, loc.z, spd.x * ratio.x, spd.y * ratio.y, spd.z * ratio.z, this.game, this.composition);
+        new Rock(this.system, newSize, loc.x, loc.y, loc.z, spd.x * ratio.x, spd.y * ratio.y, spd.z * ratio.z, this.composition);
       }
 
       if (0 < newComp.getValue()) {
-        new Rock(newSize, loc.x, loc.y, loc.z, spd.x * ratio2.x, spd.y * ratio2.y, spd.z * ratio2.z, this.game, newComp);
+        new Rock(this.system, newSize, loc.x, loc.y, loc.z, spd.x * ratio2.x, spd.y * ratio2.y, spd.z * ratio2.z, newComp);
       }
     } else {
-      this.composition.mineralize(loc, spd, this.mass / 2, this.game);
+      this.composition.mineralize(loc, spd, this.mass / 2, this.system);
     }
   }
 
@@ -177,9 +176,10 @@ class Rock extends NonShipItem {
   }
 
   animate() {
-    this.rotateX(this.rotationRate.x / Universe.getAnimateRate());
-    this.rotateY(this.rotationRate.y / Universe.getAnimateRate());
-    this.rotateZ(this.rotationRate.z / Universe.getAnimateRate());
+    let ar = this.getGame().getAnimateRate();
+    this.rotateX(this.rotationRate.x / ar);
+    this.rotateY(this.rotationRate.y / ar);
+    this.rotateZ(this.rotationRate.z / ar);
 
     this.moveItem(true);
     this.moveMesh();
