@@ -2,7 +2,6 @@
 // For now simple spheres.
 import * as THREE from 'three';
 import Item from './item.js';
-import Universe from '../universe.js';
 
 // Create material.
 const explosionMaterial = new THREE.MeshStandardMaterial(

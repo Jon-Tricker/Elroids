@@ -31,7 +31,7 @@ class Weapon extends Component {
         this.fireLast = date;
 
         if (!this.isWorking()) {
-            this.ship.playSound("click");
+            this.set.getShip().playSound("click");
             throw (new GameError("Weapon failed"));
         }
 
@@ -39,7 +39,7 @@ class Weapon extends Component {
             if (0 <= this.ammo) {
                 this.ammo--;
             } else {
-                this.ship.GameErrorplaySound("click");
+                this.set.getShip().playSound("click");
                 throw (new GameError("Out of ammo"));
             }
         }

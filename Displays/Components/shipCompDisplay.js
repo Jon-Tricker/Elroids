@@ -1,5 +1,4 @@
 // Special ComponentDisplay for stuff relating to whole ship.
-import * as THREE from 'three';
 import DarkPanel from '../Utils/darkPanel.js';
 import TextPanel from '../Utils/textPanel.js';
 import BarPanel from '../Utils/barPanel.js';
@@ -16,7 +15,7 @@ class ShipCompDisplay extends DarkPanel {
         this.ship = game.getShip();
 
         this.add(new TextPanel(ctx, defaultColour, false));
-        this.speedPanel = new BarPanel(ctx, defaultColour, false, "Speed", "(m/s)", this.ship.hull.compSets.hullSet.getMaxSpeed(), false);
+        this.speedPanel = new BarPanel(ctx, defaultColour, false, "Speed", "(" + this.ship.system.units + "/s)", this.ship.hull.compSets.hullSet.getMaxSpeed(), false);
         this.add(this.speedPanel);
     }
 
@@ -35,11 +34,13 @@ class ShipCompDisplay extends DarkPanel {
     animate() {
         super.animate();
 
+        let text = "System: " + this.ship.system.name;
         if (null == this.ship.dockedWith) {
-            this.subPanels[0].setText("Ship - Pos : (" + this.printNum(this.ship.location.x) + " , " + this.printNum(this.ship.location.y) + " , " + this.printNum(this.ship.location.z) + ")");
+            text += "     Pos: (" + this.printNum(this.ship.location.x) + " , " + this.printNum(this.ship.location.y) + " , " + this.printNum(this.ship.location.z) + ") " + this.ship.system.units;
         } else {
-            this.subPanels[0].setText("Ship - Docked");
+            text += " Docked";
         }
+        this.subPanels[0].setText(text);
 
         this.speedPanel.setMax(this.ship.hull.compSets.hullSet.getMaxSpeed());
         this.speedPanel.setValue(Math.floor(this.ship.speed.length()));

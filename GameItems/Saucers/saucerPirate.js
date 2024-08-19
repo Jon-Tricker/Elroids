@@ -46,7 +46,7 @@ class SaucerPirate extends Saucer {
     animate(date) {
         // Decay cargo
         if (0 < this.cargoMass) {
-            this.cargoMass -= DECAY_RATE / Universe.getAnimateRate();
+            this.cargoMass -= DECAY_RATE / this.getGame().getAnimateRate();
         }
 
         super.animate(date);

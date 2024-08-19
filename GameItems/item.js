@@ -75,11 +75,13 @@ class Item extends THREE.Group {
         // Set default boundary
         this.setBoundary(size);
 
-        // Add self to the game universe
-        this.system.addItem(this);
+        // Add self to system
+        system.addItem(this);
 
-        // Add self to graphics scene.
-        this.getGame().getScene().add(this);
+        // If this system is active add item to the graphics scene.
+        if (system == this.getGame().universe.system) {
+            this.getGame().getScene().add(this);
+        }
 
         // Deal with situation where Item created inside another Item.
         if (null != this.getBoundary()) {
@@ -95,10 +97,22 @@ class Item extends THREE.Group {
         }
     }
 
-    getUniverse() {
-        return(this.system.universe);
+    // Move item between systems.
+    setSystem(newSystem) {
+        // If already in a system remove it.
+        if (null != this.system) {
+            this.system.removeItem(this);
+        }
+
+        // Add it to new system
+        newSystem.addItem(this);
+        this.system = newSystem;
     }
-    
+
+    getUniverse() {
+        return (this.system.universe);
+    }
+
     getClass() {
         return (null);
     }
@@ -113,11 +127,11 @@ class Item extends THREE.Group {
     }
 
     getGame() {
-        return(this.system.universe.game);
+        return (this.system.universe.game);
     }
 
     getShip() {
-        return(this.system.ship);
+        return (this.system.universe.ship);
     }
 
     // Set speed/
@@ -143,7 +157,10 @@ class Item extends THREE.Group {
     destruct() {
         this.hitPoints = 0;
         this.system.removeItem(this);
-        this.getGame().getScene().remove(this);
+        // If this system is active remove item from the graphics scene.
+        if (this.system == this.getGame().universe.system) {
+            this.getGame().getScene().remove(this);
+        }
     }
 
     // Push item. Thrust in kN, mass in Tonnes. This should work without scaling.
@@ -178,7 +195,7 @@ class Item extends THREE.Group {
 
     // Damage (HP) when ramming.
     getRamDamage() {
-        return(Math.ceil(this.speed.length() * this.getTotalMass()/1000));
+        return (Math.ceil(this.speed.length() * this.getTotalMass() / 1000));
     }
 
     // Move item in universal space, Handle wrap round.
@@ -199,8 +216,6 @@ class Item extends THREE.Group {
             this.getUniverse().handleWrap(this.location);
         }
     }
-
-
 
     // Detects if a colisions will occur in next move.
     //
@@ -299,7 +314,19 @@ class Item extends THREE.Group {
     // Separate two overlapping objects.
     separateFrom(that) {
 
+        if (this.immobile && that.immobile) {
+            throw new BugError("Two immobile Items cannot collide.")
+        }
+
+        // Work out how much we need to move things by.
+        let reqdDelta = (this.getBoundary().getSize() + that.getBoundary().getSize()) * 1.1;
+        if (0 >= reqdDelta) {
+            // Already separated.
+            return;
+        }
+
         // Make sure speeds differ
+        /*
         let spd = this.speed.clone();
         spd.sub(that.speed);
         if (1 > spd.length()) {
@@ -311,15 +338,38 @@ class Item extends THREE.Group {
             spd.add(new THREE.Vector3(-1, -1, -1));
             that.setSpeed(spd);
         }
+        */
 
-        let totalSize = (this.getBoundary().getSize() + that.getBoundary().getSize()) * 1.5;
-        while (this.getRelativeLocation(that.location).length() < totalSize) {
-            this.moveItem(false);
-            // Don't let things push the ship around.
-            if (!(that instanceof Ship)) {
-                that.moveItem(false);
+        // Work out which object is faster.
+        let faster;
+        let slower;
+        if (this.speed.length() > that.speed.length()) {
+            faster = this;
+            slower = that;
+        } else {
+            faster = that;
+            slower = this;
+        }
+
+        // Move the faster object.
+
+        // Move outside requiredDelta.
+        let move = faster.speed.clone();
+
+        // If even 'faster' not moving.
+        if (0 == move.length()) {
+            // Move relative to current position.
+            move = slower.getRelativeLocation(faster.location);
+            if (0 == move.length()) {
+                // If at same location make random  move.
+                move = this.getGame().createRandomVector(1);
             }
-        }  
+        }
+
+        move.normalize();
+        move.multiplyScalar(reqdDelta);
+        faster.location = slower.location.clone();
+        faster.location.add(move);
 
         /*
         console.log("After this " + this.position.x + " " + this.position.y + " " + this.position.z + " " + this.location.x + " " + this.location.y + " " + this.location.z);
@@ -332,7 +382,6 @@ class Item extends THREE.Group {
     // Since we already have everything as x,y,z components hopefully can avoid any messy 'trig'.
     // Return true if actually collided.
     handleCollision(that) {
-
         this.transferMomentum(that);
 
         // If overlapping separate ... even if one of us is about to be destroyed.

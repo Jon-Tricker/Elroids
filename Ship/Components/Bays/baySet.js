@@ -152,7 +152,7 @@ class BaySet extends ComponentSet {
 
         // Make mineral 
         let ship = this.getShip();
-        let min = new Mineral(this.sets.ship.system, mass, ship.location.x, ship.location.y, ship.location.y, ship.speed.x * 0.9, ship.speed.y * 0.9, ship.speed.z * 0.9, mineral);
+        let min = new Mineral(this.sets.ship.system, mass, ship.location.x, ship.location.y, ship.location.y, ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random(), mineral);
 
         min.separateFrom(ship);
     }

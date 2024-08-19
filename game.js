@@ -21,8 +21,7 @@ import Player from './player.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "5.3";
-
+const VERSION = "5.4";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -95,14 +94,14 @@ class Game {
 
         Rock.setRockStyle(rockStyle);
 
+        // Create shopping list.
+        this.purchaseList = new PurchaseList(this);     
+
         // Create universe
         this.universe = new Universe(this, uniSize, systemSize, maxRockCount);  
 
         // Create the scene
         this.scene = new MyScene(this, (0 == maxRockCount));
-
-        // Create shopping list.
-        this.purchaseList = new PurchaseList(this);     
 
         // Now there is something to display it popuate the universe,
         this.universe.populate();
@@ -232,7 +231,7 @@ class Game {
     }
 
     getShip() {
-        return (this.universe.system.ship);
+        return (this.universe.ship);
     }
 
     togglePaused() {

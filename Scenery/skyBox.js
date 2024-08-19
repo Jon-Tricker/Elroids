@@ -5,7 +5,6 @@
 import * as THREE from 'three';
 import Game from '../game.js';
 import StarFieldTexture from '../Utils/starFieldText.js';
-import Universe from '../universe.js';
 
 // Sizes as percentage of sky box size.
 const SUN_SIZE = 5;

@@ -10,6 +10,7 @@ import MyCamera from '../Scenery/myCamera.js';
 import BasicHull from './Components/Hulls/basicHull.js';
 import Mineral from "../GameItems/mineral.js";
 import Station from '../GameItems/System/station.js';
+import WormholeEnd from '../GameItems/System/wormholeEnd.js';
 
 // Slightly damped attitude contols to allow fine adjustment.
 const ROTATE_RATE_DELTA = 0.125;        // r/s
@@ -138,8 +139,8 @@ class Ship extends Item {
             this.speed.multiplyScalar(0);
             this.setEngineSound(false);
             return;
-        }  
-        
+        }
+
         // Thrust in opposite direction to speed.
         let xDirection = this.speed.clone();
         xDirection.multiplyScalar(-1);
@@ -315,12 +316,12 @@ class Ship extends Item {
 
     // Get cargo bay
     getBays() {
-        return(this.hull.compSets.baySet);
+        return (this.hull.compSets.baySet);
     }
 
     // Get termnal (if active)
     getTerminal() {
-        return(this.getGame().displays.terminal);
+        return (this.getGame().displays.terminal);
     }
 
     // Pick up a mineral.
@@ -338,7 +339,7 @@ class Ship extends Item {
     loadComponent(comp) {
         this.hull.compSets.baySet.loadComponent(comp);
     }
-    
+
     // Unload component from bay.
     unloadComponent(comp) {
 
@@ -352,7 +353,7 @@ class Ship extends Item {
     }
 
     getCredits() {
-        return (this.getGame().player.getCredits()); 
+        return (this.getGame().player.getCredits());
     }
 
     handleCollision(that) {
@@ -369,6 +370,12 @@ class Ship extends Item {
             if (that.collideWithShip(this)) {
                 return;
             }
+        }
+
+        if (that instanceof WormholeEnd) {
+            // Try to raverse wormhole.
+            that.enter(this);
+            return;
         }
 
         return (super.handleCollision(that));
@@ -450,7 +457,7 @@ class Ship extends Item {
     }
 
     getMass() {
-        return(this.hull.compSets.getMass());
+        return (this.hull.compSets.getMass());
     }
 
     getTotalMass() {

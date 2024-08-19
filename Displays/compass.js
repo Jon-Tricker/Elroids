@@ -41,8 +41,11 @@ class Compass extends DarkPanel {
         let dots = new Array();
 
         // Populate dots. 
-        this.addDots(dots, this.game.universe.system.getStations(), STA_FRONT_COL, STA_REAR_COL);
-        this.addDots(dots, this.game.universe.system.getWormholes(), WH_FRONT_COL, WH_REAR_COL);
+        if (typeof this.game.universe.system.getStations === "function") { 
+            // We may have stations.
+            this.addDots(dots, this.game.universe.system.getStations(), STA_FRONT_COL, STA_REAR_COL);
+        }
+        this.addDots(dots, this.game.universe.system.getWormholeEnds(), WH_FRONT_COL, WH_REAR_COL);
 
         // Sort dots into size order. Largest first.
         dots.sort(function(a, b){return b.size - a.size});
@@ -70,7 +73,7 @@ class Compass extends DarkPanel {
             // Handle wrap round relative to ship.
             relPos.sub(thisship.location);
             this.game.universe.handleWrap(relPos);
-            if ((null == closest) || (relPos.length() < closest.length())) {
+            if ((null == closest) || (relPos.length() < closestRp.length())) {
                 closest = item;
                 closestRp = relPos;
             }
@@ -118,7 +121,7 @@ class Compass extends DarkPanel {
     }
 
     getShip() {
-        return (this.game.universe.system.ship);
+        return (this.game.universe.ship);
     }
 
     resize(parentWidth, parentHeight) {

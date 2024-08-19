@@ -106,7 +106,7 @@ class MyScene extends THREE.Scene {
     // Remove any existing, non rotating, camera ... and let GC deal with it (I hope).
     if (null != this.camera) {
       if (this.camera.getIsFixedRotation()) {
-        this.remove(this.camera);
+        super.remove(this.camera);
       }
     }
 
@@ -174,6 +174,17 @@ class MyScene extends THREE.Scene {
     this.labelRenderer.setSize(this.sizes.width, this.sizes.height);
   }
 
+  // Remove an item
+  remove(item) {
+    if (undefined != item.label) {
+      // If item has a label remove it and re-add it.
+      // This is a work round to a problem (bug?). Looks like a CSS2DObject that is part of a group is not removed when it parent group is removed from a scene.
+      item.remove(item.label);
+      item.add(item.label);
+    }
+    super.remove(item);
+  }
+
   animate() {
     // Update camera position
     this.camera.updatePosition();
@@ -189,8 +200,6 @@ class MyScene extends THREE.Scene {
     this.renderer.render(this, this.camera);
     this.labelRenderer.render(this, this.camera);
   }
-
-
 }
 
 export default MyScene;

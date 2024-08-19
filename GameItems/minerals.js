@@ -73,12 +73,14 @@ class Composition {
     }
   }
 
+  /*
   dump(msg) {
     for (let i = 0; i < this.composition.length; i++) {
       msg += this.composition[i].percentage + " ";
     }
     console.log(msg);
   }
+  */
 
   // Split in a way that 'concentrates' minerals.
   // One half is modified 'this' other is a new Composition
