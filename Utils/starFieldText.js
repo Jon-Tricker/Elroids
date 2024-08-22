@@ -4,14 +4,14 @@ import Texture from './texture.js';
 
 // Colours with the most common first.
 const starColours = [new THREE.Color(0xF0F0F0), new THREE.Color(0xF0F000), new THREE.Color(0xF08000), new THREE.Color(0xF00000), new THREE.Color(0x0000F0)];
-const BACKGROUND = new THREE.Color('black');
+const DEFAULT_BACKGROUND = new THREE.Color('black');
 
 const MAX_SIZE = 1024;
 
 class StarFieldTexture extends Texture {
 
   // Percent = the percentage of pixels to be stars.
-  constructor(width, height, percent) {
+  constructor(width, height, percent, background) {
     if (undefined == percent) {
       percent = 0.02;
     }
@@ -24,7 +24,11 @@ class StarFieldTexture extends Texture {
       width = MAX_SIZE;
     }
 
-    super(width, height, BACKGROUND);
+    if (undefined == background) {
+      background = DEFAULT_BACKGROUND
+    }
+
+    super(width, height, background);
 
     this.createData(percent);
   }

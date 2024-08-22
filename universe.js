@@ -96,6 +96,9 @@ class Universe {
             // First system is active.
             if (1 == count) {
                 this.system = system;
+
+                // Make current system graphics active.
+                system.setActive(true);
             }
 
             // Create wormhole between this system and hyperspace.
@@ -114,10 +117,8 @@ class Universe {
 
         // Put ship into current system.
         this.ship.setSystem(this.system);
-        this.system.populate();
 
-        // Make system graphics active.
-        // this.system.setActive(true);
+        this.system.populate();
     }
 
     // Animate all objects.

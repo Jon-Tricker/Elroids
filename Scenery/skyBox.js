@@ -68,33 +68,42 @@ class Moon extends THREE.Mesh {
   }
 }
 
-
 class SkyBox extends THREE.Group {
-  game;
+  system;
+  background;
 
-  constructor(size, game, gridOn) {
+  constructor(size, system, populate, background) {
     super();
 
     this.size = size;
-    this.game = game;
+    this.system = system;
+ 
+    if (undefined == background) {
+      background = new THREE.Color('black');
+    }
+    this.background = background;
 
-    moonMaterial.map = Game.getCraterTexture(),
-    moonMaterial.bumpMap = Game.getCraterTexture(),
+    moonMaterial.map = Game.getCraterTexture();
+    moonMaterial.bumpMap = Game.getCraterTexture();
 
-    this.setupMesh(gridOn);
+    this.setupMesh(populate);
   }
 
   getUniverse() {
-    return(this.game.universe);
+    return(this.system.universe);
   }
 
-  setupMesh(gridOn) {
+  getGame() {
+    return(this.getUniverse().game);
+  }
+
+  setupMesh(populate) {
     let boxGeometry = new THREE.BoxGeometry(this.size, this.size, this.size);
 
     // compute vertex normals
     boxGeometry.computeVertexNormals();
 
-    if (gridOn) {
+    if (populate) {
       let boxMaterialArray = this.createDataMaterialArray(this.size, this.size);
 
       let boxMesh = new THREE.Mesh(boxGeometry, boxMaterialArray);
@@ -113,7 +122,7 @@ class SkyBox extends THREE.Group {
         let moonMesh = new Moon((1 + Math.floor(Math.random() * MAX_MOON_SIZE)) * this.size/100);
         this.add(moonMesh);
 
-        let position = this.game.createRandomVector(sz);
+        let position = this.getGame().createRandomVector(sz);
 
         // Stick it on a side where the sun isn't.
         switch (Math.floor(Math.random() * 5)) {
@@ -146,7 +155,7 @@ class SkyBox extends THREE.Group {
 
   // Dynamic image creation.
   createDataMaterialArray(width, height) {
-    let texture = new StarFieldTexture(width, height).getTexture();
+    let texture = new StarFieldTexture(width, height, 0.02, this.background).getTexture();
     let textures = [];
     for (let i = 0; i < 6; i++) {
       textures.push(texture);

@@ -19,8 +19,10 @@ class Wormhole {
 
     constructor(system, systemLocation, hyperLocation) {
         let hyper = system.universe.hyperspace;
-        this.systemEnd = new WormholeEnd(system, systemLocation, hyper.name, this);
+        
+        // this.systemEnd = new WormholeEnd(system, systemLocation, hyper.name, this);
         this.hyperspaceEnd = new WormholeEnd(hyper, hyperLocation, system.name, this);
+        this.systemEnd = new WormholeEnd(system, systemLocation, hyper.name, this, hyper.skyBox.background);
 
         // Add ends to systems
         system.addWormholeEnd(this.systemEnd);

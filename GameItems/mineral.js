@@ -6,9 +6,7 @@
 
 import * as THREE from 'three';
 import NonShipItem from './nonShipItem.js';
-import Universe from '../universe.js';
 import Ship from '../Ship/ship.js';
-import Item from './item.js';
 import Explosion from './explosion.js';
 
 const MAX_SIZE = 10;

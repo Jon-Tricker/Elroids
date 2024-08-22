@@ -7,9 +7,8 @@
 import * as THREE from 'three';
 import NonShipItem from './nonShipItem.js';
 import Game from '../game.js';
-import Universe from '../universe.js'
 import FacitRockGeometry from '../facitRockGeometry.js'
-import { MineralType, MineralComponent, Composition } from './minerals.js';
+import { Composition } from './minerals.js';
 import Ship from '../Ship/ship.js'
 
 // Type of rock graphics
@@ -27,9 +26,6 @@ const BASE_ROCK_MATERIAL = new THREE.MeshStandardMaterial(
     color: RADAR_COLOUR,
     roughness: 0.5,
     opacity: 1,
-    map: Game.getCraterTexture(),
-    // roughnessMap: texture,
-    bumpMap: Game.getCraterTexture(),
     metalness: 0,
   }
 )
@@ -46,6 +42,9 @@ class Rock extends NonShipItem {
 
   constructor(system, rockSize, locationX, locationY, locationZ, speedX, speedY, speedZ, composition) {
     super(system, locationX, locationY, locationZ, speedX, speedY, speedZ, rockSize, rockSize * rockSize * rockSize, 1 + rockSize / 10);
+
+    BASE_ROCK_MATERIAL.map = Game.getCraterTexture();
+    BASE_ROCK_MATERIAL.bumpMap = Game.getCraterTexture();
 
     this.rockSize = rockSize;
     this.originalHP = this.hitPoints;

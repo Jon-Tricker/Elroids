@@ -8,7 +8,6 @@ import * as THREE from 'three';
 import Universe from '../universe.js';
 import ItemBoundary from './itemBoundary.js';
 import BugError from "../GameErrors/bugError.js";
-import Ship from '../Ship/ship.js';
 
 const COLOUR = "#FFFFFF";
 
@@ -95,6 +94,11 @@ class Item extends THREE.Group {
                 }
             }
         }
+    }
+
+    // Work round for circular dependency with Ship class.
+    isShip() {
+        return(false);
     }
 
     // Move item between systems.
@@ -253,14 +257,14 @@ class Item extends THREE.Group {
 
                 // For the ship be generous ... has to go through windscreen.
                 let minDist = 0;
-                if (this instanceof Ship) {
+                if (this.isShip()) {
                     // console.log("X " + thisBoundary.getSize() + " " + thatBoundary.getSize())
                     minDist += thisBoundary.getSize() / 4;
                 } else {
                     minDist += thisBoundary.getSize();
                 }
 
-                if (that instanceof Ship) {
+                if (that.isShip()) {
                     minDist += thatBoundary.getSize() / 4;
                 } else {
                     minDist += thatBoundary.getSize();

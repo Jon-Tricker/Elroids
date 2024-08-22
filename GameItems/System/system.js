@@ -1,4 +1,5 @@
 // Base class for all 'systems' (areas that can be navigated.)
+import SkyBox from "../../Scenery/skyBox.js"
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -24,11 +25,23 @@ class System {
     // Universal locaiton (in lightyears)
     uniLocation
 
-    constructor(universe, name, systemSize, uniLocation) {
+    // Static elements
+    skyBox;
+
+    constructor(universe, name, systemSize, uniLocation, background) {
         this.name = name;
         this.systemSize = systemSize;
         this.universe = universe;
         this.uniLocation = uniLocation;
+
+        // Create static elements.
+        let skyBoxSize = universe.systemSize * 4;
+        this.createSkyBox(skyBoxSize, background);
+    }
+
+    createSkyBox(size, background) {
+        // Create populated.
+        this.skyBox = new SkyBox(size, this, true, background);
     }
 
     getGame() {
@@ -39,11 +52,15 @@ class System {
     setActive(state) {
         let scene = this.getGame().getScene();
         if (state) {
+            scene.add(this.skyBox);
+
             // Add all items to the scene.
             for (let item of this.items) {
                 scene.add(item);
             }
         } else {
+            scene.remove(this.skyBox);
+
             // Remove all items from the scene.
             for (let item of this.items) {
                 // Remove item
@@ -69,6 +86,18 @@ class System {
     }
 
     animate(date, keyBoard) {
+        let game = this.getGame();
+        let scene = game.getScene();
+
+        // Move sky box so we never get closer to it.
+        if (!scene.camera.getIsFixedLocation()) {
+            // Move with ship. 
+            this.skyBox.position.set(game.getShip().position.x, game.getShip().position.y, game.getShip().position.z);
+        } else {
+            // Move with camera.
+            this.skyBox.position.set(scene.camera.position.x, scene.camera.position.y, scene.camera.position.z);
+        }
+
         for (let item of this.items) {
             item.animate(date, keyBoard);
         }

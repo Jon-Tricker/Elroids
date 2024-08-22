@@ -57,6 +57,11 @@ class Ship extends Item {
 
         this.createCameras();
     }
+    
+    // Work round for circular dependency with Item class.
+    isShip() {
+        return(true);
+    }
 
     // Build/Rebuild ship components.
     buildShip() {

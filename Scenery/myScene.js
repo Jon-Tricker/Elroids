@@ -6,7 +6,6 @@
 
 import * as THREE from 'three';
 import MyCamera from './myCamera.js'
-import SkyBox from "./skyBox.js";
 import WrapBox from "./wrapBox.js";
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 
@@ -25,7 +24,6 @@ class MyScene extends THREE.Scene {
   sizes;
   game;
   myCanvas;
-  skyBox;
   wrapBox;
 
 
@@ -55,11 +53,6 @@ class MyScene extends THREE.Scene {
     this.labelRenderer.domElement.style.position = 'absolute';
     this.labelRenderer.domElement.style.top = '0px';
     document.body.appendChild(this.labelRenderer.domElement);
-
-    // Create static elements.
-    let skyBoxSize = this.game.universe.systemSize * 4;
-    this.skyBox = new SkyBox(skyBoxSize, game, true);
-    this.add(this.skyBox);
 
     if (wrapBoxOn) {
       let wrapBoxSize = this.game.universe.systemSize * 2;
@@ -188,14 +181,7 @@ class MyScene extends THREE.Scene {
   animate() {
     // Update camera position
     this.camera.updatePosition();
-
-    if (!this.camera.getIsFixedLocation()) {
-      // Move sky box with ship. So we never get closer to it.
-      this.skyBox.position.set(this.game.getShip().position.x, this.game.getShip().position.y, this.game.getShip().position.z);
-    } else {
-      this.skyBox.position.set(this.camera.position.x, this.camera.position.y, this.camera.position.z);
-    }
-
+    
     // Re-render
     this.renderer.render(this, this.camera);
     this.labelRenderer.render(this, this.camera);
