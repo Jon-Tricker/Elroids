@@ -38,10 +38,7 @@ class Saucer extends NonShipItem {
         super(system, locationX, locationY, locationZ, 0, 0, 0, size, mass, SAUCER_HP, owner);
         this.colour = colour;
 
-        let saucerMaterial = this.getDefaultMaterial().clone();
-        saucerMaterial.color.set(colour);
-
-        this.setupMesh(saucerMaterial);
+        this.setupMesh();
         this.rotateRate = Math.random() * MAX_ROTATE_RATE * 2 - MAX_ROTATE_RATE;
 
         if (safe === undefined) {
@@ -74,7 +71,10 @@ class Saucer extends NonShipItem {
         return (0);
     }
 
-    setupMesh(material) {
+    setupMesh() {
+        let material = this.getDefaultMaterial().clone();
+        material.color.set(this.colour);
+
         let sphereGeometry = new THREE.SphereGeometry(this.size / 2, 64, 64);
 
         // compute vertex normals

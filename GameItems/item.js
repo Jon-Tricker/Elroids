@@ -96,6 +96,17 @@ class Item extends THREE.Group {
         }
     }
 
+    // By default jus add/remove from scene.
+    // Override in Items that support (in)activate when not in use. 
+    setActive(state) {
+        let scene = this.getGame().getScene();
+        if (state) {
+            scene.add(this);
+        } else {  
+            scene.remove(this);
+        }
+    }
+
     // Work round for circular dependency with Ship class.
     isShip() {
         return(false);

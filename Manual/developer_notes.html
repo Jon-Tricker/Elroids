@@ -36,21 +36,21 @@
 		<LI>Labels are in the foreground. If something passes between the viewer and a labeled object label will be infront.</LI>
 	</UL>
 
+	<P>For notes on code operation/stucture see the <A HREF="developer_code_notes.html">Developer Code notes.</A>.</P>
+
 	<H2>ToDos (In some sort of priority order)</H2>
 
 	<H3>V5.x Extend Universe (In progress)</H3>
 	<UL>
 		<LI>Multiple systems.</LI>
-		<LI>Wormhole + warp space.</LI>
-		<LI>Galactic map.</LI>
-		<LI>Move sky box to StarSystem and customise for each system.</LI>
-		<LI>Only persist essential System data when system inactive.</LI>
+		<LI>Delete old 'Galaxies stuff' from wormholes.</LI>
 	</UL>
 
 	<H3>V6.x Economics game</H3>
+	<P>Add vairable mineral scarcity/tech level for each system</P>
 	<P>Add non mineral trade goods (requires multiple systems/stations.)</P>
 	<P>Add economy/stock market for each system.</P>
-	<P>Add vairable mineral scarcity for each system</P>
+	<P>Add system details display panel. (populated as systems are visited?)</P>
 
 	<H3>V7.x Add extra ship components.</H3>
 	<UL>
@@ -122,7 +122,7 @@
 			<LI>Fix audio to use THREE.PositionalAudio (Item.js.playSound()). I tried but cant get the listener to stay
 				stuck to the camera in all cases. Maybe add it to the Ship instead. Fell back on manually reducing volume
 				wih distance (and living without correct stereo).</LI>
-			<LI>Make crater and galaxy textures proceduraly generated (less download).</LI>
+			<LI>Make crater textures proceduraly generated (less download).</LI>
 			<LI>Add 'tunnel' graphics when going through wormholes.</LI>
 		</UL>
 
@@ -156,112 +156,6 @@
 			</UL>
 		</LI>
 	</UL>
-
-	<H2>Structure</H2>
-	<P>To level classes work something like</P>
-	<UL>
-		<LI>Game - Stuff related to game play. Not the simulated universe.
-			<UL>
-				<LI>Player - Stuff related to the current player.</LI>
-				<LI>MyScene - Stuff related to sound and graphics rendering.</LI>
-				<LI>Displays - Screen display graphics (Maybe should go under Ship).</LI>
-				<LI>Purchase list - Component shoping list.</LI>
-				<LI>Universe - Everything related to the in game universe.
-					<UL>
-						<LI>In game time keeping</LI>
-						<LI>List and positions of all star systems.</LI>
-						<LI>Pointer to 'current' star system.</LI>
-						<LI>System - Details about a specific start system. If not the 'current' system some data (e.g. rock locations) will be dicarded.
-							<UL>
-								<LI>Item - The game objects that can exist within a system. Can also be moved to other systems.
-									<UL>
-										<LI>Ship - The players ship.</LI>
-										<LI>NonShipItems - Other in came objects..</LI>
-									</UL>
-								</LI>
-								<LI>items - List of items.</LI>
-								<LI>stations - List of stations.</LI>
-								<LI>wormholes - List of wormholes</LI>
-							</UL>
-						</LI>
-						<LI>Hyperspace - A subclass of System.</LI>
-					</UL>
-				</LI>
-				<LI>Main animation loop.</LI>
-			</UL>
-		</LI>
-	</UL>
-
-	<H2>Learnings</H2>
-	<UL>
-		<LI>Three JS is oriented towards 'landscape' scenes.
-			odd things (flipings and unexpected rotations)
-			can happen if a camera flies over the 'poles'.
-			After a lot of effort I worked round this by making the 'chase/pilot
-			cameras' part of the ship.
-		</LI>
-		<LI>Two threejs 'renderers' are used:
-		<UL>
-			<LI>A THREE.WebGLRenderer handles the 3D rendering.</LI>
-			<LI>A separate CSS2DRenderer handles 2D objects, like labels, that we want to be flat on to camera.</LI>
-		</UL>
-			This as described in the exapmle <A HREF="https://threejs.org/examples/css2d_label.html"> here.</A>
-		</LI>
-
-		<LI>1D conservation of momentum, during collisions, is handled as described in the equasions
-			<A HREF="https://en.wikipedia.org/wiki/Momentum"> here.</A>
-			Most discussion on extending this to 3D decends into a mass of 'Euler angles' and 'trig'. However since we
-			have both the
-			velocities and impact direction as x, y and z components it can be handled using
-			dot products (and less CPU) ... but it took a while to get the maths right.
-		</LI>
-		<LI>There are problems with 'quantized' time. A slower moving object can catch up with and collide with a faster
-			one if it gets a move phase 'first'. Some messy work round have been required.</LI>
-		<LI>Sound support on Chrome is a pain. In an attempt to block audio spam audio components can only ne
-			initialized from within user events. So sounds have to be loaded on the first key/mouse click. Which means
-			they are not yet ready if this event wans to make a sound,</LI>
-		<LI>'statics' are slow. Require an instance of the class to be created? For better performance create a single instance as part of a top level object (e.g. Game) and call by reference.</LI>
-	</UL>
-
-	<H2>Units and dimensions</H2>
-	<P>This project was coded with arbitary units of distance, mass and time. I have since modified it to use something resembling
-		SI.</P>
-	<UL>
-		<LI>Distance:
-			<UL>
-				<LI>For short distance (within systems) is in Meters.</LI>
-				<LI>For long distance (between systems) is in some larger unit (lightyears?).</LI>
-			</UL> 
-		</LI>
-		<LI>Mass is in Tonnes (1000KG).</LI>
-		<LI>Time is in seconds.</LI>
-		<LI>Damage (HPs) is an arbitary unit. However, from the 'ram damage' calculation we can conclude that its units are M kg m/s</LI>
-		<LI>Rocks have a mass equal to the cube of their size. i.e (assuming cubic rocks) a density of about 1
-			tonne/m^3. Probably should be a bit higher and related to their composition. However it will do for now.
-		</LI>
-	</UL>
-
-	<P>There are a few incorrect 'artifacts' to make the game playable.</P>
-	<UL>
-		<LI>Rock mass is proportional to the cube of its size. When a rock splits it make 2 rocks of half the size. So
-			3/4 of the mass is lost. However this makes for a mangable amounts of minerals once a rock is broken down.
-			(The spare mass becomes 'dark matter')</LI>
-		<LI>Universe is too small. Only a few km across. Necessary to keep a reasonable rock density wihtout a huge
-			number of rocks.</LI>
-		<LI>Distances and sizes are far too small for a 'realistic' universe. However if made realistic objects would
-			only be points of light in the distance. For playability everything is moved closer together. (Excuse:
-			StarTrek/Wars battles where ships engage a few hundred meters apart and travelling at a few 10s of kph.)
-		</LI>
-		<LI>At present angular momentum is not conserved (for anything) ... If it were ship contol would be difficult.</LI>
-		<LI>Deceleration doesn't really make sense. Engines fire in a ramdom direction. But it is necessary for game play.</LI>
-	</UL>
-
-	<H2>Why not Typescript?</H2>
-	<P>As a Java coder I prefer stongly typed languages. However...</P>
-	<OL>
-		<LI>I only found out about Typescript late in the development of this project.</LI>
-		<LI>I want the code available warts/comments and all. Not an additional build step with modified output.</LI>
-	</OL>
 </BODY>
 
 </HTML>

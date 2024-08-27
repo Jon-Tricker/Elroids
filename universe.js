@@ -11,7 +11,7 @@ import { MineralTypes } from './GameItems/minerals.js';
 import Ship from './Ship/ship.js';
 import Wormhole from './GameItems/System/wormhole.js';
 
-const SYSTEM_NAMES = ["Asteel", "Brian"];
+const SYSTEM_NAMES = ["Sol", "Asteel", "Kessel"];
 
 class Universe {
     // Back reference to out parent.
@@ -79,7 +79,7 @@ class Universe {
                 // Locate system randomly in the universe
                 let minDist;
                 do {    
-                    uniLoc = this.game.createRandomVector(this.systemSize);
+                    uniLoc = this.game.createRandomVector(this.systemSize/5);
                     minDist = this.systemSize;
                     for (let sys of this.systems) {
                         let relLoc = sys.uniLoc;
@@ -91,14 +91,12 @@ class Universe {
                 } while (minDist < (this.systemSize/10));
             }
             let system = new StarSystem(this, name, this.systemSize, this.maxRockCount, uniLoc);
+            system.populate();
             this.systems.add(system);
 
             // First system is active.
             if (1 == count) {
                 this.system = system;
-
-                // Make current system graphics active.
-                system.setActive(true);
             }
 
             // Create wormhole between this system and hyperspace.
@@ -118,7 +116,8 @@ class Universe {
         // Put ship into current system.
         this.ship.setSystem(this.system);
 
-        this.system.populate();
+        // Make current system graphics active.
+        this.system.setActive(true);
     }
 
     // Animate all objects.

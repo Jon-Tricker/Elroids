@@ -287,7 +287,7 @@ class Ship extends Item {
             this.setEngineSound(false);
 
             // new Explosion(this.size, this);
-            this.game.shipDestroyed(that);
+            this.getGame().shipDestroyed(that);
         } else {
             this.playSound('clang');
         }

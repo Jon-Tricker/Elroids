@@ -10,7 +10,7 @@ import StarFieldTexture from '../Utils/starFieldText.js';
 const SUN_SIZE = 5;
 const MAX_MOON_SIZE = 4;
 
-const FACIT_COUNT= 32;
+const FACIT_COUNT = 32;
 
 // Create sun material.
 const sunMaterial = new THREE.MeshStandardMaterial(
@@ -37,47 +37,86 @@ const moonMaterial = new THREE.MeshStandardMaterial(
   }
 )
 
-class Sun extends THREE.Mesh {
+class SkyBoxItem {
+  skyBox;
+  size;
+  position;
+  colour;
+  mesh;
 
-  constructor(size) {
-    let sunGeometry = new THREE.SphereGeometry(size, FACIT_COUNT, FACIT_COUNT);
-    sunGeometry.computeVertexNormals();
+  constructor(skyBox, size, position) {
+    this.skyBox = skyBox;
+    this.size = size;
+    this.position = position;
+  }
 
-    super(sunGeometry, sunMaterial);
+  setActive(state) {
+    if (true == state) {
+      this.setupMesh();
+
+      this.mesh.position.set(this.position.x, this.position.y, this.position.z);
+      this.skyBox.add(this.mesh)
+    } else {
+      this.skyBox.remove(this.mesh);
+      // ... and GC.
+      this.mesh = undefined;
+    }
   }
 }
 
-class Moon extends THREE.Mesh {
+class Sun extends SkyBoxItem {
 
-  constructor(size) {
-    let moonGeometry = new THREE.SphereGeometry(size, FACIT_COUNT, FACIT_COUNT);
+  constructor(skyBox, size, position) {
+    super(skyBox, size, position);
+  }
+
+  setupMesh() {
+    let sunGeometry = new THREE.SphereGeometry(this.size, FACIT_COUNT, FACIT_COUNT);
+    sunGeometry.computeVertexNormals();
+
+    this.mesh = new THREE.Mesh(sunGeometry, sunMaterial);
+  }
+}
+
+class Moon extends SkyBoxItem {
+  colour;
+
+  constructor(skyBox, size, position) {
+    super(skyBox, size, position);
+    this.colour = this.randomColour();
+  }
+
+  setupMesh() {
+    let moonGeometry = new THREE.SphereGeometry(this.size, FACIT_COUNT, FACIT_COUNT);
     moonGeometry.computeVertexNormals();
 
     let material = moonMaterial.clone();
-    material.color.set(Moon.randomColour());
+    material.color.set(this.colour);
 
-    super(moonGeometry, material);
+    this.mesh = new THREE.Mesh(moonGeometry, material);
   }
-  
+
   // Generate weighted random colours
-  static randomColour() {
+  randomColour() {
     let rnd = Math.random();
     let offset = Math.floor((rnd * rnd * rnd) * moonColours.length);
     let colour = moonColours[offset];
-    return(colour);
+    return (colour);
   }
 }
 
 class SkyBox extends THREE.Group {
   system;
   background;
+  moons = new Set();
+  suns = new Set();
 
   constructor(size, system, populate, background) {
     super();
 
     this.size = size;
     this.system = system;
- 
+
     if (undefined == background) {
       background = new THREE.Color('black');
     }
@@ -86,41 +125,16 @@ class SkyBox extends THREE.Group {
     moonMaterial.map = Game.getCraterTexture();
     moonMaterial.bumpMap = Game.getCraterTexture();
 
-    this.setupMesh(populate);
+    this.populate(populate);
   }
 
-  getUniverse() {
-    return(this.system.universe);
-  }
-
-  getGame() {
-    return(this.getUniverse().game);
-  }
-
-  setupMesh(populate) {
-    let boxGeometry = new THREE.BoxGeometry(this.size, this.size, this.size);
-
-    // compute vertex normals
-    boxGeometry.computeVertexNormals();
-
+  // Create box in an inactive state.
+  populate(populate) {
     if (populate) {
-      let boxMaterialArray = this.createDataMaterialArray(this.size, this.size);
-
-      let boxMesh = new THREE.Mesh(boxGeometry, boxMaterialArray);
-      this.add(boxMesh);
-
-      let sunMesh = new Sun(SUN_SIZE * this.size/100);
-      this.add(sunMesh);
-
-      // Same position as light.
-      let sz = this.getUniverse().systemSize;
-      // sunMesh.position.set(0, sz * 2, sz * 2);
-      sunMesh.position.set(0, 0, sz * 2);
-
       let moonCount = 2 + Math.floor(Math.random() * 3);
       for (let i = 0; i <= moonCount; i++) {
-        let moonMesh = new Moon((1 + Math.floor(Math.random() * MAX_MOON_SIZE)) * this.size/100);
-        this.add(moonMesh);
+
+        let sz = this.getUniverse().systemSize;
 
         let position = this.getGame().createRandomVector(sz);
 
@@ -148,9 +162,59 @@ class SkyBox extends THREE.Group {
             break;
         }
 
-        moonMesh.position.set(position.x, position.y, position.z);
+        this.moons.add(new Moon(this, (1 + Math.floor(Math.random() * MAX_MOON_SIZE)) * this.size / 100, position));
+      }
+
+      // One sun for now.
+      // Same position as light.
+      let sz = this.getUniverse().systemSize;
+      let position = new THREE.Vector3(0, 0, sz * 2);
+      this.suns.add(new Sun(this, SUN_SIZE * this.size / 100, position));
+    }
+  }
+
+  setActive(state) {
+    if (true == state) {
+      this.setupMesh();
+      this.getGame().getScene().add(this);
+    }
+
+    for (let sun of this.suns) {
+      sun.setActive(state);
+    }
+
+    for (let moon of this.moons) {
+      moon.setActive(state);
+    }
+
+    if (false == state) {
+      this.getGame().getScene().remove(this);
+      for (let mesh of this.children) {
+        this.remove(mesh);
+        // ... and GC.
+        mesh = undefined;
       }
     }
+  }
+
+  getUniverse() {
+    return (this.system.universe);
+  }
+
+  getGame() {
+    return (this.getUniverse().game);
+  }
+
+  setupMesh() {
+    let boxGeometry = new THREE.BoxGeometry(this.size, this.size, this.size);
+
+    // compute vertex normals
+    boxGeometry.computeVertexNormals();
+
+    let boxMaterialArray = this.createDataMaterialArray(this.size, this.size);
+
+    let boxMesh = new THREE.Mesh(boxGeometry, boxMaterialArray);
+    this.add(boxMesh);
   }
 
   // Dynamic image creation.

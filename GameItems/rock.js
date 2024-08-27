@@ -5,7 +5,7 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import NonShipItem from './nonShipItem.js';
+import NonShipItem2 from './nonShipItem2.js';
 import Game from '../game.js';
 import FacitRockGeometry from '../facitRockGeometry.js'
 import { Composition } from './minerals.js';
@@ -30,7 +30,7 @@ const BASE_ROCK_MATERIAL = new THREE.MeshStandardMaterial(
   }
 )
 
-class Rock extends NonShipItem {
+class Rock extends NonShipItem2 {
 
   rockSize;
   originalHP;
@@ -60,9 +60,13 @@ class Rock extends NonShipItem {
       this.composition = composition;
     }
 
-    this.setupMesh();
+    // this.setupMesh();
 
     system.rockCount++;
+
+    if (system == system.universe.system) {
+        this.setActive(true);
+    }
   }
 
   destruct() {
@@ -156,11 +160,13 @@ class Rock extends NonShipItem {
       }
 
       if (0 < this.composition.getValue()) {
-        new Rock(this.system, newSize, loc.x, loc.y, loc.z, spd.x * ratio.x, spd.y * ratio.y, spd.z * ratio.z, this.composition);
+        let rock = new Rock(this.system, newSize, loc.x, loc.y, loc.z, spd.x * ratio.x, spd.y * ratio.y, spd.z * ratio.z, this.composition);
+        rock.setActive(true);
       }
 
       if (0 < newComp.getValue()) {
-        new Rock(this.system, newSize, loc.x, loc.y, loc.z, spd.x * ratio2.x, spd.y * ratio2.y, spd.z * ratio2.z, newComp);
+        let rock = new Rock(this.system, newSize, loc.x, loc.y, loc.z, spd.x * ratio2.x, spd.y * ratio2.y, spd.z * ratio2.z, newComp);
+        rock.setActive(true);
       }
     } else {
       this.composition.mineralize(loc, spd, this.mass / 2, this.system);

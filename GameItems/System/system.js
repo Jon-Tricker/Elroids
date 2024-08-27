@@ -50,22 +50,9 @@ class System {
 
     // Switch this system on/off
     setActive(state) {
-        let scene = this.getGame().getScene();
-        if (state) {
-            scene.add(this.skyBox);
-
-            // Add all items to the scene.
-            for (let item of this.items) {
-                scene.add(item);
-            }
-        } else {
-            scene.remove(this.skyBox);
-
-            // Remove all items from the scene.
-            for (let item of this.items) {
-                // Remove item
-                scene.remove(item);
-            }
+        this.skyBox.setActive(state);
+        for (let item of this.items) {
+            item.setActive(state);
         }
     }
 

@@ -141,7 +141,7 @@ class SaucerPirate extends Saucer {
         // If cargo on board make new mineral.
         this.cargoMass = Math.floor(this.cargoMass);
         if (0 < this.cargoMass) {
-            new Mineral(this.cargoMass, this.location.x, this.location.y, this.location.z, this.speed.x, this.speed.y, this.speed.z, this.getGame(), this.cargoType);
+            new Mineral(this.system, this.cargoMass, this.location.x, this.location.y, this.location.z, this.speed.x, this.speed.y, this.speed.z, this.cargoType);
         }
         super.destruct();
     }

@@ -153,7 +153,10 @@ class StarSystem extends System {
         let maxVel = game.createRandomVector(game.getMaxRockVelocity());
         let sz = Math.floor((Math.random() * game.getMaxRockSize()) + 10);
 
-        new Rock(this, sz, loc.x, loc.y, loc.z, maxVel.x, maxVel.y, maxVel.z);
+        let rock = new Rock(this, sz, loc.x, loc.y, loc.z, maxVel.x, maxVel.y, maxVel.z);
+        if (this == this.universe.system) {
+            rock.setActive(true);
+        }
     };
 
     createStation() {
