@@ -66,8 +66,8 @@ class CargoMenu {
                 row.push(mass);
 
                 if (null != ship.dockedWith) {
-                    row.push(CargoMenu.getButtonText(mineral, 1));
-                    row.push(CargoMenu.getButtonText(mineral, mass));
+                    row.push(CargoMenu.getButtonText(ship.system, mineral, 1));
+                    row.push(CargoMenu.getButtonText(ship.system, mineral, mass));
 
                     totalValue += mineral.value * mass;
                 } else {
@@ -118,7 +118,7 @@ class CargoMenu {
                 vals.push("<button type=\"button\" onclick=\"CargoMenu.onDetailsClick(this, cursor)\">Show</button>");
                 if (null != ship.dockedWith) {
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onMountCompClick(this, cursor)\">Mount</button>");
-                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellCompClick(this, cursor)\">" + comp.getCurrentValue() + "</button>");
+                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellCompClick(this, cursor)\">" + comp.getCurrentValue(ship.system) + "</button>");
                 }
                 tab.addRow(vals);
             }
@@ -127,8 +127,8 @@ class CargoMenu {
         return (doc);
     }
 
-    static getButtonText(mineral, mass) {
-        let value = mineral.value * mass;
+    static getButtonText(system, mineral, mass) {
+        let value = Math.floor(system.spec.getMineralValue(mineral) * mass);
         return ("<button type=\"button\" onclick=\"CargoMenu.onSellMineralClick(this.getShip(), cursor, " + mass + ")\">" + value + "</button>");
     }
 

@@ -40,16 +40,18 @@ class PurchaseMenu {
                         printHeads = false;
                     }
 
-                    let vals = new Array();
-                    vals.push(comp.name);
-                    vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onDetailsClick(this, cursor)\">Show</button>");
-                    if (set != sets.hullSet) {
-                        vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onBuyClick(this, cursor)\">" + comp.getCurrentValue() + "</button>");
-                        vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onMountClick(this, cursor)\">" + comp.getCurrentValue() + "</button>");
-                    } else {
-                        vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onUpgradeClick(this, cursor)\">" + comp.getUpgradeCost(this.getShip()) + "</button>");
+                    if (comp.getTechLevel() <= game.universe.system.getTechLevel()) {
+                        let vals = new Array();
+                        vals.push(comp.name);
+                        vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onDetailsClick(this, cursor)\">Show</button>");
+                        if (set != sets.hullSet) {
+                            vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onBuyClick(this, cursor)\">" + comp.getCurrentValue(game.universe.system) + "</button>");
+                            vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onMountClick(this, cursor)\">" + comp.getCurrentValue(game.universe.system) + "</button>");
+                        } else {
+                            vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onUpgradeClick(this, cursor)\">" + comp.getUpgradeCost(this.getShip()) + "</button>");
+                        }
+                        tab.addRow(vals);
                     }
-                    tab.addRow(vals);
                 }
                 doc += tab.toString();
                 doc += "<BR />";
@@ -85,7 +87,7 @@ class PurchaseMenu {
 
         comp.mount(ship, true);
     }
-    
+
     static onUpgradeClick(menuSystem, cursor) {
         let game = menuSystem.getGame();
         let comp = PurchaseMenu.getCompForCursor(game, cursor);
@@ -98,10 +100,12 @@ class PurchaseMenu {
         let compNumber = 0;
         for (let set of game.purchaseList) {
             for (let comp of set) {
-                if (compNumber == cursor.y) {
-                    return (comp);
-                } else {
-                    compNumber++;
+                if (comp.getTechLevel() <= game.universe.system.getTechLevel()) {
+                    if (compNumber == cursor.y) {
+                        return (comp);
+                    } else {
+                        compNumber++;
+                    }
                 }
             }
         }

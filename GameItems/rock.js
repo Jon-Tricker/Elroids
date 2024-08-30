@@ -54,9 +54,9 @@ class Rock extends NonShipItem2 {
     // Get mineral composition
     if (composition === undefined) {
       // Random composition.
-      this.composition = new Composition(true);
+      this.composition = new Composition(true, this.system);
     } else {
-      // Same a s parent.
+      // Same as parent.
       this.composition = composition;
     }
 

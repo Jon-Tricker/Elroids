@@ -21,7 +21,7 @@ import Player from './player.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "5.6";
+const VERSION = "6.0";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -113,7 +113,7 @@ class Game {
         if (this.testMode) {
             // Doc ship to first station.
             for (let station of this.universe.system.stations ) {
-                // this.getShip().dock(station);
+                this.getShip().dock(station);
                 break;
             }
         }

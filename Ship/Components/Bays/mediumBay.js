@@ -6,7 +6,7 @@ const DESCRIPTION = "A medium sized cargo bay";
 class MediumBay extends Bay {
 
     constructor(ship) {
-        super("Skip", 20, 500, 3, ship, 50);
+        super("Skip", 2, 20, 500, 3, ship, 50);
     }
 
     getDescription() {

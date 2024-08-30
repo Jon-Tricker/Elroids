@@ -1,6 +1,6 @@
 // A normal star system.
 import * as THREE from 'three';
-import System from './system.js'
+import { System } from './system.js'
 import Ship from '../../Ship/ship.js';
 import Rock from '../rock.js';
 import Mineral from '../mineral.js';
@@ -26,8 +26,8 @@ class StarSystem extends System {
     // Stations in the system.
     stations = new Set();
 
-    constructor(universe, name, systemSize, maxRockCount, uniLocation) {
-        super(universe, name, systemSize, uniLocation)
+    constructor(universe, spec, systemSize, maxRockCount, uniLocation) {
+        super(universe, spec, systemSize, uniLocation)
         this.maxRockCount = maxRockCount;
     }
 
@@ -154,9 +154,6 @@ class StarSystem extends System {
         let sz = Math.floor((Math.random() * game.getMaxRockSize()) + 10);
 
         let rock = new Rock(this, sz, loc.x, loc.y, loc.z, maxVel.x, maxVel.y, maxVel.z);
-        if (this == this.universe.system) {
-            rock.setActive(true);
-        }
     };
 
     createStation() {

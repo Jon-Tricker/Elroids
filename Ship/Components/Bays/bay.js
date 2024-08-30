@@ -14,8 +14,8 @@ class Bay extends Component {
 
     capacity;    
 
-    constructor(name, mass, cost, maxHp, set, capacity) {
-        super(name, mass, cost, maxHp, set);
+    constructor(name, techLevel, mass, cost, maxHp, set, capacity) {
+        super(name, techLevel, mass, cost, maxHp, set);
         this.capacity = capacity;
         if (undefined != set) {
             set.recalc();

@@ -9,7 +9,7 @@ const DESCRIPTION = "A cheap launcher that fires unguided missiles.";
 class DumbMissileWeapon extends MissileWeapon {
 
     constructor(set) {
-        super("DML1", 3, 3000, 2, set, FIRE_RATE);
+        super("DML1", 1, 3, 3000, 2, set, FIRE_RATE);
     }
 
     getDescription() {

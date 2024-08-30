@@ -80,7 +80,7 @@ class WormholeEnd extends NonShipItem {
         let farEnd = this.wormhole.getFarEnd(this.system);
 
         // Do 'warp' animation.
-        this.getGame().displays.addMessage("Entering " + farEnd.system.name);
+        this.getGame().displays.addMessage("Entering " + farEnd.system.getName());
 
         // Remove that from current system.
         this.system.removeItem(that);

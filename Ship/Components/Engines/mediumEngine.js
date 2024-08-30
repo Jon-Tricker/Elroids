@@ -7,7 +7,7 @@ const DESCRIPTION = "Medium power engine.";
 class MediumEngine extends Engine {
 
     constructor(set) {
-        super("Pootle7", 10, 2000, 2, set, 6000);
+        super("Pootle7", 2, 10, 2000, 2, set, 6000);
     }
 
     getDescription() {

@@ -8,6 +8,7 @@ import GameError from "../../GameErrors/gameError.js";
 class Component {
 
     name;
+    techLevel;
     mass;       // Tonnes
     cost;       // Credits.
     maxHp;
@@ -17,8 +18,9 @@ class Component {
     // Set if componentDisplay to be shown.
     displayPanel = false;
 
-    constructor(name, mass, cost, maxHp, set) {
+    constructor(name, techLevel, mass, cost, maxHp, set) {
         this.name = name;
+        this.techLevel = techLevel;
         this.mass = mass;
         this.cost = cost;
         this.maxHp = maxHp;
@@ -37,16 +39,20 @@ class Component {
     }
     */
 
+    getTechLevel() {
+        return (this.techLevel);
+    }
+
     getDescription() {
         throw (new BugError("No description for default component."));
     }
 
     getGame() {
-        return(this.set.sets.ship.system.universe.game);
+        return (this.set.sets.ship.system.universe.game);
     }
 
-    getUniverse(){
-        return(this.set.sets.ship.system.universe);
+    getUniverse() {
+        return (this.set.sets.ship.system.universe);
     }
 
 
@@ -74,6 +80,7 @@ class Component {
     getHeadings() {
         let heads = new Array();
         heads.push("Name");
+        heads.push("Level");
         heads.push("Mass(t)");
         heads.push("Cost(cr)");
         heads.push("Max HP");
@@ -85,6 +92,7 @@ class Component {
     getValues() {
         let vals = new Array();
         vals.push(this.name);
+        vals.push(this.techLevel);
         vals.push(this.mass);
         vals.push(this.cost);
         vals.push(this.maxHp);
@@ -98,13 +106,13 @@ class Component {
     }
 
     getShip() {
-        return(this.set.getShip());
+        return (this.set.getShip());
     }
 
     mount(ship, alsoBuy) {
         // Check that we can we afford it.
         if (alsoBuy) {
-            if (this.getCurrentValue() > ship.getCredits()) {
+            if (this.getCurrentValue(ship.system) > ship.getCredits()) {
                 throw (new GameError("Not enough credits."));
             }
         }
@@ -118,7 +126,7 @@ class Component {
 
         // Now we have added complete financial transaction. 
         if (alsoBuy) {
-            ship.addCredits(-this.getCurrentValue());
+            ship.addCredits(-this.getCurrentValue(ship.system));
         }
 
         // If it is in a bay remove it.
@@ -141,7 +149,7 @@ class Component {
             ship.getTerminal().playSound("anvil", 0.5);
         }
 
-        return(comp);
+        return (comp);
     }
 
     unmount() {
@@ -170,7 +178,7 @@ class Component {
         }
 
         // Check that we can we afford it.
-        if ((!isFree) && (this.getCurrentValue() > ship.getCredits())) {
+        if ((!isFree) && (this.getCurrentValue(ship.system) > ship.getCredits())) {
             throw (new GameError("Not enough credits."));
         }
 
@@ -183,10 +191,10 @@ class Component {
 
         // Now we have added complete financial transaction. 
         if (!isFree) {
-            ship.addCredits(-this.getCurrentValue());
+            ship.addCredits(-this.getCurrentValue(ship.system));
         }
 
-        return(comp);
+        return (comp);
     }
 
     sell() {
@@ -204,7 +212,7 @@ class Component {
         this.getGame().displays.compDisplays.recalc(true);
 
         // Add value to wallet.
-        this.getShip().addCredits(this.getCurrentValue());
+        this.getShip().addCredits(this.getCurrentValue(this.getShip().system));
 
         // Allow to go out of scope and GC
     }
@@ -276,8 +284,21 @@ class Component {
         }
     }
 
-    getCurrentValue() {
-        return (Math.ceil(this.cost * this.status / 100));
+    getCurrentValue(system) {
+        let value = this.cost * this.status / 100;
+
+        if (undefined != system) {
+            // Modify for system tech level.
+            let sysLevel = system.spec.techLevel;
+
+            if (sysLevel < this.getTechLevel()) {
+                if (1 > sysLevel) {
+                    sysLevel = 1;
+                }
+                value *= 1 + ((this.getTechLevel() - sysLevel)/this.getTechLevel());
+            }
+        }
+        return (Math.ceil(value));
     }
 }
 

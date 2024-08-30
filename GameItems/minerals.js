@@ -27,9 +27,9 @@ class Composition {
   spikyness;
   facets;
 
-  constructor(randomize) {
+  constructor(randomize, system) {
     if (randomize) {
-      this.createRandom();
+      this.createRandom(system);
     }
 
     this.calculateValues();
@@ -45,10 +45,19 @@ class Composition {
   }
 
   // Create a random composition
-  createRandom() {
+  createRandom(system) {
 
     for (let type = 0; type < MineralTypes.length; type++) {
-      let percentage = Math.floor(Math.random() * 100) * MineralTypes[type].abundance;
+      let abundance;
+      if (undefined == system) {
+        // Get genetic value
+        abundance = MineralTypes[type].abundance;
+      } else {
+        // Get system specific value
+        abundance = system.spec.getMineralAbundance(MineralTypes[type]);
+      }
+
+      let percentage = Math.floor(Math.random() * 100) * abundance;
       this.composition.push(new MineralComponent(MineralTypes[type], percentage));
     }
 
@@ -71,6 +80,7 @@ class Composition {
         this.composition.splice(i, 1);
       }
     }
+    // this.dump("x")
   }
 
   /*
@@ -81,6 +91,7 @@ class Composition {
     console.log(msg);
   }
   */
+  
 
   // Split in a way that 'concentrates' minerals.
   // One half is modified 'this' other is a new Composition
@@ -183,19 +194,22 @@ class MineralType {
   spikyness;
   facets;
   value;      // Cr/t
+  isMagic;    // Set if magical.
 
   material;
 
-  // Ammont of this (0 - 1) in the universe
+  // Ammont of this (0 - 1). For all minerals should total 1.
+  // Modified for each system.
   abundance;
 
-  constructor(name, colour, spikyness, facets, abundance, value) {
+  constructor(name, colour, spikyness, facets, abundance, value, isMagic) {
     this.colour = colour;
     this.name = name;
     this.spikyness = spikyness;
     this.facets = facets;
     this.abundance = abundance;
-    this.value = value;           // Cr/t
+    this.value = value;
+    this.isMagic = isMagic;
 
     this.material = new THREE.MeshStandardMaterial(
       {
@@ -208,17 +222,22 @@ class MineralType {
   getMaterial() {
     return (this.material);
   }
+
+  getIsMagic() {
+    return(this.isMagic);
+  }
 }
 
 // Mineral types.
 // 1st item is valueless.
+// TOTAL OF ALL ABUNDANCES SHOULD ADD UP TO 1 (ish)
 const MineralTypes = new Array(
-  new MineralType("potch", new THREE.Color(0x808080), 0.6, 10, 1, 0),
-  new MineralType("iron", new THREE.Color(0xB06000), 0.3, 15, 0.5, 20),
-  new MineralType("copper", new THREE.Color(0x00D080), 0.2, 15, 0.2, 40),
-  new MineralType("gold", new THREE.Color(0xFFF000), 0.3, 15, 0.05, 80),
-  new MineralType("dilithium", new THREE.Color(0x0080D0), 0.8, 20, 0.03, 200),
-  new MineralType("octarine", new THREE.Color(0xD000D0), 0.8, 20, 0.02, 500)
+  new MineralType("potch", new THREE.Color(0x808080), 0.6, 10, 0.5, 0, false),
+  new MineralType("iron", new THREE.Color(0xB06000), 0.3, 15, 0.25, 20, false),
+  new MineralType("copper", new THREE.Color(0x00D080), 0.2, 15, 0.16, 40, false),
+  new MineralType("gold", new THREE.Color(0xFFF000), 0.3, 15, 0.04, 80, false),
+  new MineralType("dilithium", new THREE.Color(0x0080D0), 0.8, 20, 0.02, 200, false),
+  new MineralType("octarine", new THREE.Color(0xD000D0), 0.8, 20, 0.01, 500, true)
 )
 
 export { MineralType, MineralComponent, Composition, MineralTypes };

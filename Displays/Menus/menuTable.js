@@ -37,13 +37,15 @@ class MenuTable {
         let doc = "<table>";
 
         // Print headers
-        doc += "<tr>";
-        for (let i = 0; i < this.headers.length; i++) {
-            doc += "<th>";
-            doc += this.printElement(this.headers[i], this.widths[i]);
-            doc += "</th>"
+        if (undefined != this.headers) {
+            doc += "<tr>";
+            for (let i = 0; i < this.headers.length; i++) {
+                doc += "<th>";
+                doc += this.printElement(this.headers[i], this.widths[i]);
+                doc += "</th>"
+            }
+            doc += "</tr>";
         }
-        doc += "</tr>";
 
         // Print rows
         for (let row of this.rows) {

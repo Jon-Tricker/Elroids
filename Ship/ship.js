@@ -448,7 +448,7 @@ class Ship extends Item {
     }
 
     sellMineral(mineral, mass) {
-        let value = mineral.value * mass;
+        let value = Math.floor(this.system.spec.getMineralValue(mineral) * mass);
         this.unloadMineral(mineral, mass);
         this.addCredits(value);
     }

@@ -4,14 +4,19 @@
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import * as THREE from 'three';
-import System from './GameItems/System/system.js';
+import { System, SystemSpec } from './GameItems/System/system.js';
 import StarSystem from './GameItems/System/starSystem.js';
 import Hyperspace from './GameItems/System/hyperspace.js';
 import { MineralTypes } from './GameItems/minerals.js';
 import Ship from './Ship/ship.js';
 import Wormhole from './GameItems/System/wormhole.js';
 
-const SYSTEM_NAMES = ["Sol", "Asteel", "Kessel"];
+const SYSTEM_SPECS = [
+    new SystemSpec("Sol", 1, 0, 2, "Mostly harmless."),
+    new SystemSpec("Asteel", 2, 0, 1, "Industrial society"),
+    new SystemSpec("Kessel", 3, 0, 2, "High tech society"),
+    new SystemSpec("Endor", 0, 1, 1, "Magical society")
+];
 
 class Universe {
     // Back reference to out parent.
@@ -69,17 +74,17 @@ class Universe {
         // Create initial systems
         this.hyperspace = new Hyperspace(this, this.systemSize);
         let count = 0;
-        for (let name of SYSTEM_NAMES) {
+        for (let spec of SYSTEM_SPECS) {
             let uniLoc;
-            count ++;
+            count++;
 
             if (this.game.testMode) {
                 uniLoc = new THREE.Vector3(500 * count, 0, 0);
             } else {
                 // Locate system randomly in the universe
                 let minDist;
-                do {    
-                    uniLoc = this.game.createRandomVector(this.systemSize/5);
+                do {
+                    uniLoc = this.game.createRandomVector(this.systemSize / 5);
                     minDist = this.systemSize;
                     for (let sys of this.systems) {
                         let relLoc = sys.uniLoc;
@@ -88,9 +93,9 @@ class Universe {
                             minDist = relLoc.length;
                         }
                     }
-                } while (minDist < (this.systemSize/10));
+                } while (minDist < (this.systemSize / 10));
             }
-            let system = new StarSystem(this, name, this.systemSize, this.maxRockCount, uniLoc);
+            let system = new StarSystem(this, spec, this.systemSize, this.maxRockCount, uniLoc);
             system.populate();
             this.systems.add(system);
 
@@ -101,13 +106,13 @@ class Universe {
 
             // Create wormhole between this system and hyperspace.
             // Locate system end away from origin in system.
-            let sysLoc;  if (this.game.testMode) {
+            let sysLoc; if (this.game.testMode) {
                 sysLoc = new THREE.Vector3(0, 500 * count, 0);
             } else {
                 // Locate system randomly in the universe
-                do {    
+                do {
                     sysLoc = this.game.createRandomVector(this.systemSize);
-                } while (sysLoc.length < (this.systemSize/2));
+                } while (sysLoc.length < (this.systemSize / 2));
             }
 
             this.wormholes.add(new Wormhole(system, sysLoc, uniLoc));
@@ -167,7 +172,7 @@ class Universe {
             vec.z += 2 * sz;
         }
     }
-    
+
     createShip(system) {
         if (this.game.testMode) {
             this.ship = new Ship(system, 5, 10, 20, 0, 0, 0);
@@ -188,6 +193,20 @@ class Universe {
                 comp.takeDamage(1);
                 break;
             }
+
+            // Add a higher tech component.
+            /*
+            let first = true;
+            for (let comp of this.game.purchaseList.engineSet) {
+                if (first) {
+                    first = false;
+                } else {
+                    comp = comp.buy(this.ship, true);
+                    comp.takeDamage(1);
+                    break;
+                }
+            }
+            */
 
             // Add another cargo bay
             for (let bay of this.game.purchaseList.baySet) {

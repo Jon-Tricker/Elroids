@@ -15,7 +15,7 @@ const DESCRIPTION = "A medium hull used for freighters.";
 class MediumHull extends Hull {
 
     constructor(set) {
-        super("GP2", 50, 5000, 4, set, 250);
+        super("GP2", 2, 50, 5000, 4, set, 250);
         super.buildSets(1, 2, 2, 2);
     }
 

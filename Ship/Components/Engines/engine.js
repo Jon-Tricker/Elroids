@@ -12,8 +12,8 @@ class Engine extends Component {
 
     thrust;         // kN
 
-    constructor(name, mass, cost, maxHp, set, thrust) {
-        super(name, mass, cost, maxHp, set);
+    constructor(name, techLevel, mass, cost, maxHp, set, thrust) {
+        super(name, techLevel, mass, cost, maxHp, set);
         this.thrust = thrust;
         if (undefined != set) {
             set.recalc();

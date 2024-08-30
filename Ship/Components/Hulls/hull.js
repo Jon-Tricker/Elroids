@@ -77,8 +77,8 @@ class Hull extends Component {
 
     mesh = new THREE.Group();
 
-    constructor(name, mass, cost, maxHp, set, maxSpeed) {
-        super(name, mass, cost, maxHp, set);
+    constructor(name, techLevel, mass, cost, maxHp, set, maxSpeed) {
+        super(name, techLevel, mass, cost, maxHp, set);
         this.maxSpeed = maxSpeed;
         this.flameMaterial = Hull.baseFlameMaterial.clone();
         this.displayPanel = true;

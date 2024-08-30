@@ -54,7 +54,7 @@ class ComponentsMenu {
                             vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, cursor)\">N/A</button>");
                         } else {
                             vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onUnmountClick(this, cursor)\">Unmount</button>");
-                            vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, cursor)\">" + comp.getCurrentValue() + "</button>");
+                            vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, cursor)\">" + comp.getCurrentValue(ship.system) + "</button>");
                         }
                     }
                     tab.addRow(vals);

@@ -15,7 +15,7 @@ const DESCRIPTION = "A small hull used for scouts and light freighters.";
 class BasicHull extends Hull {
 
     constructor(set) {
-        super("GP1", 50, 1000, 3, set, 200);
+        super("GP1", 1, 50, 1000, 3, set, 200);
         super.buildSets(1, 1, 1, 2);
     }
 

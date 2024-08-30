@@ -34,7 +34,7 @@ class ShipCompDisplay extends DarkPanel {
     animate() {
         super.animate();
 
-        let text = "System: " + this.ship.system.name;
+        let text = "System: " + this.ship.system.getName();
         if (null == this.ship.dockedWith) {
             text += "     Pos: (" + this.printNum(this.ship.location.x) + " , " + this.printNum(this.ship.location.y) + " , " + this.printNum(this.ship.location.z) + ") " + this.ship.system.units;
         } else {
