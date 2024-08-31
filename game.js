@@ -21,7 +21,7 @@ import Player from './player.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "6.1";
+const VERSION = "6.2";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -66,6 +66,7 @@ class Game {
         ["explosion", null],
         ["clang", null],
         ["coin", null],
+        ["till", null],
         ["click", null],
         ["anvil", null],
         ["roar", null],

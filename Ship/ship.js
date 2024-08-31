@@ -57,10 +57,10 @@ class Ship extends Item {
 
         this.createCameras();
     }
-    
+
     // Work round for circular dependency with Item class.
     isShip() {
-        return(true);
+        return (true);
     }
 
     // Build/Rebuild ship components.
@@ -354,6 +354,8 @@ class Ship extends Item {
         this.getGame().player.addCredits(score);
         if (0 < score) {
             this.playSound('coin');
+        } else {
+            this.playSound('till');
         }
     }
 

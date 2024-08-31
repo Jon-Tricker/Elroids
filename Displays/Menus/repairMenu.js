@@ -82,7 +82,7 @@ class RepairMenu {
         for (let set of sets) {
             if (set.size > 0) { 
                 if (setNumber == cursor.y) {
-                    if (!set.repair(percent)) {
+                    if (!set.repair(percent, ship)) {
                         throw(new GameError("Repair incomplete."))
                     }
                     break;
