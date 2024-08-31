@@ -35,9 +35,12 @@ class ComponentsMenu {
                         heads.push("Details");
                         heads.push("Display");
                         if (null != ship.dockedWith) {
-                            heads.push("Unmount");
-                            heads.push("Sell");
+                            if (!(sets.hullSet == set)) {
+                                heads.push("Unmount");
+                                heads.push("Sell");
+                            }
                         }
+                        heads.push("Repair(Cr)");
                         tab.addHeadings(heads);
                         printHeads = false;
                     }
@@ -49,13 +52,15 @@ class ComponentsMenu {
                     vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onDetailsClick(this, cursor)\">Show</button>");
                     vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onEnableClick(this, cursor)\">" + ComponentsMenu.onOff(comp.displayPanel) + "</button>");
                     if (null != ship.dockedWith) {
-                        if (sets.hullSet == set) {
-                            vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onUnmountClick(this, cursor)\">N/A</button>");
-                            vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, cursor)\">N/A</button>");
-                        } else {
+                        if (!(sets.hullSet == set)) {
                             vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onUnmountClick(this, cursor)\">Unmount</button>");
                             vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, cursor)\">" + comp.getCurrentValue(ship.system) + "</button>");
                         }
+                        vals.push("10%=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, cursor, 10)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 10) + "</button>" +
+                            " All=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, cursor, 100)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 100) + "</button>");
+                    } else {
+                        vals.push("10%=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, cursor, 10)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 10) + "</button>" +
+                            " All=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, cursor, 100)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 100)  + "</button>");
                     }
                     tab.addRow(vals);
                 }
@@ -70,11 +75,27 @@ class ComponentsMenu {
 
     }
 
+    static getRepairButtonText(ship, comp, percent) {
+        let cost = comp.getRepairCost(percent, ship)
+
+        if (0 == cost) {
+            return("N/A");
+        }
+
+        return(cost);
+    }
+
     static onOff(bool) {
         if (bool) {
             return ("On");
         }
         return ("Off");
+    }
+
+    static onRepairClick(menuSystem, cursor, percent) {
+        let ship = menuSystem.getShip();
+        let comp = ComponentsMenu.getCompForCursor(ship, cursor, false);
+        comp.repair(percent, ship, false);
     }
 
     static onUnmountClick(menuSystem, cursor) {
@@ -165,7 +186,7 @@ class ComponentDetailsMenu {
             tab.addRow(vals);
 
             doc += tab.toString();
-    
+
             doc += "<BR />";
         }
 

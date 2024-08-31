@@ -63,18 +63,20 @@ class ComponentSet extends Set {
     }
 
     getUniverse() {
-        return(this.getShip().system.universe);
+        return (this.getShip().system.universe);
     }
 
     getGame() {
-        return(this.getUniverse().game);
+        return (this.getUniverse().game);
     }
 
-    getRepairCost(percent) {
+    // Get the repair cost.
+    // This will be influenced by the ships docking status and system.
+    getRepairCost(percent, ship) {
         let cost = 0;
 
         for (let comp of this) {
-            cost += comp.getRepairCost(percent);
+            cost += comp.getRepairCost(percent, ship);
         }
 
         return (Math.floor(cost));
@@ -118,37 +120,26 @@ class ComponentSet extends Set {
     }
 
     // Repair a given amount.
-    repair(percent) {
+    repair(percent, ship) {
         let allDone = true;
         let someDone = false;
 
         // Do repair
-        let ship = this.getShip();
         for (let comp of this) {
-            // Can we afford it?
-            let cost = comp.getRepairCost(percent);
-            if (0 < cost) {
-                if (ship.getCredits() < cost) {
-                    allDone = false;
-                    percent = Math.ceil(ship.getCredits() * percent / cost);
-                    if (0 >= percent) {
-                        break;
-                    }
-                    comp.repair(percent);
-                    this.ship.addCredits(-ship.getCredits());
-                    someDone = true;
-                    break;
-                } else {
-                    comp.repair(percent);
-                    someDone = true;
-                    ship.addCredits(-cost);
-                }
+            comp.repair(percent, ship, true);
+
+            if (0 >= ship.getCredits()) {
+                allDone = false;
+                break;
             }
+
+            someDone = true;
         }
 
         if (someDone) {
             ship.getTerminal().playSound("anvil", 0.5);
         }
+
         this.recalc();
 
         return (allDone);

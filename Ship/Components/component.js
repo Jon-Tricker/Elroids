@@ -245,60 +245,110 @@ class Component {
         return ((Math.random() * 50) <= this.status);
     }
 
-    getRepairCost(percent) {
-        let maxRepair = 100;
+    // Get the repair cost.
+    // This will be influenced by the ships docking status and system.
+    getRepairCost(percent, ship) {
+        percent = this.getMaxRepair(percent, ship);
+        let cost
+
+        // Doubled if not docked.
         if (null == this.getShip().dockedWith) {
-            maxRepair = 50;
+            // Base cost ... anywhere.
+            cost = this.cost * 2;
+        } else {
+            // Cost in this system
+            cost = this.getCostInSystem(ship.system);
         }
 
-        let toDo = percent;
-        if (maxRepair - this.status < percent) {
-            toDo = maxRepair - this.status;
-        }
-
-        let cost = this.cost * toDo / 100;
-
-        if (null == this.getShip().dockedWith) {
-            cost *= 2;
-        }
+        cost *= percent / 100;
 
         if (0 > cost) {
             cost = 0;
         }
 
-        return (cost);
+        return (Math.floor(cost));
     }
 
-    repair(percent) {
-        let maxRepair = 100;
-        if (null == this.getShip().dockedWith) {
-            maxRepair = 50;
-        }
-
-        if (percent + this.status > maxRepair) {
-            percent = maxRepair - this.status;
-        }
+    repair(percent, ship, silent) {
+        percent = this.getMaxRepair(percent, ship);
+        let cost = this.getRepairCost(percent, ship);
 
         if (0 < percent) {
+            // Do the repair
             this.status += percent;
+
+            // Pay for it.
+            ship.addCredits(-cost);
+
+            if (!silent) {
+                ship.getTerminal().playSound("anvil", 0.5);
+            }
         }
+    }
+
+    // Get the amount to repair based on the ship's situation.
+    getMaxRepair(percent, ship) {
+        let maxRepair = 100;
+
+
+        // No more than asked
+        if (percent < maxRepair) {
+            maxRepair = percent;
+        }
+
+        // No more than we can afford.
+        let affordable = ship.getCredits() / (this.getCostInSystem(ship.system) / 100);
+        if (affordable < maxRepair) {
+            maxRepair = affordable;
+        }
+
+        // Only upto half when undocked.
+        let maxRepairable = 100;
+        if (null == this.getShip().dockedWith) {
+            maxRepairable = 50;
+        } else {
+            // Only upto half in low tech systems.
+            if (ship.system.spec.techLevel < this.getTechLevel()) {
+                maxRepairable = 50;
+            }
+        }
+
+        // No more than can be done.
+        if (maxRepair > (maxRepairable - this.status)) {
+            maxRepair = maxRepairable - this.status;
+        }
+
+        if (0 > maxRepair) {
+            maxRepair = 0;
+        }
+
+        return (maxRepair)
     }
 
     getCurrentValue(system) {
-        let value = this.cost * this.status / 100;
+        let value;
 
         if (undefined != system) {
-            // Modify for system tech level.
-            let sysLevel = system.spec.techLevel;
-
-            if (sysLevel < this.getTechLevel()) {
-                if (1 > sysLevel) {
-                    sysLevel = 1;
-                }
-                value *= 1 + ((this.getTechLevel() - sysLevel)/this.getTechLevel());
-            }
+            value = this.getCostInSystem(system);
+        } else {
+            value = this.cost;
         }
+
+        value *= this.status / 100;
+
         return (Math.ceil(value));
+    }
+
+    // Get total cost in a given system.
+    // Takes account of system tech level.
+    getCostInSystem(system) {
+        let value = this.cost
+        let sysLevel = system.spec.techLevel;
+
+        if (sysLevel < this.getTechLevel()) {
+            value *= 1 + ((this.getTechLevel() - sysLevel) / this.getTechLevel());
+        }
+        return (value);
     }
 }
 

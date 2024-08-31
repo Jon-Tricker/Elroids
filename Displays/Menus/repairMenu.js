@@ -47,8 +47,8 @@ class RepairMenu {
 
                 row.push(set.plural);
                 row.push(status);
-                row.push(RepairMenu.getButtonText(set, 10));
-                row.push(RepairMenu.getButtonText(set, 100));
+                row.push(RepairMenu.getButtonText(ship, set, 10));
+                row.push(RepairMenu.getButtonText(ship, set, 100));
 
                 tab.addRow(row);
             }
@@ -61,8 +61,8 @@ class RepairMenu {
         return (doc);
     }
 
-    static getButtonText(set, percent) {
-        let cost = set.getRepairCost(percent)
+    static getButtonText(ship, set, percent) {
+        let cost = set.getRepairCost(percent, ship)
 
         if(0 == cost) {
             return("<button type=\"button\" onclick=\"RepairMenu.onRepairClick(this.getShip(), cursor, null)\">N/A</button>");

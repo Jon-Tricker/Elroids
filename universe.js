@@ -195,7 +195,6 @@ class Universe {
             }
 
             // Add a higher tech component.
-            /*
             let first = true;
             for (let comp of this.game.purchaseList.engineSet) {
                 if (first) {
@@ -206,7 +205,6 @@ class Universe {
                     break;
                 }
             }
-            */
 
             // Add another cargo bay
             for (let bay of this.game.purchaseList.baySet) {

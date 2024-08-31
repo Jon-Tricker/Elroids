@@ -30,10 +30,10 @@ class PurchaseMenu {
                         heads.push("Name");
                         heads.push("Details");
                         if (set != sets.hullSet) {
-                            heads.push("Buy (Cr)");
-                            heads.push("Mount (Cr)");
+                            heads.push("Buy(Cr)");
+                            heads.push("Mount(Cr)");
                         } else {
-                            heads.push("Upgrade (Cr)");
+                            heads.push("Upgrade(Cr)");
                         }
 
                         tab.addHeadings(heads);
