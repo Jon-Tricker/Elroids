@@ -15,7 +15,7 @@ const SYSTEM_SPECS = [
     new SystemSpec("Sol", 1, 0, 2, "Mostly harmless."),
     new SystemSpec("Asteel", 2, 0, 1, "Industrial society"),
     new SystemSpec("Kessel", 3, 0, 2, "High tech society"),
-    new SystemSpec("Endor", 0, 1, 1, "Magical society")
+    new SystemSpec("Endor", 0, 1, 1, "Magical society. Guess some trading house built them a station.")
 ];
 
 class Universe {

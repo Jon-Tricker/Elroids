@@ -72,7 +72,7 @@ class StarSystemDetailsMenu {
         doc += "<BR />";
         doc += "<BR />";
 
-        doc += "Mineral abundance:"
+        doc += "Mineral abundance(%):"
         doc += "<BR />";
         let tab = new MenuTable;
         let heads = new Array();

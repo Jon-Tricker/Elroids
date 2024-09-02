@@ -69,7 +69,8 @@ class CargoMenu {
                     row.push(CargoMenu.getButtonText(ship.system, mineral, 1));
                     row.push(CargoMenu.getButtonText(ship.system, mineral, mass));
 
-                    totalValue += mineral.value * mass;
+                    let value = Math.floor(ship.system.spec.getMineralValue(mineral) * mass);
+                    totalValue += value;
                 } else {
                     row.push(mineral.value * mass);
                 }

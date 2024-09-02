@@ -7,7 +7,7 @@ import GameError from '../../../GameErrors/gameError.js';
 const DESCRIPTION = "'Cargo bays' contain minerals and trade goods.\n" +
                     "Each bay can contain a certain maximum mass.\n" +
                     "If a bay is damaged it's capacity is reduced.\n" +
-                    "   If it no longer fits the lowest value cargo is dumped.\n" +
+                    "   If the cargo no longer fits the lowest value cargo is dumped.\n" +
                     "The ship's total cargo capacity is the sum of all it's bays."
 
 class Bay extends Component {

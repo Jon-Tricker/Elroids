@@ -18,10 +18,11 @@ import Keyboard from "./keyboard.js";
 import PurchaseList from './Ship/Components/purchaseList.js';
 
 import Player from './player.js';
+import BugError from './GameErrors/bugError.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "6.2";
+const VERSION = "7.0";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -128,6 +129,14 @@ class Game {
 
     static getCraterTexture() {
         return (craterTexture);
+    }
+
+    save() {
+        throw(new GameError("Save not implemented."))
+    }
+
+    load() {
+        throw(new GameError("Load not implemented."))
     }
 
     getSounds() {

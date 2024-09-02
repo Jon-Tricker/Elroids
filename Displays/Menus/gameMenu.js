@@ -24,6 +24,14 @@ class GameInternalsMenu {
         doc += "<P>Rocks: count=" + game.getSystem().rockCount + ", Max count=" + game.getSystem().maxRockCount + "(ish)</P>";
         doc += "<P>Saucers: Mother count=" + game.universe.system.motherSaucerCount + ", Count=" + game.getSystem().saucerCount + ", Max count=" + game.maxSaucerCount + "</P>";
 
+        doc += "<BR />";
+        doc += "<P>Game:</P>";
+        doc += "<P>\t<button type=\"button\" onclick=\"GameInternalsMenu.saveClick(this.display.game)\">Save</button> "
+        doc += "<button type=\"button\" onclick=\"GameInternalsMenu.loadClick(this.display.game)\">Load</button></P>"
+        doc += "<P>Not yet implemtented!</P>";
+        doc += "<BR />";
+        
+
         doc += "<P>Show missiles on radar <button type=\"button\" onclick=\"GameInternalsMenu.missileClick(this.display)\">" + game.displays.radar.showMissiles + "</button></P>";
         doc += "<P>Play sound <button type=\"button\" onclick=\"GameInternalsMenu.soundClick(this.display.game)\">" + game.soundOn + "</button></P>";
 
@@ -39,6 +47,14 @@ class GameInternalsMenu {
     
     static soundClick(game) {
         game.soundOn = !game.soundOn;
+    }
+
+    static saveClick(game) {
+        game.save();
+    }
+
+    static loadClick(game) {
+        game.load();
     }
 }
 
