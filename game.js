@@ -22,7 +22,7 @@ import BugError from './GameErrors/bugError.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "7.0";
+const VERSION = "7.1";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -60,6 +60,7 @@ class Game {
     // Audio plumbing.
     static audioLoader = new THREE.AudioLoader();
     static listener;
+
 
     // Sounds buffer bank. Sounds written in once they are loaded.
     static sounds = new Map([
@@ -132,11 +133,94 @@ class Game {
     }
 
     save() {
-        throw(new GameError("Save not implemented."))
+        // Make JSON save image.
+        let json = this.toJSON();
+        let fileContent = JSON.stringify(json);
+
+        // Make a Blob.
+        let blob = new Blob([fileContent ], { type:  'application/json'});
+
+        // Create a download element.
+        let doc = document.createElement('a');
+        doc.download = 'ElroidSav.txt';
+        doc.href = window.URL.createObjectURL(blob);
+
+        // Invoke download to local file space.
+        doc.click();
+
+        return;
     }
 
-    load() {
-        throw(new GameError("Load not implemented."))
+    toJSON() {
+        return {
+            cameraType: this.scene.camera.type,
+            paused: this.paused,
+            testMode: this.testMode,
+            soundOn: this.soundOn,
+            player: this.player.toJSON(),
+            universe: this.universe.toJSON()
+        }
+    }
+
+    load() {  
+        // Create a file selector.
+        let input = document.createElement('input');
+        input.type = 'file';
+        
+        // Create a listener. Triggered after file loads.
+        input.onchange = e => { 
+           let file = e.target.files[0]; 
+
+           // setting up the reader
+           let reader = new FileReader();
+           reader.readAsText(file,'UTF-8');
+        
+           // Cretae a listener. Triggered once file is loaded.
+           reader.onload = readerEvent => {
+              let fileContent = readerEvent.target.result; 
+              let json = JSON.parse(fileContent);
+              this.fromJSON(json)
+
+              if (this.paused) {
+                  // Animate one frame to updatde graphics.
+                  this.togglePaused();
+                  this.animate(Date.now());
+                  this.togglePaused();
+              }
+           }
+        }
+        
+        // Invoke file selector.
+        input.click();
+    }
+
+    // Since we are the top level object, uniquely, this is not a static.
+    fromJSON(json) {
+        // Deactivate old sustem.
+        this.universe.system.setActive(false);
+        
+        this.testMode = json.testMode;
+        this.soundOn = json.soundOn;
+
+        this.player = Player.fromJSON(json.player);
+        this.universe = Universe.fromJSON(json.universe, this);   
+
+        // Activate new system.
+        this.universe.system.setActive(true);
+
+        if (this.paused != json.paused) {
+            this.togglePaused();
+        }
+
+        // Refresh displays.
+        this.displays = new Displays(this);
+        this.displays.resize();
+
+        // We saved from a menu. So koad with terminal open/
+        this.displays.terminalEnable(true);
+
+        this.scene.setCamera(json.cameraType);
+
     }
 
     getSounds() {
@@ -260,8 +344,7 @@ class Game {
             this.togglePaused();
         }
 
-        if (!this.paused) {
-            
+        if (!this.paused) {      
             this.universe.animate(date, Keyboard);
             this.scene.animate();
         }

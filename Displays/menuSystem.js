@@ -76,7 +76,7 @@ class MenuSystem {
 
     constructor(display) {
         this.display = display;
-        if (null != this.getShip().dockedTo()) {
+        if (null != this.getShip().getDockedWith()) {
             this.pushMenu(dockedMenu);
         } else {
             this.pushMenu(topMenu);
@@ -237,7 +237,7 @@ class MenuSystem {
         }
 
         let selected = this.targetCursor.equals(cursor);
-        if (null == this.getShip().dockedTo()) {
+        if (null == this.getShip().getDockedWith()) {
             this.display.terminal.println("\tExit", selected);
             if (selected && this.isClicked(keyboard)) {
                 this.display.terminalEnable(false);

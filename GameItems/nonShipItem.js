@@ -10,8 +10,30 @@ class NonShipItem extends Item {
     // Textual label (if any).
     label;
 
-    constructor(system, locationX, locationY, locationZ, speedX, speedY, speedZ, size, mass, hitPoints, owner, immobile) {
+    // Unique id.
+    // During the game Items are passed by reference.
+    // However for save/load we need a uniqueID.
+    static idCount = 0;
+    myId;
+
+    constructor(system, locationX, locationY, locationZ, speedX, speedY, speedZ, size, mass, hitPoints, owner, immobile, id) {
         super(system, locationX, locationY, locationZ, speedX, speedY, speedZ, size, mass, hitPoints, owner, immobile);
+        if (undefined == id) {
+            // Generate a sequential id
+            this.myId = NonShipItem.idCount++;
+        } else {
+            this.myId = id;
+        }
+    }
+
+    toJSON() {
+        let json = super.toJSON();
+        json.id = this.myId;
+        return(json);
+    }
+
+    getId() {
+        return(this.myId);
     }
 
     addLabel(label) {

@@ -58,9 +58,45 @@ class Ship extends Item {
         this.createCameras();
     }
 
+    toJSON() {
+        let json = super.toJSON();
+        json.height = this.height;
+        json.width = this.width;
+        json.shipLength = this.shipLength;
+
+        if (null != this.dockedWith) {
+            json.dockedWith = this.dockedWith.getId();
+        }
+        return (json);
+    }
+
+    static fromJSON(json, system) {
+        let newShip = new Ship(system, json.height, json.width, json.shipLength, json.location.x, json.location.y, json.location.z);
+        if (undefined == json.dockedWith) {
+            newShip.rotateX(json.rotationx);
+            newShip.rotateY(json.rotationy);
+            newShip.rotateZ(json.rotationz);
+        } else {
+            // let station = system.getItemById(json.dockedWith);
+            //newShip.dock(station);
+        }
+        return (newShip);
+    }
+
     // Work round for circular dependency with Item class.
     isShip() {
         return (true);
+    }
+
+    setActive(state) {
+        if (!state) {
+            super.setActive(state);
+        } else {
+            // Only move to scene if not part of something else.
+            if (null == this.getDockedWith()) {
+                super.setActive(state);
+            }
+        }
     }
 
     // Build/Rebuild ship components.
@@ -436,7 +472,7 @@ class Ship extends Item {
         this.moveItem(false);
     }
 
-    dockedTo() {
+    getDockedWith() {
         return (this.dockedWith);
     }
 

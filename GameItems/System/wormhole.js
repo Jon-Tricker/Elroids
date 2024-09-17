@@ -26,6 +26,19 @@ class Wormhole {
         // Add ends to systems
         system.addWormholeEnd(this.systemEnd);
         hyper.addWormholeEnd(this.hyperspaceEnd);
+    } 
+    
+    toJSON() {
+        return {
+            system: this.systemEnd.system.getId(),
+            systemLocation: this.systemEnd.location,
+            hyperspaceLocation: this.hyperspaceEnd.location
+        }
+    }
+
+    static fromJSON(json, universe) {
+        let system = universe.getSystemById(json.system);
+        return (new Wormhole(system, json.systemLocation, json.hyperspaceLocation));
     }
 
     // Get the near end for specific system

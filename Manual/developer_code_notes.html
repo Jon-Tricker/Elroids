@@ -55,6 +55,21 @@
 		</LI>
 	</UL>
 
+	<H2>Save/Load mechanism.</H2>
+	<P>Game images are saved as JSON files.</P>
+	<P>Each object persists only none recreatable members. i.e NOT stuff like Meshes that don't change and can be dynamically re-created.</P>
+	<P>Each persistable object has two methods:</P>
+	<UL>
+		<LI>toJSON() - Converts the non-recreateble members into JSON objects. This is built into one big JSON image and then Stringified.</LI>
+		<LI>static fromJSON() - This is given the JSON object, invokes the object's normal constructor and and returns a new version of the object.</LI>
+	</UL>
+	<P>Object sets can be handled with the utility class JSONSet.</P>
+	
+	<H3>Item/System IDs</H3>
+	<P>During game operation references between objects are handled by standard javascript reference. However these won't survive save/load operations.</P>
+	<P>When a reference need to be saved the target object is assigned a unique ID. This is converted back to the new reference during re-load.</P>
+	<P>For now there is a single instance to Hyperspace with ID hard coded to 0.</P>
+
 	<H2>Item activation (this is a work in progress)</H2>
 	<P>In attempt to reduce memory/cpu footprint most threejs derived graphical object can exist in two states:</P>
 	<UL>

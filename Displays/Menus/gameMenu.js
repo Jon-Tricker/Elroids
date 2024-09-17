@@ -28,7 +28,7 @@ class GameInternalsMenu {
         doc += "<P>Game:</P>";
         doc += "<P>\t<button type=\"button\" onclick=\"GameInternalsMenu.saveClick(this.display.game)\">Save</button> "
         doc += "<button type=\"button\" onclick=\"GameInternalsMenu.loadClick(this.display.game)\">Load</button></P>"
-        doc += "<P>Not yet implemtented!</P>";
+        doc += "<P>Partially implemtented. Ship internals/cargo not yet saved!</P>";
         doc += "<BR />";
         
 

@@ -1,6 +1,7 @@
 // Base class for all 'systems' (areas that can be navigated.)
 import SkyBox from "../../Scenery/skyBox.js"
 import { MineralTypes } from "../minerals.js";
+import BugError from "../../GameErrors/bugError.js";
 
 // Specification of a star system.
 class SystemSpec {
@@ -10,24 +11,53 @@ class SystemSpec {
     lawLevel;
     mineralAbundance = new Map();   // %
 
-    constructor(name, techLevel, magicLevel, lawLevel, description) {
+    constructor(name, techLevel, magicLevel, lawLevel, description, abundancies) {
         this.name = name;
         this.techLevel = techLevel;
         this.magicLevel = magicLevel;
         this.lawLevel = lawLevel;
         this.description = description;
+        this.setupAbundancies(abundancies);
+    }
 
-        // Work out mineral abundancies for this system.
+    setupAbundancies(abundancies) {
         for (let type = 0; type < MineralTypes.length; type++) {
-            // ToDo : Following to vary dependant on system tech and magic levels.
             let mineralType = MineralTypes[type];
-            let abundance = mineralType.abundance * (0.5 + Math.random());
-            if (mineralType.getIsMagic()) {
-                abundance *= magicLevel;
+            let abundance;
+            if (undefined === abundancies) {
+                // Work out mineral abundance for this system.
+                abundance = mineralType.abundance * (0.5 + Math.random());
+                if (mineralType.getIsMagic()) {
+                    abundance *= this.magicLevel;
+                }
+            } else {
+                // Use passed.
+                abundance = abundancies[type];
             }
             this.mineralAbundance.set(mineralType, abundance);
         }
         this.normalizeAbundancies();
+    }
+
+    toJSON() {
+        // Store in same order as MineralTypes. So don't need key.
+        let abundancies = [];
+        for (let [key, value] of this.mineralAbundance) {
+            abundancies.push(Math.round(value * 1000) / 1000);
+        }
+
+        return {
+            name: this.name,
+            techLevel: this.techLevel,
+            magicLevel: this.magicLevel,
+            lawLevel: this.lawLevel,
+            description: this.description,
+            abundancies: abundancies
+        }
+    }
+
+    static fromJSON(json) {
+        return (new SystemSpec(json.name, json.techLevel, json.magicLevel, json.lawLevel, json.description, json.abundancies));
     }
 
     normalizeAbundancies() {
@@ -84,15 +114,57 @@ class System {
     // Static elements
     skyBox;
 
-    constructor(universe, spec, systemSize, uniLocation, background) {
+    // Unique id.
+    // During the game Items are passed by reference.
+    // However for save/load we need a uniqueID.
+    static idCount = 1;
+    // 0 reserved for hyperspace.
+    static HYPERSPACE_ID = 0;
+    myId;
+
+    constructor(universe, spec, systemSize, uniLocation, background, skyBoxJson, id) {
         this.spec = spec;
         this.systemSize = systemSize;
         this.universe = universe;
         this.uniLocation = uniLocation;
 
-        // Create static elements.
-        let skyBoxSize = universe.systemSize * 4;
-        this.createSkyBox(skyBoxSize, background);
+        if (undefined === id) {
+            // Generate a sequential id
+            this.myId = System.idCount++;
+        } else {
+            this.myId = id;
+        }
+
+        this.createSkyBox(background, skyBoxJson)
+    }
+    
+    createSkyBox(background, skyBoxJson) {
+        if (undefined === skyBoxJson) {
+            // Create static elements.
+            let skyBoxSize = this.universe.systemSize * 4;
+            this.skyBox = new SkyBox(skyBoxSize, this, true, background);
+        } else {
+            this.skyBox = SkyBox.fromJSON(skyBoxJson, this);
+        }
+    }
+
+    toJSON() {
+        return {
+            spec: this.spec.toJSON(),
+            systemSize: this.systemSize,
+            uniLocation: this.uniLocation,
+            background: this.background,
+            id: this.myId,
+            skyBox: this.skyBox.toJSON()
+        }
+    }
+
+    static fromJSON(json, universe) {
+        return (new System(universe, new SystemSpec(json.SystemSpec), json.systemSize, json.uniLocation, json.background, json.skyBox, json.id));
+    }
+
+    getId() {
+        return (this.myId);
     }
 
     getName() {
@@ -115,11 +187,6 @@ class System {
         return (this.spec.description);
     }
 
-    createSkyBox(size, background) {
-        // Create populated.
-        this.skyBox = new SkyBox(size, this, true, background);
-    }
-
     getGame() {
         return (this.universe.game);
     }
@@ -138,6 +205,19 @@ class System {
 
     removeItem(item) {
         this.items.delete(item);
+    }
+
+    // Get item by id.
+    // null if not found.
+    getItemById(id) {
+        for (let item of this.items) {
+            if (undefined != item.getId()) {
+                if (id == item.getId()) {
+                    return (item);
+                }
+            }
+        }
+        throw(new BugError("Cannot find item ID " + id + " in " + this.name + " system."))
     }
 
     addWormholeEnd(hole) {

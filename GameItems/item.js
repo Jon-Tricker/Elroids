@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import Universe from '../universe.js';
 import ItemBoundary from './itemBoundary.js';
 import BugError from "../GameErrors/bugError.js";
+import MyScene from '../Scenery/myScene.js';
 
 const COLOUR = "#FFFFFF";
 
@@ -96,20 +97,34 @@ class Item extends THREE.Group {
         }
     }
 
+    // Stuff saved to all items.
+    toJSON() {
+        return {
+            location: this.location,
+            rotationx: this.rotation.x,
+            rotationy: this.rotation.y,
+            rotationz: this.rotation.z
+        };
+    }
+
     // By default jus add/remove from scene.
     // Override in Items that support (in)activate when not in use. 
     setActive(state) {
         let scene = this.getGame().getScene();
         if (state) {
             scene.add(this);
-        } else {  
+        } else {
             scene.remove(this);
         }
     }
 
     // Work round for circular dependency with Ship class.
     isShip() {
-        return(false);
+        return (false);
+    }
+
+    getId() {
+        return (undefined);
     }
 
     // Move item between systems.
@@ -357,12 +372,22 @@ class Item extends THREE.Group {
 
         // Work out which object is faster.
         let faster;
-        let slower;
-        if (this.speed.length() > that.speed.length()) {
-            faster = this;
-            slower = that;
-        } else {
+        if (this.immobile) {
             faster = that;
+        } else {
+            if (that.immobile) {
+                faster = this;
+            } else {
+                if (this.speed.length() > that.speed.length()) {
+                    faster = this;
+                } else {
+                    faster = that;
+                }
+            }
+        }
+
+        let slower = that;
+        if (faster == that) {
             slower = this;
         }
 

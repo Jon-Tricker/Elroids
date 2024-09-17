@@ -13,6 +13,7 @@ import SaucerShooter from '../Saucers/saucerShooter.js';
 import SaucerStatic from '../Saucers/saucerStatic.js';
 import SaucerWanderer from '../Saucers/saucerWanderer.js';
 import Station from './station.js';
+import { SystemSpec } from './system.js';
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -26,15 +27,41 @@ class StarSystem extends System {
     // Stations in the system.
     stations = new Set();
 
-    constructor(universe, spec, systemSize, maxRockCount, uniLocation) {
-        super(universe, spec, systemSize, uniLocation)
+    constructor(universe, spec, systemSize, maxRockCount, uniLocation, background, stations, skyBoxJson, id) {
+        super(universe, spec, systemSize, uniLocation, background, skyBoxJson, id);
+        this.createStations(stations);
         this.maxRockCount = maxRockCount;
     }
 
-    populate() {
+    toJSON() {
+        let json = super.toJSON();
+
+        json.maxRockCount = this.maxRockCount;
+
+        // Add stations. 
+        let stations = [];
+        for (let station of this.stations) {
+            stations.push(station.toJSON());
+        }
+        json.stations = stations;
+
+        json.skyBox = this.skyBox.toJSON()
+
+        return (json);
+    }
+
+    static fromJSON(json, universe) {
+        let system = new StarSystem(universe, SystemSpec.fromJSON(json.spec), json.systemSize, json.maxRockCount, json.uniLocation, json.background, json.stations, json.skyBox, json.id);
+        return (system);
+    }
+
+    // Create content.
+    populate(loading) {
         this.createRocks(this.maxRockCount);
-        this.createSaucers();
-        this.createStation();
+        if (!loading) {
+            // If this is intial create (rather than a load) do some extra stuff.
+            this.createSaucers();
+        }
     }
 
     addStation(station) {
@@ -74,9 +101,9 @@ class StarSystem extends System {
         let max = new THREE.Vector3(xmax, ymax, zmax);
         let clearBox = new THREE.Box3(min, max);
 
-        let sz = this.systemSize;
+        let sz = this.systemSize/2;
         for (let item of this.items) {
-            if (!(item instanceof Ship)) {
+            if (!(item instanceof Ship) && !(item instanceof Station)) {
                 let thatBoundary = item.getBoundary();
                 if ((null != thatBoundary) && (thatBoundary.intersectsBox(clearBox))) {
                     // Bounce it far away.
@@ -156,15 +183,24 @@ class StarSystem extends System {
         let rock = new Rock(this, sz, loc.x, loc.y, loc.z, maxVel.x, maxVel.y, maxVel.z);
     };
 
-    createStation() {
-        let station;
-        if (this.getGame().testMode) {
-            station = new Station(this, 1100, 0, 0, null);
-            // station = new Station(200, 0, 0, this, null);
+    createStations(stations) {
+        if (undefined === stations) {
+            // Create new stations.
+            let station;
+            if (this.getGame().testMode) {
+                station = new Station(this, 1100, 0, 0, null);
+                // station = new Station(200, 0, 0, this, null);
+            } else {
+                station = new Station(this, 0, 0, 0, null);
+            }
+            this.stations.add(station);
         } else {
-            station = new Station(this, 0, 0, 0, null);
+            // Restore old stations.
+            for (let station of stations) {
+                let newStation = Station.fromJSON(station, this);
+                this.stations.add(newStation);
+            }
         }
-        this.stations.add(station);
     }
 
     createSaucers() {

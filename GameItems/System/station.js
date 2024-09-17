@@ -62,8 +62,8 @@ class Station extends NonShipItem {
 
     bayMesh;
 
-    constructor(system, locationX, locationY, locationZ, owner) {
-        super(system, locationX, locationY, locationZ, 0, 0, 0, STATION_SIZE, STATION_MASS, STATION_HP, owner, true);
+    constructor(system, locationX, locationY, locationZ, owner, id) {
+        super(system, locationX, locationY, locationZ, 0, 0, 0, STATION_SIZE, STATION_MASS, STATION_HP, owner, true, id);
 
         this.setupMesh();
 
@@ -76,6 +76,20 @@ class Station extends NonShipItem {
         STATION_MATERIAL.map = text;
         STATION_MATERIAL.bumpMap = text;
         STATION_MATERIAL.needsUpdate = true;
+    }
+
+    toJSON() {
+        let json = super.toJSON();
+        // json.stationSpecific = ....
+        return(json);
+    }
+
+    static fromJSON(json, system) {
+        let newStation = new Station(system, json.location.x, json.location.y, json.location.z, system.owner, json.id);
+        newStation.rotateX(json.rotationx);
+        newStation.rotateY(json.rotationy);
+        newStation.rotateZ(json.rotationz);
+        return (newStation);
     }
 
     destruct() {
@@ -266,7 +280,7 @@ class Station extends NonShipItem {
         switch (side) {
             case BoxSides.FRONT:
             case BoxSides.TOP:
-            //case BoxSides.BOTTOM:
+                //case BoxSides.BOTTOM:
                 col = whiteCol;
                 break;
 
