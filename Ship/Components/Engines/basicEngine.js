@@ -1,17 +1,20 @@
 // Basic engine
-
 import Engine from './engine.js'
+import { GoodsType } from '../../../Trade/goods.js';
+
 
 const DESCRIPTION = "A small, low thrust, engine.";
 
 class BasicEngine extends Engine {
 
+    static type = new GoodsType("Natphart1", 1,  5, 1000, 2,)
+
     constructor(set) {
-        super("Natphart1", 1,  5, 1000, 2, set, 4000);
+        super(BasicEngine.type, set, 4000);
     }
 
     getDescription() {
-        return (super.getDescription() + "\n\n'" + this.name + "' is " + DESCRIPTION.toLowerCase());
+        return (super.getDescription() + "\n\n'" + this.getName() + "' is " + DESCRIPTION.toLowerCase());
     }
 }
 

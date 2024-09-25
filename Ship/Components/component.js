@@ -3,16 +3,17 @@
 // For now ships are made of components. Other things are just 'lumps'.
 import ComponentDisplay from "../../Displays/Components/componentDisplay.js";
 import BugError from "../../GameErrors/bugError.js";
-import GameError from "../../GameErrors/gameError.js";
-import Goods from "../../Trade/goods.js";
+import { Goods } from "../../Trade/goods.js";
 
 class Component extends Goods {
 
     // Set if componentDisplay to be shown.
     displayPanel = false;
 
-    constructor(name, techLevel, mass, cost, maxHp, set) {
-        super (name, techLevel, mass, cost, maxHp, set);
+    type;
+
+    constructor(type, set) {
+        super (type, set);
     }
 
     // Get the target set in a specific ship for this compoent.

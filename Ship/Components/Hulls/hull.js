@@ -11,13 +11,14 @@ import Component from '../component.js'
 import ComponentSets from '../componentSets.js';
 import GameError from '../../../GameErrors/gameError.js';
 import BugError from '../../../GameErrors/bugError.js';
+import BaySet from '../Bays/baySet.js';
 
 const DESCRIPTION = "Each ship had one 'hull'.\n" +
-                    "The hull has 'slots' into which other components can be fitted.\n" +
-                    "The ships maximum speed in determined by it's hull type.\n" +
-                    "    i.e. the hull can only withstand a certain amount of stress.\n" +
-                    "If the hull is damage maximum speed is reduced.\n" +
-                    "If hull status reaches 0% the ship is destroyed.";
+    "The hull has 'slots' into which other components can be fitted.\n" +
+    "The ships maximum speed in determined by it's hull type.\n" +
+    "    i.e. the hull can only withstand a certain amount of stress.\n" +
+    "If the hull is damage maximum speed is reduced.\n" +
+    "If hull status reaches 0% the ship is destroyed.";
 
 
 class Hull extends Component {
@@ -39,7 +40,7 @@ class Hull extends Component {
             metalness: 0.8,
         }
     )
-    
+
     // Create engine material.
     static engineMaterial = new THREE.MeshStandardMaterial(
         {
@@ -54,18 +55,18 @@ class Hull extends Component {
             side: THREE.DoubleSide,
         }
     )
-    
+
     // Create flame material.
     static baseFlameMaterial = new THREE.MeshStandardMaterial(
         {
             // TODO ... Seems to loose the color when made transparent.
             color: "yellow",
             roughness: 0.9,
-    
+
             // Full transprent when off.
             transparent: true,
             opacity: 0,
-    
+
             // map: texture,
             // roughnessMap: texture,
             // bumpMap: texture,
@@ -77,14 +78,48 @@ class Hull extends Component {
 
     mesh = new THREE.Group();
 
-    constructor(name, techLevel, mass, cost, maxHp, set, maxSpeed) {
-        super(name, techLevel, mass, cost, maxHp, set);
+    constructor(type, set, maxSpeed) {
+        super(type, set);
         this.maxSpeed = maxSpeed;
         this.flameMaterial = Hull.baseFlameMaterial.clone();
         this.displayPanel = true;
         if (undefined != set) {
             set.recalc();
         }
+    }
+
+    toJSON() {
+        let json = super.toJSON();
+
+        json.comps = this.compSets.toJSON(this);
+
+        // Pack cargo.
+        json.cargo = this.compSets.baySet.toJSON();
+
+        return (json);
+    }
+
+
+    static fromJSON(json, ship) {
+
+        let hull = ship.system.getGame().purchaseList.getByClass(json.class);
+        ship.hull.compSets.hullSet.clear();
+        hull = new hull.constructor(hull.getTargetSet(ship));
+        hull.status = json.status;    
+        hull.compSets.ship = ship;
+        ship.setHull(hull);
+
+        // Unpack other components
+        for (let jsonComp of json.comps) {
+            let comp = ship.system.getGame().purchaseList.getByClass(jsonComp.class);
+            comp = new comp.constructor(comp.getTargetSet(ship));
+            comp.status = jsonComp.status;
+        }
+        
+        // Unpack cargo
+        hull.compSets.baySet.loadFromJSON(json.cargo);
+
+        return(hull);
     }
 
     getDescription() {
@@ -128,19 +163,19 @@ class Hull extends Component {
     getHeadings() {
         let heads = super.getHeadings();
         heads.push("Max speed(m/s)");
-        return(heads);
+        return (heads);
     }
 
     getValues() {
         let vals = super.getValues();
         vals.push(this.maxSpeed);
-        return(vals);
+        return (vals);
     }
 
     unmount() {
         throw (new GameError("Can't unmount hulls."))
-    } 
-    
+    }
+
     sell() {
         throw (new GameError("Can't sell hulls."))
     }
@@ -157,11 +192,11 @@ class Hull extends Component {
         // Need to iterate both set of sets.
         let thisIter = this.compSets.keys();
         let thisCurs = thisIter.next()
-        let shipIter =  ship.hull.compSets.keys();
+        let shipIter = ship.hull.compSets.keys();
         let shipCurs = shipIter.next()
         while ((!thisCurs.done) && (!shipCurs.done)) {
             if (thisCurs.value.slots < shipCurs.value.size) {
-                throw(new GameError ("Not enough slots in " + shipCurs.value.plural + ". Unmount/Sell something first."));
+                throw (new GameError("Not enough slots in " + shipCurs.value.plural + ". Unmount/Sell something first."));
             }
             thisCurs = thisIter.next()
             shipCurs = shipIter.next()
@@ -170,7 +205,7 @@ class Hull extends Component {
         // Move compomemt sets into this.
         thisIter = this.compSets.keys();
         thisCurs = thisIter.next()
-        shipIter =  ship.hull.compSets.keys();
+        shipIter = ship.hull.compSets.keys();
         shipCurs = shipIter.next()
         while ((!thisCurs.done) && (!shipCurs.done)) {
             let thisSet = thisCurs.value;
@@ -199,22 +234,22 @@ class Hull extends Component {
 
     getUpgradeCost(ship) {
         let oldHull = ship.hull;
-        let cost = Math.floor((this.cost * this.status/100) - (oldHull.cost * oldHull.status/100));
+        let cost = Math.floor(this.getCurrentValue() - oldHull.getCurrentValue());
 
         // Half price on trade ins.
         if (0 > cost) {
             cost /= 2;
         }
-    
+
         return (cost);
     }
 
     getMaxSpeed() {
-        return (Math.ceil(this.maxSpeed * this.status/100));
-    } 
-    
+        return (Math.ceil(this.maxSpeed * this.status / 100));
+    }
+
     getTargetSet(ship) {
-        return(ship.hull.compSets.hullSet);
+        return (ship.hull.compSets.hullSet);
     }
 }
 

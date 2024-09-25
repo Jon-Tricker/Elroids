@@ -6,6 +6,7 @@
 
 import * as THREE from 'three';
 import Mineral from './mineral.js'
+import BugError from '../GameErrors/bugError.js';
 
 const SPLIT_VIOLENCE = 2;
 
@@ -225,6 +226,15 @@ class MineralType {
 
   getIsMagic() {
     return(this.isMagic);
+  }
+
+  static getByName(name) {
+    for(let type of MineralTypes) {
+      if(type.name == name) {
+        return(type)
+      }
+    }
+    throw(new BugError("Cant find mineral type " + name));
   }
 }
 

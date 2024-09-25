@@ -113,8 +113,8 @@ class CargoMenu {
 
             for (let comp of comps) {
                 let vals = new Array();
-                vals.push(comp.name);
-                vals.push(comp.mass);
+                vals.push(comp.getName());
+                vals.push(comp.getMass());
                 vals.push(comp.status);
                 vals.push("<button type=\"button\" onclick=\"CargoMenu.onDetailsClick(this, cursor)\">Show</button>");
                 if (null != ship.dockedWith) {

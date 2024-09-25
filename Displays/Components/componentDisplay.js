@@ -20,7 +20,7 @@ class ComponentDisplay extends DarkPanel {
         this.comp = comp;
 
         let title = new TextPanel(ctx, defaultColour, false);
-        title.setText("" + comp.getSet().singular + " - " + comp.name);
+        title.setText("" + comp.getSet().singular + " - " + comp.getName());
         this.add(title);
 
         this.statusPanel = new BarPanel(ctx, defaultColour, false, "Status", "(%)", 100, true);

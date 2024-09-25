@@ -18,11 +18,10 @@ import Keyboard from "./keyboard.js";
 import PurchaseList from './Ship/Components/purchaseList.js';
 
 import Player from './player.js';
-import BugError from './GameErrors/bugError.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "7.1";
+const VERSION = "7.2";
 
 const ANIMATE_RATE = 25;            // frames/second
 

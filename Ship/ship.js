@@ -11,6 +11,7 @@ import BasicHull from './Components/Hulls/basicHull.js';
 import Mineral from "../GameItems/mineral.js";
 import Station from '../GameItems/System/station.js';
 import WormholeEnd from '../GameItems/System/wormholeEnd.js';
+import Hull from './Components/Hulls/hull.js';
 
 // Slightly damped attitude contols to allow fine adjustment.
 const ROTATE_RATE_DELTA = 0.125;        // r/s
@@ -67,19 +68,26 @@ class Ship extends Item {
         if (null != this.dockedWith) {
             json.dockedWith = this.dockedWith.getId();
         }
+
+        json.hull = this.hull.toJSON();
+
         return (json);
     }
 
     static fromJSON(json, system) {
+        // Make a default ship.
+        // Default components will be made. We will replace them latter. 
         let newShip = new Ship(system, json.height, json.width, json.shipLength, json.location.x, json.location.y, json.location.z);
         if (undefined == json.dockedWith) {
             newShip.rotateX(json.rotationx);
             newShip.rotateY(json.rotationy);
             newShip.rotateZ(json.rotationz);
-        } else {
-            // let station = system.getItemById(json.dockedWith);
-            //newShip.dock(station);
-        }
+        } 
+
+        // Make new hull.
+        // Will also add it to ship.
+        Hull.fromJSON(json.hull, newShip);
+
         return (newShip);
     }
 

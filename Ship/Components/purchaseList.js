@@ -29,7 +29,6 @@ class PurchaseList extends ComponentSets {
     getGame() {
         return(this.game);
     }
-
 }
 
 export default PurchaseList;

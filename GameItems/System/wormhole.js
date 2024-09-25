@@ -30,14 +30,14 @@ class Wormhole {
     
     toJSON() {
         return {
-            system: this.systemEnd.system.getId(),
+            system: this.systemEnd.system.getName(),
             systemLocation: this.systemEnd.location,
             hyperspaceLocation: this.hyperspaceEnd.location
         }
     }
 
     static fromJSON(json, universe) {
-        let system = universe.getSystemById(json.system);
+        let system = universe.getSystemByName(json.system);
         return (new Wormhole(system, json.systemLocation, json.hyperspaceLocation));
     }
 

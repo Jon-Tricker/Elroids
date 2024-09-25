@@ -72,7 +72,7 @@ class Universe {
             uniSize: this.uniSize,
             systemSize: this.systemSize,
             maxRockCount: this.maxRockCount,
-            currentSystem: this.system.getId(),
+            currentSystem: this.system.getName(),
             systems: this.systems.toJSON(),
             wormholes: this.wormholes.toJSON(),
             ship: this.ship.toJSON(),
@@ -89,7 +89,7 @@ class Universe {
         uni.populate(json);
 
         if (undefined != json.ship.dockedWith) {
-            let station = uni.getSystemById(json.currentSystem).getItemById(json.ship.dockedWith);
+            let station = uni.getSystemByName(json.currentSystem).getItemById(json.ship.dockedWith);
             if (null != station) {
                 uni.ship.dock(station);
             }
@@ -163,7 +163,7 @@ class Universe {
 
         // Scan through systems and setup other variables.
         if (undefined != json) {
-            this.system = this.getSystemById(json.currentSystem)
+            this.system = this.getSystemByName(json.currentSystem)
         } else {
             let count = 0;;
             for (let system of this.systems) {
@@ -307,21 +307,21 @@ class Universe {
         }
     }
 
-    // Get System by id.
+    // Get System by name.
     // null if not found.
-    getSystemById(id) {
-        if (System.HYPERSPACE_ID == id) {
+    getSystemByName(name) {
+        if (this.hyperspace.getName() == name) {
             return (this.hyperspace);
         }
 
         for (let system of this.systems) {
-            if (undefined != system.getId()) {
-                if (id == system.getId()) {
+            if (undefined != system.getName()) {
+                if (system.getName() == name) {
                     return (system);
                 }
             }
         }
-        throw (new BugError("Cannot find system ID " + id + "."))
+        throw (new BugError("Cannot find system named " + name + "."))
     }
 }
 

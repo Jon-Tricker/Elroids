@@ -1,25 +1,29 @@
 // Base class for anything that can be traded, or put in a cargo bay..
-
-import BugError from "../GameErrors/bugError.js";
 import GameError from "../GameErrors/gameError.js";
 
-class Goods {
-
+class GoodsType {
     name;
     techLevel;
     mass;       // Tonnes
     cost;       // Credits.
     maxHp;
-    status;     // % of maxHp. May result in non integer number of HPs.
 
-    set;        // Set of goods that this is a member of.
-
-    constructor(name, techLevel, mass, cost, maxHp, set) {
+    constructor(name, techLevel, mass, cost, maxHp) {
         this.name = name;
         this.techLevel = techLevel;
         this.mass = mass;
         this.cost = cost;
         this.maxHp = maxHp;
+    }  
+}
+
+class Goods {
+    goodsType;
+    status;     // % of maxHp. May result in non integer number of HPs.
+    set;        // Set of goods that this is a member of.
+
+    constructor(type, set) {
+        this.goodsType = type;
         this.status = 100;
         this.set = set;
 
@@ -28,12 +32,19 @@ class Goods {
         }
     }
 
+    toJSON() {
+        return { 
+            class: this.constructor.name,
+            status: this.status
+        }
+    }
+
     getTechLevel() {
-        return (this.techLevel);
+        return (this.goodsType.techLevel);
     }
 
     getDescription() {
-        throw (new BugError("No description for default component."));
+        return (this.goodsType.description);
     }
 
     getShip() {
@@ -63,18 +74,26 @@ class Goods {
 
     getValues() {
         let vals = new Array();
-        vals.push(this.name);
-        vals.push(this.techLevel);
-        vals.push(this.mass);
-        vals.push(this.cost);
-        vals.push(this.maxHp);
+        vals.push(this.getName());
+        vals.push(this.getTechLevel());
+        vals.push(this.getMass());
+        vals.push(this.goodsType.cost);
+        vals.push(this.goodsType.maxHp);
         vals.push(this.status);
 
         return (vals);
     }
 
+    getName() {
+        return(this.goodsType.name);
+    }
+
+    getMass() {
+        return(this.goodsType.mass);
+    }
+
     getMaxHp() {
-        return (this.maxHp);
+        return (this.goodsType.maxHp);
     }
 
     // Set when added to a set.
@@ -158,9 +177,9 @@ class Goods {
         let cost
 
         // Doubled if not docked.
-        if (null == this.getShip().dockedWith) {
+        if (null == ship.dockedWith) {
             // Base cost ... anywhere.
-            cost = this.cost * 2;
+            cost = this.goodsType.cost * 2;
         } else {
             // Cost in this system
             cost = this.getCostInSystem(ship.system);
@@ -210,7 +229,7 @@ class Goods {
 
         // Only upto half when undocked.
         let maxRepairable = 100;
-        if (null == this.getShip().dockedWith) {
+        if (null == ship.dockedWith) {
             maxRepairable = 50;
         } else {
             // Only upto half in low tech systems.
@@ -237,7 +256,7 @@ class Goods {
         if (undefined != system) {
             value = this.getCostInSystem(system);
         } else {
-            value = this.cost;
+            value = this.goodsType.cost;
         }
 
         value *= this.status / 100;
@@ -248,7 +267,7 @@ class Goods {
     // Get total cost in a given system.
     // Takes account of system tech level.
     getCostInSystem(system) {
-        let value = this.cost
+        let value = this.goodsType.cost
         let sysLevel = system.spec.techLevel;
 
         if (sysLevel < this.getTechLevel()) {
@@ -258,4 +277,4 @@ class Goods {
     }
 }
 
-export default Goods;
+export { GoodsType, Goods };

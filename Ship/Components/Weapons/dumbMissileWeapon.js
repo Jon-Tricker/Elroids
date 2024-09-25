@@ -1,6 +1,7 @@
 // Base class for dumb missile weapons (DML)
 import MissileWeapon from './missileWeapon.js'
 import DumbMissile from '../../../GameItems/dumbMissile.js'
+import { GoodsType } from '../../../Trade/goods.js';
 
 const FIRE_RATE = 4;
 
@@ -8,12 +9,14 @@ const DESCRIPTION = "A cheap launcher that fires unguided missiles.";
 
 class DumbMissileWeapon extends MissileWeapon {
 
+    static type = new GoodsType("DML1", 1, 3, 3000, 2,);
+
     constructor(set) {
-        super("DML1", 1, 3, 3000, 2, set, FIRE_RATE);
+        super(DumbMissileWeapon.type, set, FIRE_RATE);
     }
 
     getDescription() {
-        return (super.getDescription() + "\n\n'" + this.name + "' is " + DESCRIPTION.toLowerCase());
+        return (super.getDescription() + "\n\n'" + this.getName() + "' is " + DESCRIPTION.toLowerCase());
     }
 
     fire(target, date) {

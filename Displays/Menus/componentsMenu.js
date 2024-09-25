@@ -46,8 +46,8 @@ class ComponentsMenu {
                     }
 
                     let vals = new Array();
-                    vals.push(comp.name);
-                    vals.push(comp.mass);
+                    vals.push(comp.getName());
+                    vals.push(comp.getMass());
                     vals.push(comp.status);
                     vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onDetailsClick(this, cursor)\">Show</button>");
                     vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onEnableClick(this, cursor)\">" + ComponentsMenu.onOff(comp.displayPanel) + "</button>");

@@ -1,7 +1,8 @@
 // Base list class for Goods.
 import GameError from "../GameErrors/gameError.js";
+import jsonSet from "../Utils/jsonSet.js"
 
-class GoodsSet extends Set {
+class GoodsSet extends jsonSet {
 
     plural;
     singular;
@@ -28,7 +29,7 @@ class GoodsSet extends Set {
     recalc() {
         this.mass = 0;
         for (let comp of this) {
-            this.mass += comp.mass;
+            this.mass += comp.getMass();
         }
     }
 

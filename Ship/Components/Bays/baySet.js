@@ -2,6 +2,7 @@
 import ComponentSet from '../componentSet.js'
 import GameError from "../../../GameErrors/gameError.js"
 import Mineral from "../../../GameItems/mineral.js";
+import { MineralType } from '../../../GameItems/minerals.js';
 
 class BaySet extends ComponentSet {
 
@@ -28,6 +29,43 @@ class BaySet extends ComponentSet {
         this.recalc();
     }
 
+    toJSON() {
+        let json = {};
+
+        let jsonMinerals = [];
+        for (let [key, value] of this.minerals) {
+            jsonMinerals.push({
+                name: key.name,
+                mass: value
+            })
+        }
+        json.minerals = jsonMinerals;
+
+        json.comps = this.components.toJSON();
+
+        return (json)
+    }
+
+    loadFromJSON(json) {
+
+        // Unpack components.
+        this.components.clear();
+        for (let jsonComp of json.comps) {
+            let comp = this.getGame().purchaseList.getByClass(jsonComp.class);
+            comp = new comp.constructor(this.components);
+            comp.status = jsonComp.status;
+        }
+
+        // Unpack minerals.
+        this.minerals = new Map();
+        for (let jsonMineral of json.minerals) {
+            let mineral = MineralType.getByName(jsonMineral.name);
+            this.loadMineral(mineral, jsonMineral.mass);
+        }
+
+        this.recalc();
+    }
+
     recalc() {
         super.recalc();
 
@@ -50,7 +88,7 @@ class BaySet extends ComponentSet {
     getComponentsMass() {
         let mass = 0;
         for (let comp of this.components) {
-            mass += comp.mass;
+            mass += comp.getMass();
         }
         return (mass);
     }
@@ -120,18 +158,18 @@ class BaySet extends ComponentSet {
     }
 
     loadComponent(comp) {
-        if(comp.mass > (this.capacity - this.getContentMass())) {
+        if (comp.mass > (this.capacity - this.getContentMass())) {
             throw (new GameError("Not enough capacity in bay."))
         }
 
         // If it's part of something remove it.
-        if(undefined != comp.set){
+        if (undefined != comp.set) {
             comp.set.delete(comp);
             comp.setSet(undefined);
         }
-        
+
         this.components.add(comp);
-        
+
         this.recalc();
 
         // Dump any overspill.

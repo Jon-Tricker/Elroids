@@ -114,14 +114,6 @@ class System {
     // Static elements
     skyBox;
 
-    // Unique id.
-    // During the game Items are passed by reference.
-    // However for save/load we need a uniqueID.
-    static idCount = 1;
-    // 0 reserved for hyperspace.
-    static HYPERSPACE_ID = 0;
-    myId;
-
     constructor(universe, spec, systemSize, uniLocation, background, skyBoxJson, id) {
         this.spec = spec;
         this.systemSize = systemSize;
@@ -161,10 +153,6 @@ class System {
 
     static fromJSON(json, universe) {
         return (new System(universe, new SystemSpec(json.SystemSpec), json.systemSize, json.uniLocation, json.background, json.skyBox, json.id));
-    }
-
-    getId() {
-        return (this.myId);
     }
 
     getName() {

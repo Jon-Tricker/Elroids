@@ -1,5 +1,4 @@
 // Base class for engines
-
 import Component from '../component.js'
 
 const DESCRIPTION = "Engines provide 'thrust' to accelerate the ship.\n" +
@@ -12,8 +11,8 @@ class Engine extends Component {
 
     thrust;         // kN
 
-    constructor(name, techLevel, mass, cost, maxHp, set, thrust) {
-        super(name, techLevel, mass, cost, maxHp, set);
+    constructor(type, set, thrust) {
+        super(type, set);
         this.thrust = thrust;
         if (undefined != set) {
             set.recalc();

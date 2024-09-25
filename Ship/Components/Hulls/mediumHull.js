@@ -9,18 +9,21 @@ import Hull from './hull.js'
 import BasicEngine from '../Engines/basicEngine.js';
 import DumbMissileWeapon from '../Weapons/dumbMissileWeapon.js';
 import BasicBay from '../Bays/basicBay.js';
+import { GoodsType } from '../../../Trade/goods.js';
 
 const DESCRIPTION = "A medium hull used for freighters.";
 
 class MediumHull extends Hull {
 
+    static type =  new GoodsType("GP2", 2, 50, 5000, 4);
+
     constructor(set) {
-        super("GP2", 2, 50, 5000, 4, set, 250);
+        super(MediumHull.type, set, 250);
         super.buildSets(1, 2, 2, 2);
     }
 
     getDescription() {
-        return (super.getDescription() + "\n\n'" + this.name + "' is " + DESCRIPTION.toLowerCase());
+        return (super.getDescription() + "\n\n'" + this.getName() + "' is " + DESCRIPTION.toLowerCase());
     }
 
     buildShip(ship) {

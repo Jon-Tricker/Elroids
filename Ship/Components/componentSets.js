@@ -4,8 +4,9 @@ import EngineSet from "./Engines/engineSet.js";
 import HullSet from "./Hulls/hullSet.js";
 import WeaponSet from "./Weapons/weaponSet.js";
 import BaySet from "./Bays/baySet.js";
+import JSONSet from "../../Utils/jsonSet.js";
 
-class ComponentSets extends Set {
+class ComponentSets extends JSONSet {
 
     // Ship ... or may be purchace list.
     ship;
@@ -31,6 +32,18 @@ class ComponentSets extends Set {
         super.add(this.baySet);
     }
 
+    toJSON(skip) {
+        let json = [];
+        for (let set of this) {
+            for (let comp of set) {
+                if (comp != skip) {
+                    json.push(comp.toJSON());
+                }
+            }
+        }
+        return(json)
+    }
+
     getGame() {
         return (this.ship.getGame());
     }
@@ -41,6 +54,18 @@ class ComponentSets extends Set {
             hits -= this.getRandomElement().takeDamage(1);
         }
     }  
+
+    // Get a component by class name.
+    getByClass(name) {
+        for (let set of this) {
+            for (let comp of set) {
+                if (comp.constructor.name == name) {
+                    return(comp);
+                }
+            }
+        }
+        throw(new BugError("Cant find component class " + name));
+    }
     
     // Return a random element of the set.
     // This is a bit inefficient but is rarely used and, in general, we would rather have Sets and Sets ... not Arrays.

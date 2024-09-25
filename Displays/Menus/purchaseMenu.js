@@ -42,7 +42,7 @@ class PurchaseMenu {
 
                     if (comp.getTechLevel() <= game.universe.system.getTechLevel()) {
                         let vals = new Array();
-                        vals.push(comp.name);
+                        vals.push(comp.getName());
                         vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onDetailsClick(this, cursor)\">Show</button>");
                         if (set != sets.hullSet) {
                             vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onBuyClick(this, cursor)\">" + comp.getCurrentValue(game.universe.system) + "</button>");
