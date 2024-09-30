@@ -130,7 +130,7 @@ class Universe {
                     // Locate system randomly in the universe
                     let minDist;
                     do {
-                        uniLoc = this.game.createRandomVector(this.systemSize / 5);
+                        uniLoc = this.game.createRandomIntegerVector(this.systemSize / 5);
                         minDist = this.systemSize;
                         for (let sys of this.systems) {
                             let relLoc = sys.uniLoc;
@@ -142,7 +142,6 @@ class Universe {
                     } while (minDist < (this.systemSize / 10));
                 }
                 let system = new StarSystem(this, spec, this.systemSize, this.maxRockCount, uniLoc);
-                system.populate(false);
                 this.systems.add(system);
             }
         } else {
@@ -150,7 +149,6 @@ class Universe {
             let systemIndex = 0;
             for (let jsonSystem of json.systems) {
                 let system = StarSystem.fromJSON(jsonSystem, this);
-                system.populate(true);
 
                 if (systemIndex == json.systemIndex) {
                     this.system = system;
@@ -188,7 +186,7 @@ class Universe {
                 } else {
                     // Locate wormhole randomly in the system
                     do {
-                        sysLoc = this.game.createRandomVector(this.systemSize);
+                        sysLoc = this.game.createRandomIntegerVector(this.systemSize);
                     } while (sysLoc.length < (this.systemSize / 2));
                 }
                 this.wormholes.add(new Wormhole(system, sysLoc, system.uniLocation));
@@ -275,7 +273,7 @@ class Universe {
 
                 // Add some components to cargo.
                 // Ugg ... just get first element.
-                for (let comp of this.game.purchaseList.weaponSet) {
+                for (let comp of this.game.componentsList.weaponSet) {
                     comp = comp.buy(this.ship, true);
                     comp.takeDamage(1);
                     break;
@@ -283,7 +281,7 @@ class Universe {
 
                 // Add a higher tech component.
                 let first = true;
-                for (let comp of this.game.purchaseList.engineSet) {
+                for (let comp of this.game.componentsList.engineSet) {
                     if (first) {
                         first = false;
                     } else {
@@ -294,7 +292,7 @@ class Universe {
                 }
 
                 // Add another cargo bay
-                for (let bay of this.game.purchaseList.baySet) {
+                for (let bay of this.game.componentsList.baySet) {
                     bay = bay.mount(this.ship, true);
                     bay.takeDamage(1);
                     break;

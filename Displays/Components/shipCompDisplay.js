@@ -15,8 +15,12 @@ class ShipCompDisplay extends DarkPanel {
         this.ship = game.getShip();
 
         this.add(new TextPanel(ctx, defaultColour, false));
-        this.speedPanel = new BarPanel(ctx, defaultColour, false, "Speed", "(" + this.ship.system.units + "/s)", this.ship.hull.compSets.hullSet.getMaxSpeed(), false);
+        this.speedPanel = new BarPanel(ctx, defaultColour, false, "Speed", this.getUnits(), this.ship.hull.compSets.hullSet.getMaxSpeed(), false);
         this.add(this.speedPanel);
+    }
+
+    getUnits() {
+        return("(" + this.ship.system.units + "/s)");
     }
 
     resize(width, height, x, y) {
@@ -44,6 +48,7 @@ class ShipCompDisplay extends DarkPanel {
 
         this.speedPanel.setMax(this.ship.hull.compSets.hullSet.getMaxSpeed());
         this.speedPanel.setValue(Math.floor(this.ship.speed.length()));
+        this.speedPanel.setUnits(this.getUnits());
     }
 
     printNum(num) {

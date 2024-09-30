@@ -101,9 +101,9 @@ class Item extends THREE.Group {
     toJSON() {
         return {
             location: this.location,
-            rotationx: this.rotation.x,
-            rotationy: this.rotation.y,
-            rotationz: this.rotation.z
+            rotationx: this.rotation.x.toFixed(4),
+            rotationy: this.rotation.y.toFixed(4),
+            rotationz: this.rotation.z.toFixed(4)
         };
     }
 

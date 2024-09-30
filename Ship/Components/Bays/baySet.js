@@ -51,7 +51,7 @@ class BaySet extends ComponentSet {
         // Unpack components.
         this.components.clear();
         for (let jsonComp of json.comps) {
-            let comp = this.getGame().purchaseList.getByClass(jsonComp.class);
+            let comp = this.getGame().componentsList.getByClass(jsonComp.class);
             comp = new comp.constructor(this.components);
             comp.status = jsonComp.status;
         }

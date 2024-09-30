@@ -12,7 +12,7 @@ let purchaseMenu = "\
 class PurchaseMenu {
 
     static printMenu(game) {
-        let sets = game.purchaseList;
+        let sets = game.componentsList;
         let doc = "";
 
         doc += "<P>"
@@ -98,7 +98,7 @@ class PurchaseMenu {
 
     static getCompForCursor(game, cursor) {
         let compNumber = 0;
-        for (let set of game.purchaseList) {
+        for (let set of game.componentsList) {
             for (let comp of set) {
                 if (comp.getTechLevel() <= game.universe.system.getTechLevel()) {
                     if (compNumber == cursor.y) {

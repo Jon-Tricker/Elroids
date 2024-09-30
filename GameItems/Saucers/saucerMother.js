@@ -30,6 +30,21 @@ class SaucerMother extends Saucer {
 
     constructor(system, locationX, locationY, locationZ, owner, safe) {
         super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
+    }   
+    
+    toJSON() {
+        let json = super.toJSON();
+        json.safe = this.safe;
+        // json.stationSpecific = ....
+        return(json);
+    }
+    
+    static fromJSON(json, system) {
+        let newSaucer = new SaucerMother(system, json.location.x, json.location.y, json.location.z, system.owner, json.safe);
+        newSaucer.rotateX(json.rotationx);
+        newSaucer.rotateY(json.rotationy);
+        newSaucer.rotateZ(json.rotationz);
+        return (newSaucer);
     }
     
     getMaxSpeed() {
@@ -42,7 +57,7 @@ class SaucerMother extends Saucer {
 
     destruct() {
         // Remove self from game.
-        this.system.removeMotherSaucer();
+        this.system.removeMotherSaucer(this);
 
         super.destruct();
     }

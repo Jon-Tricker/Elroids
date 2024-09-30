@@ -11,9 +11,9 @@ let dockedMenu = "\
 \"&lt;\" - Scroll up, \"&gt;\" - Scroll down, \"M\" - Select).\n</P>\
 "/*
 \
-        <P>\t<button type=\"button\" onclick=\"GameInternalsMenu.saveClick(this.display.g
         <P>\t<button type=\"button\" onclick=\"GameInternalsMenu.saveClick(this.display.game)\">Save</button>\
         <button type=\"button\" onclick=\"GameInternalsMenu.loadClick(this.display.game)\">Load</button></P>\
+\
 */ + "\
 <UL>\
     <LI><A HREF=\"helpMenu\">Menu controls help screen.</A></LI>\

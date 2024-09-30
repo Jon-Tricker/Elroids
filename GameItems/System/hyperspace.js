@@ -11,10 +11,10 @@ class Hyperspace extends System {
     units = "ly";
 
     constructor(universe, systemSize) {
-        super(universe, new SystemSpec("Hyperspace", 0, 0), systemSize, universe.game.originVector, new THREE.Color(0x000020), undefined, System.HYPERSPACE_ID);
+        super(universe, new SystemSpec("Hyperspace", 0, 0), systemSize, universe.game.originVector, new THREE.Color(0x000020), undefined);
     }
 
-    createSkyBox(background, skyBoxJson) {
+    createSkyBox(background, json) {
         // Create unpopulated. Json not used.
         let skyBoxSize = this.universe.systemSize * 4;
         this.skyBox = new SkyBox(skyBoxSize, this, false, background);

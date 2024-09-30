@@ -33,6 +33,10 @@ class BarPanel extends Panel {  // Text sizes. Everything else will be scaled re
         this.max = max;
     }
 
+    setUnits(units) {
+        this.units = units;
+    }
+
     resize(width, height, x, y) {
         this.textHeight = height;
         this.pt = this.textHeight * 0.8;

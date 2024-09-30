@@ -9,19 +9,17 @@ import * as THREE from 'three';
 import Universe from './universe.js';
 import Rock from "./GameItems/rock.js";
 import GameError from "./GameErrors/gameError.js"
-
-
+import { ComponentsList } from './Trade/purchaseLists.js';
+import { GoodsList } from './Trade/purchaseLists.js';
 import MyScene from './Scenery/myScene.js'
 import MyCamera from './Scenery/myCamera.js'
 import Displays from './Displays/displays.js'
 import Keyboard from "./keyboard.js";
-import PurchaseList from './Ship/Components/purchaseList.js';
-
 import Player from './player.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "7.2";
+const VERSION = "7.3";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -48,13 +46,15 @@ class Game {
     soundOn = false;
 
     testMode = false;
-    
+
     // Gradually increasing saucer number limit.
     maxSaucerCount = 5;
 
     paused = false;
 
-    purchaseList;
+    // Shopping catalogs.
+    componentsList;
+    goodsList;
 
     // Audio plumbing.
     static audioLoader = new THREE.AudioLoader();
@@ -97,10 +97,11 @@ class Game {
         Rock.setRockStyle(rockStyle);
 
         // Create shopping list.
-        this.purchaseList = new PurchaseList(this);     
+        this.componentsList = new ComponentsList(this);
+        this.goodsList = new GoodsList(this);
 
         // Create universe
-        this.universe = new Universe(this, uniSize, systemSize, maxRockCount);  
+        this.universe = new Universe(this, uniSize, systemSize, maxRockCount);
 
         // Create the scene
         this.scene = new MyScene(this, (0 == maxRockCount));
@@ -114,7 +115,7 @@ class Game {
 
         if (this.testMode) {
             // Doc ship to first station.
-            for (let station of this.universe.system.stations ) {
+            for (let station of this.universe.system.stations) {
                 this.getShip().dock(station);
                 break;
             }
@@ -137,7 +138,7 @@ class Game {
         let fileContent = JSON.stringify(json);
 
         // Make a Blob.
-        let blob = new Blob([fileContent ], { type:  'application/json'});
+        let blob = new Blob([fileContent], { type: 'application/json' });
 
         // Create a download element.
         let doc = document.createElement('a');
@@ -156,39 +157,40 @@ class Game {
             paused: this.paused,
             testMode: this.testMode,
             soundOn: this.soundOn,
+            maxSaucerCount: this.maxSaucerCount,
             player: this.player.toJSON(),
             universe: this.universe.toJSON()
         }
     }
 
-    load() {  
+    load() {
         // Create a file selector.
         let input = document.createElement('input');
         input.type = 'file';
-        
+
         // Create a listener. Triggered after file loads.
-        input.onchange = e => { 
-           let file = e.target.files[0]; 
+        input.onchange = e => {
+            let file = e.target.files[0];
 
-           // setting up the reader
-           let reader = new FileReader();
-           reader.readAsText(file,'UTF-8');
-        
-           // Cretae a listener. Triggered once file is loaded.
-           reader.onload = readerEvent => {
-              let fileContent = readerEvent.target.result; 
-              let json = JSON.parse(fileContent);
-              this.fromJSON(json)
+            // setting up the reader
+            let reader = new FileReader();
+            reader.readAsText(file, 'UTF-8');
 
-              if (this.paused) {
-                  // Animate one frame to updatde graphics.
-                  this.togglePaused();
-                  this.animate(Date.now());
-                  this.togglePaused();
-              }
-           }
+            // Cretae a listener. Triggered once file is loaded.
+            reader.onload = readerEvent => {
+                let fileContent = readerEvent.target.result;
+                let json = JSON.parse(fileContent);
+                this.fromJSON(json)
+
+                if (this.paused) {
+                    // Animate one frame to updatde graphics.
+                    this.togglePaused();
+                    this.animate(Date.now());
+                    this.togglePaused();
+                }
+            }
         }
-        
+
         // Invoke file selector.
         input.click();
     }
@@ -197,12 +199,13 @@ class Game {
     fromJSON(json) {
         // Deactivate old sustem.
         this.universe.system.setActive(false);
-        
+
         this.testMode = json.testMode;
         this.soundOn = json.soundOn;
+        this.maxSaucerCount = json.maxSaucerCount;
 
         this.player = Player.fromJSON(json.player);
-        this.universe = Universe.fromJSON(json.universe, this);   
+        this.universe = Universe.fromJSON(json.universe, this);
 
         // Activate new system.
         this.universe.system.setActive(true);
@@ -287,8 +290,22 @@ class Game {
         return (this.player);
     }
 
-    createRandomVector(max) {
-        return (new THREE.Vector3(Math.random() * max * 2 - max, Math.random() * max * 2 - max, Math.random() * max * 2 - max));
+    createRandomVector(max, integer) {
+        let x = Math.random() * max * 2 - max;
+        let y = Math.random() * max * 2 - max;
+        let z = Math.random() * max * 2 - max;
+
+        if ((undefined != integer) && integer) {
+            x = Math.floor(x);
+            y = Math.floor(y);
+            z = Math.floor(z);
+        }
+
+        return (new THREE.Vector3(x, y, z));
+    }
+
+    createRandomIntegerVector(max) {
+        return (this.createRandomVector(max, true));
     }
 
 
@@ -335,7 +352,7 @@ class Game {
     }
 
     getSystem() {
-        return(this.universe.system);
+        return (this.universe.system);
     }
 
     animate(date) {
@@ -343,7 +360,7 @@ class Game {
             this.togglePaused();
         }
 
-        if (!this.paused) {      
+        if (!this.paused) {
             this.universe.animate(date, Keyboard);
             this.scene.animate();
         }

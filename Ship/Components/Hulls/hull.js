@@ -102,7 +102,7 @@ class Hull extends Component {
 
     static fromJSON(json, ship) {
 
-        let hull = ship.system.getGame().purchaseList.getByClass(json.class);
+        let hull = ship.system.getGame().componentsList.getByClass(json.class);
         ship.hull.compSets.hullSet.clear();
         hull = new hull.constructor(hull.getTargetSet(ship));
         hull.status = json.status;    
@@ -111,9 +111,10 @@ class Hull extends Component {
 
         // Unpack other components
         for (let jsonComp of json.comps) {
-            let comp = ship.system.getGame().purchaseList.getByClass(jsonComp.class);
+            let comp = ship.system.getGame().componentsList.getByClass(jsonComp.class);
             comp = new comp.constructor(comp.getTargetSet(ship));
             comp.status = jsonComp.status;
+            comp.displayPanel = jsonComp.displayPanel;
         }
         
         // Unpack cargo

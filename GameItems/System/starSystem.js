@@ -20,17 +20,19 @@ const RESPAWN_SIZE = 250;          // m
 
 class StarSystem extends System {
     saucerCount = 0;
-    motherSaucerCount = 0;
     rockCount = 0;
     maxRockCount;
 
-    // Stations in the system.
+    // Special items in the system.
+    motherSaucers = new Set();
     stations = new Set();
 
-    constructor(universe, spec, systemSize, maxRockCount, uniLocation, background, stations, skyBoxJson, id) {
-        super(universe, spec, systemSize, uniLocation, background, skyBoxJson, id);
-        this.createStations(stations);
+    constructor(universe, spec, systemSize, maxRockCount, uniLocation, background, json) {
+        super(universe, spec, systemSize, uniLocation, background, json);
         this.maxRockCount = maxRockCount;
+        this.createStations(json);
+        this.createSaucers(json);
+        this.createRocks(this.maxRockCount);
     }
 
     toJSON() {
@@ -45,23 +47,20 @@ class StarSystem extends System {
         }
         json.stations = stations;
 
-        json.skyBox = this.skyBox.toJSON()
+        json.skyBox = this.skyBox.toJSON();
+
+        let saucers = [];
+        for (let saucer of this.motherSaucers) {
+            saucers.push(saucer);
+        }
+        json.saucers = saucers;
 
         return (json);
     }
 
     static fromJSON(json, universe) {
-        let system = new StarSystem(universe, SystemSpec.fromJSON(json.spec), json.systemSize, json.maxRockCount, json.uniLocation, json.background, json.stations, json.skyBox, json.id);
+        let system = new StarSystem(universe, SystemSpec.fromJSON(json.spec), json.systemSize, json.maxRockCount, json.uniLocation, json.background, json);
         return (system);
-    }
-
-    // Create content.
-    populate(loading) {
-        this.createRocks(this.maxRockCount);
-        if (!loading) {
-            // If this is intial create (rather than a load) do some extra stuff.
-            this.createSaucers();
-        }
     }
 
     addStation(station) {
@@ -80,7 +79,7 @@ class StarSystem extends System {
 
         if (!this.getGame().testMode) {
             // If mother saucer detroyed periodicaly re-create
-            if (0 == this.motherSaucerCount) {
+            if (0 == this.motherSaucers.size) {
                 if ((Math.random() * 1000) < 1) {
                     this.createMotherSaucer(this.safe);
                 }
@@ -101,7 +100,7 @@ class StarSystem extends System {
         let max = new THREE.Vector3(xmax, ymax, zmax);
         let clearBox = new THREE.Box3(min, max);
 
-        let sz = this.systemSize/2;
+        let sz = this.systemSize / 2;
         for (let item of this.items) {
             if (!(item instanceof Ship) && !(item instanceof Station)) {
                 let thatBoundary = item.getBoundary();
@@ -128,7 +127,6 @@ class StarSystem extends System {
             }
         }
     }
-
 
     createRocks(rockCount) {
         if (this.getGame().testMode) {
@@ -183,8 +181,8 @@ class StarSystem extends System {
         let rock = new Rock(this, sz, loc.x, loc.y, loc.z, maxVel.x, maxVel.y, maxVel.z);
     };
 
-    createStations(stations) {
-        if (undefined === stations) {
+    createStations(json) {
+        if (undefined === json) {
             // Create new stations.
             let station;
             if (this.getGame().testMode) {
@@ -196,26 +194,32 @@ class StarSystem extends System {
             this.stations.add(station);
         } else {
             // Restore old stations.
-            for (let station of stations) {
+            for (let station of json.stations) {
                 let newStation = Station.fromJSON(station, this);
                 this.stations.add(newStation);
             }
         }
     }
 
-    createSaucers() {
-        if (this.getGame().testMode) {
-            // New saucer
-            new SaucerStatic(this, 200, 100, -50, false);
-            new SaucerWanderer(this, 400, 100, -50, null, false);
-            new SaucerShooter(this, 300, 100, -50, null, true);
-            new SaucerHunter(this, 300, 200, -50, null, true);
-            new SaucerRam(this, 1000, 200, 200, null, true);
-            new SaucerPirate(this, 1500, 200, -50, null, true);
-            new SaucerMother(this, 1000, 100, -50, null, true);
-        } else {
+    createSaucers(json) {
+        if (undefined === json) {
+            if (this.getGame().testMode) {
+                // New saucer
+                new SaucerStatic(this, 200, 100, -50, false);
+                new SaucerWanderer(this, 400, 100, -50, null, false);
+                new SaucerShooter(this, 300, 100, -50, null, true);
+                new SaucerHunter(this, 300, 200, -50, null, true);
+                new SaucerRam(this, 1000, 200, 200, null, true);
+                new SaucerPirate(this, 1500, 200, -50, null, true);
+            }
             // First mother ship always in safe mode.
             this.createMotherSaucer(true);
+        } else {  
+            // Restore old saucers.
+            for (let saucer of json.saucers) {
+                let newSaucer = SaucerMother.fromJSON(saucer, this);
+                this.motherSaucers.add(newSaucer);
+            }
         }
     }
 
@@ -223,27 +227,31 @@ class StarSystem extends System {
         let loc;
         let game = this.getGame();
 
-        // Create it close so we can find it.
-        if (safe) {
-            loc = this.universe.ship.location.clone();
-            let offset = 1000;
-            loc.x += offset;
-            loc.y += offset / 2;
-            this.universe.handleWrap(loc);
+        // Create it close so we can find it. 
+        if (this.getGame().testMode) {
+            loc = new THREE.Vector3(1000, 100, -50);
+            safe = true;
         } else {
-            loc = game.getFarAway(this.universe.ship.location);
+            if (safe) {
+                loc = this.universe.ship.location.clone();
+                let offset = 1000;
+                loc.x += offset;
+                loc.y += offset / 2;
+                this.universe.handleWrap(loc);
+            } else {
+                loc = game.getFarAway(this.universe.ship.location);
+            }
         }
-        new SaucerMother(this, loc.x, loc.y, loc.z, null, safe);
 
-        this.motherSaucerCount++;
+        this.motherSaucers.add(new SaucerMother(this, loc.x, loc.y, loc.z, null, safe));
 
         // Game gradually gets harder.
         game.maxSaucerCount++;
     }
 
-    removeMotherSaucer() {
+    removeMotherSaucer(saucer) {
         // console.log("MS destoryed");
-        this.motherSaucerCount--;
+        this.motherSaucers.delete(saucer);
     }
 }
 

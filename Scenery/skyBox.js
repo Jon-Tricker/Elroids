@@ -190,7 +190,7 @@ class SkyBox extends THREE.Group {
 
           let sz = this.getUniverse().systemSize;
 
-          let position = this.getGame().createRandomVector(sz);
+          let position = this.getGame().createRandomIntegerVector(sz);
 
           // Stick it on a side where the sun isn't.
           switch (Math.floor(Math.random() * 5)) {

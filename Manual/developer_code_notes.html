@@ -68,9 +68,8 @@
 	<H3>Item/System IDs</H3>
 	<P>During game operation references between objects are handled by standard javascript reference. However these won't survive save/load operations.</P>
 	<P>When a reference need to be saved the target object is assigned a unique ID. This is converted back to the new reference during re-load.</P>
-	<P>For now there is a single instance to Hyperspace with ID hard coded to 0.</P>
 
-	<H2>Item activation (this is a work in progress)</H2>
+	<H2>Item activation</H2>
 	<P>In attempt to reduce memory/cpu footprint most threejs derived graphical object can exist in two states:</P>
 	<UL>
 		<LI>

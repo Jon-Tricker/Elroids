@@ -4,6 +4,7 @@
 import ComponentDisplay from "../../Displays/Components/componentDisplay.js";
 import BugError from "../../GameErrors/bugError.js";
 import { Goods } from "../../Trade/goods.js";
+import GameError from "../../GameErrors/gameError.js";
 
 class Component extends Goods {
 
@@ -14,6 +15,12 @@ class Component extends Goods {
 
     constructor(type, set) {
         super (type, set);
+    }
+
+    toJSON() {
+        let json = super.toJSON();
+        json.displayPanel = this.displayPanel;
+        return(json);
     }
 
     // Get the target set in a specific ship for this compoent.

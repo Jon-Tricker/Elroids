@@ -62,14 +62,24 @@ class Station extends NonShipItem {
 
     bayMesh;
 
-    constructor(system, locationX, locationY, locationZ, owner, id) {
-        super(system, locationX, locationY, locationZ, 0, 0, 0, STATION_SIZE, STATION_MASS, STATION_HP, owner, true, id);
+    constructor(system, locationX, locationY, locationZ, owner, json) {
+        if (undefined === json) {
+            super(system, locationX, locationY, locationZ, 0, 0, 0, STATION_SIZE, STATION_MASS, STATION_HP, owner, true);
+        } else {
+            super(system, locationX, locationY, locationZ, 0, 0, 0, STATION_SIZE, STATION_MASS, STATION_HP, owner, true, json.id);
+        }
 
         this.setupMesh();
 
-        if (!this.getGame().testMode) {
-            this.rotateX(Math.random() * Math.PI);
-            this.rotateZ(Math.random() * Math.PI);
+        if (undefined === json) {
+            if (!this.getGame().testMode) {
+                this.rotateX(Math.random() * Math.PI);
+                this.rotateZ(Math.random() * Math.PI);
+            }
+        } else {
+            this.rotateX(json.rotationx);
+            this.rotateY(json.rotationy);
+            this.rotateZ(json.rotationz);
         }
 
         let text = new PlateTexture().getTexture();
@@ -81,14 +91,11 @@ class Station extends NonShipItem {
     toJSON() {
         let json = super.toJSON();
         // json.stationSpecific = ....
-        return(json);
+        return (json);
     }
 
     static fromJSON(json, system) {
-        let newStation = new Station(system, json.location.x, json.location.y, json.location.z, system.owner, json.id);
-        newStation.rotateX(json.rotationx);
-        newStation.rotateY(json.rotationy);
-        newStation.rotateZ(json.rotationz);
+        let newStation = new Station(system, json.location.x, json.location.y, json.location.z, system.owner, json);
         return (newStation);
     }
 

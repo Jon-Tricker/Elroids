@@ -114,45 +114,39 @@ class System {
     // Static elements
     skyBox;
 
-    constructor(universe, spec, systemSize, uniLocation, background, skyBoxJson, id) {
+    constructor(universe, spec, systemSize, uniLocation, background, json) {
         this.spec = spec;
         this.systemSize = systemSize;
         this.universe = universe;
         this.uniLocation = uniLocation;
 
-        if (undefined === id) {
-            // Generate a sequential id
-            this.myId = System.idCount++;
-        } else {
-            this.myId = id;
-        }
-
-        this.createSkyBox(background, skyBoxJson)
+        this.createSkyBox(background, json)
     }
     
-    createSkyBox(background, skyBoxJson) {
-        if (undefined === skyBoxJson) {
+    createSkyBox(background, json) {
+        if (undefined === json) {
             // Create static elements.
             let skyBoxSize = this.universe.systemSize * 4;
             this.skyBox = new SkyBox(skyBoxSize, this, true, background);
         } else {
-            this.skyBox = SkyBox.fromJSON(skyBoxJson, this);
+            this.skyBox = SkyBox.fromJSON(json.skyBox, this);
         }
     }
 
     toJSON() {
-        return {
+        let json = {
             spec: this.spec.toJSON(),
             systemSize: this.systemSize,
             uniLocation: this.uniLocation,
             background: this.background,
-            id: this.myId,
             skyBox: this.skyBox.toJSON()
         }
+
+        return(json);
     }
 
     static fromJSON(json, universe) {
-        return (new System(universe, new SystemSpec(json.SystemSpec), json.systemSize, json.uniLocation, json.background, json.skyBox, json.id));
+        return (new System(universe, new SystemSpec(json.SystemSpec), json.systemSize, json.uniLocation, json.background, json.skyBox));
     }
 
     getName() {
