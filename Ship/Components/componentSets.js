@@ -12,7 +12,7 @@ class ComponentSets extends JSONSet {
     ship;
 
     // Sub sets
-    engineSet; 
+    engineSet;
     hullSet;
     weaponSet;
     baySet;
@@ -35,13 +35,14 @@ class ComponentSets extends JSONSet {
     toJSON(skip) {
         let json = [];
         for (let set of this) {
-            for (let comp of set) {
-                if (comp != skip) {
-                    json.push(comp.toJSON());
-                }
+            let comps = set.toJSON(skip);
+
+            // Flatten in into single array.
+            for (let comp of comps) {
+                json.push(comp);
             }
         }
-        return(json)
+        return (json)
     }
 
     getGame() {
@@ -49,24 +50,23 @@ class ComponentSets extends JSONSet {
     }
 
     takeDamage(hits) {
-        while((hits > 0) && (this.getCurrentHp() > 0)) {
+        while ((hits > 0) && (this.getCurrentHp() > 0)) {
             // Damage a random set.
             hits -= this.getRandomElement().takeDamage(1);
         }
-    }  
+    }
 
     // Get a component by class name.
     getByClass(name) {
         for (let set of this) {
-            for (let comp of set) {
-                if (comp.constructor.name == name) {
-                    return(comp);
-                }
-            }
+            let comp = set.getByClass(name);
+            if (null != comp)
+                return (comp);
         }
-        throw(new BugError("Cant find component class " + name));
+
+        throw (new BugError("Cant find component class " + name));
     }
-    
+
     // Return a random element of the set.
     // This is a bit inefficient but is rarely used and, in general, we would rather have Sets and Sets ... not Arrays.
     getRandomElement() {
@@ -75,18 +75,18 @@ class ComponentSets extends JSONSet {
         let i = 0;
         for (let set of this) {
             if (i == index) {
-                return(set);
+                return (set);
             }
             i++;
         }
     }
 
     getCurrentHp() {
-        let hp = 0;       
+        let hp = 0;
         for (let set of this) {
             hp += set.getCurrentHp();
         }
-        return(hp);
+        return (hp);
     }
 
     getMass() {
@@ -96,7 +96,7 @@ class ComponentSets extends JSONSet {
             mass += set.getMass();
         }
 
-        return(mass);
+        return (mass);
     }
 
     delete(comp) {

@@ -1,5 +1,5 @@
 // Base class for engines
-import Component from '../component.js'
+import { Component } from "../component.js";
 
 const DESCRIPTION = "Engines provide 'thrust' to accelerate the ship.\n" +
                     "The ship accelerates (according to F=ma) up to it's maxmum speed.\n" +

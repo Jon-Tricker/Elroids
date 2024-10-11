@@ -1,4 +1,4 @@
-// Version of a Set which can be converted tgo JSON. 
+// Version of a Set which can be converted to JSON. 
 
 // Copyright (C) Jon Tricker 2023.
 // Released under the terms of the GNU Public licence (GPL)
@@ -18,14 +18,6 @@ class JSONSet extends Set{
 
         return(json);
     }
-
-    /*
-    static fromJSON(json) {
-        for (let obj in json) {
-            console.log(obj);
-        }
-    }
-    */
 }
 
 export default JSONSet;

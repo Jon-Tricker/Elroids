@@ -3,17 +3,22 @@ import ComponentSet from '../componentSet.js'
 import GameError from "../../../GameErrors/gameError.js"
 import Mineral from "../../../GameItems/mineral.js";
 import { MineralType } from '../../../GameItems/minerals.js';
+import GoodsSet from '../../../Trade/goodsSet.js';
+import { Component } from '../component.js';
 
 class BaySet extends ComponentSet {
 
     // Capacity
     capacity;
 
-    // Mineral contents
+    // Stored stuff.
     minerals;
-
-    // Stored compoenents. 
     components;
+
+    // Trade goods are stored in a map with:
+    //   Key = An instance of the good in the catalog.
+    //   Value = The number of the good.
+    tradeGoods;
 
     // Mass of contents
     contentMass = 0;
@@ -21,15 +26,16 @@ class BaySet extends ComponentSet {
     constructor(sets, slots) {
         super("Cargo bays", "Cargo bay", sets, slots);
 
-        // Could be a ComponentSet. But that contains a BaySet so we get a circular depndancy.
-        // Since these components are not going to be used don't need full functionality so store in a simple set.
         this.components = new ComponentSet("Components", "Component", sets);
 
         this.minerals = new Map();
+
+        this.tradeGoods = new GoodsSet("Trade goods", "Trade good", sets);
+
         this.recalc();
     }
 
-    toJSON() {
+    cargoToJSON() {
         let json = {};
 
         let jsonMinerals = [];
@@ -41,7 +47,9 @@ class BaySet extends ComponentSet {
         }
         json.minerals = jsonMinerals;
 
-        json.comps = this.components.toJSON();
+        json.comps = this.components.toJSON(); 
+        
+        json.goods = this.tradeGoods.toJSON();
 
         return (json)
     }
@@ -54,6 +62,13 @@ class BaySet extends ComponentSet {
             let comp = this.getGame().componentsList.getByClass(jsonComp.class);
             comp = new comp.constructor(this.components);
             comp.status = jsonComp.status;
+        }
+
+        // Unpack goods  
+        this.tradeGoods.clear();
+        for (let jsonGood of json.goods) {
+            let good = this.getGame().goodsList.getByClass(jsonGood.class);
+            good = new good.constructor(this.tradeGoods, jsonGood.number);
         }
 
         // Unpack minerals.
@@ -74,23 +89,17 @@ class BaySet extends ComponentSet {
             this.capacity += bay.getCapacity();
         }
 
+        this.contentMass = 0;
+        this.contentMass += this.components.getMass();
+
         // Ugly but minerals in not initialized when recalc called from super.constructor.
         if (undefined != this.minerals) {
-            this.contentMass = 0;
             for (let [key, value] of this.minerals) {
                 this.contentMass += value;
             }
-
-            this.contentMass += this.getComponentsMass();
         }
-    }
 
-    getComponentsMass() {
-        let mass = 0;
-        for (let comp of this.components) {
-            mass += comp.getMass();
-        }
-        return (mass);
+        this.contentMass += this.tradeGoods.getMass();
     }
 
     loadMineral(mineral, mass) {
@@ -109,6 +118,82 @@ class BaySet extends ComponentSet {
         // Dump any overspill.
         this.level();
 
+        this.recalc();
+    }
+
+    loadComponent(comp) {
+        if (comp.getMass() > (this.capacity - this.getContentMass())) {
+            throw (new GameError("Not enough capacity in bay."))
+        }
+
+        // If it's part of something remove it.
+        if (undefined != comp.set) {
+            comp.set.delete(comp);
+            comp.setSet(undefined);
+        }
+
+        this.components.add(comp);
+        comp.setSet(this.components);
+
+        this.recalc();
+        // Dump any overspill.
+        this.level();
+        this.recalc();
+    }
+
+    unloadComponent(comp) {
+        if (!this.components.has(comp)) {
+            throw (new BugError("Bay does not contain " + comp));
+        }
+
+        this.components.delete(comp);
+
+        this.recalc();
+        // Dump any overspill.
+        this.level();
+        this.recalc();
+    }
+
+    loadGoods(goods) {
+        if (goods.getMass() > (this.capacity - this.getContentMass())) {
+            throw (new GameError("Not enough capacity in bay."))
+        }
+
+        let existing = this.tradeGoods.getByType(goods.type);
+
+        if (null != existing) {
+            // Already present. Tncrease number.
+            existing.number += goods.number;
+            // ... Passed object no longer needed ... allow it go out of scope.
+        } else {
+            // Not present. Add to list.
+            this.tradeGoods.add(goods);
+            goods.setSet(this.tradeGoods);
+        }
+
+        this.recalc();
+        // Dump any overspill.
+        this.level();
+        this.recalc();
+    }
+
+    unloadGoods(goods, number) {
+        // Reduce count.
+        let existing = this.tradeGoods.getByType(goods.type);
+        if (null == existing) {
+            throw (new BugError("Bay does not contain " + existing));
+        }
+
+        // Reduce number.
+        existing.number -= number;
+        if (0 >= existing.number) {
+            // Remove from list.
+            this.tradeGoods.delete(existing);
+        }
+
+        this.recalc();
+        // Dump any overspill.
+        this.level();
         this.recalc();
     }
 
@@ -142,41 +227,32 @@ class BaySet extends ComponentSet {
         }
 
         // Not enough minerals. Dump some other cargo.
-        while ((0 < this.getComponentsMass()) && (0 < (spaceReqd = this.getContentMass() - this.capacity))) {
+        while ((0 < this.components.getMass()) && (0 < (spaceReqd = this.getContentMass() - this.capacity))) {
             // Find cheapest component. 
             let cheapest = null;
             for (let comp of this.components) {
                 if ((null == cheapest) || (comp.cost < cheapest.cost)) {
                     cheapest = comp;
                 }
+            }  
+            
+            for (let goods of this.tradeGoods) {
+                if ((null == cheapest) || (goods.cost < cheapest.cost)) {
+                    cheapest = goods;
+                }
             }
 
-            // Delete it and let it get CGed.
+            // Delete it.
+            // ToDo : One day this will dump a cargo crate.
             spaceReqd -= cheapest.getMass();
-            this.components.delete(cheapest);
+            if (cheapest instanceof Component) {
+                this.unloadComponent(cheapest);
+            }else {
+                this.unloadGoods(cheapest, 1);
+            }
         }
     }
 
-    loadComponent(comp) {
-        if (comp.mass > (this.capacity - this.getContentMass())) {
-            throw (new GameError("Not enough capacity in bay."))
-        }
-
-        // If it's part of something remove it.
-        if (undefined != comp.set) {
-            comp.set.delete(comp);
-            comp.setSet(undefined);
-        }
-
-        this.components.add(comp);
-
-        this.recalc();
-
-        // Dump any overspill.
-        this.level();
-
-        this.recalc();
-    }
 
     takeDamage(hits, that) {
         super.takeDamage(hits, that);

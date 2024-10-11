@@ -3,13 +3,13 @@ import MenuTable from './menuTable.js';
 import BugError from '../../GameErrors/bugError.js';
 import { ComponentsMenu } from './componentsMenu.js';
 
-let purchaseMenu = "\
+let compPurchaseMenu = "\
 <BODY>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Components Purchase Menu</P>\
-<script src=\"PurchaseMenu\" game=\"this.getGame()\"></script>\
+<script src=\"CompPurchaseMenu\" game=\"this.getGame()\"></script>\
 </BODY>"
 
-class PurchaseMenu {
+class CompPurchaseMenu {
 
     static printMenu(game) {
         let sets = game.componentsList;
@@ -43,12 +43,12 @@ class PurchaseMenu {
                     if (comp.getTechLevel() <= game.universe.system.getTechLevel()) {
                         let vals = new Array();
                         vals.push(comp.getName());
-                        vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onDetailsClick(this, cursor)\">Show</button>");
+                        vals.push("<button type=\"button\" onclick=\"CompPurchaseMenu.onDetailsClick(this, cursor)\">Show</button>");
                         if (set != sets.hullSet) {
-                            vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onBuyClick(this, cursor)\">" + comp.getCurrentValue(game.universe.system) + "</button>");
-                            vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onMountClick(this, cursor)\">" + comp.getCurrentValue(game.universe.system) + "</button>");
+                            vals.push("<button type=\"button\" onclick=\"CompPurchaseMenu.onBuyClick(this, cursor)\">" + comp.getCurrentValue(game.universe.system) + "</button>");
+                            vals.push("<button type=\"button\" onclick=\"CompPurchaseMenu.onMountClick(this, cursor)\">" + comp.getCurrentValue(game.universe.system) + "</button>");
                         } else {
-                            vals.push("<button type=\"button\" onclick=\"PurchaseMenu.onUpgradeClick(this, cursor)\">" + comp.getUpgradeCost(this.getShip()) + "</button>");
+                            vals.push("<button type=\"button\" onclick=\"CompPurchaseMenu.onUpgradeClick(this, cursor)\">" + comp.getUpgradeCost(this.getShip()) + "</button>");
                         }
                         tab.addRow(vals);
                     }
@@ -67,14 +67,14 @@ class PurchaseMenu {
 
     static onDetailsClick(menuSystem, cursor) {
         let game = menuSystem.getGame();
-        let comp = PurchaseMenu.getCompForCursor(game, cursor);
+        let comp = CompPurchaseMenu.getCompForCursor(game, cursor);
 
         ComponentsMenu.displayDetails(menuSystem, comp);
     }
 
     static onBuyClick(menuSystem, cursor) {
         let game = menuSystem.getGame();
-        let comp = PurchaseMenu.getCompForCursor(game, cursor);
+        let comp = CompPurchaseMenu.getCompForCursor(game, cursor);
         let ship = game.getShip();
 
         comp.buy(ship);
@@ -82,7 +82,7 @@ class PurchaseMenu {
 
     static onMountClick(menuSystem, cursor) {
         let game = menuSystem.getGame();
-        let comp = PurchaseMenu.getCompForCursor(game, cursor);
+        let comp = CompPurchaseMenu.getCompForCursor(game, cursor);
         let ship = game.getShip();
 
         comp.mount(ship, true);
@@ -90,7 +90,7 @@ class PurchaseMenu {
 
     static onUpgradeClick(menuSystem, cursor) {
         let game = menuSystem.getGame();
-        let comp = PurchaseMenu.getCompForCursor(game, cursor);
+        let comp = CompPurchaseMenu.getCompForCursor(game, cursor);
         let ship = game.getShip();
 
         comp.upgrade(ship);
@@ -113,4 +113,63 @@ class PurchaseMenu {
     }
 }
 
-export { purchaseMenu, PurchaseMenu };
+// A menu with arguments
+class ComponentDetailsMenu {
+
+    static printMenu(comp) {
+        let doc = "";
+
+        doc += "<BODY>"
+        doc += "<P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Component Details Menu</P>"
+
+        doc += "<BR />";
+
+        let tab = new MenuTable();
+
+        let heads = comp.getHeadings();
+        tab.addHeadings(heads);
+
+        let vals = comp.getValues();
+        tab.addRow(vals);
+
+        doc += tab.toString();
+
+        doc += "<BR />";
+
+        // If it's a hull show slots.
+        if (comp.set == comp.set.sets.hullSet) {
+            tab = new MenuTable();
+
+            heads = new Array();
+            heads.push("Slots");
+            for (let set of comp.set.sets) {
+                heads.push(set.plural);
+            }
+            tab.addHeadings(heads);
+
+            vals = new Array();
+            vals.push("");
+            for (let set of comp.set.sets) {
+                vals.push(set.slots);
+            }
+            tab.addRow(vals);
+
+            doc += tab.toString();
+
+            doc += "<BR />";
+        }
+
+        doc += "<P>";
+        doc += comp.getDescription();
+        doc += "</P>";
+
+        doc += "<BR />";
+
+        doc += "</BODY>"
+
+        return (doc);
+    }
+
+}
+
+export { compPurchaseMenu, CompPurchaseMenu, ComponentDetailsMenu };

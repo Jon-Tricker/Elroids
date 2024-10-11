@@ -9,13 +9,13 @@ import Hull from './hull.js'
 import BasicEngine from '../Engines/basicEngine.js';
 import DumbMissileWeapon from '../Weapons/dumbMissileWeapon.js';
 import BasicBay from '../Bays/basicBay.js';
-import { GoodsType } from '../../../Trade/goods.js';
+import { ComponentType } from '../component.js';
 
 const DESCRIPTION = "A small hull used for scouts and light freighters.";
 
 class BasicHull extends Hull {
 
-    static type = new GoodsType("GP1", 1, 50, 1000, 3);
+    static type = new ComponentType("GP1", 1, 50, 1000, 3);
 
     constructor(set) {
         super(BasicHull.type , set, 200);

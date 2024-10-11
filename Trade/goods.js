@@ -1,31 +1,40 @@
-// Base class for anything that can be traded, or put in a cargo bay..
+// Base class for anything that can be traded, or put in a cargo bay.
+//
+// Can also represent multiple goods.
+// Goods dont have status. If they are damaged the number is reduced.
 import GameError from "../GameErrors/gameError.js";
 
 class GoodsType {
-    name;
+    singular;
+    plural;
     techLevel;
+    magicLevel;
     mass;       // Tonnes
-    cost;       // Credits.
-    maxHp;
+    cost;       // Base cost of a single unit. Credits.
 
-    constructor(name, techLevel, mass, cost, maxHp) {
-        this.name = name;
+    constructor(singular, plural, techLevel, magicLevel, mass, cost) {
+        this.singular = singular;
+        this.plural = plural;
         this.techLevel = techLevel;
+        this.magicLevel = magicLevel;
         this.mass = mass;
         this.cost = cost;
-        this.maxHp = maxHp;
-    }  
+    }
 }
 
 class Goods {
-    goodsType;
-    status;     // % of maxHp. May result in non integer number of HPs.
+    type;
     set;        // Set of goods that this is a member of.
+    number;     // Number of goods.
 
-    constructor(type, set) {
-        this.goodsType = type;
-        this.status = 100;
+    constructor(type, set, number) {
+        this.type = type;
         this.set = set;
+
+        if (undefined === number) {
+            number = 1;
+        }
+        this.number = number;
 
         if (undefined != set) {
             set.add(this);
@@ -33,18 +42,18 @@ class Goods {
     }
 
     toJSON() {
-        return { 
-            class: this.constructor.name,
-            status: this.status
+        return {
+            number: this.number,
+            class: this.constructor.name
         }
     }
 
     getTechLevel() {
-        return (this.goodsType.techLevel);
+        return (this.type.techLevel);
     }
 
     getDescription() {
-        return (this.goodsType.description);
+        return (this.type.description);
     }
 
     getShip() {
@@ -66,8 +75,6 @@ class Goods {
         heads.push("Level");
         heads.push("Mass(t)");
         heads.push("Cost(cr)");
-        heads.push("Max HP");
-        heads.push("Status(%)");
 
         return (heads);
     }
@@ -77,23 +84,20 @@ class Goods {
         vals.push(this.getName());
         vals.push(this.getTechLevel());
         vals.push(this.getMass());
-        vals.push(this.goodsType.cost);
-        vals.push(this.goodsType.maxHp);
-        vals.push(this.status);
+        vals.push(this.type.cost);
 
         return (vals);
     }
 
     getName() {
-        return(this.goodsType.name);
+        if (1 == this.number) {
+            return (this.type.singular);
+        }
+        return (this.type.plural);
     }
 
     getMass() {
-        return(this.goodsType.mass);
-    }
-
-    getMaxHp() {
-        return (this.goodsType.maxHp);
+        return (this.type.mass + this.number);
     }
 
     // Set when added to a set.
@@ -105,175 +109,77 @@ class Goods {
         return (this.set);
     }
 
-    // Buy from purchace list.
-    buy(ship, isFree) {
+    // Get value of the whole thing.
+    getCurrentValue(system) {
+        let value;
+
+        value = this.getCostInSystem(system, this.number);
+
+        return (Math.ceil(value));
+    }
+
+    // Get total cost of a number of units in a given system.
+    // Takes account of system tech level.
+    getCostInSystem(system, number) {
+        let value = this.type.cost;
+        if (undefined != system) {
+            let sysLevel = system.spec.techLevel;
+
+            if (sysLevel < this.getTechLevel()) {
+                value *= 1 + ((this.getTechLevel() - sysLevel) / this.getTechLevel());
+            }
+        } else {
+            value = this.type.cost;
+        }
+
+        if (undefined != number) {
+            value *= number;
+        }
+
+        return (value);
+    }
+
+    // Buy from list.
+    buy(ship, number, isFree) {
         if (undefined === isFree) {
             isFree = false;
         }
 
         // Check that we can we afford it.
-        if ((!isFree) && (this.getCurrentValue(ship.system) > ship.getCredits())) {
+        if ((!isFree) && (this.getCostInSystem(ship.system) * number> ship.getCredits())) {
             throw (new GameError("Not enough credits."));
         }
 
         // Make copy of purchace menu item.
         // Seems to work ... but not sure why.
-        let comp = new this.constructor();
-
+        let good = new this.constructor();
+        good.number = number;
+        
         // Put it in bay. 
-        ship.hull.compSets.baySet.loadComponent(comp);
+        ship.hull.compSets.baySet.loadGoods(good);
 
         // Now we have added complete financial transaction. 
         if (!isFree) {
-            ship.addCredits(-this.getCurrentValue(ship.system));
+            ship.addCredits(-this.getCostInSystem(ship.system) * number);
         }
-
-        return (comp);
     }
 
-    sell() {
+    sell(number) {
         // Remove from container.
-        if (undefined != this.set) {
-            // We are part of a ship.
-            this.set.delete(this)
+        if (undefined == this.set) {
+            throw (new BugError("Cant sell component thats not part of a set."))
         } else {
-            // We are in a cargo bay.
-            this.ship.getBays().components.delete(this);
+            this.set.sets.baySet.unloadGoods(this, number)
         }
 
-        // Remove display (if present).
-        this.displayPanel = false;
-        this.getGame().displays.compDisplays.recalc(true);
-
         // Add value to wallet.
-        this.getShip().addCredits(this.getCurrentValue(this.getShip().system));
-
-        // Allow to go out of scope and GC
+        this.getShip().addCredits(this.getCostInSystem(this.getShip().system));
     }
 
     // Take damage 
     // Return the amount taken.
     takeDamage(hits) {
-        let dam = Math.floor(hits / this.getMaxHp() * 100);
-
-        if (this.status < dam) {
-            // Cant take full damage
-            hits = this.getCurrentHp();
-            dam = this.status;
-        }
-
-        this.status -= dam;
-        return (hits)
-    }
-
-    getCurrentHp() {
-        return (this.getMaxHp() * this.status / 100);
-    }
-
-    // Get the repair cost.
-    // This will be influenced by the ships docking status and system.
-    getRepairCost(percent, ship) {
-        percent = this.getMaxRepair(percent, ship);
-        let cost
-
-        // Doubled if not docked.
-        if (null == ship.dockedWith) {
-            // Base cost ... anywhere.
-            cost = this.goodsType.cost * 2;
-        } else {
-            // Cost in this system
-            cost = this.getCostInSystem(ship.system);
-        }
-
-        cost *= percent / 100;
-
-        if (0 > cost) {
-            cost = 0;
-        }
-
-        return (Math.floor(cost));
-    }
-
-    repair(percent, ship, silent) {
-        percent = this.getMaxRepair(percent, ship);
-        let cost = this.getRepairCost(percent, ship);
-
-        if (0 < percent) {
-            // Do the repair
-            this.status += percent;
-
-            // Pay for it.
-            ship.addCredits(-cost);
-
-            if (!silent) {
-                ship.getTerminal().playSound("anvil", 0.5);
-            }
-        }
-    }
-
-    // Get the amount to repair based on the ship's situation.
-    getMaxRepair(percent, ship) {
-        let maxRepair = 100;
-
-
-        // No more than asked
-        if (percent < maxRepair) {
-            maxRepair = percent;
-        }
-
-        // No more than we can afford.
-        let affordable = ship.getCredits() / (this.getCostInSystem(ship.system) / 100);
-        if (affordable < maxRepair) {
-            maxRepair = affordable;
-        }
-
-        // Only upto half when undocked.
-        let maxRepairable = 100;
-        if (null == ship.dockedWith) {
-            maxRepairable = 50;
-        } else {
-            // Only upto half in low tech systems.
-            if (ship.system.spec.techLevel < this.getTechLevel()) {
-                maxRepairable = 50;
-            }
-        }
-
-        // No more than can be done.
-        if (maxRepair > (maxRepairable - this.status)) {
-            maxRepair = maxRepairable - this.status;
-        }
-
-        if (0 > maxRepair) {
-            maxRepair = 0;
-        }
-
-        return (maxRepair)
-    }
-
-    getCurrentValue(system) {
-        let value;
-
-        if (undefined != system) {
-            value = this.getCostInSystem(system);
-        } else {
-            value = this.goodsType.cost;
-        }
-
-        value *= this.status / 100;
-
-        return (Math.ceil(value));
-    }
-
-    // Get total cost in a given system.
-    // Takes account of system tech level.
-    getCostInSystem(system) {
-        let value = this.goodsType.cost
-        let sysLevel = system.spec.techLevel;
-
-        if (sysLevel < this.getTechLevel()) {
-            value *= 1 + ((this.getTechLevel() - sysLevel) / this.getTechLevel());
-        }
-        return (value);
+        throw (new BugError("Cant damage default goods."));
     }
 }
 

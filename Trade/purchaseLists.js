@@ -2,7 +2,6 @@
 import BasicBay from "../Ship/Components/Bays/basicBay.js";
 import MediumBay from "../Ship/Components/Bays/mediumBay.js";
 import ComponentSets from "../Ship/Components/componentSets.js";
-import GoodsSet from "./goodsSet.js";
 import BasicEngine from "../Ship/Components/Engines/basicEngine.js";
 import DumbMissileWeapon from "../Ship/Components/Weapons/dumbMissileWeapon.js";
 import MediumEngine from "../Ship/Components/Engines/mediumEngine.js";
@@ -31,21 +30,4 @@ class ComponentsList extends ComponentSets {
     }
 }
 
-class GoodsList extends GoodsSet {
-    game;
-
-    constructor(game) {
-        super();
-
-        this.game = game;
-
-        // ToDo ... No trade goods yet.
-    }
-
-    getGame() {
-        return (this.game);
-    }
-
-}
-
-export {ComponentsList, GoodsList}
+export {ComponentsList}

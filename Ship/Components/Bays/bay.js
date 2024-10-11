@@ -1,6 +1,6 @@
 // Base class for cargo bays
 
-import Component from '../component.js'
+import { Component } from "../component.js";
 import BayDisplay from "../../../Displays/Components/bayDisplay.js";
 import GameError from '../../../GameErrors/gameError.js';
 

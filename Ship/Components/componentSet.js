@@ -5,7 +5,7 @@ class ComponentSet extends GoodsSet {
 
     // If slots is undefined can have an unlimited number of components.
     constructor(plural, singular, sets, slots) {
-        super(plural, singular, sets, slots); 
+        super(plural, singular, sets, slots);
     }
 
     takeDamage(hits) {

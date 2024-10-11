@@ -1,12 +1,12 @@
 // Medium engine
-import { GoodsType } from '../../../Trade/goods.js';
 import Engine from './engine.js'
+import { ComponentType } from '../component.js';
 
 const DESCRIPTION = "Medium power engine.";
 
 class MediumEngine extends Engine {
 
-    static type = new GoodsType("Pootle7", 2, 10, 2000, 2);
+    static type = new ComponentType("Pootle7", 2, 10, 2000, 2);
 
     constructor(set) {
         super(MediumEngine.type, set, 6000);

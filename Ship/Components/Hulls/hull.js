@@ -7,7 +7,7 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import Component from '../component.js'
+import { Component } from '../component.js';
 import ComponentSets from '../componentSets.js';
 import GameError from '../../../GameErrors/gameError.js';
 import BugError from '../../../GameErrors/bugError.js';
@@ -94,7 +94,7 @@ class Hull extends Component {
         json.comps = this.compSets.toJSON(this);
 
         // Pack cargo.
-        json.cargo = this.compSets.baySet.toJSON();
+        json.cargo = this.compSets.baySet.cargoToJSON();
 
         return (json);
     }

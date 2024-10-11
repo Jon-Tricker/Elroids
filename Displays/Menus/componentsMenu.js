@@ -1,6 +1,7 @@
 // Component details menu.
 import MenuTable from './menuTable.js';
 import BugError from '../../GameErrors/bugError.js';
+import { ComponentDetailsMenu } from './compPurchaseMenu.js';
 
 let componentsMenu = "\
 <BODY>\
@@ -122,10 +123,6 @@ class ComponentsMenu {
     static onDetailsClick(menuSystem, cursor) {
         let ship = menuSystem.getShip();
         let comp = ComponentsMenu.getCompForCursor(ship, cursor);
-        this.displayDetails(menuSystem, comp);
-    }
-
-    static displayDetails(menuSystem, comp) {
         menuSystem.pushScript(ComponentDetailsMenu, comp);
     }
 
@@ -144,63 +141,5 @@ class ComponentsMenu {
     }
 }
 
-// A menu with arguments
-class ComponentDetailsMenu {
 
-    static printMenu(comp) {
-        let doc = "";
-
-        doc += "<BODY>"
-        doc += "<P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Component Details Menu</P>"
-
-        doc += "<BR />";
-
-        let tab = new MenuTable();
-
-        let heads = comp.getHeadings();
-        tab.addHeadings(heads);
-
-        let vals = comp.getValues();
-        tab.addRow(vals);
-
-        doc += tab.toString();
-
-        doc += "<BR />";
-
-        // If it's a hull show slots.
-        if (comp.set == comp.set.sets.hullSet) {
-            tab = new MenuTable();
-
-            heads = new Array();
-            heads.push("Slots");
-            for (let set of comp.set.sets) {
-                heads.push(set.plural);
-            }
-            tab.addHeadings(heads);
-
-            vals = new Array();
-            vals.push("");
-            for (let set of comp.set.sets) {
-                vals.push(set.slots);
-            }
-            tab.addRow(vals);
-
-            doc += tab.toString();
-
-            doc += "<BR />";
-        }
-
-        doc += "<P>";
-        doc += comp.getDescription();
-        doc += "</P>";
-
-        doc += "<BR />";
-
-        doc += "</BODY>"
-
-        return (doc);
-    }
-
-}
-
-export { componentsMenu, ComponentsMenu, ComponentDetailsMenu };
+export { componentsMenu, ComponentsMenu };

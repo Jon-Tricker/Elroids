@@ -22,7 +22,17 @@ class GoodsSet extends jsonSet {
         this.slots = slots;
         this.sets = sets;
 
-        this.recalc();
+        // this.recalc();
+    }
+
+    toJSON(skip) {
+        let json = [];
+        for (let good of this) {
+            if (good != skip) {
+                json.push(good.toJSON());
+            }
+        }
+        return (json);
     }
 
     // Recalculate any composite variables.
@@ -48,6 +58,26 @@ class GoodsSet extends jsonSet {
         super.delete(comp);
 
         this.recalc();
+    }
+
+    getByType(type) {
+        for (let good of this) {
+            if (good.type == type) {
+                return (good);
+            }
+        }
+
+        // Not found
+        return (null);
+    }
+
+    getByClass(name) {
+        for (let good of this) {
+            if (good.constructor.name == name) {
+                return (good);
+            }
+        }
+        return (null);
     }
 
     getMass() {

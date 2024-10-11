@@ -10,7 +10,7 @@ import Universe from './universe.js';
 import Rock from "./GameItems/rock.js";
 import GameError from "./GameErrors/gameError.js"
 import { ComponentsList } from './Trade/purchaseLists.js';
-import { GoodsList } from './Trade/purchaseLists.js';
+import GoodsList  from './Trade/goodsTypes.js';
 import MyScene from './Scenery/myScene.js'
 import MyCamera from './Scenery/myCamera.js'
 import Displays from './Displays/displays.js'
@@ -19,7 +19,7 @@ import Player from './player.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "7.3";
+const VERSION = "8.0";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -153,6 +153,7 @@ class Game {
 
     toJSON() {
         return {
+            version: VERSION,
             cameraType: this.scene.camera.type,
             paused: this.paused,
             testMode: this.testMode,

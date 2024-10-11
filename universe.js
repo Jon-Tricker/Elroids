@@ -265,6 +265,13 @@ class Universe {
                 // Do some damage
                 this.ship.hull.compSets.takeDamage(1);
 
+                // Add another cargo bay
+                for (let bay of this.game.componentsList.baySet) {
+                    bay = bay.mount(this.ship, true);
+                    bay.takeDamage(1);
+                    break;
+                }
+
                 // Add some minerals to the cargo.
                 for (let i = 1; i < 3; i++) {
                     let type = 1 + Math.floor(Math.random() * (MineralTypes.length - 1));
@@ -291,11 +298,21 @@ class Universe {
                     }
                 }
 
-                // Add another cargo bay
-                for (let bay of this.game.componentsList.baySet) {
-                    bay = bay.mount(this.ship, true);
-                    bay.takeDamage(1);
-                    break;
+                // Add some goods. 
+                let count = 0;
+                for (let good of this.game.goodsList) {
+                    switch (count) {
+                        case 1:
+                            good.buy(this.ship, 2, true);
+                        // Fall thru.
+
+                        case 0:
+                            good.buy(this.ship, 1, true);
+
+                        default:
+                            break;
+                    }
+                    count++;
                 }
             } else {
                 this.ship = new Ship(system, 5, 10, 20, -200, 100, 0);

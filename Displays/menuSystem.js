@@ -18,9 +18,11 @@ import { GameInternalsMenu } from './Menus/gameMenu.js'
 import { repairMenu } from './Menus/repairMenu.js';
 import { componentsMenu } from './Menus/componentsMenu.js';
 import { ComponentsMenu } from './Menus/componentsMenu.js';
-import { ComponentDetailsMenu } from './Menus/componentsMenu.js';
-import { purchaseMenu } from './Menus/purchaseMenu.js';
-import { PurchaseMenu } from './Menus/purchaseMenu.js';
+import { ComponentDetailsMenu } from './Menus/compPurchaseMenu.js';
+import { compPurchaseMenu } from './Menus/compPurchaseMenu.js';
+import { CompPurchaseMenu } from './Menus/compPurchaseMenu.js';
+import { goodsPurchaseMenu } from './Menus/goodsPurchaseMenu.js';
+import { GoodsPurchaseMenu } from './Menus/goodsPurchaseMenu.js';
 import { RepairMenu } from './Menus/repairMenu.js';
 import { cargoMenu } from './Menus/cargoMenu.js';
 import { CargoMenu } from './Menus/cargoMenu.js';

@@ -4,7 +4,9 @@
 
 import MenuTable from './menuTable.js';
 import BugError from '../../GameErrors/bugError.js';
-import { ComponentsMenu } from './componentsMenu.js';
+import { GoodsDetailsMenu} from './goodsPurchaseMenu.js'
+import { ComponentDetailsMenu } from './compPurchaseMenu.js';
+import { Component } from '../../Ship/Components/component.js';
 
 let cargoMenu = "\
 <BODY>\
@@ -27,6 +29,10 @@ class CargoMenu {
         doc += "<BR />";
 
         doc += CargoMenu.displayComponents(ship);
+
+        doc += "<BR />";
+
+        doc += CargoMenu.displayGoods(ship);
 
         doc += "</P>"
 
@@ -95,11 +101,13 @@ class CargoMenu {
         let tab = new MenuTable();
 
         let comps = ship.getBays().components;
+        doc += "<P>";
         if (0 == comps.size) {
-            doc += "<P>No components.</P>"
-        } else {
-            doc += "<P>Components</P>"
+            doc += "No "
+        }
+        doc += comps.plural + "</P>" 
 
+        if (0 != comps.size) {
             let heads = new Array();
             heads.push("Name");
             heads.push("Mass(t)");
@@ -126,6 +134,46 @@ class CargoMenu {
             doc += tab.toString();
         }
         return (doc);
+    } 
+    
+    static displayGoods(ship) {
+        let doc = "";
+        let tab = new MenuTable();
+
+        let goods = ship.getBays().tradeGoods;
+        doc += "<P>";
+        if (0 == goods.size) {
+            doc += "No "
+        }
+        doc += goods.plural + "</P>" 
+
+        if (0 != goods.size) {
+            let heads = new Array();
+            heads.push("Name");
+            heads.push("Mass(t)");
+            heads.push("Number");
+            heads.push("Details");
+            if (null != ship.dockedWith) {
+                heads.push("Sell 1(t)");
+                heads.push("Sell all");
+            }
+            tab.addHeadings(heads);
+
+            for (let good of goods) {
+                let vals = new Array();
+                vals.push(good.getName());
+                vals.push(good.getMass());
+                vals.push(good.number);
+                vals.push("<button type=\"button\" onclick=\"CargoMenu.onDetailsClick(this, cursor)\">Show</button>");
+                if (null != ship.dockedWith) {
+                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, cursor, 1)\">" + good.getCurrentValue(ship.system) + "</button>");
+                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, cursor, " + good.number + ")\">" + good.getCurrentValue(ship.system) * good.number+ "</button>");
+                }
+                tab.addRow(vals);
+            }
+            doc += tab.toString();
+        }
+        return (doc);
     }
 
     static getButtonText(system, mineral, mass) {
@@ -135,44 +183,65 @@ class CargoMenu {
 
     static onDetailsClick(menuSystem, cursor) {
         let ship = menuSystem.getShip();
-        let comp = CargoMenu.getCompForCursor(ship, cursor);
-        ComponentsMenu.displayDetails(menuSystem, comp);
+        let comp = CargoMenu.getGoodsForCursor(ship, cursor);
+        if (comp instanceof Component) {
+            menuSystem.pushScript(ComponentDetailsMenu, comp);
+        } else {
+            menuSystem.pushScript(GoodsDetailsMenu, comp);
+        }
     }
+    
+    // Get component or goods for current cursor.
+    static getGoodsForCursor(ship, cursor) {
+        let itemNumber = 0;
 
-    static getCompForCursor(ship, cursor) {
-        let compNumber = 0;
-
+        // Skip minerals
         if (null != ship.dockedWith) {
             if (0 < ship.getBays().minerals.size) {
-                // Skip minerals
-                compNumber += ship.getBays().minerals.size;
+                itemNumber += ship.getBays().minerals.size;
 
                 // Skip sell all
-                compNumber++;
+                itemNumber++;
             }
         }
 
+        // Look for component
         let comps = ship.getBays().components;
         for (let comp of comps) {
-            if (compNumber == cursor.y) {
+            if (itemNumber == cursor.y) {
                 return (comp);
             } else {
-                compNumber++;
+                itemNumber++;
             }
         }
-        throw (new BugError("No component at cursor."));
+        
+        let goods = ship.getBays().tradeGoods;
+        for (let good of goods) {
+            if (itemNumber == cursor.y) {
+                return (good);
+            } else {
+                itemNumber++;
+            }
+        }
+        throw (new BugError("No components/goods at cursor."));
     }  
     
     static onMountCompClick(menuSystem, cursor) {
         let ship = menuSystem.getShip();
-        let comp = CargoMenu.getCompForCursor(ship, cursor);
+        let comp = CargoMenu.getGoodsForCursor(ship, cursor);
         comp.mount(ship, false);
     }
 
     static onSellCompClick(menuSystem, cursor) {
         let ship = menuSystem.getShip();
-        let comp = CargoMenu.getCompForCursor(ship, cursor);
+        let comp = CargoMenu.getGoodsForCursor(ship, cursor);
         comp.sell();
+    }   
+    
+    static onSellGoodsClick(menuSystem, cursor, number) {
+        let ship = menuSystem.getShip();
+        let goods = CargoMenu.getGoodsForCursor(ship, cursor);
+        goods.sell(number);
     }
 
     static onSellMineralClick(ship, cursor, mass) {
