@@ -181,7 +181,8 @@ class Composition {
           // Some ramdom violence based on size of impact.
           let bang = new THREE.Vector3((Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, (Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, Math.random() * (SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE);
 
-          new Mineral(system, newMass, location.x, location.y, location.z, speed.x * speedRatio + bang.x, speed.y * speedRatio + bang.y, speed.z * speedRatio + bang.z, component.type);
+          let min = new Mineral(system, newMass, location.x, location.y, location.z, speed.x * speedRatio + bang.x, speed.y * speedRatio + bang.y, speed.z * speedRatio + bang.z, component.type);
+          min.setActive(true);
         }
       }
     }

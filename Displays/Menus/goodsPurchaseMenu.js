@@ -22,24 +22,26 @@ class GoodsPurchaseMenu {
 
             let printHeads = true;
             for (let goods of game.goodsList) {
-                if (printHeads) {
-                    let heads = new Array();
-                    heads.push("Name");
-                    heads.push("Details");
-                    heads.push("Buy 1(Cr)");
-                    heads.push("Buy 10(Cr)");
+                if (goods.isLeagal(game.universe.system)) {
+                    if (printHeads) {
+                        let heads = new Array();
+                        heads.push("Name");
+                        heads.push("Details");
+                        heads.push("Buy 1(Cr)");
+                        heads.push("Buy 10(Cr)");
 
-                    tab.addHeadings(heads);
-                    printHeads = false;
-                }
+                        tab.addHeadings(heads);
+                        printHeads = false;
+                    }
 
-                if (goods.getTechLevel() <= game.universe.system.getTechLevel()) {
-                    let vals = new Array();
-                    vals.push(goods.getName());
-                    vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onDetailsClick(this, cursor)\">Show</button>");
-                    vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onBuyClick(this, cursor, 1)\">" + goods.getCurrentValue(game.universe.system) + "</button>");
-                    vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onBuyClick(this, cursor, 10)\">" + goods.getCurrentValue(game.universe.system) * 10 + "</button>");
-                    tab.addRow(vals);
+                    if (goods.isAvailableInSystem(game.universe.system)) {
+                        let vals = new Array();
+                        vals.push(goods.getName());
+                        vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onDetailsClick(this, cursor)\">Show</button>");
+                        vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onBuyClick(this, cursor, 1)\">" + goods.getValueInSystem(game.universe.system) + "</button>");
+                        vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onBuyClick(this, cursor, 10)\">" + goods.getValueInSystem(game.universe.system) * 10 + "</button>");
+                        tab.addRow(vals);
+                    }
                 }
             }
             doc += tab.toString();
@@ -69,7 +71,7 @@ class GoodsPurchaseMenu {
     static getGoodsForCursor(game, cursor) {
         let goodsNumber = 0;
         for (let goods of game.goodsList) {
-            if (goods.getTechLevel() <= game.universe.system.getTechLevel()) {
+            if (goods.isAvailableInSystem(game.universe.system)) {
                 if (goodsNumber == cursor.y) {
                     return (goods);
                 } else {

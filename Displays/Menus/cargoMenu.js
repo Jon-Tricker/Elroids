@@ -4,7 +4,7 @@
 
 import MenuTable from './menuTable.js';
 import BugError from '../../GameErrors/bugError.js';
-import { GoodsDetailsMenu} from './goodsPurchaseMenu.js'
+import { GoodsDetailsMenu } from './goodsPurchaseMenu.js'
 import { ComponentDetailsMenu } from './compPurchaseMenu.js';
 import { Component } from '../../Ship/Components/component.js';
 
@@ -79,6 +79,7 @@ class CargoMenu {
                     totalValue += value;
                 } else {
                     row.push(mineral.value * mass);
+                    row.push("<button type=\"button\" onclick=\"CargoMenu.onDumpMineralClick(this, cursor)\">Dump</button>");
                 }
 
                 tab.addRow(row);
@@ -87,7 +88,7 @@ class CargoMenu {
 
             if (null != ship.dockedWith) {
                 doc += "<BR />";
-                doc += "<P>Sell all minerals <button type=\"button\" onclick=\"CargoMenu.onSellMineralClick(this.getShip())\">" + totalValue + "</button></P>";
+                doc += "<P>Sell all minerals <button type=\"button\" onclick=\"CargoMenu.onSellMineralClick(this)\">" + totalValue + "</button></P>";
             }
 
         }
@@ -105,7 +106,7 @@ class CargoMenu {
         if (0 == comps.size) {
             doc += "No "
         }
-        doc += comps.plural + "</P>" 
+        doc += comps.plural + "</P>"
 
         if (0 != comps.size) {
             let heads = new Array();
@@ -127,15 +128,17 @@ class CargoMenu {
                 vals.push("<button type=\"button\" onclick=\"CargoMenu.onDetailsClick(this, cursor)\">Show</button>");
                 if (null != ship.dockedWith) {
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onMountCompClick(this, cursor)\">Mount</button>");
-                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellCompClick(this, cursor)\">" + comp.getCurrentValue(ship.system) + "</button>");
+                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellCompClick(this, cursor)\">" + comp.getValueInSystem(ship.system) + "</button>");
+                } else {
+                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onDumpGoodsClick(this, cursor)\">Dump</button>");
                 }
                 tab.addRow(vals);
             }
             doc += tab.toString();
         }
         return (doc);
-    } 
-    
+    }
+
     static displayGoods(ship) {
         let doc = "";
         let tab = new MenuTable();
@@ -145,7 +148,7 @@ class CargoMenu {
         if (0 == goods.size) {
             doc += "No "
         }
-        doc += goods.plural + "</P>" 
+        doc += goods.plural + "</P>"
 
         if (0 != goods.size) {
             let heads = new Array();
@@ -153,8 +156,10 @@ class CargoMenu {
             heads.push("Mass(t)");
             heads.push("Number");
             heads.push("Details");
+            heads.push("Leagal")
             if (null != ship.dockedWith) {
-                heads.push("Sell 1(t)");
+                heads.push("Base cost")
+                heads.push("Sell 1");
                 heads.push("Sell all");
             }
             tab.addHeadings(heads);
@@ -165,9 +170,13 @@ class CargoMenu {
                 vals.push(good.getMass());
                 vals.push(good.number);
                 vals.push("<button type=\"button\" onclick=\"CargoMenu.onDetailsClick(this, cursor)\">Show</button>");
+                vals.push(good.isLeagal(ship.system));
                 if (null != ship.dockedWith) {
-                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, cursor, 1)\">" + good.getCurrentValue(ship.system) + "</button>");
-                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, cursor, " + good.number + ")\">" + good.getCurrentValue(ship.system) * good.number+ "</button>");
+                    vals.push(good.getCost());
+                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, cursor, 1)\">" + good.getUnitCostInSystem(ship.system) + "</button>");
+                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, cursor, " + good.number + ")\">" + good.getValueInSystem(ship.system) + "</button>");
+                } else {
+                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onDumpGoodsClick(this, cursor)\">Dump</button>");
                 }
                 tab.addRow(vals);
             }
@@ -178,7 +187,7 @@ class CargoMenu {
 
     static getButtonText(system, mineral, mass) {
         let value = Math.floor(system.spec.getMineralValue(mineral) * mass);
-        return ("<button type=\"button\" onclick=\"CargoMenu.onSellMineralClick(this.getShip(), cursor, " + mass + ")\">" + value + "</button>");
+        return ("<button type=\"button\" onclick=\"CargoMenu.onSellMineralClick(this, cursor, " + mass + ")\">" + value + "</button>");
     }
 
     static onDetailsClick(menuSystem, cursor) {
@@ -190,16 +199,16 @@ class CargoMenu {
             menuSystem.pushScript(GoodsDetailsMenu, comp);
         }
     }
-    
+
     // Get component or goods for current cursor.
     static getGoodsForCursor(ship, cursor) {
         let itemNumber = 0;
 
         // Skip minerals
-        if (null != ship.dockedWith) {
-            if (0 < ship.getBays().minerals.size) {
-                itemNumber += ship.getBays().minerals.size;
+        if (0 < ship.getBays().minerals.size) {
+            itemNumber += ship.getBays().minerals.size;
 
+            if (null != ship.dockedWith) {
                 // Skip sell all
                 itemNumber++;
             }
@@ -214,7 +223,7 @@ class CargoMenu {
                 itemNumber++;
             }
         }
-        
+
         let goods = ship.getBays().tradeGoods;
         for (let good of goods) {
             if (itemNumber == cursor.y) {
@@ -224,8 +233,8 @@ class CargoMenu {
             }
         }
         throw (new BugError("No components/goods at cursor."));
-    }  
-    
+    }
+
     static onMountCompClick(menuSystem, cursor) {
         let ship = menuSystem.getShip();
         let comp = CargoMenu.getGoodsForCursor(ship, cursor);
@@ -236,30 +245,55 @@ class CargoMenu {
         let ship = menuSystem.getShip();
         let comp = CargoMenu.getGoodsForCursor(ship, cursor);
         comp.sell();
-    }   
-    
+    }
+
     static onSellGoodsClick(menuSystem, cursor, number) {
         let ship = menuSystem.getShip();
         let goods = CargoMenu.getGoodsForCursor(ship, cursor);
         goods.sell(number);
     }
 
-    static onSellMineralClick(ship, cursor, mass) {
+    static onSellMineralClick(menuSystem, cursor, mass) {
+        let ship = menuSystem.getShip();
+
+        if (undefined === cursor) {
+            // Sell everything
+            let minerals = ship.getBays().minerals;
+            for (let [key, value] of minerals) {
+                ship.sellMineral(key, value);
+            }
+        } else {
+            // Sell selected mineral.
+            let mineral = this.getMineralForCursor(ship, cursor);
+            ship.sellMineral(mineral, mass);
+        }
+    }
+
+    static getMineralForCursor(ship, cursor) {
         let minerals = ship.getBays().minerals;
         let index = 0;
         for (let [key, value] of minerals) {
-            if (undefined === cursor) {
-                // Sell everything
-                ship.sellMineral(key, value);
-            } else {
-                // Sell selected mineral.
-                if (index == cursor.y) {
-                    ship.sellMineral(key, mass);
-                    break;
-                }
+            // Sell selected mineral.
+            if (index == cursor.y) {
+                return (key);
             }
             index++;
         }
+
+        // Not found
+        throw (new BugError("No mineral at cursor."));
+    }
+
+    static onDumpMineralClick(menuSystem, cursor) {
+        let ship = menuSystem.getShip();
+        let mineral = this.getMineralForCursor(ship, cursor);
+        ship.getBays().dumpMineral(mineral);
+    }
+
+    static onDumpGoodsClick(menuSystem, cursor) {
+        let ship = menuSystem.getShip();
+        let goods = CargoMenu.getGoodsForCursor(ship, cursor);
+        ship.getBays().dumpGoods(goods);
     }
 }
 

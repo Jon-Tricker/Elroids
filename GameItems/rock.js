@@ -34,7 +34,6 @@ class Rock extends NonShipItem2 {
 
   rockSize;
   originalHP;
-  rotationRate;
   composition;
   game;
 
@@ -180,15 +179,6 @@ class Rock extends NonShipItem2 {
     }
   }
 
-  animate() {
-    let ar = this.getGame().getAnimateRate();
-    this.rotateX(this.rotationRate.x / ar);
-    this.rotateY(this.rotationRate.y / ar);
-    this.rotateZ(this.rotationRate.z / ar);
-
-    this.moveItem(true);
-    this.moveMesh();
-  }
 }
 
 export default Rock;

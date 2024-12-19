@@ -40,13 +40,13 @@ class CompPurchaseMenu {
                         printHeads = false;
                     }
 
-                    if (comp.getTechLevel() <= game.universe.system.getTechLevel()) {
+                    if (comp.isAvailableInSystem(game.universe.system)) {
                         let vals = new Array();
                         vals.push(comp.getName());
                         vals.push("<button type=\"button\" onclick=\"CompPurchaseMenu.onDetailsClick(this, cursor)\">Show</button>");
                         if (set != sets.hullSet) {
-                            vals.push("<button type=\"button\" onclick=\"CompPurchaseMenu.onBuyClick(this, cursor)\">" + comp.getCurrentValue(game.universe.system) + "</button>");
-                            vals.push("<button type=\"button\" onclick=\"CompPurchaseMenu.onMountClick(this, cursor)\">" + comp.getCurrentValue(game.universe.system) + "</button>");
+                            vals.push("<button type=\"button\" onclick=\"CompPurchaseMenu.onBuyClick(this, cursor)\">" + comp.getValueInSystem(game.universe.system) + "</button>");
+                            vals.push("<button type=\"button\" onclick=\"CompPurchaseMenu.onMountClick(this, cursor)\">" + comp.getValueInSystem(game.universe.system) + "</button>");
                         } else {
                             vals.push("<button type=\"button\" onclick=\"CompPurchaseMenu.onUpgradeClick(this, cursor)\">" + comp.getUpgradeCost(this.getShip()) + "</button>");
                         }
@@ -68,8 +68,7 @@ class CompPurchaseMenu {
     static onDetailsClick(menuSystem, cursor) {
         let game = menuSystem.getGame();
         let comp = CompPurchaseMenu.getCompForCursor(game, cursor);
-
-        ComponentsMenu.displayDetails(menuSystem, comp);
+        menuSystem.pushScript(ComponentDetailsMenu, comp);
     }
 
     static onBuyClick(menuSystem, cursor) {
@@ -100,7 +99,7 @@ class CompPurchaseMenu {
         let compNumber = 0;
         for (let set of game.componentsList) {
             for (let comp of set) {
-                if (comp.getTechLevel() <= game.universe.system.getTechLevel()) {
+                if (comp.isAvailableInSystem(game.universe.system)) {
                     if (compNumber == cursor.y) {
                         return (comp);
                     } else {

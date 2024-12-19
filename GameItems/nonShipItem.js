@@ -7,6 +7,8 @@ const MAX_ROTATION_RATE = 0.5;    // R/s
 
 class NonShipItem extends Item {
 
+    rotationRate;
+
     // Textual label (if any).
     label;
 
@@ -29,11 +31,11 @@ class NonShipItem extends Item {
     toJSON() {
         let json = super.toJSON();
         json.id = this.myId;
-        return(json);
+        return (json);
     }
 
     getId() {
-        return(this.myId);
+        return (this.myId);
     }
 
     addLabel(label) {
@@ -69,6 +71,16 @@ class NonShipItem extends Item {
     generateRotationRate() {
         let rr = Math.random() * 2 * MAX_ROTATION_RATE - MAX_ROTATION_RATE;
         return (rr);
+    }
+
+    animate() {
+        let ar = this.getGame().getAnimateRate();
+        this.rotateX(this.rotationRate.x / ar);
+        this.rotateY(this.rotationRate.y / ar);
+        this.rotateZ(this.rotationRate.z / ar);
+
+        this.moveItem(true);
+        this.moveMesh();
     }
 }
 

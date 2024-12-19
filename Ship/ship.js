@@ -12,6 +12,8 @@ import Mineral from "../GameItems/mineral.js";
 import Station from '../GameItems/System/station.js';
 import WormholeEnd from '../GameItems/System/wormholeEnd.js';
 import Hull from './Components/Hulls/hull.js';
+import GoodsCrate from '../Trade/goodsCrate.js';
+import { Component } from './Components/component.js';
 
 // Slightly damped attitude contols to allow fine adjustment.
 const ROTATE_RATE_DELTA = 0.125;        // r/s
@@ -82,7 +84,7 @@ class Ship extends Item {
             newShip.rotateX(json.rotationx);
             newShip.rotateY(json.rotationy);
             newShip.rotateZ(json.rotationz);
-        } 
+        }
 
         // Make new hull.
         // Will also add it to ship.
@@ -384,14 +386,21 @@ class Ship extends Item {
         return (true);
     }
 
-    // Load component into bay.
-    loadComponent(comp) {
-        this.hull.compSets.baySet.loadComponent(comp);
+    // Pick up a goods crate.
+    // Return true if successful.
+    cratePickup(crate) {
+        this.getGame().displays.addMessage("Loaded " + crate.contents.number + " X " + crate.contents.getName());
+
+        // Store goods
+        this.loadGoods(crate.contents);
+        this.playSound('thud');
+        crate.destruct();
+        return (true);
     }
 
-    // Unload component from bay.
-    unloadComponent(comp) {
-
+    // Load goods into bay.
+    loadGoods(goods) {
+        this.hull.compSets.baySet.loadGoods(goods);
     }
 
     addCredits(score) {
@@ -415,6 +424,10 @@ class Ship extends Item {
 
         if (that instanceof Mineral) {
             return (this.mineralPickup(that));
+        }
+
+        if (that instanceof GoodsCrate) {
+            return (this.cratePickup(that));
         }
 
         if (that instanceof Station) {

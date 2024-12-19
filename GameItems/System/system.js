@@ -227,10 +227,6 @@ class System {
             item.animate(date, keyBoard);
         }
     }
-
-    getGame() {
-        return (this.universe.game);
-    }
 }
 
 export { System, SystemSpec };

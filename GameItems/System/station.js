@@ -357,7 +357,7 @@ class Station extends NonShipItem {
 
                 // Check speed.
                 if (MAX_DOCKING_SPEED < Math.floor(ship.speed.length())) {
-                    this.game.displays.addMessage("Too fast! Max docking speed " + MAX_DOCKING_SPEED + " m/s");
+                    this.getGame().displays.addMessage("Too fast! Max docking speed " + MAX_DOCKING_SPEED + " m/s");
                     return (false);
                 }
 

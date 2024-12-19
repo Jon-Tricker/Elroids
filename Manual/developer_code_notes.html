@@ -28,46 +28,69 @@
 				<LI>Player - Stuff related to the current player.</LI>
 				<LI>MyScene - Stuff related to sound and graphics rendering.</LI>
 				<LI>Displays - Screen display graphics (Maybe should go under Ship).</LI>
-				<LI>Purchase list - Component shoping list.</LI>
-				<LI>Universe - Everything related to the in game universe.
-					<UL>
-						<LI>In game time keeping</LI>
-						<LI>List and positions of all star systems.</LI>
-						<LI>Pointer to 'current' star system.</LI>
-						<LI>System - Details about a specific star system. If not the 'current' active system some data (e.g. rock shapes) will be dicarded (see 'Activation' below).
-							<UL>
-								<LI>Item - The game objects that can exist within a system. Can also be moved to other systems.
-									<UL>
-										<LI>Ship - The players ship.</LI>
-										<LI>NonShipItems - Other in game objects..</LI>
-									</UL>
-								</LI>
-								<LI>items - List of items.</LI>
-								<LI>stations - List of stations.</LI>
-								<LI>wormholes - List of wormholes</LI>
-							</UL>
-						</LI>
-						<LI>Hyperspace - A subclass of System.</LI>
-					</UL>
-				</LI>
+				<LI>Purchase lists - Component and goods shoping lists.</LI>
 				<LI>Main animation loop.</LI>
+			</UL>
+		</LI>
+		<LI>Universe - Everything related to the in game universe.
+			<UL>
+				<LI>In game time keeping</LI>
+				<LI>Ship - Details of the player's ship.</LI>
+				<UL>
+					<LI>Ship components</LI>
+					<LI>Ship cargo</LI>
+				</UL>
+				<LI>List and positions of all star systems.</LI>
+				<UL>
+					<LI>StarSystem - Details about a specific star system. If not the 'current' active system some data
+						(e.g. rock details) will be dicarded (see 'Activation' below).
+						<UL>
+							<LI>System stats.
+								<UL>
+									<LI>Law, tech and magic levels.</LI>
+									<LI>Mineral abundancies.</LI>
+									<LI>Rock and saucer counts.</LI>
+								</UL>
+							</LI>
+							<LI>Items - The game objects within a system.
+								<UL>
+									<LI>Rocks</LI>
+									<LI>Saucers</LI>
+									<LI>Stations</LI>
+									<LI>Wormholes</LI>
+									<LI>Floating minerals and goods crates.</LI>
+								</UL>
+							</LI>
+							<LI>List of stations.</LI>
+							<LI>List of wormholes</LI>
+							<LI>Total</LI>
+						</UL>
+					</LI>
+					<LI>Hyperspace - A subclass of System.</LI>
+				</UL>
+				<LI>Pointer to 'current' star system.</LI>
 			</UL>
 		</LI>
 	</UL>
 
 	<H2>Save/Load mechanism.</H2>
 	<P>Game images are saved as JSON files.</P>
-	<P>Each object persists only none recreatable members. i.e NOT stuff like Meshes that don't change and can be dynamically re-created.</P>
+	<P>Each object persists only none recreatable members. i.e NOT stuff, like meshes, that don't change and can be
+		dynamically re-created.</P>
 	<P>Each persistable object has two methods:</P>
 	<UL>
-		<LI>toJSON() - Converts the non-recreateble members into JSON objects. This is built into one big JSON image and then Stringified.</LI>
-		<LI>static fromJSON() - This is given the JSON object, invokes the object's normal constructor and and returns a new version of the object.</LI>
+		<LI>toJSON() - Converts the non-recreateble members into JSON objects. This is built into one big JSON image and
+			then Stringified.</LI>
+		<LI>static fromJSON() - This is given the JSON object, invokes the object's normal constructor and and returns a
+			new version of the object.</LI>
 	</UL>
 	<P>Object sets can be handled with the utility class JSONSet.</P>
-	
+
 	<H3>Item/System IDs</H3>
-	<P>During game operation references between objects are handled by standard javascript reference. However these won't survive save/load operations.</P>
-	<P>When a reference need to be saved the target object is assigned a unique ID. This is converted back to the new reference during re-load.</P>
+	<P>During game operation references between objects are handled by standard javascript reference. However these
+		won't survive save/load operations.</P>
+	<P>When a reference need to be saved the target object is assigned a unique ID. This is converted back to the new
+		reference during re-load.</P>
 
 	<H2>Item activation</H2>
 	<P>In attempt to reduce memory/cpu footprint most threejs derived graphical object can exist in two states:</P>
@@ -87,10 +110,15 @@
 			<P>Item does not get animate() calls. If is 'frozen' until system is re-activated.</P>
 		</LI>
 	</UL>
-	<P>When Systems are constructed their Items are created with a populate() method. The Items are created in 'inactive' state.</P>
-	<P>When a System becomed 'active', generally because th Ship has moved into it, its setActive(true) method is called. This invokes the setActive() of it's child Items. Each sets up it's graphical components (generally by calling setumMesh()) and adds itself to the scene.</P>
-	<P>When a System become 'inactive' its setActive(false) method is called. The child Items must remove themselves from the scene and null all theit grapical components. The graphical parts should then be GCed.</P>
-	<P>ToDo: Maybe 'System' should extend threejs.Group. Objects contained in the System could be added to it. The the whole Group could be added/removed from scene.</P>
+	<P>When Systems are constructed their Items are created with a populate() method. The Items are created in
+		'inactive' state.</P>
+	<P>When a System becomed 'active', generally because th Ship has moved into it, its setActive(true) method is
+		called. This invokes the setActive() of it's child Items. Each sets up it's graphical components (generally by
+		calling setumMesh()) and adds itself to the scene.</P>
+	<P>When a System become 'inactive' its setActive(false) method is called. The child Items must remove themselves
+		from the scene and null all theit grapical components. The graphical parts should then be GCed.</P>
+	<P>ToDo: Maybe 'System' should extend threejs.Group. Objects contained in the System could be added to it. The the
+		whole Group could be added/removed from scene.</P>
 
 	<H2>Learnings</H2>
 	<UL>
@@ -101,10 +129,10 @@
 			cameras' part of the ship.
 		</LI>
 		<LI>Two threejs 'renderers' are used:
-		<UL>
-			<LI>A THREE.WebGLRenderer handles the 3D rendering.</LI>
-			<LI>A separate CSS2DRenderer handles 2D objects, like labels, that we want to be flat on to camera.</LI>
-		</UL>
+			<UL>
+				<LI>A THREE.WebGLRenderer handles the 3D rendering.</LI>
+				<LI>A separate CSS2DRenderer handles 2D objects, like labels, that we want to be flat on to camera.</LI>
+			</UL>
 			This as described in the exapmle <A HREF="https://threejs.org/examples/css2d_label.html"> here.</A>
 		</LI>
 
@@ -120,22 +148,25 @@
 		<LI>Sound support on Chrome is a pain. In an attempt to block audio spam audio components can only ne
 			initialized from within user events. So sounds have to be loaded on the first key/mouse click. Which means
 			they are not yet ready if this event wans to make a sound,</LI>
-		<LI>'statics' are slow. Require an instance of the class to be created? For better performance create a single instance as part of a top level object (e.g. Game) and call by reference.</LI>
+		<LI>'statics' are slow. Require an instance of the class to be created? For better performance create a single
+			instance as part of a top level object (e.g. Game) and call by reference.</LI>
 	</UL>
 
 	<H2>Units and dimensions</H2>
-	<P>This project was coded with arbitary units of distance, mass and time. I have since modified it to use something resembling
+	<P>This project was coded with arbitary units of distance, mass and time. I have since modified it to use something
+		resembling
 		SI.</P>
 	<UL>
 		<LI>Distance:
 			<UL>
 				<LI>For short distance (within systems) is in Meters.</LI>
 				<LI>For long distance (between systems) is in some larger unit (lightyears?).</LI>
-			</UL> 
+			</UL>
 		</LI>
 		<LI>Mass is in Tonnes (1000KG).</LI>
 		<LI>Time is in seconds.</LI>
-		<LI>Damage (HPs) is an arbitary unit. However, from the 'ram damage' calculation we can conclude that its units are M kg m/s</LI>
+		<LI>Damage (HPs) is an arbitary unit. However, from the 'ram damage' calculation we can conclude that its units
+			are M kg m/s</LI>
 		<LI>Rocks have a mass equal to the cube of their size. i.e (assuming cubic rocks) a density of about 1
 			tonne/m^3. Probably should be a bit higher and related to their composition. However it will do for now.
 		</LI>
@@ -152,8 +183,10 @@
 			only be points of light in the distance. For playability everything is moved closer together. (Excuse:
 			StarTrek/Wars battles where ships engage a few hundred meters apart and travelling at a few 10s of kph.)
 		</LI>
-		<LI>At present angular momentum is not conserved (for anything) ... If it were ship contol would be difficult.</LI>
-		<LI>Deceleration doesn't really make sense. Engines fire in a ramdom direction. But it is necessary for game play.</LI>
+		<LI>At present angular momentum is not conserved (for anything) ... If it were ship contol would be difficult.
+		</LI>
+		<LI>Deceleration doesn't really make sense. Engines fire in a ramdom direction. But it is necessary for game
+			play.</LI>
 	</UL>
 
 	<H2>Why not Typescript?</H2>

@@ -235,7 +235,7 @@ class Hull extends Component {
 
     getUpgradeCost(ship) {
         let oldHull = ship.hull;
-        let cost = Math.floor(this.getCurrentValue() - oldHull.getCurrentValue());
+        let cost = Math.floor(this.getValueInSystem(ship.system) - oldHull.getValueInSystem(ship.system));
 
         // Half price on trade ins.
         if (0 > cost) {

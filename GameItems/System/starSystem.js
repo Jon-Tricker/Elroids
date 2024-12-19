@@ -14,6 +14,8 @@ import SaucerStatic from '../Saucers/saucerStatic.js';
 import SaucerWanderer from '../Saucers/saucerWanderer.js';
 import Station from './station.js';
 import { SystemSpec } from './system.js';
+import { GoodsList } from '../../Trade/goodsTypes.js';
+import GoodsCrate from '../../Trade/goodsCrate.js';
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -161,6 +163,15 @@ class StarSystem extends System {
             // And a sample mineral
             new Mineral(this, 100, 250, -10, 50, 0, 0, 0, MineralTypes[2]);
             new Mineral(this, 100, 500, 50, 50, 0, 0, 0, MineralTypes[3]);
+
+            // Add sample goods crates.
+            let good = new (this.universe.game.goodsList.getByClass("Robot")).constructor();
+            good.number = 50;
+            new GoodsCrate(this, 250, 10, 50, 0, 0, 0, good); 
+            
+            let comp = new (this.universe.game.componentsList.getByClass("BasicEngine")).constructor();
+            comp.number = 1;
+            new GoodsCrate(this, 270, 10, 70, 0, 0, 0, comp);
 
         } else {
             // Create a bunch of random rocks

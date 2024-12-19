@@ -55,13 +55,13 @@ class ComponentsMenu {
                     if (null != ship.dockedWith) {
                         if (!(sets.hullSet == set)) {
                             vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onUnmountClick(this, cursor)\">Unmount</button>");
-                            vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, cursor)\">" + comp.getCurrentValue(ship.system) + "</button>");
+                            vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, cursor)\">" + comp.getValueInSystem(ship.system) + "</button>");
                         }
                         vals.push("10%=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, cursor, 10)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 10) + "</button>" +
                             " All=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, cursor, 100)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 100) + "</button>");
                     } else {
                         vals.push("10%=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, cursor, 10)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 10) + "</button>" +
-                            " All=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, cursor, 100)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 100)  + "</button>");
+                            " Max=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, cursor, 100)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 100)  + "</button>");
                     }
                     tab.addRow(vals);
                 }

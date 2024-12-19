@@ -157,7 +157,7 @@ class Item extends THREE.Group {
     }
 
     getGame() {
-        return (this.system.universe.game);
+        return (this.system.getGame());
     }
 
     getShip() {

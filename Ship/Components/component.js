@@ -5,15 +5,15 @@
 //  Always has a Goods.number of '1'. Can't bulk individually damagable objects.
 import ComponentDisplay from "../../Displays/Components/componentDisplay.js";
 import BugError from "../../GameErrors/bugError.js";
-import { Goods } from "../../Trade/goods.js";
-import { GoodsType } from "../../Trade/goods.js";
+import Goods from "../../Trade/goods.js";
+import { GoodsType } from "../../Trade/goodsTypes.js";
 import GameError from "../../GameErrors/gameError.js";
 
 class ComponentType extends GoodsType {
     maxHp;
 
     constructor(name, techLevel, mass, cost, maxHp) {
-        super(name, name, techLevel, 0, mass, cost)
+        super(name, name, techLevel, 0, 1, mass, cost)
         this.maxHp = maxHp;
     }
 
@@ -44,51 +44,31 @@ class Component extends Goods {
 
     // Buy from list.
     buy(ship, isFree) {
-        if (undefined === isFree) {
-            isFree = false;
-        }
-
-        // Check that we can we afford it.
-        if ((!isFree) && (this.getCostInSystem(ship.system) > ship.getCredits())) {
-            throw (new GameError("Not enough credits."));
-        }
-
-        // Make copy of purchace menu item.
-        // Seems to work ... but not sure why.
-        let comp = new this.constructor();
-
-        // Put it in bay. 
-        ship.hull.compSets.baySet.loadComponent(comp);
-
-        // Now we have added complete financial transaction. 
-        if (!isFree) {
-            ship.addCredits(-this.getCostInSystem(ship.system));
-        }
-
-        return (comp);
+        return(super.buy(ship, 1, isFree));
     }
 
     sell() {
-        // Remove from container.
-        if (undefined == this.set) {
-            throw (new BugError("Cant sell component thats not part of a set."))
-        } else {
-            this.set.sets.baySet.unloadComponent(this)
-        }
+        super.sell(1);
 
         // Remove display (if present).
         this.displayPanel = false;
         this.getGame().displays.compDisplays.recalc(true);
 
-        // Add value to wallet.
-        this.getShip().addCredits(this.getCostInSystem(this.getShip().system));
-
         // Allow to go out of scope and GC
     }
 
+    unloadFromShip(number) {
+        if (1 != number) {
+            throw(new BugError("Trying to unloade multiple components."));
+        }
+        this.set.sets.baySet.unloadGoods(this, number)
+    }
+
     // Get value of the whole thing.
-    getCurrentValue(system) {
-        let value = super.getCurrentValue(system);
+    getValueInSystem(system) {
+        let value = super.getValueInSystem(system);
+
+        // Modify depending how damaged it is.
         value *= this.status / 100;
         return (Math.ceil(value));
     }
@@ -125,7 +105,7 @@ class Component extends Goods {
     mount(ship, alsoBuy) {
         // Check that we can we afford it.
         if (alsoBuy) {
-            if (this.getCurrentValue(ship.system) > ship.getCredits()) {
+            if (this.getValueInSystem(ship.system) > ship.getCredits()) {
                 throw (new GameError("Not enough credits."));
             }
         }
@@ -139,7 +119,7 @@ class Component extends Goods {
 
         // Now we have added complete financial transaction. 
         if (alsoBuy) {
-            ship.addCredits(-this.getCurrentValue(ship.system));
+            ship.addCredits(-this.getValueInSystem(ship.system));
         }
 
         // If it is in a bay remove it.
@@ -229,15 +209,17 @@ class Component extends Goods {
     // This will be influenced by the ships docking status and system.
     getRepairCost(percent, ship) {
         percent = this.getMaxRepair(percent, ship);
-        let cost
+        let cost = 0;
 
         // Doubled if not docked.
         if (null == ship.dockedWith) {
             // Base cost ... anywhere.
             cost = this.type.cost * 2;
         } else {
-            // Cost in this system
-            cost = this.getCostInSystem(ship.system);
+            if(this.isAvailableInSystem(ship.system)) {
+                // Cost in this system
+                cost = this.getUnitCostInSystem(ship.system);
+            }
         }
 
         cost *= percent / 100;
@@ -260,7 +242,7 @@ class Component extends Goods {
         }
 
         // No more than we can afford.
-        let affordable = ship.getCredits() / (this.getCostInSystem(ship.system) / 100);
+        let affordable = ship.getCredits() / (this.getUnitCostInSystem(ship.system) / 100);
         if (affordable < maxRepair) {
             maxRepair = affordable;
         }

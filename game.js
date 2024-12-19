@@ -10,7 +10,7 @@ import Universe from './universe.js';
 import Rock from "./GameItems/rock.js";
 import GameError from "./GameErrors/gameError.js"
 import { ComponentsList } from './Trade/purchaseLists.js';
-import GoodsList  from './Trade/goodsTypes.js';
+import { GoodsList } from './Trade/goodsTypes.js';
 import MyScene from './Scenery/myScene.js'
 import MyCamera from './Scenery/myCamera.js'
 import Displays from './Displays/displays.js'
@@ -19,7 +19,7 @@ import Player from './player.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "8.0";
+const VERSION = "8.2";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -92,6 +92,7 @@ class Game {
 
             // Give us some cash
             this.player.addCredits(12345);
+            //this.player.addCredits(121);
         }
 
         Rock.setRockStyle(rockStyle);
@@ -116,7 +117,7 @@ class Game {
         if (this.testMode) {
             // Doc ship to first station.
             for (let station of this.universe.system.stations) {
-                this.getShip().dock(station);
+                // this.getShip().dock(station);
                 break;
             }
         }

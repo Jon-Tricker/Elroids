@@ -5,7 +5,7 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import NonShipItem from './nonShipItem.js';
+import NonShipItem2 from './nonShipItem2.js';
 import Ship from '../Ship/ship.js';
 import Explosion from './explosion.js';
 
@@ -14,9 +14,7 @@ const MAX_SIZE = 10;
 // Tine to live ms.
 const TTL = 100000;   // ms
 
-class Mineral extends NonShipItem {
-
-  rotationRate;
+class Mineral extends NonShipItem2 {
   type;
   expiryTime;
 
@@ -36,7 +34,7 @@ class Mineral extends NonShipItem {
 
     this.type = type;
 
-    this.setupMesh();
+    // this.setupMesh();
 
     this.expiryTime = this.getUniverse().getTime() + TTL;
   }
@@ -66,13 +64,7 @@ class Mineral extends NonShipItem {
   }
 
   animate(date) {
-    let ar = this.getGame().getAnimateRate();
-    this.rotateX(this.rotationRate.x / ar);
-    this.rotateY(this.rotationRate.y / ar);
-    this.rotateZ(this.rotationRate.z / ar);
-
-    this.moveItem(true);
-    this.moveMesh();
+    super.animate();
 
     if (date > this.expiryTime) {
       new Explosion(1, this);
