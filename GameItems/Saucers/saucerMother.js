@@ -6,7 +6,6 @@
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import Saucer from './saucer.js';
-import Universe from '../../universe.js'
 
 import SaucerWanderer from "./saucerWanderer.js";
 import SaucerShooter from "./saucerShooter.js";
@@ -164,7 +163,7 @@ class SaucerMother extends Saucer {
     }
 
     getScore() {
-        return (200);
+        return (400);
     }
 }
 

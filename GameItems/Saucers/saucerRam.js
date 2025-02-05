@@ -5,7 +5,6 @@
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import Saucer from './saucer.js';
-import Universe from '../../universe.js';
 
 const COLOUR = "#FF2020";
 const SIZE = 20;
@@ -55,7 +54,7 @@ class SaucerRam extends Saucer {
     }
 
     getScore() {
-        return (30);
+        return (60);
     }
 }
 

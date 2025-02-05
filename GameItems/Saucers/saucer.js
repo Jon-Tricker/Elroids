@@ -6,7 +6,8 @@
 
 import * as THREE from 'three';
 import NonShipItem from '../nonShipItem.js';
-import Universe from '../../universe.js';
+import Mineral from '../mineral.js';
+import { MineralTypes } from '../minerals.js';
 
 const MAX_ROTATE_RATE = 2.5;    // r/s
 const SAUCER_HP = 1;
@@ -119,10 +120,38 @@ class Saucer extends NonShipItem {
 
         if (destroyed) {
             if ((that.owner == this.getShip()) || (that == this.getShip())) {
-                // Score it
-                this.getShip().addCredits(this.getScore(), that);
-                this.getGame().displays.addMessage("Bounty " + this.getScore() + "  (Cr)");
+                // For now only make loot if destroyed by ship.
+                this.makeLoot();
             }
+        }
+    }
+
+    makeLoot() {
+        let value = Math.ceil(0.5 + this.getScore() * Math.random() * 1.5);
+        switch (Math.floor(Math.random() * 4)) {
+            case 0:
+                // Make mineral
+                let type = MineralTypes[1 + Math.floor(Math.random() * MineralTypes.length)];
+                let mass = Math.ceil(value/type.value);
+                let mineral = new Mineral(this.system, mass, this.location.x, this.location.y, this.location.z, this.speed.x, this.speed.y, this.speed.z, type);
+                mineral.setActive(true);
+                break;
+
+            case 1:
+                // Make goods.
+                let good = new (this.getGame().goodsList.getRandomElement()).constructor();
+                good.number = Math.ceil(value/good.type.cost);
+                let crate = good.makeCrate(this.system, this.location.x, this.location.y, this.location.z, this.speed.x, this.speed.y, this.speed.z);
+                crate.setActive(true);
+                break;
+
+            case 2:
+                // Todo make component.
+                break;
+
+            default:
+                // Don't make anything.
+                break;
         }
     }
 

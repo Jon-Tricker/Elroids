@@ -5,7 +5,6 @@
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import Saucer from './saucer.js';
-import Universe from '../../universe.js';
 import Mineral from '../mineral.js';
 import DumbMissile from '../../GameItems/dumbMissile.js'
 
@@ -158,7 +157,7 @@ class SaucerPirate extends Saucer {
     }
 
     getScore() {
-        return (30);
+        return (60);
     }
 }
 

@@ -117,7 +117,6 @@ class GoodsList extends GoodsSet {
     getGame() {
         return (this.game);
     }
-
 }
 
 export { GoodsList, GoodsType };

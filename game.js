@@ -19,7 +19,7 @@ import Player from './player.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "8.2";
+const VERSION = "8.3";
 
 const ANIMATE_RATE = 25;            // frames/second
 

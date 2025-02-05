@@ -3,6 +3,7 @@
 // Can also represent multiple goods.
 // Goods dont have status. If they are damaged the number is reduced.
 import GameError from "../GameErrors/gameError.js";
+import GoodsCrate from "./goodsCrate.js";
 
 
 class Goods {
@@ -29,6 +30,12 @@ class Goods {
             number: this.number,
             class: this.constructor.name
         }
+    }
+
+    // Make a crate containing this type of goods/
+    makeCrate(system, x, y, z, speedX, speedY, speedZ) {  
+        let crate = new GoodsCrate(system, x, y, z, speedX, speedY, speedZ, this); 
+        return(crate)
     }
 
     getNumber() {

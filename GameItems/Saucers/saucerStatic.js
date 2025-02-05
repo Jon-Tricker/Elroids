@@ -26,7 +26,7 @@ class SaucerStatic extends Saucer {
     } 
     
     getScore() {
-        return(10);
+        return(20);
     }
 }
 

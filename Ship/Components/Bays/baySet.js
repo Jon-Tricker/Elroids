@@ -288,12 +288,12 @@ class BaySet extends ComponentSet {
 
         // Make goods crate, 
         let ship = this.getShip();
-
         let good = new goods.constructor();
         good.number = number;
-        let crate = new GoodsCrate(this.sets.ship.system, ship.location.x, ship.location.y, ship.location.y, ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random(), good); 
-        crate.setActive(true);
 
+        let crate = good.makeCrate(this.sets.ship.system, ship.location.x, ship.location.y, ship.location.z, ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random());
+
+        crate.setActive(true);
         crate.separateFrom(ship);
     }
 

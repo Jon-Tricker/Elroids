@@ -6,7 +6,6 @@
 
 import DumbMissile from '../dumbMissile.js';
 import Saucer from './saucer.js';
-import Universe from '../../universe.js';
 
 const COLOUR = "#008000";
 const SIZE = 20;  
@@ -104,7 +103,7 @@ class SaucerHunter extends Saucer {
     }
 
     getScore() {
-        return (40);
+        return (80);
     }
 }
 

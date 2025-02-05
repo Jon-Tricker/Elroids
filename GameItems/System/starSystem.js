@@ -14,8 +14,6 @@ import SaucerStatic from '../Saucers/saucerStatic.js';
 import SaucerWanderer from '../Saucers/saucerWanderer.js';
 import Station from './station.js';
 import { SystemSpec } from './system.js';
-import { GoodsList } from '../../Trade/goodsTypes.js';
-import GoodsCrate from '../../Trade/goodsCrate.js';
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;          // m
@@ -165,13 +163,13 @@ class StarSystem extends System {
             new Mineral(this, 100, 500, 50, 50, 0, 0, 0, MineralTypes[3]);
 
             // Add sample goods crates.
-            let good = new (this.universe.game.goodsList.getByClass("Robot")).constructor();
+            let good = new (this.universe.game.goodsList.getByClass("Gun")).constructor();
             good.number = 50;
-            new GoodsCrate(this, 250, 10, 50, 0, 0, 0, good); 
+            good.makeCrate(this, 250, 10, 50, 0, 0, 0); 
             
             let comp = new (this.universe.game.componentsList.getByClass("BasicEngine")).constructor();
             comp.number = 1;
-            new GoodsCrate(this, 270, 10, 70, 0, 0, 0, comp);
+            comp.makeCrate(this, 270, 10, 70, 0, 0, 0);
 
         } else {
             // Create a bunch of random rocks
@@ -223,8 +221,8 @@ class StarSystem extends System {
                 new SaucerRam(this, 1000, 200, 200, null, true);
                 new SaucerPirate(this, 1500, 200, -50, null, true);
             }
-            // First mother ship always in safe mode.
-            this.createMotherSaucer(true);
+            // First mother ship in home system always in safe mode.
+            this.createMotherSaucer(this.spec.name == "Sol");   // Ugg!
         } else {  
             // Restore old saucers.
             for (let saucer of json.saucers) {
