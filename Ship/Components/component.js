@@ -8,6 +8,7 @@ import BugError from "../../GameErrors/bugError.js";
 import Goods from "../../Trade/goods.js";
 import { GoodsType } from "../../Trade/goodsTypes.js";
 import GameError from "../../GameErrors/gameError.js";
+import ComponentSet from "./componentSet.js";
 
 class ComponentType extends GoodsType {
     maxHp;
@@ -57,11 +58,27 @@ class Component extends Goods {
         // Allow to go out of scope and GC
     }
 
+    // Check if component is mounted.
+    // If it's mounted it will be in one of the ship's component sets. If not it will be in a bays componets set.
+    isMounted() {
+        for(let set of this.set.sets.ship.hull.compSets) {
+            if (this.set == set) {
+                return(true);
+            }
+        }
+        return(false);
+    }
+
     unloadFromShip(number) {
         if (1 != number) {
-            throw(new BugError("Trying to unloade multiple components."));
+            throw(new BugError("Trying to unload multiple components."));
         }
-        this.set.sets.baySet.unloadGoods(this, number)
+
+        if (this.isMounted()) {
+            this.set.delete(this);
+        } else {
+            this.set.sets.baySet.unloadGoods(this, number);
+        }
     }
 
     // Get value of the whole thing.

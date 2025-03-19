@@ -20,12 +20,12 @@ const MISSILE_DAMAGE = 1;
 
 class DumbMissile extends Missile {
 
-  static sound;
-
-  constructor(direction, owner) {
+  constructor(direction, owner, silent) {
     super(direction, owner, MISSILE_DAMAGE, COLOUR, missileMaterial);
 
-    this.playSound('pew', 0.2); 
+    if ((undefined == silent) || (!silent)) {
+      this.playSound('pew', 0.2); 
+    }
   }
 }
 

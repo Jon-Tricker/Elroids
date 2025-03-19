@@ -19,7 +19,7 @@ import Player from './player.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "8.3";
+const VERSION = "8.4";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -44,8 +44,8 @@ class Game {
     rockStyle;
 
     soundOn = false;
-
     testMode = false;
+    startDocked = false;
 
     // Gradually increasing saucer number limit.
     maxSaucerCount = 5;
@@ -78,13 +78,17 @@ class Game {
         ["saw", null]
     ]);
 
-    constructor(uniSize, systemSize, maxRockCount, rockStyle, safe, soundOn) {
+    constructor(uniSize, systemSize, maxRockCount, rockStyle, safe, soundOn, startDocked) {
 
         this.safe = safe;
         this.player = new Player();
 
         if ((soundOn != null) && (soundOn.toLowerCase() == "true")) {
             this.soundOn = true;
+        }     
+        
+        if ((startDocked != null) && (startDocked.toLowerCase() == "true")) {
+            this.startDocked = true;
         }
 
         if (0 == maxRockCount) {
@@ -114,10 +118,10 @@ class Game {
         this.displays = new Displays(this);
         this.displays.resize();
 
-        if (this.testMode) {
+        if (this.startDocked) {
             // Doc ship to first station.
             for (let station of this.universe.system.stations) {
-                // this.getShip().dock(station);
+                this.getShip().dock(station);
                 break;
             }
         }

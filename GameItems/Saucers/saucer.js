@@ -8,6 +8,8 @@ import * as THREE from 'three';
 import NonShipItem from '../nonShipItem.js';
 import Mineral from '../mineral.js';
 import { MineralTypes } from '../minerals.js';
+import Explosion from '../explosion.js';
+import DumbMissile from '../dumbMissile.js';
 
 const MAX_ROTATE_RATE = 2.5;    // r/s
 const SAUCER_HP = 1;
@@ -35,6 +37,10 @@ class Saucer extends NonShipItem {
     // Safe mode ... leathality reduced.
     safe;
 
+    // Time to self destruct.
+    // 0 if never.
+    destructTime = 0;
+
     constructor(system, size, locationX, locationY, locationZ, mass, colour, owner, safe) {
         super(system, locationX, locationY, locationZ, 0, 0, 0, size, mass, SAUCER_HP, owner);
         this.colour = colour;
@@ -48,7 +54,18 @@ class Saucer extends NonShipItem {
             this.safe = safe;
         }
 
+        let ttl = this.getTtl();
+        if ((0 != ttl) && (!safe)) {
+            this.destructTime = this.getUniverse().getTime() + Math.floor(ttl / 2 + Math.random() * ttl / 2);
+        }
+
         this.system.saucerCount++;
+    }
+
+    // Return time to live.
+    // 0 if forever.
+    getTtl() {
+        return (0);
     }
 
     destruct() {
@@ -131,8 +148,8 @@ class Saucer extends NonShipItem {
         switch (Math.floor(Math.random() * 4)) {
             case 0:
                 // Make mineral
-                let type = MineralTypes[1 + Math.floor(Math.random() * MineralTypes.length)];
-                let mass = Math.ceil(value/type.value);
+                let type = MineralTypes[1 + Math.floor(Math.random() * (MineralTypes.length -1))];
+                let mass = Math.ceil(value / type.value);
                 let mineral = new Mineral(this.system, mass, this.location.x, this.location.y, this.location.z, this.speed.x, this.speed.y, this.speed.z, type);
                 mineral.setActive(true);
                 break;
@@ -140,7 +157,7 @@ class Saucer extends NonShipItem {
             case 1:
                 // Make goods.
                 let good = new (this.getGame().goodsList.getRandomElement()).constructor();
-                good.number = Math.ceil(value/good.type.cost);
+                good.number = Math.ceil(value / good.type.cost);
                 let crate = good.makeCrate(this.system, this.location.x, this.location.y, this.location.z, this.speed.x, this.speed.y, this.speed.z);
                 crate.setActive(true);
                 break;
@@ -164,7 +181,7 @@ class Saucer extends NonShipItem {
         0;
     }
 
-    animate() {
+    animate(date) {
         // Spin
         this.rotation.y += this.rotateRate / this.getGame().getAnimateRate();
 
@@ -183,6 +200,24 @@ class Saucer extends NonShipItem {
         this.shoot();
 
         this.moveItem(true);
+
+        if ((0 != this.destructTime) && (date > this.destructTime)) {
+            this.explode();
+        }
+    }
+
+    // Self destruct.
+    explode() {
+        // Make fragments
+        let count = Math.ceil(Math.random() * 100);
+        for (let i = 0; i < count; i++) {
+            let direction = this.getGame().createRandomVector(2);
+            new DumbMissile(direction, this, true);
+        }
+
+        // Blow up.
+        new Explosion(this.size, this);
+        this.destruct();
     }
 
     // Do navigation logic

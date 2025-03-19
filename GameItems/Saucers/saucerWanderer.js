@@ -9,16 +9,22 @@ const COLOUR = "#D0D0FF";
 const SIZE = 30;
 const MASS = 100;
 const MAX_SPEED = 200;
+const TTL = 60000;
 
 class SaucerWanderer extends Saucer {
 
     constructor(system, locationX, locationY, locationZ, owner, safe) {
         super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
+    }   
+    
+    getTtl() {
+        return(TTL);
     }
 
     getMaxSpeed() {
         return(MAX_SPEED);
     }
+
     // Do navigation logic
     navigate() {
         let delta = this.getGame().createRandomVector(2);    

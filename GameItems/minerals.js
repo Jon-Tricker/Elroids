@@ -174,7 +174,7 @@ class Composition {
     // Break down into minerals (ignore valueless).
     for (let component of this.composition) {
       if ((0 != component.type.value) && (10 < component.percentage)) {
-        let newMass = mass * component.percentage/100
+        let newMass = Math.floor(mass * component.percentage/100);
         if (1 <= newMass) {
           let speedRatio = Math.random();
 

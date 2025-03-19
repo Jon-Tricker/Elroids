@@ -16,7 +16,7 @@ const MAX_ACC = 5;    // m/s^2
 
 const SHOOT_FREQUENCY = 200;
 const MOVE_FREQUENCY = 2010;
-const STANDOFF_DISTANCE = 500;
+const STANDOFF_DISTANCE = 400;
 
 const BURST_COUNT = 3;
 

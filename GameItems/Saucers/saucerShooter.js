@@ -16,7 +16,9 @@ const MAX_ACC = 3;
 
 const SHOOT_FREQUENCY = 100;
 const MOVE_FREQUENCY = 1010;
-const STANDOFF_DISTANCE = 500;
+const STANDOFF_DISTANCE = 300;
+
+const TTL = 60000;
 
 class SaucerShooter extends Saucer {
     shootDue = 0;
@@ -26,7 +28,11 @@ class SaucerShooter extends Saucer {
     constructor(system, locationX, locationY, locationZ, owner, safe) {
         super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
         this.createTargetLocation();
-    } 
+    }   
+
+    getTtl() {
+        return(TTL);
+    }
     
     getClass() {
         return("Shooter");

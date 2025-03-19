@@ -5,7 +5,7 @@ import Mineral from "../../../GameItems/mineral.js";
 import { MineralType } from '../../../GameItems/minerals.js';
 import GoodsSet from '../../../Trade/goodsSet.js';
 import { Component } from '../component.js';
-import GoodsCrate from '../../../Trade/goodsCrate.js';
+import BugError from '../../../GameErrors/bugError.js';
 
 class BaySet extends ComponentSet {
 

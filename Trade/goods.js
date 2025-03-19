@@ -100,7 +100,12 @@ class Goods {
         vals.push(this.getName());
         vals.push(this.getTechLevel());
         vals.push(this.getMagicLevel());
-        vals.push(this.getLawLevel());
+        let law = this.getLawLevel();
+        if (undefined == law) {
+            vals.push("legal");
+        } else {
+            vals.push(this.getLawLevel());
+        }
         vals.push(this.type.mass);
         vals.push(this.type.cost);
 

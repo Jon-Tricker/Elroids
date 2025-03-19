@@ -215,7 +215,7 @@ class StarSystem extends System {
             if (this.getGame().testMode) {
                 // New saucer
                 new SaucerStatic(this, 200, 100, -50, false);
-                new SaucerWanderer(this, 400, 100, -50, null, false);
+                new SaucerWanderer(this, 400, 100, -50, null, true);
                 new SaucerShooter(this, 300, 100, -50, null, true);
                 new SaucerHunter(this, 300, 200, -50, null, true);
                 new SaucerRam(this, 1000, 200, 200, null, true);

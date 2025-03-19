@@ -4,9 +4,7 @@
 
 import * as THREE from 'three';
 import Keyboard from "./keyboard.js";
-import Universe from './universe.js'
 import Game from './game.js'
-import Player from './player.js'
 import MyCamera from './Scenery/myCamera.js'
 
 // Some plumbing to get passed parameters.
@@ -16,12 +14,13 @@ var scriptName = lastScript;
 var rockCount = parseInt(scriptName.getAttribute('rockCount'));
 var uniSize = parseInt(scriptName.getAttribute('uniSize'));
 var rockStyle = scriptName.getAttribute('rockStyle');
+var startDocked = scriptName.getAttribute('startDocked');
 var soundOn = scriptName.getAttribute('soundOn');
 var safe = false;
 
 // Create the game objects
 // For the moment universe and system are the same size.
-const game = new Game(uniSize, uniSize, rockCount, rockStyle, safe, soundOn);
+const game = new Game(uniSize, uniSize, rockCount, rockStyle, safe, soundOn, startDocked);
 
 // Add event listener on clicks.
 // It takes a while for auto repeat to kick in. Also we don't know how fast it will be. So
