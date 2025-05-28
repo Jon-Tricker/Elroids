@@ -45,17 +45,18 @@
 
 	<H2>ToDos (In some sort of priority order)</H2>
 
-	<H3>V8.0 Extend economy.</H3>
-	<P>Implemnt penalty for illeagal sales.</P>
-	<P>Ballance trade.</P>
-
 	<H3>V9.x Improve opposition.</H3>
-	<P>add multiple hull meshes.</P>
+	<P>Add multiple hull meshes.</P>
 	<P>Add smart enemy ships.</P>
+	<P>Possibly limit amount of goods available at stations.
+		<UL>
+			<LI>Maybe stations gradually 'grow' goods.</LI>
+			<LI>Maybe station 'craft' goods from minerals delivered.</LI>
+		</UL>
+	</P>
 
 	<H3>V10.x Fix game launch problems.</H3>
 	<P>Add 'loading' screen.</P>
-	<P>Investigate why loading appears to have become slow.</P>
 	<P>Look into 'CORS' bug.  (I think this is due to the library host initially refusing our domain but immediatly 'learning'. Possible soloution copy the lib to a local file.)</P>
 	
 	<H3>V11.x Add extra ship components.</H3>
@@ -78,6 +79,15 @@
 		<LI>Separate warp drive.</LI>
 		<LI>Improved terminal (but keep VT100 as default).</LI>
 	</UL>
+
+	<H3>V12.x Bulk up.</H3>
+	<LI>Add many more:
+		<UL>
+			<LI>Goods Types.</LI>
+			<LI>Systems.</LI>
+			<LI>Hull types.</LI>
+		</UL>
+	</LI>
 
 	<H3>Documentation.</H3>
 	<P>Add screen shot with various display panels labled.</P>
@@ -148,13 +158,15 @@
 
 		<LI>Extensions:
 			<UL>
-				<LI>Test on platforms other than PC/Chrome</LI>
+				<LI>Test on platforms other than PC/Chrome.</LI>
+				<LI>Move code under npm repository.</LI>
 				<LI>Make it multi-player (AJAX?).</LI>
 				<LI>Add optional gravity effects (like Gravitar).</LI>
 				<LI>Add on line high score table?</LI>
 				<LI>Maybe collision damage should be proportional to mass and relative speed of colliding object. Common for all items apart from 'rock on rock' impacts.</LI>
 				<LI>Revisit inline 'ToDos'.</LI>
 				<LI>Add 'toxic' crates. Triibles, bombs, xenomorphs.</LI>
+				<LI>Add 'crafting'. Take minerals to stations to get components made.</LI>
 			</UL>
 		</LI>
 	</UL>

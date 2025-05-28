@@ -22,7 +22,7 @@ class GoodsPurchaseMenu {
 
             let printHeads = true;
             for (let goods of game.goodsList) {
-                if (goods.isLeagal(game.universe.system)) {
+                if (goods.isLegal(game.universe.system)) {
                     if (printHeads) {
                         let heads = new Array();
                         heads.push("Name");

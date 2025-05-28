@@ -19,7 +19,6 @@ let dockedMenu = "\
     <LI><A HREF=\"helpMenu\">Menu controls help screen.</A></LI>\
     <LI><A HREF=\"cargoMenu\">Cargo bay</A></LI>\
     <LI><A HREF=\"componentsMenu\">Ship Components Menu.</A></LI>\
-    <LI><A HREF=\"repairMenu\">Ship Repair Menu.</A></LI>\
     <LI><A HREF=\"compPurchaseMenu\">Components Purchase Menu.</A></LI>\
     <LI><A HREF=\"goodsPurchaseMenu\">Goods Purchase Menu.</A></LI>\
     <LI><A HREF=\"starSystemsMenu\">Guide to the Galaxy.</A></LI>\

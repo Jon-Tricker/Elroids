@@ -21,7 +21,7 @@ class CargoMenu {
 
         doc += "<P>"
         doc += "<P>Total capacity " + ship.getCargoCapacity() + "(t)</P>"
-        doc += "<P>Current load " + (ship.getTotalMass() - ship.getMass()) + "(t)</P>"
+        doc += "<P>Current load " + ship.hull.compSets.baySet.getContentMass() + "(t)</P>"
         doc += "<BR />"
 
         doc += CargoMenu.displayMinerals(ship);
@@ -156,7 +156,7 @@ class CargoMenu {
             heads.push("Mass(t)");
             heads.push("Number");
             heads.push("Details");
-            heads.push("Leagal")
+            heads.push("Legal")
             if (null != ship.dockedWith) {
                 heads.push("Base cost")
                 heads.push("Sell 1");
@@ -170,7 +170,7 @@ class CargoMenu {
                 vals.push(good.getMass());
                 vals.push(good.number);
                 vals.push("<button type=\"button\" onclick=\"CargoMenu.onDetailsClick(this, cursor)\">Show</button>");
-                vals.push(good.isLeagal(ship.system));
+                vals.push(good.isLegal(ship.system));
                 if (null != ship.dockedWith) {
                     vals.push(good.getCost());
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, cursor, 1)\">" + good.getUnitCostInSystem(ship.system) + "</button>");

@@ -45,7 +45,7 @@ class Component extends Goods {
 
     // Buy from list.
     buy(ship, isFree) {
-        return(super.buy(ship, 1, isFree));
+        return (super.buy(ship, 1, isFree));
     }
 
     sell() {
@@ -61,17 +61,17 @@ class Component extends Goods {
     // Check if component is mounted.
     // If it's mounted it will be in one of the ship's component sets. If not it will be in a bays componets set.
     isMounted() {
-        for(let set of this.set.sets.ship.hull.compSets) {
+        for (let set of this.set.sets.ship.hull.compSets) {
             if (this.set == set) {
-                return(true);
+                return (true);
             }
         }
-        return(false);
+        return (false);
     }
 
     unloadFromShip(number) {
         if (1 != number) {
-            throw(new BugError("Trying to unload multiple components."));
+            throw (new BugError("Trying to unload multiple components."));
         }
 
         if (this.isMounted()) {
@@ -226,19 +226,8 @@ class Component extends Goods {
     // This will be influenced by the ships docking status and system.
     getRepairCost(percent, ship) {
         percent = this.getMaxRepair(percent, ship);
-        let cost = 0;
 
-        // Doubled if not docked.
-        if (null == ship.dockedWith) {
-            // Base cost ... anywhere.
-            cost = this.type.cost * 2;
-        } else {
-            if(this.isAvailableInSystem(ship.system)) {
-                // Cost in this system
-                cost = this.getUnitCostInSystem(ship.system);
-            }
-        }
-
+        let cost = this.getCompleteRepairCost(ship);
         cost *= percent / 100;
 
         if (0 > cost) {
@@ -248,10 +237,25 @@ class Component extends Goods {
         return (Math.floor(cost));
     }
 
+    // Get current cost to repair 100%
+    getCompleteRepairCost(ship) {
+        let cost = 0;
+
+        if (null == ship.dockedWith) {
+            // Doubled if not docked.
+            cost = this.type.cost * 2;
+        } else {
+            if (this.isAvailableInSystem(ship.system)) {
+                // Cost in this system
+                cost = this.getUnitCostInSystem(ship.system);
+            }
+        }
+        return (cost);
+    }
+
     // Get the amount to repair based on the ship's situation.
     getMaxRepair(percent, ship) {
         let maxRepair = 100;
-
 
         // No more than asked
         if (percent < maxRepair) {
@@ -259,9 +263,10 @@ class Component extends Goods {
         }
 
         // No more than we can afford.
-        let affordable = ship.getCredits() / (this.getUnitCostInSystem(ship.system) / 100);
-        if (affordable < maxRepair) {
-            maxRepair = affordable;
+        let cost = this.getCompleteRepairCost(ship);
+        cost *= percent / 100;
+        if (ship.getCredits() < cost) {
+            maxRepair = Math.floor(percent * (ship.getCredits() / cost));
         }
 
         // Only upto half when undocked.

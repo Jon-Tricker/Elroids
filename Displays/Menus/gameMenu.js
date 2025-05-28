@@ -26,8 +26,11 @@ class GameInternalsMenu {
 
         doc += "<BR />";
         doc += "<P>Game:</P>";
-        doc += "<P>\t<button type=\"button\" onclick=\"GameInternalsMenu.saveClick(this.display.game)\">Save</button> "
-        doc += "<button type=\"button\" onclick=\"GameInternalsMenu.loadClick(this.display.game)\">Load</button></P>"
+        doc += "<P>\t<button type=\"button\" onclick=\"GameInternalsMenu.saveClick(this.display.game)\">Save</button></P>"
+        doc += "<P>\tA save file will be dropped into your local 'downloads' directory.</P>"
+        doc += "<BR />";
+        doc += "<P>\t<button type=\"button\" onclick=\"GameInternalsMenu.loadClick(this.display.game)\">Load</button></P>"
+        doc += "<P>\tWhen promted 'open' a peviously downloaded save file.</P>"
         doc += "<BR />";
         
 

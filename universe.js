@@ -302,8 +302,8 @@ class Universe {
                 let count = 0;
                 for (let good of this.game.goodsList) {
                     switch (count) {
-                        case 1:
-                            good.buy(this.ship, 2, true);
+                        case 3:
+                            good.buy(this.ship, 1, true);
                         // Fall thru.
 
                         case 0:

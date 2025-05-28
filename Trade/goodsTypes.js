@@ -16,8 +16,8 @@ class GoodsType {
         this.techLevel = techLevel;
         this.magicLevel = magicLevel;
 
-        // Maximum law level at which leagal.
-        // undefined if leagal everywhere.
+        // Maximum law level at which legal.
+        // undefined if legal everywhere.
         this.lawLevel = lawLevel;
 
         this.mass = mass;

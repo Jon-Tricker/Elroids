@@ -42,8 +42,8 @@ class Goods {
         return(this.number);
     }
 
-    // Is this leagal in a given system.
-    isLeagal(system) {
+    // Is this legal in a given system.
+    isLegal(system) {
         if (undefined == this.type.lawLevel) {
             return (true);
         }
@@ -208,6 +208,8 @@ class Goods {
     }
 
     sell(number) {
+        let ship = this.getShip();
+
         // Remove from container.
         if (undefined == this.set) {
             throw (new BugError("Cant sell goods that are not part of a set."))
@@ -215,8 +217,16 @@ class Goods {
 
         this.unloadFromShip(number);
 
+        if(!this.isLegal(ship.system)) {
+            // ToDo: Add more complex penalties/benefits fro illegal sales.=
+            if(Math.random() < 0.5) {
+                ship.playSound("police");
+                throw new GameError("'Elo 'elo 'elo. That's a bit dodgy! ... Goods confiscated.");
+            }
+        }
+
         // Add value to wallet.
-        this.getShip().addCredits(this.getUnitCostInSystem(this.getShip().system) * number);
+        ship.addCredits(this.getUnitCostInSystem(this.getShip().system) * number);
     }
 
     unloadFromShip(number) {
