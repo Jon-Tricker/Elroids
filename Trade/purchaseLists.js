@@ -3,6 +3,8 @@ import BasicBay from "../Ship/Components/Bays/basicBay.js";
 import MediumBay from "../Ship/Components/Bays/mediumBay.js";
 import ComponentSets from "../Ship/Components/componentSets.js";
 import BasicEngine from "../Ship/Components/Engines/basicEngine.js";
+import BasicRadar from "../Ship/Components/Avionics/basicRadar.js";
+import BasicCompass from "../Ship/Components/Avionics/basicCompass.js";
 import DumbMissileWeapon from "../Ship/Components/Weapons/dumbMissileWeapon.js";
 import MediumEngine from "../Ship/Components/Engines/mediumEngine.js";
 import BasicHull from "../Ship/Components/Hulls/basicHull.js";
@@ -23,6 +25,8 @@ class ComponentsList extends ComponentSets {
         new DumbMissileWeapon(this.weaponSet);
         new BasicBay(this.baySet);
         new MediumBay(this.baySet);
+        new BasicRadar(this.avionicsSet);
+        new BasicCompass(this.avionicsSet);
     }
 
     getGame() {

@@ -58,7 +58,6 @@ class CompPurchaseMenu {
             }
         }
 
-
         doc += "</P>"
 
         return (doc);

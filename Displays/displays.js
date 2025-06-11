@@ -1,6 +1,6 @@
 // Game and ship display overlays.
-import Radar from "./radar.js";
-import Compass from "./compass.js";
+import RadarDisplay from "./radarDisplay.js";
+import CompassDisplay from "./compassDisplay.js";
 import ComponentDisplays from "./Components/componentDisplays.js";
 import Terminal from './terminal.js'
 import MenuSystem from './menuSystem.js'
@@ -78,8 +78,8 @@ class Displays {
         let terminalCtx = terminalDoc.getContext("2d");
         this.terminal = new Terminal(this.game, terminalCtx, terminalDoc, DEFAULT_TERM_COLOUR);
 
-        this.radar = new Radar(this.game, this.statusCtx, DEFAULT_COLOUR);
-        this.compass = new Compass(this.game, this.statusCtx, DEFAULT_COLOUR);
+        this.radar = new RadarDisplay(this.game, this.statusCtx, DEFAULT_COLOUR);
+        this.compass = new CompassDisplay(this.game, this.statusCtx, DEFAULT_COLOUR);
         this.compDisplays = new ComponentDisplays(this.statusCtx, DEFAULT_COLOUR, this);
 
         // this.resize();

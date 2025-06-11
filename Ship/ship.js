@@ -8,10 +8,11 @@ import * as THREE from 'three';
 import Item from '../GameItems/item.js';
 import MyCamera from '../Scenery/myCamera.js';
 import BasicHull from './Components/Hulls/basicHull.js';
+import MediumHull from './Components/Hulls/mediumHull.js';
 import Mineral from "../GameItems/mineral.js";
 import Station from '../GameItems/System/station.js';
 import WormholeEnd from '../GameItems/System/wormholeEnd.js';
-import Hull from './Components/Hulls/hull.js';
+import { Hull } from './Components/Hulls/hull.js';
 import GoodsCrate from '../Trade/goodsCrate.js';
 import { Component } from './Components/component.js';
 
@@ -21,6 +22,8 @@ const ROTATE_RATE_MAX = 5;              // r/s
 
 class Ship extends Item {
 
+    // ToDo : These really should be part of the 'Hull' sub classes.
+    // However for now have all ships are actually the same size (so game mechanics are identcal) and just vary the size of the hull meshes.
     height;
     width;
     shipLength;
@@ -114,6 +117,7 @@ class Ship extends Item {
         // Create hull
         // Will also create all other components, for that hull type, and add them to our components sets.
         this.hull = new BasicHull();
+        // this.hull = new MediumHull();
         this.hull.buildShip(this);
 
         // Add in weight of all components.

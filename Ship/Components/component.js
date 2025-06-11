@@ -17,7 +17,6 @@ class ComponentType extends GoodsType {
         super(name, name, techLevel, 0, 1, mass, cost)
         this.maxHp = maxHp;
     }
-
 }
 
 class Component extends Goods {

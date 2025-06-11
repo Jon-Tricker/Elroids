@@ -112,11 +112,16 @@ class Goods {
         return (vals);
     }
 
-    getName() {
-        if (1 == this.number) {
-            return (this.type.singular);
+    getName(plural) {
+        if (undefined == plural) {
+            plural = false;
         }
-        return (this.type.plural);
+
+        if (plural || (1 != this.number)) {
+            return (this.type.plural);
+        }
+        
+        return (this.type.singular);
     }
 
     getMass() {

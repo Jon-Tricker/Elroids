@@ -5,8 +5,10 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import Hull from './hull.js'
+import { Hull, HullSection } from './hull.js';
 import BasicEngine from '../Engines/basicEngine.js';
+import BasicRadar from '../Avionics/basicRadar.js';
+import BasicCompass from '../Avionics/basicCompass.js';
 import DumbMissileWeapon from '../Weapons/dumbMissileWeapon.js';
 import BasicBay from '../Bays/basicBay.js';
 import { ComponentType } from '../component.js';
@@ -18,8 +20,8 @@ class BasicHull extends Hull {
     static type = new ComponentType("GP1", 1, 50, 1000, 3);
 
     constructor(set) {
-        super(BasicHull.type , set, 200);
-        super.buildSets(1, 1, 1, 2);
+        super(BasicHull.type, set, 200, 0.8);
+        super.buildSets(1, 1, 1, 2, 3);
     }
 
     getDescription() {
@@ -34,16 +36,37 @@ class BasicHull extends Hull {
         new BasicEngine(this.compSets.engineSet);
         new DumbMissileWeapon(this.compSets.weaponSet);
         new BasicBay(this.compSets.baySet);
+        new BasicRadar(this.compSets.avionicsSet);
+        new BasicCompass(this.compSets.avionicsSet);
     }
 
     getMesh() {
+        // Create the group
         let mesh = new THREE.Group();
+
+        // Work out graphics sizes.
+        let scalingFactor = 0.8;
+        this.length = this.getShip().shipLength * scalingFactor;
+        this.height = this.getShip().height * scalingFactor;
+        this.width = this.getShip().width * scalingFactor;
+
+        // Add graphical components.
+        mesh.add(this.createBodyMesh());
+        mesh.add(this.createEngineMesh(HullSection.CENTER, HullSection.TOP));
+        mesh.add(this.createThrusterMesh(HullSection.PORT, HullSection.BOTTOM));
+        mesh.add(this.createThrusterMesh(HullSection.STARBOARD, HullSection.BOTTOM));
+        mesh.add(this.createCockpitMesh());
+
+        return (mesh);
+    }
+
+    createBodyMesh() {
         let ratio = 2 / 1.5;
 
         // Save a few 'this.'s
-        let length = this.getShip().shipLength;
-        let height = this.getShip().height;
-        let width = this.getShip().width;
+        let length = this.length;
+        let height = this.height;
+        let width = this.width;
 
         let vertices = new Float32Array([
             length, 0, 0, // v0 nose
@@ -81,86 +104,46 @@ class BasicHull extends Hull {
 
         ];
 
-        let bodyGeometry = new THREE.BufferGeometry();
+        let geometry = new THREE.BufferGeometry();
 
-        bodyGeometry.setIndex(indices);
-        bodyGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-
-        // compute vertex normals
-        bodyGeometry.computeVertexNormals();
-
-        let bodyMesh = new THREE.Mesh(bodyGeometry, Hull.shipMaterial);
-
-        bodyMesh.castShadow = true;
-        bodyMesh.receiveShadow = true;
-
-        // Add the engine cone
-        var engineWidth = width;
-        if (height < width) {
-            engineWidth = height;
-        }
-        let engineGeometry = new THREE.ConeGeometry(engineWidth, length, 20, 1, true);
+        geometry.setIndex(indices);
+        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
         // compute vertex normals
-        engineGeometry.computeVertexNormals();
-        let engineMesh = new THREE.Mesh(engineGeometry, Hull.engineMaterial);
+        geometry.computeVertexNormals();
 
-        // Mount engine
-        engineMesh.rotateZ(-Math.PI / 2);
-        engineMesh.position.set(-length * 0.25, 0, height * .25);
+        let mesh = new THREE.Mesh(geometry, Hull.shipMaterial);
 
-        engineMesh.castShadow = true;
-        engineMesh.receiveShadow = true;
-
-        var thrusterWidth = engineWidth * 0.5;
-        let thrusterGeometry = new THREE.ConeGeometry(thrusterWidth, length / 2, 10, 1, true);
-
-        // compute vertex normals
-        thrusterGeometry.computeVertexNormals();
-        let thrusterMaterialL = Hull.engineMaterial.clone();
-        thrusterMaterialL.color.setHex(0x800000);
-        let thrusterMeshL = new THREE.Mesh(thrusterGeometry, thrusterMaterialL);
-
-        // Mount engine
-        thrusterMeshL.rotateZ(-Math.PI / 2);
-        thrusterMeshL.position.set(-length * 0.5, width * 0.75, height * -.25);
-
-        thrusterMeshL.castShadow = true;
-        thrusterMeshL.receiveShadow = true;
-
-
-        let thrusterMaterialR = Hull.engineMaterial.clone();
-        thrusterMaterialR.color.setHex(0x008000);
-        let thrusterMeshR = new THREE.Mesh(thrusterGeometry, thrusterMaterialR);
-
-        // Mount engine
-        thrusterMeshR.rotateZ(-Math.PI / 2);
-        thrusterMeshR.position.set(-length * 0.5, -width * 0.75, height * -.25);
-
-        thrusterMeshR.castShadow = true;
-        thrusterMeshR.receiveShadow = true;
-
-        // Add the flame cone
-        let flameGeometry = new THREE.ConeGeometry(engineWidth * 0.75, length, 20, 1, false);
-
-        // compute vertex normals
-        flameGeometry.computeVertexNormals();
-        let flameMesh = new THREE.Mesh(flameGeometry, this.flameMaterial);
-
-        // Position flame
-        flameMesh.rotateZ(Math.PI / 2);
-        flameMesh.position.set(-length, 0, height * .25);
-
-        // Create the group
-        mesh.add(bodyMesh);
-        mesh.add(engineMesh);
-        mesh.add(thrusterMeshL);
-        mesh.add(thrusterMeshR);
-
-        mesh.add(flameMesh);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
 
         return (mesh);
     }
+
+    createCockpitMesh() {
+        let size = this.width;
+        if (this.height < size) {
+            size = this.height;
+        }
+
+        let geometry = new THREE.ConeGeometry(size * 0.75, this.length * 0.75, 20, 1, false);
+
+        // compute vertex normals
+        geometry.computeVertexNormals();
+        let mesh = new THREE.Mesh(geometry, Hull.glassMaterial);
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        // Mount
+        mesh.rotateZ(-Math.PI / 2);
+        mesh.rotateX(-Math.PI / 20);
+        mesh.position.set(size, 0, this.height - size / 2);
+
+        return (mesh);
+    }
+
+
 }
 
 export default BasicHull;

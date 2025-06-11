@@ -161,11 +161,21 @@ class Rock extends NonShipItem2 {
       if (0 < this.composition.getValue()) {
         let rock = new Rock(this.system, newSize, loc.x, loc.y, loc.z, spd.x * ratio.x, spd.y * ratio.y, spd.z * ratio.z, this.composition);
         rock.setActive(true);
+
+        // Possible recurse
+        if (Math.random() < 0.1) {
+          rock.split();
+        }
       }
 
       if (0 < newComp.getValue()) {
         let rock = new Rock(this.system, newSize, loc.x, loc.y, loc.z, spd.x * ratio2.x, spd.y * ratio2.y, spd.z * ratio2.z, newComp);
-        rock.setActive(true);
+        rock.setActive(true); 
+        
+        // Possible recurse
+        if (Math.random() < 0.1) {
+          rock.split();
+        }
       }
     } else {
       this.composition.mineralize(loc, spd, this.mass / 2, this.system);

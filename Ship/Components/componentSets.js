@@ -1,6 +1,7 @@
 // A group of component sets, for example, a shopping catalogue.
 
 import EngineSet from "./Engines/engineSet.js";
+import AvionicsSet from "./Avionics/avionicsSet.js";
 import HullSet from "./Hulls/hullSet.js";
 import WeaponSet from "./Weapons/weaponSet.js";
 import BaySet from "./Bays/baySet.js";
@@ -17,7 +18,7 @@ class ComponentSets extends JSONSet {
     weaponSet;
     baySet;
 
-    constructor(ship, hullSlots, engineSlots, weaponSlots, baySlots) {
+    constructor(ship, hullSlots, engineSlots, weaponSlots, baySlots, avionicsSlots) {
         super();
         this.ship = ship;
 
@@ -29,7 +30,9 @@ class ComponentSets extends JSONSet {
         this.weaponSet = new WeaponSet(this, weaponSlots);
         super.add(this.weaponSet);
         this.baySet = new BaySet(this, baySlots);
-        super.add(this.baySet);
+        super.add(this.baySet); 
+        this.avionicsSet = new AvionicsSet(this, avionicsSlots);
+        super.add(this.avionicsSet);
     }
 
     toJSON(skip) {

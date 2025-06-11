@@ -35,7 +35,7 @@ class GoodsType {
 
 class Robot extends Goods {
 
-    static type = new GoodsType("Robots", "Robots", 2, 0, undefined, 1, 100);
+    static type = new GoodsType("Robot", "Robots", 2, 0, undefined, 1, 100);
 
     constructor(set, number) {
         super(Robot.type, set, number);
@@ -48,7 +48,7 @@ class Robot extends Goods {
 
 class Tool extends Goods {
 
-    static type = new GoodsType("Tools", "Tool", 1, 0, undefined, 0.5, 50);
+    static type = new GoodsType("Tool", "Tools", 1, 0, undefined, 0.5, 50);
 
     constructor(set, number) {
         super(Tool.type, set, number);
@@ -61,7 +61,7 @@ class Tool extends Goods {
 
 class Luxury extends Goods {
 
-    static type = new GoodsType("Luxuries", "Luxury", 0, 0, undefined, 0.5, 500);
+    static type = new GoodsType("Luxury", "Luxuries",  0, 0, undefined, 0.5, 500);
 
     constructor(set, number) {
         super(Luxury.type, set, number);
@@ -74,7 +74,7 @@ class Luxury extends Goods {
 
 class Gun extends Goods {
 
-    static type = new GoodsType("Guns", "Gun", 1, 0, 0, 0.5, 100);
+    static type = new GoodsType("Gun", "Guns", 1, 0, 0, 0.5, 100);
 
     constructor(set, number) {
         super(Gun.type, set, number);
@@ -87,7 +87,7 @@ class Gun extends Goods {
 
 class Crystal extends Goods {
 
-    static type = new GoodsType("Crystals", "Crystal", 0, 1, undefined, 0.1, 100);
+    static type = new GoodsType("Crystal", "Crystals", 0, 1, undefined, 0.1, 100);
 
     constructor(set, number) {
         super(Crystal.type, set, number);

@@ -36,7 +36,7 @@ class GoodsPurchaseMenu {
 
                     if (goods.isAvailableInSystem(game.universe.system)) {
                         let vals = new Array();
-                        vals.push(goods.getName());
+                        vals.push(goods.getName(true));
                         vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onDetailsClick(this, cursor)\">Show</button>");
                         vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onBuyClick(this, cursor, 1)\">" + goods.getValueInSystem(game.universe.system) + "</button>");
                         vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onBuyClick(this, cursor, 10)\">" + goods.getValueInSystem(game.universe.system) * 10 + "</button>");

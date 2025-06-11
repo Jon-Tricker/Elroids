@@ -1,4 +1,4 @@
-// Compass screen
+// Compass screen just one for the ship
 import * as THREE from 'three';
 import DarkPanel from './Utils/darkPanel.js';
 
@@ -13,7 +13,7 @@ const STA_REAR_COL = "red";
 const WH_FRONT_COL = "cyan";
 const WH_REAR_COL = "yellow";
 
-class Compass extends DarkPanel {
+class CompassDisplay extends DarkPanel {
     game;
     radius;
 
@@ -34,6 +34,12 @@ class Compass extends DarkPanel {
         let thisship = this.getShip();
 
         if (null != thisship.dockedWith) {
+            return;
+        }   
+        
+        // Check we have a working compass component.
+        let compass = thisship.hull.compSets.avionicsSet.getCompass();
+        if ((undefined == compass) || (!compass.isWorking())) {
             return;
         }
 
@@ -161,4 +167,4 @@ class Dot {
     }
 }
 
-export default Compass;
+export default CompassDisplay;
