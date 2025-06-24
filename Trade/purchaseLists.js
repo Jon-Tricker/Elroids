@@ -9,6 +9,7 @@ import DumbMissileWeapon from "../Ship/Components/Weapons/dumbMissileWeapon.js";
 import MediumEngine from "../Ship/Components/Engines/mediumEngine.js";
 import BasicHull from "../Ship/Components/Hulls/basicHull.js";
 import MediumHull from "../Ship/Components/Hulls/mediumHull.js";
+import LargeHull from "../Ship/Components/Hulls/largeHull.js";
 
 class ComponentsList extends ComponentSets {
     game;
@@ -20,6 +21,7 @@ class ComponentsList extends ComponentSets {
 
         new BasicHull(this.hullSet);
         new MediumHull(this.hullSet);
+        new LargeHull(this.hullSet);
         new BasicEngine(this.engineSet);
         new MediumEngine(this.engineSet);
         new DumbMissileWeapon(this.weaponSet);

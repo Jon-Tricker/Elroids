@@ -1,4 +1,4 @@
-// Medium hull
+// Large hull
 //
 // Copyright (C) Jon Tricker 2023.
 // Released under the terms of the GNU Public licence (GPL)
@@ -13,15 +13,15 @@ import BasicBay from '../Bays/basicBay.js';
 import { ComponentType } from '../component.js';
 import BasicCompass from '../Avionics/basicCompass.js';
 
-const DESCRIPTION = "A mid sized hull used for general purpose freighters.";
+const DESCRIPTION = "A large used for heavy freighters.";
 
-class MediumHull extends Hull {
+class LargeHull extends Hull {
 
-    static type =  new ComponentType("GP2", 2, 50, 5000, 4);
+    static type = new ComponentType("GP3", 3, 100, 10000, 6);
 
     constructor(set) {
-        super(MediumHull.type, set, 250);
-        super.buildSets(1, 2, 1, 2, 4);  
+        super(LargeHull.type, set, 250);
+        super.buildSets(1, 3, 1, 4, 4);
     }
 
     getDescription() {
@@ -44,9 +44,9 @@ class MediumHull extends Hull {
     getMesh() {
         // Create the group
         let mesh = new THREE.Group();
-        
+
         // Work out graphics sizes.
-        let scalingFactor = 1;
+        let scalingFactor = 1.5;
         this.length = this.getShip().shipLength * scalingFactor;
         this.height = this.getShip().height * scalingFactor;
         this.width = this.getShip().width * scalingFactor;
@@ -55,16 +55,17 @@ class MediumHull extends Hull {
         mesh.add(this.createBodyMesh());
         mesh.add(this.createEngineMesh(HullSection.PORT, HullSection.TOP));
         mesh.add(this.createEngineMesh(HullSection.STARBOARD, HullSection.TOP));
+        mesh.add(this.createEngineMesh(HullSection.CENTER, HullSection.BOTTOM));
         mesh.add(this.createThrusterMesh(HullSection.PORT, HullSection.BOTTOM));
         mesh.add(this.createThrusterMesh(HullSection.STARBOARD, HullSection.BOTTOM));
+        mesh.add(this.createThrusterMesh(HullSection.PORT, HullSection.TOP));
+        mesh.add(this.createThrusterMesh(HullSection.STARBOARD, HullSection.TOP));
         mesh.add(this.createCockpitMesh());
 
         return (mesh);
     }
 
     createBodyMesh() {
-        let ratio = 2 / 1.5;
-
         // Save a few 'this.'s
         let length = this.length;
         let height = this.height;
@@ -72,40 +73,58 @@ class MediumHull extends Hull {
 
         let vertices = new Float32Array([
             length, width * 0.5, 0, // v0 nose left
-            -length, width * 0.5 * (1 + ratio), height * ratio,// v1 left fin top
-            -length, width * 2, 0, // v2 left fin mid
-            -length, width * 0.5 *  (1 + ratio), -height * ratio,// v3 left fin bottom
+            -length, width, height,// v1 left fin top
+            -length, width * 1.2, 0, // v2 left fin mid
+            -length, width , -height,// v3 left fin bottom
             -length * 0.5, width, height,// v4 cemtre left top
             -length * 0.5, width, -height, // v5 center left bottom
             -length * 0.5, -width, height, // v6 cemter right top
             -length * 0.5, -width, -height,// v7 center right bottom
-            -length, -width * 0.5  * (1 + ratio), height * ratio,// v8  right fin top
-            -length, -width * 2, 0,// v9 right fin mid
-            -length, -width * 0.5 * (1 + ratio), -height * ratio,// v10 right fin bottom
+            -length, -width, height,// v8 right fin top
+            -length, -width * 1.2, 0,// v9 right fin mid
+            -length, -width, -height,// v10 right fin bottom
             -length * 0.5, width, 0, // v11 centre left mid
             -length * 0.5, -width, 0, // v12 centre right mid
             length, -width * 0.5, 0, // v13 nose right
+            0, width, height, // v14 Midship top left
+            0, -width, height, // v15 Midship top right
+            0, width, -height, // v16 Midship bottom left
+            0, -width, -height, // v17 Midship bottom right
+            0, width * 1.2, 0, // v18 Midship mid left
+            0, -width * 1.2, 0 // v19 Midship mid right
         ]);
 
-         let indices = [
-            0, 2, 1, // left fin top
-            0, 3, 2, // left fin bottom
-            0, 4, 6,// center left top
-            0, 7, 5,// centre left bottom
-            13, 0, 6,// center right top
-            13, 7, 0,// centre right bottom
-            13, 8, 9, // rt fin top
-            13, 9, 10,// rt fin bottom
+        let indices = [
+            0, 18, 14, // left fin top front
+            0, 16, 18, // left fin bottom front
+            0, 14, 13, //  left top front
+            0, 17, 16, // left bottom front
+            14, 15, 13, // right top front
+            0, 13, 17, // right bottom front
+            13, 15, 19, // rt fin top front
+            13, 19, 17, // rt fin bottom front
+            4, 6, 14, // left top rear
+            7, 5, 16, // left bottom rear
+            6, 15, 14, // rt top rear
+            7, 16, 17, // rt bottom rear
             5, 6, 4, // back plate A
-            6, 5, 7,// back plate B
-            1, 2, 11,// fin left inner top A
-            11, 4, 1,// fin left inner top B
-            3, 11, 2,// fin left inner bottom A
-            11, 3, 5,// fin left inner bottom B
-            8, 12, 9,// fin right inner top A
-            12, 8, 6,// fin right inner top B
-            10, 9, 12,// fin right inner bottom A
-            12, 7, 10,// fin right inner top bottom
+            6, 5, 7, // back plate B
+            1, 2, 11, // fin left inner top A
+            11, 4, 1, // fin left inner top B
+            1, 14, 2,// fin left top rear A
+            14, 18, 2, // fin left top rear B
+            2, 18, 3, // fin left bottom rear A
+            3, 18, 16, // fin left bottom rear B
+            3, 11, 2, // fin left inner bottom A
+            11, 3, 5, // fin left inner bottom B
+            8, 12, 9, // fin right inner top A
+            12, 8, 6, // fin right inner top B
+            8, 9, 15,// fin right top rear A
+            9, 19, 15,// fin right top rear B
+            9, 10 , 19, // fin right bottom rear A
+            10, 17, 19, // fin right bottom rear B
+            10, 9, 12, // fin right inner bottom A
+            12, 7, 10, // fin right inner top bottom
 
         ];
 
@@ -143,12 +162,10 @@ class MediumHull extends Hull {
         // Mount
         mesh.rotateZ(-Math.PI / 2);
         mesh.rotateX(-Math.PI / 20);
-        mesh.position.set(size * 1.5 , 0, this.height - size / 1.7);
+        mesh.position.set(size * 1.5, 0, this.height - size / 1.7);
 
         return (mesh);
     }
-
-
 }
 
-export default MediumHull;
+export default LargeHull;

@@ -9,6 +9,7 @@ import Item from '../GameItems/item.js';
 import MyCamera from '../Scenery/myCamera.js';
 import BasicHull from './Components/Hulls/basicHull.js';
 import MediumHull from './Components/Hulls/mediumHull.js';
+import LargeHull from './Components/Hulls/largeHull.js';
 import Mineral from "../GameItems/mineral.js";
 import Station from '../GameItems/System/station.js';
 import WormholeEnd from '../GameItems/System/wormholeEnd.js';
@@ -118,6 +119,7 @@ class Ship extends Item {
         // Will also create all other components, for that hull type, and add them to our components sets.
         this.hull = new BasicHull();
         // this.hull = new MediumHull();
+        //this.hull = new LargeHull();
         this.hull.buildShip(this);
 
         // Add in weight of all components.
@@ -460,7 +462,8 @@ class Ship extends Item {
 
         // Move to the centre of the bay. Use station relative coordinates.
         this.location = station.bayMesh.position.clone();
-        // this.moveMesh();
+
+        this.moveMesh();
 
         // Rotate to face exit.
         this.rotation.set(0, 0, Math.PI);

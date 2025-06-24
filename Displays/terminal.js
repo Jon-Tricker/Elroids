@@ -44,6 +44,9 @@ class Terminal extends DarkPanel {
     // Maximum number of lines in buffer.
     maxBufLines = 200;
 
+    // Scroll to cursor mode
+    scrollToCursorMode = true;
+
     constructor(game, ctx, doc, defaultColour, rows, cols) {
         super(ctx, defaultColour, true);
         this.game = game;
@@ -290,14 +293,22 @@ class Terminal extends DarkPanel {
             this.firstLine--;
         }
     }
-    
-    scrollToCurrent() {
-        // If Y cursor outside current scroll window.
-        if ((this.cursor.y < this.firstLine) || (this.cursor.y > this.firstLine + this.rows)) {
-            // Put cursor line in centre of scroll.
-            this.firstLine = this.cursor.y - this.rows/2;
-            if (0 > this.firstLine) {
-                this.firstLine = 0;
+
+    setScrollToCursor(mode) {
+        this.scrollToCursorMode = mode;
+    }
+
+    scrollToCursor() {
+        if (this.scrollToCursorMode) {
+            // If Y cursor outside current scroll window.
+            if (this.cursor.y < this.firstLine) {
+                // Moving up ... cursor line at top.
+                this.firstLine = this.cursor.y;
+            } else {
+                if (this.cursor.y > this.firstLine + this.rows) {
+                    // Moving down ... cursor line at bottom.
+                    this.firstLine = this.cursor.y - this.rows + 1;
+                }
             }
         }
     }

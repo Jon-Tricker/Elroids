@@ -16,7 +16,7 @@ let aboutMenu = "\
 <P>Released under the terms of the GNU Public licence (GPL)</P>\
 <P>\thttps://www.gnu.org/licenses/gpl-3.0.en.html</P>\
 <BR />\
-<P ALIGN=\"CENTER\">Copyright (C) Jon Tricker, Kaltronics, 2023, 2024.</P>\
+<P ALIGN=\"CENTER\">Copyright (C) Jon Tricker, Kaltronics, 2023, 2024, 2025.</P>\
 <BR />\
 </BODY>"
 

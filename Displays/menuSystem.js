@@ -84,11 +84,11 @@ class MenuSystem {
     }
 
     getShip() {
-        return(this.display.getShip());
+        return (this.display.getShip());
     }
 
     getGame() {
-        return(this.display.getGame());
+        return (this.display.getGame());
     }
 
     pushMenu(menu) {
@@ -158,34 +158,42 @@ class MenuSystem {
     }
 
     handleKeyboard(keyboard) {
+        let terminal = this.display.terminal;
+
         if (keyboard.getClearState("X") || keyboard.getClearState("x")) {
+            terminal.setScrollToCursor(true);
             if (this.targetCursor.y < this.maxYCursor) {
                 this.targetCursor.y++;
             }
         }
 
         if (keyboard.getClearState("S") || keyboard.getClearState("s")) {
+            terminal.setScrollToCursor(true);
             if (this.targetCursor.y > 0) {
                 this.targetCursor.y--;
             }
         }
 
         if (keyboard.getClearState("Z") || keyboard.getClearState("z")) {
+            terminal.setScrollToCursor(true);
             if (this.targetCursor.x > 0) {
                 this.targetCursor.x--;
             }
         }
 
         if (keyboard.getClearState("C") || keyboard.getClearState("c")) {
+            terminal.setScrollToCursor(true);
             this.targetCursor.x++;
         }
 
         if (keyboard.getClearState("<") || keyboard.getClearState(",")) {
-            this.display.terminal.scrollUp();
+            terminal.setScrollToCursor(false);
+            terminal.scrollUp();
         }
 
         if (keyboard.getClearState(">") || keyboard.getClearState(".")) {
-            this.display.terminal.scrollDown();
+            terminal.setScrollToCursor(false);
+            terminal.scrollDown();
         }
     }
 
@@ -213,47 +221,47 @@ class MenuSystem {
 
         this.printChildren(doc.children[0], keyboard, cursor, false, false, tableData);
 
-        // Add default 'back' and 'exit/undock' selection.
+        this.printDefaults(keyboard, cursor);
+    }
+
+    // Print default, back, exit etc. buttons.
+    printDefaults(keyboard, cursor) {
         if (this.menuStack.length > 1) {
             cursor.x = 0;
-            if (this.targetCursor.y == cursor.y) {
-                this.targetCursor.x = 0;
-            }
             let selected = this.targetCursor.equals(cursor);
-            this.display.terminal.println("\tBack", selected);
+            this.display.terminal.print("\t", false);
+            this.display.terminal.print("Back", selected);
             if (selected) {
-                this.display.terminal.scrollToCurrent();
+                this.display.terminal.scrollToCursor();
                 if (this.isClicked(keyboard)) {
                     this.popMenu();
                     return;
                 }
             }
-            cursor.y++;
+            cursor.x++;
         }
 
-        cursor.x = 0;
-        if (this.targetCursor.y == cursor.y) {
-            this.targetCursor.x = 0;
-        }
-
+        this.display.terminal.print("\t", false);
         let selected = this.targetCursor.equals(cursor);
         if (null == this.getShip().getDockedWith()) {
-            this.display.terminal.println("\tExit", selected);
+            this.display.terminal.print("Exit", selected);
             if (selected && this.isClicked(keyboard)) {
-                this.display.terminalEnable(false);
                 this.display.game.togglePaused();
                 return;
             }
         } else {
-            this.display.terminal.println("\tUndock", selected);
+            this.display.terminal.print("Undock", selected);
             if (selected && this.isClicked(keyboard)) {
                 this.getShip().undock();
                 return;
             }
         }
+        cursor.x++;
         if (selected) {
-            this.display.terminal.scrollToCurrent();
+            this.display.terminal.scrollToCursor();
         }
+
+        this.limitX(cursor);
 
         this.maxYCursor = cursor.y;
     }
@@ -395,7 +403,7 @@ class MenuSystem {
         // If necessary scroll to element just printed.
         if (selectable) {
             if (this.targetCursor.equals(cursor)) {
-                this.display.terminal.scrollToCurrent();
+                this.display.terminal.scrollToCursor();
             }
         }
 
@@ -409,11 +417,7 @@ class MenuSystem {
         // If there was anything selectable in children also move cursor.
         if (lfReqd) {
             if ((result.selectableCount > 0)) {
-                if (this.targetCursor.y == cursor.y) {
-                    if (this.targetCursor.x > cursor.x - 1) {
-                        this.targetCursor.x = cursor.x - 1 ;
-                    }
-                }
+                this.limitX(cursor);
 
                 // Next selectable line.
                 cursor.y++;
@@ -423,6 +427,15 @@ class MenuSystem {
         }
 
         return (result);
+    }
+
+    // Prevent X cursor from being to right of line.
+    limitX(cursor) {
+        if (this.targetCursor.y == cursor.y) {
+            if (this.targetCursor.x > cursor.x - 1) {
+                this.targetCursor.x = cursor.x - 1;
+            }
+        }
     }
 
     // Run a script

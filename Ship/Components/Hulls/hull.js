@@ -314,13 +314,10 @@ class Hull extends Component {
 
     createEngineMesh(yLoc, zLoc) {
         // Add the engine cone
-        let width = this.width;
+        let width = this.width/4;
         if (this.height < width) {
             width = this.height;
         }
-
-        width *= 0.9;
-
 
         let geometry = new THREE.ConeGeometry(width, this.length, 20, 1, true);
 
@@ -333,10 +330,10 @@ class Hull extends Component {
     
         let y = 0;
         if (HullSection.PORT == yLoc) {
-            y = width;
+            y = this.width/2;
         }
         if (HullSection.STARBOARD == yLoc) {
-            y = -width;
+            y = -this.width/2;
         }
 
         let z = 0;
@@ -369,14 +366,12 @@ class Hull extends Component {
     }
 
     createThrusterMesh(yLoc, zLoc) {
-        let width = this.width;
+        let width = this.width/8;
         if (this.height < width) {
-            width = this.height;
+           width = this.height;
         }
 
-        width *= 0.45;
-
-        let geometry = new THREE.ConeGeometry(width, this.length / 2, 10, 1, true);
+        let geometry = new THREE.ConeGeometry(width, this.length / 4, 10, 1, true);
 
         // compute vertex normals
         geometry.computeVertexNormals();
@@ -385,17 +380,16 @@ class Hull extends Component {
         // Mount engine
         mesh.rotateZ(-Math.PI / 2);
 
-        // Move out beyond engins
+        // Move just inboard.
         let y = 0;
         if (HullSection.PORT == yLoc) {
-            // y = this.width * 0.75;
-            y = this.width;
+            y = this.width - width * 1.1;
         } 
         if (HullSection.STARBOARD == yLoc) {
-            // y = this.width * -0.75;
-            y = -this.width;
+            y = -this.width + width * 1.1;
         }  
 
+        // Move just down
         let z = 0;
         if (HullSection.TOP == zLoc) {
             z = this.height * 0.25
