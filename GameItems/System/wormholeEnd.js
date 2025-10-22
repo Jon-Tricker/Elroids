@@ -7,7 +7,7 @@
 import * as THREE from 'three';
 import NonShipItem from '../nonShipItem.js';
 import Universe from '../../universe.js';
-import Ship from '../../Ship/ship.js';
+import PlayerShip from '../../Ships/playerShip.js';
 import StarFieldTexture from '../../Utils/starFieldText.js';
 
 const RADIUS = 50;
@@ -47,7 +47,7 @@ class WormholeEnd extends NonShipItem {
     backgroundColour;
 
     constructor(system, location, name, wormhole, backgroundColour) {
-        super(system, location.x, location.y, location.z, 0, 0, 0, RADIUS * 2, MASS, HP, null, true);
+        super(system, location.x, location.y, location.z, 0, 0, 0, RADIUS, MASS, HP, null, true);
         this.wormhole = wormhole;
 
         if (undefined == backgroundColour) {
@@ -58,14 +58,13 @@ class WormholeEnd extends NonShipItem {
         this.setupMesh();
 
         this.addLabel(name);
+
+        // So other items can get relative positions.
+        this.moveMesh();
     }
 
     destruct() {
         super.destruct();
-    }
-
-    getClass() {
-        return ("WormholeEnd");
     }
 
     getWormhole() {
@@ -85,35 +84,45 @@ class WormholeEnd extends NonShipItem {
         // Remove that from current system.
         this.system.removeItem(that);
 
+        if (that instanceof PlayerShip) {
+            // Deactivate current system.
+            this.system.setActive(false);            
+
+            // Place in limbo.
+            this.system.universe.system = undefined;
+            that.system = this.undefined;
+        }
+
+        farEnd.exit(that);
+
+        return(true);
+    }
+
+    exit(that) {  
+        if (that instanceof PlayerShip) {
+
+            // Switch universe to far system
+            this.system.universe.system = this.system;
+
+            // Swich ship to far end.
+            that.system = this.system;
+
+            // Activate far system.
+            this.system.setActive(true);
+        }
 
         // Add that to far system.
-        farEnd.system.addItem(that);
+        this.system.addItem(that);
 
         // Move it outside far wormhole end.
-        let loc = farEnd.location.clone();
+        let loc = this.getLocation().clone();
 
         // Move it beyond middle.
         loc.add(that.speed);
         that.location = loc;
 
         // Move it outside
-        that.separateFrom(farEnd);
-
-        if (that instanceof Ship) {
-            // Deactivate current system.
-            this.system.setActive(false);
-
-            // Activate far system.
-            farEnd.system.setActive(true);
-
-            // Switch universe to far system
-            this.system.universe.system = farEnd.system;
-
-            // Swich ship to far end.
-            that.system = farEnd.system;
-        }
-
-        return(true);
+        that.separateFrom(this);  
     }
 
     getRadarColour() {
@@ -173,7 +182,7 @@ class WormholeEnd extends NonShipItem {
     }
 
     handleCollision(that) {
-        if (that instanceof Ship) {
+        if (that instanceof PlayerShip) {
             // TODD Handle warp
             return (texture3D);
         }

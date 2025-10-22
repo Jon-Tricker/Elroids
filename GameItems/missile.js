@@ -29,7 +29,7 @@ class Missile extends NonShipItem {
     startSpeed = direction.multiplyScalar(MISSILE_SPEED);
 
     // Ship will move first. So move out starting location in anticipation.
-    let startLocation = owner.location.clone();
+    let startLocation = owner.getLocation().clone();
 
     // Launch at just missile speed.
     super(owner.system, startLocation.x, startLocation.y, startLocation.z, startSpeed.x, startSpeed.y, startSpeed.z, MISSILE_SIZE / Universe.CBRT_THREE, MISSILE_MASS, 1, owner);
@@ -52,10 +52,6 @@ class Missile extends NonShipItem {
     let newSpeed = this.speed.clone();
     newSpeed.add(owner.speed);
     this.setSpeed(newSpeed);
-  }
-
-  getClass() {
-    return ("Missile");
   }
 
   getRadarColour() {

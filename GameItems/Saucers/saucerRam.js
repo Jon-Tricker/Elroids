@@ -16,8 +16,8 @@ class SaucerRam extends Saucer {
     constructor(system, locationX, locationY, locationZ, owner, safe) {
         super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
     } 
-    
-    getClass() {
+
+    getName() {
         return("Rammer");
     }
     

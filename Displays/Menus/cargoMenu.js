@@ -6,7 +6,7 @@ import MenuTable from './menuTable.js';
 import BugError from '../../GameErrors/bugError.js';
 import { GoodsDetailsMenu } from './goodsPurchaseMenu.js'
 import { ComponentDetailsMenu } from './compPurchaseMenu.js';
-import { Component } from '../../Ship/Components/component.js';
+import { Component } from '../../Ships/Components/component.js';
 
 let cargoMenu = "\
 <BODY>\

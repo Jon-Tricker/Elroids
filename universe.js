@@ -8,7 +8,7 @@ import { System, SystemSpec } from './GameItems/System/system.js';
 import StarSystem from './GameItems/System/starSystem.js';
 import Hyperspace from './GameItems/System/hyperspace.js';
 import { MineralTypes } from './GameItems/minerals.js';
-import Ship from './Ship/ship.js';
+import PlayerShip from './Ships/playerShip.js';
 import Wormhole from './GameItems/System/wormhole.js';
 import JSONSet from './Utils/jsonSet.js';
 import NonShipItem from './GameItems/nonShipItem.js';
@@ -99,7 +99,6 @@ class Universe {
     }
 
     populate(json) {
-        this.createShip(json);
 
         // Create hyperspacc
         this.hyperspace = new Hyperspace(this, this.systemSize);
@@ -111,7 +110,13 @@ class Universe {
         this.createWormholes(json);
 
         // Put ship into current system.
-        this.ship.setSystem(this.system);
+        this.createShip(json);
+
+        // Now we have a ship to target can create saucers.
+        this.createSaucers(json);
+
+        // Add non player ships.
+        this.createNPShips(json);
 
         // Make current system graphics active.
         this.system.setActive(true);
@@ -170,6 +175,30 @@ class Universe {
                 if (0 == count++) {
                     this.system = system;
                 }
+            }
+        }
+    }
+
+    createSaucers(json) {
+        if (undefined === json) {
+            for (let system of this.systems) {
+                system.createSaucers();
+            }
+        } else {
+            for (let jsonSystem of json.systems) {
+                this.getSystemByName(jsonSystem.spec.name).createSaucers(jsonSystem);
+            }
+        }
+    }
+
+    createNPShips(json) {
+        if (undefined === json) {
+            for (let system of this.systems) {
+                system.createNPShips();
+            }
+        } else {
+            for (let jsonSystem of json.systems) {
+                this.getSystemByName(jsonSystem.spec.name).createNPShips(jsonSystem);
             }
         }
     }
@@ -251,16 +280,11 @@ class Universe {
 
     // Create a ship.
     createShip(json) {
-        // There is a circular ependancy between populating Systems and Ships.
-        // f we don't have one yet bootstrap by putting it in a temporary system.
         let system = this.system;
-        if (undefined == system) {
-            system = new System(this, "temp", this.systemSize, this.game.universe.originVector);
-        }
 
         if (undefined === json) {
             if (this.game.testMode) {
-                this.ship = new Ship(system, 5, 10, 20, 0, 0, 0);
+                this.ship = new PlayerShip(system, 5, 10, 20, Universe.originVector);
 
                 // Do some damage
                 this.ship.hull.compSets.takeDamage(1);
@@ -315,10 +339,10 @@ class Universe {
                     count++;
                 }
             } else {
-                this.ship = new Ship(system, 5, 10, 20, -200, 100, 0);
+                this.ship = new PlayerShip(system, 5, 10, 20, new THREE.Vector3(-200, 100, 0));
             }
         } else {
-            this.ship = Ship.fromJSON(json.ship, system);
+            this.ship = PlayerShip.fromJSON(json.ship, system);
         }
     }
 

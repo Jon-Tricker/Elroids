@@ -45,14 +45,14 @@ class SaucerMother extends Saucer {
         newSaucer.rotateZ(json.rotationz);
         return (newSaucer);
     }
+
+    getName() {
+        return("Mother Saucer");
+    }
     
     getMaxSpeed() {
         return(MAX_SPEED);
     } 
-    
-    getClass() {
-        return("Mother ship");
-    }
 
     destruct() {
         // Remove self from game.
@@ -119,36 +119,37 @@ class SaucerMother extends Saucer {
                 let game = this.getGame();
                 if (game.getSystem().saucerCount < game.maxSaucerCount) {
                     let saucer;
+                    let thisLoc = this.getLocation();
 
                     let type = Math.floor(Math.random() * 6)
                     switch (type) {
                         case 0:
-                        // saucer = new SaucerStatic(this.location.x, this.location.y, this.location.z, this.getGame(), this.safe);
+                        // saucer = new SaucerStatic(thisLoc.x, thisLoc.y, thisLoc.z, this.getGame(), this.safe);
                         // break;
                         // Don't bother with statics ... fall through.
 
                         case 1:
                             if (this.safe) {
                                 // Block up a saucer slot with something useless.
-                                saucer = new SaucerWanderer(this.system, this.location.x, this.location.y, this.location.z, this, this.safe);
+                                saucer = new SaucerWanderer(this.system, thisLoc.x, thisLoc.y, thisLoc.z, this, this.safe);
                                 break;
                             }
 
                         case 2:
-                            saucer = new SaucerShooter(this.system, this.location.x, this.location.y, this.location.z, this, this.safe);
+                            saucer = new SaucerShooter(this.system, thisLoc.x, thisLoc.y, thisLoc.z, this, this.safe);
                             break;
 
                         case 3:
-                            saucer = new SaucerHunter(this.system, this.location.x, this.location.y, this.location.z, this, this.safe);
+                            saucer = new SaucerHunter(this.system, thisLoc.x, thisLoc.y, thisLoc.z, this, this.safe);
                             break; 
                             
                         case 4:
-                            saucer = new SaucerPirate(this.system, this.location.x, this.location.y, this.location.z, this, this.safe);
+                            saucer = new SaucerPirate(this.system, thisLoc.x, thisLoc.y, thisLoc.z, this, this.safe);
                             break;
 
                         case 5:
                         default:
-                            saucer = new SaucerRam(this.system, this.location.x, this.location.y, this.location.z, this, this.safe);
+                            saucer = new SaucerRam(this.system, thisLoc.x, thisLoc.y, thisLoc.z, this, this.safe);
                             break;
                     }
 

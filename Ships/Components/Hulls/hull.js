@@ -23,7 +23,7 @@ const DESCRIPTION = "Each ship had one 'hull'.\n" +
 // undefined = centre
 class HullSection {
     name;
-
+    
     // Stem to stern
     static FORWARD = new HullSection("forward");
     static MIDSHIP = new HullSection("midship");
@@ -36,17 +36,83 @@ class HullSection {
 
     // Vertical
     static TOP = new HullSection("top");
-    static MIDDLE= new HullSection("middle");
+    static MIDDLE = new HullSection("middle");
     static BOTTOM = new HullSection("bottom");
 
-    constructor() {
-        this.name = name
+    constructor(name) {
+        this.name = name;
+    }
+}
+
+class EngineMesh extends THREE.Mesh {
+    // Create engine material.
+    static engineMaterial = new THREE.MeshStandardMaterial(
+        {
+            color: "#202020",
+            roughness: 0.9,
+            metalness: 0.1,
+            side: THREE.DoubleSide,
+        }
+    )
+
+    // Create flame material.
+    static flameMaterial = new THREE.MeshStandardMaterial(
+        {
+            color: "yellow",
+            roughness: 0.1,
+            transparent: true,
+            opacity: 0.6,
+            metalness: 0.1,
+            side: THREE.FrontSide,
+        }
+    )
+
+    flameMesh = null;
+
+    constructor(width, length) {
+        let geometry = new THREE.ConeGeometry(width, length, 20, 1, true);
+        geometry.computeVertexNormals();
+
+        super(geometry, EngineMesh.engineMaterial);
+
+        this.castShadow = true;
+        this.receiveShadow = true;
+        
+        this.rotateZ(-Math.PI / 2);
+    }
+
+    setFlameState(state) {
+        if (state) {
+            if (null == this.flameMesh) {
+                // Add the flame cone
+                let width = this.geometry.parameters.radius;
+                let height = this.geometry.parameters.height;
+                let flameGeometry = new THREE.ConeGeometry(width * 0.75, height, 20, 1, false);
+
+                // compute vertex normals
+                flameGeometry.computeVertexNormals();
+                let flameMesh = new THREE.Mesh(flameGeometry, EngineMesh.flameMaterial);
+
+                // Position flame
+                flameMesh.rotateZ(Math.PI);
+                flameMesh.position.set(0, -height, 0);
+
+                this.add(flameMesh);
+                this.flameMesh = flameMesh;
+            }
+        } else {
+            if (null != this.flameMesh) {
+                // Remove flame.    
+                this.remove(this.flameMesh)
+                this.flameMesh.geometry.dispose();
+                this.flameMesh = null;
+            }
+        }
+
     }
 }
 
 class Hull extends Component {
-
-    flameMaterial;
 
     // Components in hull.
     compSets;
@@ -71,20 +137,6 @@ class Hull extends Component {
         }
     )
 
-    // Create engine material.
-    static engineMaterial = new THREE.MeshStandardMaterial(
-        {
-            color: "#202020",
-            roughness: 0.9,
-            opacity: 1,
-            // map: texture,
-            // roughnessMap: texture,
-            // bumpMap: texture,
-            metalness: 0.1,
-            side: THREE.DoubleSide,
-        }
-    )
-
     // Create glass material.
     static glassMaterial = new THREE.MeshStandardMaterial(
         {
@@ -97,32 +149,16 @@ class Hull extends Component {
         }
     )
 
-    // Create flame material.
-    static baseFlameMaterial = new THREE.MeshStandardMaterial(
-        {
-            // TODO ... Seems to loose the color when made transparent.
-            color: "yellow",
-            roughness: 0.9,
-
-            // Full transprent when off.
-            transparent: true,
-            opacity: 0,
-
-            // map: texture,
-            // roughnessMap: texture,
-            // bumpMap: texture,
-            metalness: 0.1,
-        }
-    )
 
     maxSpeed;
 
     mesh = new THREE.Group();
 
+    engineMeshes = new Set();
+
     constructor(type, set, maxSpeed) {
         super(type, set);
         this.maxSpeed = maxSpeed;
-        this.flameMaterial = Hull.baseFlameMaterial.clone();
         this.displayPanel = true;
         if (undefined != set) {
             set.recalc();
@@ -146,7 +182,8 @@ class Hull extends Component {
 
         let hull = ship.system.getGame().componentsList.getByClass(json.class);
         ship.hull.compSets.hullSet.clear();
-        hull = new hull.constructor(hull.getTargetSet(ship));
+        // hull = new hull.constructor(hull.getTargetSet(ship));
+        hull = new hull.constructor();
         hull.status = json.status;
         hull.compSets.ship = ship;
         ship.setHull(hull);
@@ -170,17 +207,21 @@ class Hull extends Component {
     }
 
     // Build a ship for this hull type.
-    buildSets(hullSlots, engineSlots, weaponSlots, baySlots, avionicsSlots) {
-        // Build set of all componets sets.
-        // Order effects order in which component display panels are displayed.
-        // All hulls have a single HullSet slot for themself.
-        if (1 != hullSlots) {
-            throw (new BugError("Can only build a ship with a single hull."));
+    buildSets(existingSet, hullSlots, engineSlots, weaponSlots, baySlots, avionicsSlots) {
+        // If we are not part of an existing set. Build set of componets sets.
+        if (undefined === existingSet) {
+            // Order effects order in which component display panels are displayed.
+            // All hulls have a single HullSet slot for themself.
+            if (1 != hullSlots) {
+                throw (new BugError("Can only build a ship with a single hull."));
+            }
+            // Initially dont know ship.
+            this.compSets = new ComponentSets(null, hullSlots, engineSlots, weaponSlots, baySlots, avionicsSlots);
+            this.set = this.compSets.hullSet;
+            this.compSets.hullSet.add(this);
+        } else {
+            this.compSets = existingSet;
         }
-        // Initially dont know ship.
-        this.compSets = new ComponentSets(null, hullSlots, engineSlots, weaponSlots, baySlots, avionicsSlots);
-        this.set = this.compSets.hullSet;
-        this.compSets.hullSet.add(this);
     }
 
     buildShip(ship) {
@@ -188,18 +229,8 @@ class Hull extends Component {
     }
 
     setFlameState(state) {
-        if (state) {
-            if (this.flameMaterial.transparent) {
-                this.flameMaterial.transparent = false;
-                this.flameMaterial.opacity = 1;
-                //this.flameMaterial.needsUpdate = true;
-            }
-        } else {
-            if (!this.flameMaterial.transparent) {
-                this.flameMaterial.transparent = true;
-                this.flameMaterial.opacity = 0;
-                // this.flameMaterial.needsUpdate = true;
-            }
+        for (let engineMesh of this.engineMeshes) {
+            engineMesh.setFlameState(state);
         }
     }
 
@@ -261,9 +292,9 @@ class Hull extends Component {
         }
 
         // Move cargo to new hull.
-        this.compSets.baySet.minerals =  ship.hull.compSets.baySet.minerals;
-        this.compSets.baySet.components =  ship.hull.compSets.baySet.components;
-        this.compSets.baySet.tradeGoods =  ship.hull.compSets.baySet.tradeGoods;
+        this.compSets.baySet.minerals = ship.hull.compSets.baySet.minerals;
+        this.compSets.baySet.components = ship.hull.compSets.baySet.components;
+        this.compSets.baySet.tradeGoods = ship.hull.compSets.baySet.tradeGoods;
 
         // Fiddle hull sets set.
         this.compSets.hullSet.clear();
@@ -299,14 +330,14 @@ class Hull extends Component {
     getTargetSet(ship) {
         return (ship.hull.compSets.hullSet);
     }
-    
+
     getMesh() {
         throw new BugError("Base Hull class does not define a mesh.");
     }
 
     createBodyMesh() {
         throw new BugError("Base Hull class does not define a 'body' mesh.");
-    } 
+    }
 
     createCockpitMesh() {
         throw new BugError("Base Hull class does not define a 'cockpit' mesh.");
@@ -314,26 +345,19 @@ class Hull extends Component {
 
     createEngineMesh(yLoc, zLoc) {
         // Add the engine cone
-        let width = this.width/4;
+        let width = this.width / 4;
         if (this.height < width) {
             width = this.height;
         }
 
-        let geometry = new THREE.ConeGeometry(width, this.length, 20, 1, true);
+        let mesh = new EngineMesh(width, this.length);
 
-        // compute vertex normals
-        geometry.computeVertexNormals();
-        let mesh = new THREE.Mesh(geometry, Hull.engineMaterial);
-
-        // Mount engine
-        mesh.rotateZ(-Math.PI / 2);
-    
         let y = 0;
         if (HullSection.PORT == yLoc) {
-            y = this.width/2;
+            y = this.width / 2;
         }
         if (HullSection.STARBOARD == yLoc) {
-            y = -this.width/2;
+            y = -this.width / 2;
         }
 
         let z = 0;
@@ -346,48 +370,28 @@ class Hull extends Component {
 
         mesh.position.set(-this.length * 0.25, y, z);
 
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-
-        // Add the flame cone
-        let flameGeometry = new THREE.ConeGeometry(width * 0.75, this.length, 20, 1, false);
-
-        // compute vertex normals
-        flameGeometry.computeVertexNormals();
-        let flameMesh = new THREE.Mesh(flameGeometry, this.flameMaterial);
-
-        // Position flame
-        flameMesh.rotateZ(Math.PI);
-        flameMesh.position.set(0, -this.length, 0);
-
-        mesh.add(flameMesh);
+        // Remeber it so can add flame when required.
+        this.engineMeshes.add(mesh);
 
         return (mesh);
     }
 
     createThrusterMesh(yLoc, zLoc) {
-        let width = this.width/8;
+        let width = this.width / 8;
         if (this.height < width) {
-           width = this.height;
+            width = this.height;
         }
 
-        let geometry = new THREE.ConeGeometry(width, this.length / 4, 10, 1, true);
-
-        // compute vertex normals
-        geometry.computeVertexNormals();
-        let mesh = new THREE.Mesh(geometry, Hull.engineMaterial.clone());
-
-        // Mount engine
-        mesh.rotateZ(-Math.PI / 2);
+        let mesh = new EngineMesh(width, this.length / 4);
 
         // Move just inboard.
         let y = 0;
         if (HullSection.PORT == yLoc) {
             y = this.width - width * 1.1;
-        } 
+        }
         if (HullSection.STARBOARD == yLoc) {
             y = -this.width + width * 1.1;
-        }  
+        }
 
         // Move just down
         let z = 0;
@@ -399,9 +403,6 @@ class Hull extends Component {
         }
 
         mesh.position.set(-this.length * 0.5, y, z);
-
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
 
         return (mesh);
     }

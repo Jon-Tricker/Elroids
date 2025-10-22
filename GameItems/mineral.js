@@ -6,7 +6,7 @@
 
 import * as THREE from 'three';
 import NonShipItem2 from './nonShipItem2.js';
-import Ship from '../Ship/ship.js';
+import PlayertShip from '../Ships/playerShip.js';
 import Explosion from './explosion.js';
 
 const MAX_SIZE = 10;
@@ -73,7 +73,7 @@ class Mineral extends NonShipItem2 {
   }
 
   handleCollision(that) {
-      if (that instanceof Ship) {
+      if (that instanceof PlayertShip) {
           return(that.mineralPickup(this));
       }
 

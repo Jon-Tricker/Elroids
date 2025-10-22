@@ -30,12 +30,12 @@ class SaucerShooter extends Saucer {
         this.createTargetLocation();
     }   
 
+    getName() {
+        return("Shooter");
+    }
+
     getTtl() {
         return(TTL);
-    }
-    
-    getClass() {
-        return("Shooter");
     }
     
     getMaxSpeed() {
@@ -43,7 +43,7 @@ class SaucerShooter extends Saucer {
     }
     
     createTargetLocation() {
-        this.targetLocation = this.getShip().location.clone();
+        this.targetLocation = this.getShip().getLocation().clone();
 
         let offset = this.getGame().createRandomVector(STANDOFF_DISTANCE)
         this.targetLocation.add(offset);

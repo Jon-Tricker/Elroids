@@ -1,6 +1,7 @@
 // Base class for all 'systems' (areas that can be navigated.)
 import SkyBox from "../../Scenery/skyBox.js"
 import { MineralTypes } from "../minerals.js";
+import JSONSet from "../../Utils/jsonSet.js";
 import BugError from "../../GameErrors/bugError.js";
 
 // Specification of a star system.
@@ -103,7 +104,7 @@ class System {
     units = "m"
 
     // Wormhole ends in the system.
-    wormholeEnds = new Set();
+    wormholeEnds = new JSONSet();
 
     // All items in system.
     items = new Set();

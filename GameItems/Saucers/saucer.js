@@ -73,10 +73,6 @@ class Saucer extends NonShipItem {
         super.destruct();
     }
 
-    getClass() {
-        return ("Saucer");
-    }
-
     getDefaultMaterial() {
         return (DEFAULT_SAUCER_MATERIAL);
     }
@@ -145,12 +141,13 @@ class Saucer extends NonShipItem {
 
     makeLoot() {
         let value = Math.ceil(0.5 + this.getScore() * Math.random() * 1.5);
+        let thisLoc = this.getLocation();
         switch (Math.floor(Math.random() * 4)) {
             case 0:
                 // Make mineral
                 let type = MineralTypes[1 + Math.floor(Math.random() * (MineralTypes.length -1))];
                 let mass = Math.ceil(value / type.value);
-                let mineral = new Mineral(this.system, mass, this.location.x, this.location.y, this.location.z, this.speed.x, this.speed.y, this.speed.z, type);
+                let mineral = new Mineral(this.system, mass, thisLoc.x, thisLoc.y, thisLoc.z, this.speed.x, this.speed.y, this.speed.z, type);
                 mineral.setActive(true);
                 break;
 
@@ -158,7 +155,7 @@ class Saucer extends NonShipItem {
                 // Make goods.
                 let good = new (this.getGame().goodsList.getRandomElement()).constructor();
                 good.number = Math.ceil(value / good.type.cost);
-                let crate = good.makeCrate(this.system, this.location.x, this.location.y, this.location.z, this.speed.x, this.speed.y, this.speed.z);
+                let crate = good.makeCrate(this.system, thisLoc.x, thisLoc.y, thisLoc.z, this.speed.x, this.speed.y, this.speed.z);
                 crate.setActive(true);
                 break;
 
@@ -188,7 +185,7 @@ class Saucer extends NonShipItem {
         // Lean towards direction of travel. Dont wobble.
         // TODO : Not really right but looks pretty ... feel free to improve.
         if (0 != this.getMaxSpeed()) {
-            if (0.5 < (this.speed.length() / this.getMaxSpeed())) {
+            if (0.5 < (this.getSpeed() / this.getMaxSpeed())) {
                 this.rotation.x = (Math.PI / 2) - (Math.PI * ((this.speed.x / this.getMaxSpeed()) / 8));
                 this.rotation.z = (Math.PI * ((this.speed.z / this.getMaxSpeed()) / 8));
             }

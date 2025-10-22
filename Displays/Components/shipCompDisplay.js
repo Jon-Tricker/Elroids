@@ -40,14 +40,15 @@ class ShipCompDisplay extends DarkPanel {
 
         let text = "System: " + this.ship.system.getName();
         if (null == this.ship.dockedWith) {
-            text += "     Pos: (" + this.printNum(this.ship.location.x) + " , " + this.printNum(this.ship.location.y) + " , " + this.printNum(this.ship.location.z) + ") " + this.ship.system.units;
+            let loc = this.ship.getLocation();
+            text += "     Pos: (" + this.printNum(loc.x) + " , " + this.printNum(loc.y) + " , " + this.printNum(loc.z) + ") " + this.ship.system.units;
         } else {
             text += " Docked";
         }
         this.subPanels[0].setText(text);
 
         this.speedPanel.setMax(this.ship.hull.compSets.hullSet.getMaxSpeed());
-        this.speedPanel.setValue(Math.floor(this.ship.speed.length()));
+        this.speedPanel.setValue(Math.floor(this.ship.getSpeed()));
         this.speedPanel.setUnits(this.getUnits());
     }
 

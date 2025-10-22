@@ -32,12 +32,16 @@ class SaucerHunter extends Saucer {
         this.createTargetLocation();
     }
 
+    getName() {
+        return("Hunter");
+    }
+
     getMaxSpeed() {
         return(MAX_SPEED);
     }
 
     createTargetLocation() {
-        this.targetLocation = this.getShip().location.clone();
+        this.targetLocation = this.getShip().getLocation().clone();
 
         let offset = this.getGame().createRandomVector(STANDOFF_DISTANCE)
         this.targetLocation.add(offset);

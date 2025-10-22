@@ -21,7 +21,7 @@ class MediumHull extends Hull {
 
     constructor(set) {
         super(MediumHull.type, set, 250);
-        super.buildSets(1, 2, 1, 2, 4);  
+        super.buildSets(set, 1, 2, 1, 2, 4);  
     }
 
     getDescription() {
@@ -47,7 +47,7 @@ class MediumHull extends Hull {
         
         // Work out graphics sizes.
         let scalingFactor = 1;
-        this.length = this.getShip().shipLength * scalingFactor;
+        this.length = this.getShip().length * scalingFactor;
         this.height = this.getShip().height * scalingFactor;
         this.width = this.getShip().width * scalingFactor;
 

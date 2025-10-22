@@ -54,16 +54,11 @@ class NonShipItem extends Item {
     }
 
     // Take damage to self.
-    // Eetunn 'true' if destroyed.
+    // Return 'true' if destroyed.
     takeDamage(hits, that) {
-        let destroyed = false;
-
-        this.hitPoints -= hits;
-        if (this.hitPoints <= 0) {
+        let destroyed = super.takeDamage(hits, that);
+        if (destroyed) {
             new Explosion(this.size, this);
-
-            this.destruct();
-            destroyed = true;
         }
         return (destroyed);
     }

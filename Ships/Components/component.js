@@ -14,7 +14,8 @@ class ComponentType extends GoodsType {
     maxHp;
 
     constructor(name, techLevel, mass, cost, maxHp) {
-        super(name, name, techLevel, 0, 1, mass, cost)
+        // For now Components are non magical and legal everywhere.
+        super(name, name, techLevel, 0, undefined, mass, cost)
         this.maxHp = maxHp;
     }
 }

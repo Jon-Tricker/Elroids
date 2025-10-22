@@ -15,7 +15,11 @@ class SaucerWanderer extends Saucer {
 
     constructor(system, locationX, locationY, locationZ, owner, safe) {
         super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
-    }   
+    } 
+
+    getName() {
+        return("Wanderer");
+    }  
     
     getTtl() {
         return(TTL);

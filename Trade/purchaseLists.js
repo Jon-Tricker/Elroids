@@ -1,15 +1,15 @@
 // Shopping catalogues containing things that can be bought.
-import BasicBay from "../Ship/Components/Bays/basicBay.js";
-import MediumBay from "../Ship/Components/Bays/mediumBay.js";
-import ComponentSets from "../Ship/Components/componentSets.js";
-import BasicEngine from "../Ship/Components/Engines/basicEngine.js";
-import BasicRadar from "../Ship/Components/Avionics/basicRadar.js";
-import BasicCompass from "../Ship/Components/Avionics/basicCompass.js";
-import DumbMissileWeapon from "../Ship/Components/Weapons/dumbMissileWeapon.js";
-import MediumEngine from "../Ship/Components/Engines/mediumEngine.js";
-import BasicHull from "../Ship/Components/Hulls/basicHull.js";
-import MediumHull from "../Ship/Components/Hulls/mediumHull.js";
-import LargeHull from "../Ship/Components/Hulls/largeHull.js";
+import BasicBay from "../Ships/Components/Bays/basicBay.js";
+import MediumBay from "../Ships/Components/Bays/mediumBay.js";
+import ComponentSets from "../Ships/Components/componentSets.js";
+import BasicEngine from "../Ships/Components/Engines/basicEngine.js";
+import BasicRadar from "../Ships/Components/Avionics/basicRadar.js";
+import BasicCompass from "../Ships/Components/Avionics/basicCompass.js";
+import DumbMissileWeapon from "../Ships/Components/Weapons/dumbMissileWeapon.js";
+import MediumEngine from "../Ships/Components/Engines/mediumEngine.js";
+import BasicHull from "../Ships/Components/Hulls/basicHull.js";
+import MediumHull from "../Ships/Components/Hulls/mediumHull.js";
+import LargeHull from "../Ships/Components/Hulls/largeHull.js";
 
 class ComponentsList extends ComponentSets {
     game;

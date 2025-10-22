@@ -32,9 +32,9 @@ class SaucerPirate extends Saucer {
 
     constructor(system, locationX, locationY, locationZ, owner, safe) {
         super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
-    }
-
-    getClass() {
+    } 
+    
+    getName() {
         return("Pirate");
     }
 
@@ -62,7 +62,7 @@ class SaucerPirate extends Saucer {
             }
             targetLoc = this.farAway;
         } else {
-            if ((null == this.target) || (0 == this.target.hitPoints)) {
+            if ((null == this.target) || this.target.isDestructed()) {
                 // Find a new target
                 this.target = this.getTarget();
             }
@@ -86,7 +86,7 @@ class SaucerPirate extends Saucer {
     }
 
     createLoiterLocation() {
-        this.targetLocation = this.getGame().getShip().location.clone();
+        this.targetLocation = this.getGame().getShip().getLocation().clone();
 
         let offset = this.getGame().createRandomVector(STANDOFF_DISTANCE)
         this.targetLocation.add(offset);
@@ -140,7 +140,8 @@ class SaucerPirate extends Saucer {
         // If cargo on board make new mineral.
         this.cargoMass = Math.floor(this.cargoMass);
         if (0 < this.cargoMass) {
-            new Mineral(this.system, this.cargoMass, this.location.x, this.location.y, this.location.z, this.speed.x, this.speed.y, this.speed.z, this.cargoType);
+            let thisLoc = this.getLocation();
+            new Mineral(this.system, this.cargoMass, thisLoc.x, thisLoc.y, thisLoc.z, this.speed.x, this.speed.y, this.speed.z, this.cargoType);
         }
         super.destruct();
     }

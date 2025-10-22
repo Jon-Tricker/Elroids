@@ -1,7 +1,7 @@
 // A normal star system.
 import * as THREE from 'three';
 import { System } from './system.js'
-import Ship from '../../Ship/ship.js';
+import PlayerShip from '../../Ships/playerShip.js';
 import Rock from '../rock.js';
 import Mineral from '../mineral.js';
 import { MineralTypes } from '../minerals.js';
@@ -14,14 +14,22 @@ import SaucerStatic from '../Saucers/saucerStatic.js';
 import SaucerWanderer from '../Saucers/saucerWanderer.js';
 import Station from './station.js';
 import { SystemSpec } from './system.js';
+import Freighter from '../../Ships/NonPlayerShips/Freighter.js';
+import NPShipFactory from '../../Ships/NonPlayerShips/NonPlayerShipFactory.js';
 
 // Box to clear out arround respawn site.
-const RESPAWN_SIZE = 250;          // m
+const RESPAWN_SIZE = 250;           // m
+
+// How often (average) are NPShips spawned.
+const NP_SHIP_FREQUENCY = 120000     // ms
 
 class StarSystem extends System {
     saucerCount = 0;
     rockCount = 0;
     maxRockCount;
+
+    // Non player ship timer.
+    nPShipTimer = 0;
 
     // Special items in the system.
     motherSaucers = new Set();
@@ -31,7 +39,11 @@ class StarSystem extends System {
         super(universe, spec, systemSize, uniLocation, background, json);
         this.maxRockCount = maxRockCount;
         this.createStations(json);
-        this.createSaucers(json);
+
+        // When we create the system don't yet have a ship. So saucers cannot target it.
+        // Hold off saucer creation till latter.
+        // this.createSaucers(json);
+
         this.createRocks(this.maxRockCount);
     }
 
@@ -86,6 +98,17 @@ class StarSystem extends System {
             }
         }
 
+            if (date > this.nPShipTimer) {
+                // Genrate new NPShip from one of the wormhole ends.
+                let wormholeEnd = this.wormholeEnds.getRandomElement();
+                let npShip = NPShipFactory.createRandom(this, wormholeEnd.location);
+                npShip.setSpeed(this.getGame().createRandomVector(10));
+                npShip.setActive(true);
+                wormholeEnd.exit(npShip);
+
+                this.nPShipTimer = date + NP_SHIP_FREQUENCY * (1 + Math.random()) * 0.5;
+            }
+
         super.animate(date, keyBoard)
     }
 
@@ -102,27 +125,30 @@ class StarSystem extends System {
 
         let sz = this.systemSize / 2;
         for (let item of this.items) {
-            if (!(item instanceof Ship) && !(item instanceof Station)) {
+            if (!(item instanceof PlayerShip) && !(item instanceof Station)) {
                 let thatBoundary = item.getBoundary();
                 if ((null != thatBoundary) && (thatBoundary.intersectsBox(clearBox))) {
+                    let loc = item.getLocation();
+
                     // Bounce it far away.
-                    if (item.location.x < 0) {
-                        item.location.x += sz;
+                    if (loc.x < 0) {
+                        loc.x += sz;
                     } else {
-                        item.location.x -= sz;
+                        loc.x -= sz;
                     }
 
-                    if (item.location.y < 0) {
-                        item.location.y += sz;
+                    if (loc.y < 0) {
+                        loc.y += sz;
                     } else {
-                        item.location.y -= sz;
+                        loc.y -= sz;
                     }
 
-                    if (item.location.z < 0) {
-                        item.location.z += sz;
+                    if (loc.z < 0) {
+                        loc.z += sz;
                     } else {
-                        item.location.z -= sz;
+                        loc.z -= sz;
                     }
+                    item.setLocation(loc);
                 }
             }
         }
@@ -133,8 +159,8 @@ class StarSystem extends System {
             // Create a few test rocks at set locations
 
             // Horizontal colliders
-            new Rock(this, 20, 100, 50, 0, 0, 0, 0);
-            new Rock(this, 10, 100, -50, 10, 0, 25, 0);
+            // new Rock(this, 20, 100, 50, 0, 0, 0, 0);
+            // new Rock(this, 10, 100, -50, 10, 0, 25, 0);
 
             // Big target
             // new Rock(this, 20, 100, 0, 0, 0, 0, 0);
@@ -165,8 +191,8 @@ class StarSystem extends System {
             // Add sample goods crates.
             let good = new (this.universe.game.goodsList.getByClass("Gun")).constructor();
             good.number = 50;
-            good.makeCrate(this, 250, 10, 50, 0, 0, 0); 
-            
+            good.makeCrate(this, 250, 10, 50, 0, 0, 0);
+
             let comp = new (this.universe.game.componentsList.getByClass("BasicEngine")).constructor();
             comp.number = 1;
             comp.makeCrate(this, 270, 10, 70, 0, 0, 0);
@@ -214,20 +240,31 @@ class StarSystem extends System {
         if (undefined === json) {
             if (this.getGame().testMode) {
                 // New saucer
+                /*
                 new SaucerStatic(this, 200, 100, -50, false);
                 new SaucerWanderer(this, 400, 100, -50, null, true);
                 new SaucerShooter(this, 300, 100, -50, null, true);
                 new SaucerHunter(this, 300, 200, -50, null, true);
                 new SaucerRam(this, 1000, 200, 200, null, true);
                 new SaucerPirate(this, 1500, 200, -50, null, true);
+                */
             }
             // First mother ship in home system always in safe mode.
             this.createMotherSaucer(this.spec.name == "Sol");   // Ugg!
-        } else {  
+        } else {
             // Restore old saucers.
             for (let saucer of json.saucers) {
                 let newSaucer = SaucerMother.fromJSON(saucer, this);
                 this.motherSaucers.add(newSaucer);
+            }
+        }
+    }
+
+    createNPShips(json) {
+        // Don't restore NP ships.
+        if (undefined === json) {
+            if (this.getGame().testMode) {
+                // new Freighter(this, new THREE.Vector3(200, -100, 50));
             }
         }
     }
@@ -242,7 +279,7 @@ class StarSystem extends System {
             safe = true;
         } else {
             if (safe) {
-                loc = this.universe.ship.location.clone();
+                loc = this.universe.ship.getLocation().clone();
                 let offset = 1000;
                 loc.x += offset;
                 loc.y += offset / 2;

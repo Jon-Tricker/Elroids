@@ -27,50 +27,70 @@
 			<UL>
 				<LI>Player - Stuff related to the current player.</LI>
 				<LI>MyScene - Stuff related to sound and graphics rendering.</LI>
-				<LI>Displays - Screen display graphics (Maybe should go under Ship).</LI>
-				<LI>Purchase lists - Component and goods shoping lists.</LI>
 				<LI>Main animation loop.</LI>
 			</UL>
 		</LI>
-		<LI>Universe - Everything related to the in game universe.
+
+		<LI>Universe - Stuff related to the in game universe.
 			<UL>
 				<LI>In game time keeping</LI>
-				<LI>Ship - Details of the player's ship.</LI>
-				<UL>
-					<LI>Ship components</LI>
-					<LI>Ship cargo</LI>
-				</UL>
-				<LI>List and positions of all star systems.</LI>
-				<UL>
-					<LI>StarSystem - Details about a specific star system. If not the 'current' active system some data
-						(e.g. rock details) will be dicarded (see 'Activation' below).
-						<UL>
-							<LI>System stats.
-								<UL>
-									<LI>Law, tech and magic levels.</LI>
-									<LI>Mineral abundancies.</LI>
-									<LI>Rock and saucer counts.</LI>
-								</UL>
-							</LI>
-							<LI>Items - The game objects within a system.
-								<UL>
-									<LI>Rocks</LI>
-									<LI>Saucers</LI>
-									<LI>Stations</LI>
-									<LI>Wormholes</LI>
-									<LI>Floating minerals and goods crates.</LI>
-								</UL>
-							</LI>
-							<LI>List of stations.</LI>
-							<LI>List of wormholes</LI>
-							<LI>Total</LI>
-						</UL>
-					</LI>
-					<LI>Hyperspace - A subclass of System.</LI>
-				</UL>
 				<LI>Pointer to 'current' star system.</LI>
 			</UL>
+
+		<LI>Ships - Any ship that vaguly follows the rules of physics.
+			<UL>
+				<LI>PlayerShip - Details of the player's ship. Implemented in full.</LI>
+				<LI>NPShip (non-player ship). Other ships. Cut down implementation of PlayerShip.</LI>
+				<LI>Components. Ship components</LI>
+			</UL>
 		</LI>
+
+		<LI>Trade
+			<UL>
+				<LI>Cargo.</LI>
+				<LI>Shopping lists.</LI>
+			</UL>
+		</LI>
+
+		<LI>System - List and positions of all star systems.</LI>
+		<UL>
+			<LI>StarSystem - Details about a specific star system. If not the 'current' active system some data
+				(e.g. rock details) will be dicarded (see 'Activation' below).
+				<UL>
+					<LI>System stats.
+						<UL>
+							<LI>Law, tech and magic levels.</LI>
+							<LI>Mineral abundancies.</LI>
+							<LI>Rock and saucer counts.</LI>
+						</UL>
+					</LI>
+					<LI>Items - All game objects within a system. Also implementation of non 'Vessel' objects.
+						<UL>
+							<LI>Rocks</LI>
+							<LI>Saucers. Dont obey the laws of physics. One day should probably do so and become
+								'NPShips'.</LI>
+							<LI>Stations</LI>
+							<LI>Wormholes</LI>
+							<LI>Floating minerals and goods crates.</LI>
+						</UL>
+						<P>I should have passed the location and speed of Items is as Vector3. Not individual x,y and z components. However fixing this is a long process. For now I am just doing it 'right' for new sub classes.</P>
+					</LI>
+					<LI>List of stations.</LI>
+					<LI>List of wormholes</LI>
+				</UL>
+			</LI>
+			<LI>Hyperspace - A subclass of System.</LI>
+		</UL>
+		</LI>
+
+		<LI>Displays - On screen displays.
+			<UL>
+				<LI>Menus - The VT100 terminal and menu system that drives it.</LI>
+				<LI>Components - Displays for individual ship components.</LI>
+			</UL>
+		</LI>
+
+		<LI>Maunal - Offline ocumentation.</LI>
 	</UL>
 
 	<H2>Save/Load mechanism.</H2>

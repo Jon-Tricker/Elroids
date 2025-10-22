@@ -19,7 +19,7 @@ import Player from './player.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "9.1";
+const VERSION = "9.2";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -119,6 +119,9 @@ class Game {
         this.displays = new Displays(this);
         this.displays.resize();
 
+        // Now we have a ship. Switch to it's camera
+        this.scene.setCamera(MyCamera.PILOT);
+
         if (this.startDocked) {
             // Doc ship to first station.
             for (let station of this.universe.system.stations) {
@@ -126,9 +129,7 @@ class Game {
                 break;
             }
         }
-
-        // Now we have a ship. Switch to it's camera
-        this.scene.setCamera(MyCamera.PILOT);
+        
 
         // First call of animation loop.
         this.loop();

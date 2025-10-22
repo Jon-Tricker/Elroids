@@ -270,7 +270,8 @@ class BaySet extends ComponentSet {
 
         // Make mineral 
         let ship = this.getShip();
-        let min = new Mineral(this.sets.ship.system, mass, ship.location.x, ship.location.y, ship.location.z, ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random(), mineral);
+        let shipLoc = ship.getLocation();
+        let min = new Mineral(this.sets.ship.system, mass, shipLoc.x, shipLoc.y, shipLoc.z, ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random(), mineral);
         min.setActive(true);
 
         min.separateFrom(ship);
@@ -291,7 +292,8 @@ class BaySet extends ComponentSet {
         let good = new goods.constructor();
         good.number = number;
 
-        let crate = good.makeCrate(this.sets.ship.system, ship.location.x, ship.location.y, ship.location.z, ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random());
+        let shipLoc = ship.getLocation();
+        let crate = good.makeCrate(this.sets.ship.system, shipLoc.x, shipLoc.y, shipLoc.z, ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random());
 
         crate.setActive(true);
         crate.separateFrom(ship);

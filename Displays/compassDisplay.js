@@ -74,7 +74,7 @@ class CompassDisplay extends DarkPanel {
         let closestRp = null;
 
         for (let item of items) {
-            let relPos = item.location.clone();
+            let relPos = item.getLocation().clone();
 
             // Handle wrap round relative to ship.
             relPos.sub(thisship.location);

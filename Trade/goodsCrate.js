@@ -6,7 +6,7 @@
 
 import * as THREE from 'three';
 import NonShipItem2 from '../GameItems/nonShipItem2.js';
-import Ship from '../Ship/ship.js';
+import PlayerShip from '../Ships/playerShip.js';
 import Explosion from '../GameItems/explosion.js';
 
 const SIZE = 5;
@@ -69,7 +69,7 @@ class GoodsCrate extends NonShipItem2 {
   }
 
   handleCollision(that) {
-      if (that instanceof Ship) {
+      if (that instanceof PlayerShip) {
           return(that.cratePickup(this));
       }
 

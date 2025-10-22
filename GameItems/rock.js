@@ -9,7 +9,7 @@ import NonShipItem2 from './nonShipItem2.js';
 import Game from '../game.js';
 import FacitRockGeometry from '../facitRockGeometry.js'
 import { Composition } from './minerals.js';
-import Ship from '../Ship/ship.js'
+import PlayerShip from '../Ships/playerShip.js'
 
 // Type of rock graphics
 const ROCK_STYLE_SPHERE = 0;
@@ -73,10 +73,6 @@ class Rock extends NonShipItem2 {
     super.destruct();
   }
 
-  getClass() {
-    return ("Rock");
-  }
-
   static setRockStyle(style) {
     if (style == "sphere") {
       Rock.rockStyle = ROCK_STYLE_SPHERE;
@@ -119,7 +115,7 @@ class Rock extends NonShipItem2 {
 
     // Dont take damage from ship rams.
     // If we do may split and fragments can also hit ship.
-    if (that instanceof Ship) {
+    if (that instanceof PlayerShip) {
       return;
     }
 
@@ -139,7 +135,7 @@ class Rock extends NonShipItem2 {
   split() {
     let newSize = Math.floor(this.rockSize / 2);
 
-    let loc = this.location.clone();
+    let loc = this.getLocation().clone();
     let spd = this.speed.clone();
 
     this.destruct();

@@ -8,8 +8,6 @@ import * as THREE from 'three';
 import Universe from '../universe.js';
 import ItemBoundary from './itemBoundary.js';
 import BugError from "../GameErrors/bugError.js";
-import MyScene from '../Scenery/myScene.js';
-
 const COLOUR = "#FFFFFF";
 
 // Distance for audio volume to half
@@ -20,7 +18,9 @@ class Item extends THREE.Group {
     speed;              // m/s
     speedFrame;         // m/frame
 
+    // Location in the system. This remains current even if docked with something.
     location;
+
     originalMaterial;
     system;
     mass;               // tonnes
@@ -40,6 +40,9 @@ class Item extends THREE.Group {
     // Set if can't be moved.
     // Can still rotate.
     immobile = false;
+
+    // Set if docked with something.
+    dockedWith = null;
 
     // Construct with optional mass
     constructor(system, locationX, locationY, locationZ, speedX, speedY, speedZ, size, mass, hitPoints, owner, immobile) {
@@ -127,6 +130,14 @@ class Item extends THREE.Group {
         return (undefined);
     }
 
+    getSpeed() {
+        return (this.speed.length());
+    }
+
+    getDockedWith() {
+        return (this.dockedWith);
+    }
+
     // Move item between systems.
     setSystem(newSystem) {
         // If already in a system remove it.
@@ -141,10 +152,6 @@ class Item extends THREE.Group {
 
     getUniverse() {
         return (this.system.universe);
-    }
-
-    getClass() {
-        return (null);
     }
 
     // Get boundary.
@@ -164,6 +171,11 @@ class Item extends THREE.Group {
         return (this.system.universe.ship);
     }
 
+    // Normally the class name but in some cases has to be overridden.
+    getName() {
+        return (this.constructor.name);
+    }
+
     // Set speed/
     // Do frame rate division only one.
     setSpeed(speed) {
@@ -180,6 +192,12 @@ class Item extends THREE.Group {
         return (this.location);
     }
 
+    setLocation(loc) {
+        this.location.x = loc.x;
+        this.location.y = loc.y;
+        this.location.z = loc.z;
+    }
+
     getRadarColour() {
         return (COLOUR);
     }
@@ -191,6 +209,10 @@ class Item extends THREE.Group {
         if (this.system == this.getGame().universe.system) {
             this.getGame().getScene().remove(this);
         }
+    }
+
+    isDestructed() {
+        return(this.hitPoints == 0);
     }
 
     // Push item. Thrust in kN, mass in Tonnes. This should work without scaling.
@@ -213,6 +235,18 @@ class Item extends THREE.Group {
         that.takeDamage(0, this);
     }
 
+    // Take damage to self.
+    // Return 'true' if destroyed.
+    takeDamage(hits, that) {
+        this.hitPoints -= hits;
+        if (this.hitPoints <= 0) {
+            this.destruct();
+            return (true);
+        }
+        return (false);
+    }
+
+
     // Get base, unladen, mass.
     getMass() {
         return (this.mass);
@@ -225,7 +259,7 @@ class Item extends THREE.Group {
 
     // Damage (HP) when ramming.
     getRamDamage() {
-        return (Math.ceil(this.speed.length() * this.getTotalMass() / 1000));
+        return (Math.ceil(this.getSpeed() * this.getTotalMass() / 1000));
     }
 
     // Move item in universal space, Handle wrap round.
@@ -238,7 +272,9 @@ class Item extends THREE.Group {
 
         if (!this.immobile) {
 
-            this.location.addVectors(this.location, this.speedFrame);
+            let loc = this.getLocation();
+            loc.addVectors(loc, this.speedFrame);
+            this.setLocation(loc);
 
             // Move boundary object.
             this.boundary.moveTo(this.location);
@@ -257,7 +293,7 @@ class Item extends THREE.Group {
     // This cheap 'aproximate' detection. If true, and in cases where it matters, a more expensive check will be done using ray tracing.
     detectCollisions() {
         // Things that don't move don't hit things
-        if (0 == this.speed.length()) {
+        if (0 == this.getSpeed()) {
             return (false);
         }
 
@@ -277,7 +313,7 @@ class Item extends THREE.Group {
 
             if (null != thatBoundary) {
 
-                let relLocation = that.location.clone();
+                let relLocation = that.getLocation().clone();
                 relLocation.sub(this.location);
                 this.getUniverse().handleWrap(relLocation);
 
@@ -296,18 +332,21 @@ class Item extends THREE.Group {
                     minDist += thatBoundary.getSize();
                 }
 
+
                 // This would be a load of math ... however threeJS does it for us.
                 let closestPoint = new THREE.Vector3(0, 0, 0);
                 move.closestPointToPoint(relLocation, true, closestPoint);
-                let dist = closestPoint.distanceTo(relLocation)
+                let dist = closestPoint.distanceTo(relLocation);
 
                 if (dist <= minDist) {
-
                     // Don't collide with self.
                     if (this != that) {
-                        if (this.handleCollision(that)) {
-                            // Only collide with one thing per frame.
-                            return (true);
+                        // Don't collide with docked items.
+                        if (null == that.getDockedWith()) {
+                            if (this.handleCollision(that)) {
+                                // Only collide with one thing per frame.
+                                return (true);
+                            }
                         }
                     }
                 }
@@ -378,7 +417,7 @@ class Item extends THREE.Group {
             if (that.immobile) {
                 faster = this;
             } else {
-                if (this.speed.length() > that.speed.length()) {
+                if (this.getSpeed() > that.getSpeed()) {
                     faster = this;
                 } else {
                     faster = that;
@@ -408,14 +447,9 @@ class Item extends THREE.Group {
 
         move.normalize();
         move.multiplyScalar(reqdDelta);
-        faster.location = slower.location.clone();
-        faster.location.add(move);
-
-        /*
-        console.log("After this " + this.position.x + " " + this.position.y + " " + this.position.z + " " + this.location.x + " " + this.location.y + " " + this.location.z);
-        console.log("After that " + that.position.x + " " + that.position.y + " " + that.position.z + " " + that.location.x + " " + that.location.y + " " + that.location.z);
-        console.log("After camera " + camera.position.x + " " + camera.position.y + " " + camera.position.z);
-        */
+        let newLoc = slower.getLocation().clone();
+        newLoc.add(move);
+        faster.setLocation(newLoc);
     }
 
     // Handle collision physics
@@ -436,8 +470,10 @@ class Item extends THREE.Group {
     transferMomentum(that) {
         // Handle momentum transfer.
         // Work out directions of collision
-        let d1 = new THREE.Vector3(that.location.x - this.location.x, that.location.y - this.location.y, that.location.z - this.location.z);
-        let d2 = new THREE.Vector3(this.location.x - that.location.x, this.location.y - that.location.y, this.location.z - that.location.z);
+        let thisLoc = this.getLocation();
+        let thatLoc = that.getLocation();
+        let d1 = new THREE.Vector3(thatLoc.x - thisLoc.x, thatLoc.y - thisLoc.y, thatLoc.z - thisLoc.z);
+        let d2 = new THREE.Vector3(thisLoc.x - thatLoc.x, thisLoc.y - thatLoc.y, thisLoc.z - thatLoc.z);
 
         // Normalize dirextionslet 
         let dmag = Math.sqrt(d1.x * d1.x + d1.y * d1.y + d1.z * d1.z);
@@ -510,13 +546,20 @@ class Item extends THREE.Group {
         let camera = this.getGame().getScene().getCamera();
         if (camera.getIsFixedLocation()) {
             // Just plot it at it's location
-            this.position.set(this.location.x, this.location.y, this.location.z);
+            let loc = this.getLocation();
+            this.position.set(loc.x, loc.y, loc.z);
         } else {
             // Get position relative to camers       
             let cameraPos = new THREE.Vector3();
             camera.getWorldPosition(cameraPos);
-            let relPos = this.getRelativeLocation(cameraPos);
+            let relPos = this.getRelativeLocation(cameraPos);   
             relPos.multiplyScalar(-1);
+
+            // If docked. Position relative to parent.
+            if (null != this.dockedWith) {
+                relPos.sub(this.dockedWith.location);
+            }
+
             this.position.set(relPos.x + cameraPos.x, relPos.y + cameraPos.y, relPos.z + cameraPos.z);
         }
     }
@@ -525,7 +568,7 @@ class Item extends THREE.Group {
     // Handle seeing Items > Universe size away.
     getRelativeLocation(loc) {
         let rel = loc.clone();
-        rel.sub(this.location);
+        rel.sub(this.getLocation());
 
         this.getUniverse().handleWrap(rel);
         return (rel);

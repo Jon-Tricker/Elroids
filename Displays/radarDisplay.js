@@ -61,7 +61,7 @@ class RadarDisplay extends DarkPanel {
 
         for (let item of this.game.universe.system.items) {
 
-            let relPos = item.location.clone();
+            let relPos = item.getLocation().clone();
 
             // Handle wrap round relative to ship.
             relPos.sub(ship.location);

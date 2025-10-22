@@ -140,7 +140,7 @@ class MyCamera extends THREE.PerspectiveCamera {
         switch (this.type) {
             case MyCamera.STANDOFF:
                 // Adjust loation
-                let loc = this.ship.location.clone();
+                let loc = this.ship.getLocation().clone();
 
                 if (null != this.ship.dockedWith) {
                     // If docked ship locarion will be relative to dock.

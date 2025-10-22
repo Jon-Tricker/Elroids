@@ -124,8 +124,11 @@ class Goods {
         return (this.type.singular);
     }
 
+    // Get mass. Handle some dodgy javascript rounding in the calculation.
     getMass() {
-        return (this.type.mass * this.number);
+        let mass = this.type.mass * this.number;
+        mass = Math.round(mass * 1000000)/1000000;
+        return (mass);
     }
 
     // Set when added to a set.

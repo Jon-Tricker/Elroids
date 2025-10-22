@@ -1,4 +1,5 @@
 // Version of a Set which can be converted to JSON. 
+// Also a few 'set' utility functions.
 
 // Copyright (C) Jon Tricker 2023.
 // Released under the terms of the GNU Public licence (GPL)
@@ -6,8 +7,8 @@
 
 class JSONSet extends Set{
 
-    constructor() {
-        super()
+    constructor(arg) {
+        super(arg)
     }
 
     toJSON() {
@@ -17,6 +18,20 @@ class JSONSet extends Set{
         }
 
         return(json);
+    }
+
+    // Return a random element of the set.
+    // This is a bit inefficient but is rarely used and, in general, we would rather have Sets and Sets ... not Arrays.
+    getRandomElement() {
+        let index = Math.floor(Math.random() * this.size);
+
+        let i = 0;
+        for (let comp of this) {
+            if (i == index) {
+                return (comp);
+            }
+            i++;
+        }
     }
 }
 

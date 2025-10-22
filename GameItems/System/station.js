@@ -7,10 +7,11 @@
 import * as THREE from 'three';
 import NonShipItem from '../nonShipItem.js';
 import Universe from '../../universe.js';
-import Ship from '../../Ship/ship.js';
+import PlayerShip from '../../Ships/playerShip.js';
 import Texture from '../../Utils/texture.js';
 import BoxSides from '../../Utils/boxSides.js'
 import PlateTexture from '../../Utils/plateTexture.js';
+import JSONSet from '../../Utils/jsonSet.js';
 
 
 const ROTATE_RATE = 0.1;    // r/s
@@ -62,6 +63,9 @@ class Station extends NonShipItem {
 
     bayMesh;
 
+    // Set of things docked with us. We don't dock with anything.
+    dockedItems = new JSONSet();
+
     constructor(system, locationX, locationY, locationZ, owner, json) {
         if (undefined === json) {
             super(system, locationX, locationY, locationZ, 0, 0, 0, STATION_SIZE, STATION_MASS, STATION_HP, owner, true);
@@ -86,6 +90,9 @@ class Station extends NonShipItem {
         STATION_MATERIAL.map = text;
         STATION_MATERIAL.bumpMap = text;
         STATION_MATERIAL.needsUpdate = true;
+
+        // Set the 'position' so other items can get positions relative to this.
+        this.moveMesh();
     }
 
     toJSON() {
@@ -99,12 +106,58 @@ class Station extends NonShipItem {
         return (newStation);
     }
 
-    destruct() {
-        super.destruct();
+    // Dock something to us.
+    // Return true if sucessfull.
+    dock(that) {  
+        if (this.dockedItems.size != 0) {
+            // Something already docked. For now we only allow one Item
+            return(false);
+        }
+
+        this.dockedItems.add(that);
+
+        // Place this in our bay. Use universal coordinates.
+        let newLoc = this.location.clone();
+        newLoc.add(this.bayMesh.position);
+        that.setLocation(newLoc);
+        // that.setLocation(this.bayMesh.position);
+
+        // While docked move mesh with station.
+        // Switch to station coordinates.
+        // this.getGame().getScene().remove(that);
+        this.add(that);
+    
+        // Rotate to face exit. Use station coordionates.
+        that.rotation.set(0, 0, Math.PI);
+
+        return(true);
     }
 
-    getClass() {
-        return ("Station");
+    undock(that) {   
+        // Skip if not really docked
+        if(!this.dockedItems.has(that)) {
+            throw new BugError("Trying to undock a non-docked Item.");
+        }
+        
+        this.dockedItems.delete(that);
+
+        // No longer move with station.
+        // Switch back to universal coordinates.
+        this.remove(that);
+
+        // It appears that, having been part of another group, 'this' needs to be added back to the scene. 
+        // Otherwise camera cannot see it's mesh.
+        this.getGame().getScene().add(that);
+
+        // Move to launch point.
+        that.setLocation(this.getLaunchPoint());
+
+        // Rotate to face away from exit.
+        that.rotation.set(this.rotation.x, this.rotation.y, this.rotation.z + Math.PI);
+    }
+
+    destruct() {
+        super.destruct();
     }
 
     getRadarColour() {
@@ -227,8 +280,16 @@ class Station extends NonShipItem {
     // So it doesn't immediatly re-dock.
     getLaunchPoint() {
         let point = this.bayMesh.position.clone();
-        // point.x -= BAY_DEPTH;
         point.x -= STATION_SIZE;
+        this.localToWorld(point);
+        return (point);
+    } 
+    
+    // Get a turning point for approach.
+    getApproachPoint() {
+        let point = this.bayMesh.position.clone();
+        point.x -= STATION_SIZE * 2;
+        this.localToWorld(point);
         return (point);
     }
 
@@ -347,7 +408,7 @@ class Station extends NonShipItem {
         // Check there really was a collision.
         // i.e is the ship's central location inside the station mesh? 
         // ToDo : Probably should be from every vertex of the ship mesh but WTF?
-        let obj = this.isPointInside(ship.location);
+        let obj = this.isPointInside(ship.getLocation());
         if (null != obj) {
 
             // If inside bay handle docking.
@@ -356,23 +417,27 @@ class Station extends NonShipItem {
                 // ToDo: Maybe could also check is this.parkPoint is inside ship mesh.
 
                 // Check speed.
-                if (MAX_DOCKING_SPEED < Math.floor(ship.speed.length())) {
-                    this.getGame().displays.addMessage("Too fast! Max docking speed " + MAX_DOCKING_SPEED + " m/s");
+                if (Station.getMaxDockingSpeed() < Math.floor(ship.getSpeed())) {
+                    if (ship instanceof PlayerShip) {
+                        this.getGame().displays.addMessage("Too fast! Max docking speed " + Station.getMaxDockingSpeed() + " m/s");
+                    }
                     return (false);
                 }
 
                 // ToDo: Check rotation speed match.
 
                 // Dock.
-                ship.dock(this);
-
-                return (true);
+                return(ship.dock(this));
             }
         } else {
             // Ship is not really inside station.
             return (true);
         }
         return (false);
+    }
+
+    static getMaxDockingSpeed() {
+        return(MAX_DOCKING_SPEED);
     }
 
     animate() {
