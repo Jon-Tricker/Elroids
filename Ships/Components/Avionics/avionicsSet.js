@@ -2,7 +2,7 @@
 
 import GameError from '../../../GameErrors/gameError.js';
 import ComponentSet from '../componentSet.js';
-import Radar from './Radar.js';
+import Radar from './radar.js';
 import Compass from './compass.js';
 
 class AvionicsSet extends ComponentSet {

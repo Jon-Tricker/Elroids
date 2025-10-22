@@ -1,5 +1,5 @@
 // Basic radar.
-import Radar from './Radar.js';
+import Radar from './radar.js';
 import { ComponentType } from '../component.js';
 
 
