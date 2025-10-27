@@ -5,7 +5,7 @@ import AvionicsSet from "./Avionics/avionicsSet.js";
 import HullSet from "./Hulls/hullSet.js";
 import WeaponSet from "./Weapons/weaponSet.js";
 import BaySet from "./Bays/baySet.js";
-import JSONSet from "../../Utils/jsonSet.js";
+import JSONSet from "../../Game/Utils/jsonSet.js";
 
 class ComponentSets extends JSONSet {
 

@@ -1,17 +1,18 @@
 // Space station graphic and physics
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
 import NonShipItem from '../nonShipItem.js';
-import Universe from '../../universe.js';
+import Universe from '../universe.js';
 import PlayerShip from '../../Ships/playerShip.js';
-import Texture from '../../Utils/texture.js';
-import BoxSides from '../../Utils/boxSides.js'
-import PlateTexture from '../../Utils/plateTexture.js';
-import JSONSet from '../../Utils/jsonSet.js';
+import Texture from '../../Game/Utils/texture.js';
+import BoxSides from '../../Game/Utils/boxSides.js'
+import PlateTexture from '../../Game/Utils/plateTexture.js';
+import JSONSet from '../../Game/Utils/jsonSet.js';
+import Location from '../../Game/Utils/location.js';
 
 
 const ROTATE_RATE = 0.1;    // r/s
@@ -66,11 +67,11 @@ class Station extends NonShipItem {
     // Set of things docked with us. We don't dock with anything.
     dockedItems = new JSONSet();
 
-    constructor(system, locationX, locationY, locationZ, owner, json) {
+    constructor(location, owner, json) {
         if (undefined === json) {
-            super(system, locationX, locationY, locationZ, 0, 0, 0, STATION_SIZE, STATION_MASS, STATION_HP, owner, true);
+            super(location, Universe.originVector, STATION_SIZE, STATION_MASS, STATION_HP, owner, true);
         } else {
-            super(system, locationX, locationY, locationZ, 0, 0, 0, STATION_SIZE, STATION_MASS, STATION_HP, owner, true, json.id);
+            super(location, Universe.originVector, STATION_SIZE, STATION_MASS, STATION_HP, owner, true, json.id);
         }
 
         this.setupMesh();
@@ -102,7 +103,7 @@ class Station extends NonShipItem {
     }
 
     static fromJSON(json, system) {
-        let newStation = new Station(system, json.location.x, json.location.y, json.location.z, system.owner, json);
+        let newStation = new Station(Location.fromJSON(json.location, system), system.owner, json);
         return (newStation);
     }
 
@@ -282,7 +283,9 @@ class Station extends NonShipItem {
         let point = this.bayMesh.position.clone();
         point.x -= STATION_SIZE;
         this.localToWorld(point);
-        return (point);
+
+        let loc = new Location(point.x, point.y, point.z, this.location.system);
+        return (loc);
     } 
     
     // Get a turning point for approach.
@@ -290,7 +293,9 @@ class Station extends NonShipItem {
         let point = this.bayMesh.position.clone();
         point.x -= STATION_SIZE * 2;
         this.localToWorld(point);
-        return (point);
+
+        let loc = new Location(point.x, point.y, point.z, this.location.system);
+        return (loc);
     }
 
     createBayTexture(width, height, side) {

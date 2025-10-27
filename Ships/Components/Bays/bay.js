@@ -2,7 +2,7 @@
 
 import { Component } from "../component.js";
 import BayDisplay from "../../../Displays/Components/bayDisplay.js";
-import GameError from '../../../GameErrors/gameError.js';
+import GameError from '../../../Game/gameError.js';
 
 const DESCRIPTION = "'Cargo bays' contain minerals and trade goods.\n" +
     "Each bay can contain a certain maximum mass.\n" +

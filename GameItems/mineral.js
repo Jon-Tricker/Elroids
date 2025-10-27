@@ -1,6 +1,6 @@
 // Minearal container
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -18,7 +18,7 @@ class Mineral extends NonShipItem2 {
   type;
   expiryTime;
 
-  constructor(system, mass, locationX, locationY, locationZ, speedX, speedY, speedZ, type) {
+  constructor(mass, location, speed, type) {
 
     let size = Math.floor(Math.cbrt(mass));
     if (size < 1) {
@@ -28,7 +28,7 @@ class Mineral extends NonShipItem2 {
       size = MAX_SIZE;
     }
 
-    super(system, locationX, locationY, locationZ, speedX, speedY, speedZ, size, mass, 1);
+    super(location, speed, size, mass, 1);
 
     this.rotationRate = new THREE.Vector3(this.generateRotationRate(), this.generateRotationRate(), this.generateRotationRate());
 

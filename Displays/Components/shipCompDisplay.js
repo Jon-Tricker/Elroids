@@ -1,4 +1,9 @@
 // Special ComponentDisplay for stuff relating to whole ship.
+// 
+// Copyright (C) Jon Tricker 2023, 2025.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import DarkPanel from '../Utils/darkPanel.js';
 import TextPanel from '../Utils/textPanel.js';
 import BarPanel from '../Utils/barPanel.js';
@@ -20,7 +25,7 @@ class ShipCompDisplay extends DarkPanel {
     }
 
     getUnits() {
-        return("(" + this.ship.system.units + "/s)");
+        return("(" + this.ship.getSystem().units + "/s)");
     }
 
     resize(width, height, x, y) {
@@ -38,10 +43,10 @@ class ShipCompDisplay extends DarkPanel {
     animate() {
         super.animate();
 
-        let text = "System: " + this.ship.system.getName();
+        let text = "System: " + this.ship.getSystem().getName();
         if (null == this.ship.dockedWith) {
             let loc = this.ship.getLocation();
-            text += "     Pos: (" + this.printNum(loc.x) + " , " + this.printNum(loc.y) + " , " + this.printNum(loc.z) + ") " + this.ship.system.units;
+            text += "     Pos: (" + this.printNum(loc.x) + " , " + this.printNum(loc.y) + " , " + this.printNum(loc.z) + ") " + this.ship.getSystem().units;
         } else {
             text += " Docked";
         }

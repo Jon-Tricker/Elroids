@@ -1,21 +1,21 @@
 // Stuff that's common to the entire game.
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
 
-import Universe from './universe.js';
-import Rock from "./GameItems/rock.js";
-import GameError from "./GameErrors/gameError.js"
-import { ComponentsList } from './Trade/purchaseLists.js';
-import { GoodsList } from './Trade/goodsTypes.js';
-import MyScene from './Scenery/myScene.js'
-import MyCamera from './Scenery/myCamera.js'
-import Displays from './Displays/displays.js'
-import Keyboard from "./keyboard.js";
+import Universe from '../GameItems/universe.js';
+import Rock from "../GameItems/rock.js";
+import GameError from "./gameError.js"
+import { ComponentsList } from '../Trade/purchaseLists.js';
+import { GoodsList } from '../Trade/goodsTypes.js';
+import MyScene from './Scenery/myScene.js';
+import MyCamera from './Scenery/myCamera.js';
+import Keyboard from "./Utils/keyboard.js";
 import Player from './player.js';
+import Displays from '../Displays/displays.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
@@ -24,7 +24,7 @@ const VERSION = "9.3";
 const ANIMATE_RATE = 25;            // frames/second
 
 // Load textures once.
-const craterTexture = new THREE.TextureLoader().load("./Scenery/CraterTexture.gif");
+const craterTexture = new THREE.TextureLoader().load("./Game/Scenery/CraterTexture.gif");
 craterTexture.wrapS = THREE.RepeatWrapping;
 craterTexture.wrapT = THREE.RepeatWrapping;
 craterTexture.repeat.set(4, 4);
@@ -316,16 +316,15 @@ class Game {
         return (this.createRandomVector(max, true));
     }
 
-
     // Get a random location far away from ship. 
     //Let wrap calculation take care if too big.
     getFarAway(location) {
+        let sz = location.system.systemSize;
         let loc = location.clone();
 
-        let delta = this.createRandomVector(this.universe.systemSize);
+        let delta = this.createRandomVector(sz);
 
         // Move it to one edge of the universe.
-        let sz = this.universe.systemSize;
         switch (Math.floor(Math.random()) * 3) {
             case 0:
                 delta.x += sz;
@@ -342,8 +341,6 @@ class Game {
         }
 
         loc.add(delta);
-
-        this.universe.handleWrap(loc);
 
         return (loc);
     }

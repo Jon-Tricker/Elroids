@@ -5,7 +5,7 @@ import DarkPanel from './Utils/darkPanel.js';
 const SCALE = 0.05;
 
 // Distance till blob at edge of circle.
-const RANGE = 1000;   // m 
+const RANGE = 2000;   // m 
 
 // Dot colours
 const STA_FRONT_COL = "white";
@@ -74,11 +74,8 @@ class CompassDisplay extends DarkPanel {
         let closestRp = null;
 
         for (let item of items) {
-            let relPos = item.getLocation().clone();
-
-            // Handle wrap round relative to ship.
-            relPos.sub(thisship.location);
-            this.game.universe.handleWrap(relPos);
+            let relPos = thisship.location.getRelative(item.getLocation());
+            
             if ((null == closest) || (relPos.length() < closestRp.length())) {
                 closest = item;
                 closestRp = relPos;
@@ -90,7 +87,7 @@ class CompassDisplay extends DarkPanel {
         }
 
         // Make it back relative to world and then Rotate to same angle as ship.
-        closestRp.add(thisship.location);
+        closestRp.add(thisship.location, false);
         thisship.worldToLocal(closestRp);
 
         let closestRpLen = closestRp.length();

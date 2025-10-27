@@ -2,7 +2,7 @@
 //
 // Can also represent multiple goods.
 // Goods dont have status. If they are damaged the number is reduced.
-import GameError from "../GameErrors/gameError.js";
+import GameError from "../Game/gameError.js";
 import GoodsCrate from "./goodsCrate.js";
 
 
@@ -33,8 +33,8 @@ class Goods {
     }
 
     // Make a crate containing this type of goods/
-    makeCrate(system, x, y, z, speedX, speedY, speedZ) {  
-        let crate = new GoodsCrate(system, x, y, z, speedX, speedY, speedZ, this); 
+    makeCrate(location, speed) {  
+        let crate = new GoodsCrate(location, speed, this); 
         return(crate)
     }
 
@@ -79,7 +79,7 @@ class Goods {
     }
 
     getUniverse() {
-        return (this.getShip().system.universe);
+        return (this.getShip().location.system.universe);
     }
 
     // Get ordered collumn headings.

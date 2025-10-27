@@ -1,6 +1,6 @@
 // Base list class for all avionic components.
 
-import GameError from '../../../GameErrors/gameError.js';
+import GameError from '../../../Game/gameError.js';
 import ComponentSet from '../componentSet.js';
 import Radar from './radar.js';
 import Compass from './compass.js';

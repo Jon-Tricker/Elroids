@@ -1,6 +1,6 @@
 // Camera and listener mechanics
 import * as THREE from 'three';
-import Universe from '../universe.js';
+import Universe from '../../GameItems/universe.js';
 
 class MyCamera extends THREE.PerspectiveCamera {
 
@@ -30,7 +30,7 @@ class MyCamera extends THREE.PerspectiveCamera {
 
         let sz = 10000;          // Some random default value
         if (undefined != ship) {
-            sz = ship.system.systemSize;
+            sz = ship.getSystem().systemSize;
         }
 
         super(45, sizes.width / sizes.height, 0.1, sz * 4 * Universe.CBRT_THREE);

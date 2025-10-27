@@ -25,8 +25,8 @@ class SaucerShooter extends Saucer {
     moveDue = 0;
     targetLocation;
 
-    constructor(system, locationX, locationY, locationZ, owner, safe) {
-        super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
+    constructor(location, owner, safe) {
+        super(SIZE, location, MASS, COLOUR, owner, safe);
         this.createTargetLocation();
     }   
 
@@ -51,7 +51,7 @@ class SaucerShooter extends Saucer {
 
     // Do navigation logic. Home to near the ship.
     navigate() {
-        let targetSpeed = this.getRelativeLocation(this.targetLocation);
+        let targetSpeed = this.location.getRelative(this.targetLocation);
 
         targetSpeed.normalize();
         targetSpeed.multiplyScalar(MAX_SPEED);
@@ -84,8 +84,7 @@ class SaucerShooter extends Saucer {
 
                 // Only fire if vaguley close enough.
                 let game = this.getGame();
-                let range = this.getRelativeLocation(game.getShip().location);
-                range.multiplyScalar(-1);
+                let range = game.getShip().location.getRelative(this.location);
                 if ((STANDOFF_DISTANCE * 2) > range.length()) {
                     let direction = game.createRandomVector(2);
                     new DumbMissile(direction, this);

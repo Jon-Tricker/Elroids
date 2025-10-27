@@ -18,8 +18,8 @@ class NonShipItem extends Item {
     static idCount = 0;
     myId;
 
-    constructor(system, locationX, locationY, locationZ, speedX, speedY, speedZ, size, mass, hitPoints, owner, immobile, id) {
-        super(system, locationX, locationY, locationZ, speedX, speedY, speedZ, size, mass, hitPoints, owner, immobile);
+    constructor(location, speed, size, mass, hitPoints, owner, immobile, id) {
+        super(location, speed, size, mass, hitPoints, owner, immobile);
         if (undefined == id) {
             // Generate a sequential id
             this.myId = NonShipItem.idCount++;

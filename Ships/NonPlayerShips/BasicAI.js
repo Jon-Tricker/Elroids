@@ -3,7 +3,7 @@
 // Copyright (C) Jon Tricker 2023.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-import BugError from '../../GameErrors/bugError.js';
+import BugError from '../../Game/bugError.js';
 import Item from '../../GameItems/item.js';
 import Station from '../../GameItems/System/station.js';
 
@@ -74,19 +74,19 @@ class NavMode {
     }
 
     static getDestApproachPoint() {
-        return (this.myShip.system.stations.values().next().value.getApproachPoint());
+        return (this.myShip.location.system.stations.values().next().value.getApproachPoint());
     }
 
     static getDestStaion() {
-        return (this.myShip.system.stations.values().next().value);
+        return (this.myShip.location.system.stations.values().next().value);
     }
 
     static getDestWormhole() {
-        return (this.myShip.system.wormholeEnds.values().next().value);
+        return (this.myShip.location.system.wormholeEnds.values().next().value);
     }
 
     static getDestRandom() {
-        return (this.myShip.getGame().createRandomVector(this.myShip.system.systemSize));
+        return (this.myShip.getGame().createRandomVector(this.myShip.location.system.systemSize));
     }
 
     // Rest are implementarions of the individual animate fucntions..
@@ -145,7 +145,7 @@ class BasicAI {
     // Navigation program.
     // Loops until it hits STOP.
     program = new Array(
-        NavMode.RANDOM,
+        // NavMode.RANDOM,
         NavMode.STATION_APPROACH,
         NavMode.STATION_DOCK,
         NavMode.WAIT,
@@ -266,7 +266,6 @@ class BasicAI {
     getShortestVec(loc) {
         let vec = loc.clone();
         vec.sub(this.myShip.location);
-        this.myShip.getUniverse().handleWrap(vec);
         vec.add(this.myShip.location);
         return(vec);
     }

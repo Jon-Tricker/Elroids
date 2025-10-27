@@ -4,7 +4,7 @@
 
 import * as THREE from 'three';
 import DarkPanel from './Utils/darkPanel.js';
-import Game from '../game.js';
+import Game from '../Game/game.js';
 
 // Scale factor relative to parent.
 const SCALE_FACTOR = 0.9;

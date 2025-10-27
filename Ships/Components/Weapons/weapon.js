@@ -1,6 +1,6 @@
 // Base class for weapons
 import { Component } from "../component.js";
-import GameError from "../../../GameErrors/gameError.js";
+import GameError from "../../../Game/gameError.js";
 
 const DESCRIPTION = "'Weapons' are used for damaging things."
 

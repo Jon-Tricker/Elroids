@@ -3,9 +3,9 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import Keyboard from "./keyboard.js";
-import Game from './game.js'
-import MyCamera from './Scenery/myCamera.js'
+import Keyboard from './Game/Utils/keyboard.js';
+import Game from './Game/game.js';
+import MyCamera from './Game/Scenery/myCamera.js';
 
 // Some plumbing to get passed parameters.
 var scripts = document.getElementsByTagName('script');

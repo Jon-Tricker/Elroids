@@ -1,6 +1,6 @@
 // Saaucer graphic and physics
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -10,6 +10,7 @@ import Mineral from '../mineral.js';
 import { MineralTypes } from '../minerals.js';
 import Explosion from '../explosion.js';
 import DumbMissile from '../dumbMissile.js';
+import Universe from '../universe.js';
 
 const MAX_ROTATE_RATE = 2.5;    // r/s
 const SAUCER_HP = 1;
@@ -41,8 +42,8 @@ class Saucer extends NonShipItem {
     // 0 if never.
     destructTime = 0;
 
-    constructor(system, size, locationX, locationY, locationZ, mass, colour, owner, safe) {
-        super(system, locationX, locationY, locationZ, 0, 0, 0, size, mass, SAUCER_HP, owner);
+    constructor(size, location, mass, colour, owner, safe) {
+        super(location, Universe.originVector, size, mass, SAUCER_HP, owner);
         this.colour = colour;
 
         this.setupMesh();
@@ -59,7 +60,7 @@ class Saucer extends NonShipItem {
             this.destructTime = this.getUniverse().getTime() + Math.floor(ttl / 2 + Math.random() * ttl / 2);
         }
 
-        this.system.saucerCount++;
+        this.location.system.saucerCount++;
     }
 
     // Return time to live.
@@ -69,7 +70,7 @@ class Saucer extends NonShipItem {
     }
 
     destruct() {
-        this.system.saucerCount--;
+        this.location.system.saucerCount--;
         super.destruct();
     }
 
@@ -147,7 +148,7 @@ class Saucer extends NonShipItem {
                 // Make mineral
                 let type = MineralTypes[1 + Math.floor(Math.random() * (MineralTypes.length -1))];
                 let mass = Math.ceil(value / type.value);
-                let mineral = new Mineral(this.system, mass, thisLoc.x, thisLoc.y, thisLoc.z, this.speed.x, this.speed.y, this.speed.z, type);
+                let mineral = new Mineral(mass, thisLoc, this.speed, type);
                 mineral.setActive(true);
                 break;
 
@@ -155,7 +156,7 @@ class Saucer extends NonShipItem {
                 // Make goods.
                 let good = new (this.getGame().goodsList.getRandomElement()).constructor();
                 good.number = Math.ceil(value / good.type.cost);
-                let crate = good.makeCrate(this.system, thisLoc.x, thisLoc.y, thisLoc.z, this.speed.x, this.speed.y, this.speed.z);
+                let crate = good.makeCrate(thisLoc, this.speed);
                 crate.setActive(true);
                 break;
 

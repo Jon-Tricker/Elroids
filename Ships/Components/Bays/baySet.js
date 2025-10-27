@@ -1,11 +1,12 @@
 // Base list class for all cargo bays.
+import * as THREE from 'three';
 import ComponentSet from '../componentSet.js'
-import GameError from "../../../GameErrors/gameError.js"
+import GameError from "../../../Game/gameError.js"
 import Mineral from "../../../GameItems/mineral.js";
 import { MineralType } from '../../../GameItems/minerals.js';
 import GoodsSet from '../../../Trade/goodsSet.js';
 import { Component } from '../component.js';
-import BugError from '../../../GameErrors/bugError.js';
+import BugError from '../../../Game/bugError.js';
 
 class BaySet extends ComponentSet {
 
@@ -271,7 +272,7 @@ class BaySet extends ComponentSet {
         // Make mineral 
         let ship = this.getShip();
         let shipLoc = ship.getLocation();
-        let min = new Mineral(this.sets.ship.system, mass, shipLoc.x, shipLoc.y, shipLoc.z, ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random(), mineral);
+        let min = new Mineral(mass, shipLoc, new THREE.Vector3(ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random()), mineral);
         min.setActive(true);
 
         min.separateFrom(ship);
@@ -293,7 +294,7 @@ class BaySet extends ComponentSet {
         good.number = number;
 
         let shipLoc = ship.getLocation();
-        let crate = good.makeCrate(this.sets.ship.system, shipLoc.x, shipLoc.y, shipLoc.z, ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random());
+        let crate = good.makeCrate(shipLoc, new THREE.Vector3(ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random()));
 
         crate.setActive(true);
         crate.separateFrom(ship);

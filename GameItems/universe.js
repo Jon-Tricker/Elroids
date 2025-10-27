@@ -1,18 +1,19 @@
 // Everything related to the simulated 'Universe'.
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import * as THREE from 'three';
-import { System, SystemSpec } from './GameItems/System/system.js';
-import StarSystem from './GameItems/System/starSystem.js';
-import Hyperspace from './GameItems/System/hyperspace.js';
-import { MineralTypes } from './GameItems/minerals.js';
-import PlayerShip from './Ships/playerShip.js';
-import Wormhole from './GameItems/System/wormhole.js';
-import JSONSet from './Utils/jsonSet.js';
-import NonShipItem from './GameItems/nonShipItem.js';
-import BugError from './GameErrors/bugError.js';
+import { System, SystemSpec } from './System/system.js';
+import StarSystem from './System/starSystem.js';
+import Hyperspace from './System/hyperspace.js';
+import { MineralTypes } from './minerals.js';
+import PlayerShip from '../Ships/playerShip.js';
+import Wormhole from './System/wormhole.js';
+import JSONSet from '../Game/Utils/jsonSet.js';
+import NonShipItem from './nonShipItem.js';
+import BugError from '../Game/bugError.js';
+import Location from '../Game/Utils/location.js';
 
 const SYSTEM_SPECS = [
     new SystemSpec("Sol", 1, 0, 2, "Mostly harmless."),
@@ -130,12 +131,12 @@ class Universe {
                 count++;
 
                 if (this.game.testMode) {
-                    uniLoc = new THREE.Vector3(500 * count, 0, 0);
+                    uniLoc = new Location(500 * count, 0, 0, this.hyperspace);
                 } else {
                     // Locate system randomly in the universe
                     let minDist;
                     do {
-                        uniLoc = this.game.createRandomIntegerVector(this.systemSize / 5);
+                        uniLoc = Location.createRandomInSystem(this.hyperspace, this.systemSize / 5, true);
                         minDist = this.systemSize;
                         for (let sys of this.systems) {
                             let relLoc = sys.uniLoc;
@@ -211,14 +212,14 @@ class Universe {
                 // Locate system end away from origin in system.
                 let sysLoc;
                 if (this.game.testMode) {
-                    sysLoc = new THREE.Vector3(0, 500 * count, 0);
+                    sysLoc = new Location(0, 500 * count, 0, system);
                 } else {
                     // Locate wormhole randomly in the system
                     do {
-                        sysLoc = this.game.createRandomIntegerVector(this.systemSize);
+                        sysLoc = Location.createRandomInSystem(system, true);
                     } while (sysLoc.length < (this.systemSize / 2));
                 }
-                this.wormholes.add(new Wormhole(system, sysLoc, system.uniLocation));
+                this.wormholes.add(new Wormhole(sysLoc, system.uniLocation));
                 count++;
             }
         } else {
@@ -254,37 +255,13 @@ class Universe {
         return (this.universeTime);
     }
 
-    // Checks and handles wrap round of a vector.
-    handleWrap(vec) {
-        let sz = this.systemSize;
-
-        if (vec.x > sz) {
-            vec.x -= 2 * sz;
-        }
-        if (vec.x < -sz) {
-            vec.x += 2 * sz;
-        }
-        if (vec.y > sz) {
-            vec.y -= 2 * sz;
-        }
-        if (vec.y < -sz) {
-            vec.y += 2 * sz;
-        }
-        if (vec.z > sz) {
-            vec.z -= 2 * sz;
-        }
-        if (vec.z < -sz) {
-            vec.z += 2 * sz;
-        }
-    }
-
     // Create a ship.
     createShip(json) {
         let system = this.system;
 
         if (undefined === json) {
             if (this.game.testMode) {
-                this.ship = new PlayerShip(system, 5, 10, 20, Universe.originVector);
+                this.ship = new PlayerShip(5, 10, 20, new Location(0, 0, 0, system));
 
                 // Do some damage
                 this.ship.hull.compSets.takeDamage(1);
@@ -339,7 +316,7 @@ class Universe {
                     count++;
                 }
             } else {
-                this.ship = new PlayerShip(system, 5, 10, 20, new THREE.Vector3(-200, 100, 0));
+                this.ship = new PlayerShip(5, 10, 20, new Location(-200, 100, 0, system));
             }
         } else {
             this.ship = PlayerShip.fromJSON(json.ship, system);

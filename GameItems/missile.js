@@ -2,7 +2,7 @@
 // For now simple spheres.
 import * as THREE from 'three';
 import NonShipItem from './nonShipItem.js';
-import Universe from '../universe.js'
+import Universe from './universe.js';
 import Explosion from './explosion.js'
 
 const MISSILE_SIZE = 1;     // m
@@ -32,7 +32,7 @@ class Missile extends NonShipItem {
     let startLocation = owner.getLocation().clone();
 
     // Launch at just missile speed.
-    super(owner.system, startLocation.x, startLocation.y, startLocation.z, startSpeed.x, startSpeed.y, startSpeed.z, MISSILE_SIZE / Universe.CBRT_THREE, MISSILE_MASS, 1, owner);
+    super(startLocation, startSpeed, MISSILE_SIZE / Universe.CBRT_THREE, MISSILE_MASS, 1, owner);
 
     this.colour = colour;
     this.damage = damage;

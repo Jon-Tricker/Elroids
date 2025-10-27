@@ -5,9 +5,11 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import Universe from '../universe.js';
+import Universe from './universe.js';
 import ItemBoundary from './itemBoundary.js';
-import BugError from "../GameErrors/bugError.js";
+import BugError from "../Game/bugError.js";
+import Location from '../Game/Utils/location.js';
+
 const COLOUR = "#FFFFFF";
 
 // Distance for audio volume to half
@@ -22,7 +24,6 @@ class Item extends THREE.Group {
     location;
 
     originalMaterial;
-    system;
     mass;               // tonnes
     hitPoints;
     owner;
@@ -45,11 +46,14 @@ class Item extends THREE.Group {
     dockedWith = null;
 
     // Construct with optional mass
-    constructor(system, locationX, locationY, locationZ, speedX, speedY, speedZ, size, mass, hitPoints, owner, immobile) {
+    constructor(location, speed, size, mass, hitPoints, owner, immobile, buffer) {
+        if (undefined != buffer) {
+            throw new BugError("Too many args for Item.")
+        }
+
         super();
-        this.system = system;
-        this.location = new THREE.Vector3(locationX, locationY, locationZ);
-        this.setSpeed(new THREE.Vector3(speedX, speedY, speedZ));
+        this.location = location.clone();
+        this.setSpeed(speed);
         this.size = size;
         this.owner = owner;
 
@@ -79,16 +83,16 @@ class Item extends THREE.Group {
         this.setBoundary(size);
 
         // Add self to system
-        system.addItem(this);
+        location.system.addItem(this);
 
         // If this system is active add item to the graphics scene.
-        if (system == this.getGame().universe.system) {
+        if (location.system == this.getGame().universe.system) {
             this.getGame().getScene().add(this);
         }
 
         // Deal with situation where Item created inside another Item.
         if (null != this.getBoundary()) {
-            for (let that of this.system.items) {
+            for (let that of this.location.system.items) {
                 if (that != this) {
                     if (null != that.getBoundary()) {
                         if (this.getBoundary().intersects(that.getBoundary())) {
@@ -141,17 +145,17 @@ class Item extends THREE.Group {
     // Move item between systems.
     setSystem(newSystem) {
         // If already in a system remove it.
-        if (null != this.system) {
-            this.system.removeItem(this);
+        if (null != this.location.system) {
+            this.location.system.removeItem(this);
         }
 
         // Add it to new system
         newSystem.addItem(this);
-        this.system = newSystem;
+        this.location.setSystem(newSystem);
     }
 
     getUniverse() {
-        return (this.system.universe);
+        return (this.getSystem().universe);
     }
 
     // Get boundary.
@@ -164,11 +168,15 @@ class Item extends THREE.Group {
     }
 
     getGame() {
-        return (this.system.getGame());
+        return (this.getSystem().getGame());
     }
 
     getShip() {
-        return (this.system.universe.ship);
+        return (this.getUniverse().ship);
+    }
+
+    getSystem() {
+        return(this.location.system);
     }
 
     // Normally the class name but in some cases has to be overridden.
@@ -193,9 +201,7 @@ class Item extends THREE.Group {
     }
 
     setLocation(loc) {
-        this.location.x = loc.x;
-        this.location.y = loc.y;
-        this.location.z = loc.z;
+        this.location.copy(loc);
     }
 
     getRadarColour() {
@@ -204,9 +210,9 @@ class Item extends THREE.Group {
 
     destruct() {
         this.hitPoints = 0;
-        this.system.removeItem(this);
+        this.location.system.removeItem(this);
         // If this system is active remove item from the graphics scene.
-        if (this.system == this.getGame().universe.system) {
+        if (this.location.system == this.getGame().universe.system) {
             this.getGame().getScene().remove(this);
         }
     }
@@ -218,7 +224,7 @@ class Item extends THREE.Group {
     // Push item. Thrust in kN, mass in Tonnes. This should work without scaling.
     thrust(thrust, direction, maxspeed) {
         let accRate = thrust / this.getTotalMass();
-        direction = direction.normalize();
+        direction.normalize();
 
         let newSpeed = this.speed.clone();
         newSpeed.addScaledVector(direction, accRate / this.getGame().getAnimateRate());
@@ -246,7 +252,6 @@ class Item extends THREE.Group {
         return (false);
     }
 
-
     // Get base, unladen, mass.
     getMass() {
         return (this.mass);
@@ -262,7 +267,7 @@ class Item extends THREE.Group {
         return (Math.ceil(this.getSpeed() * this.getTotalMass() / 1000));
     }
 
-    // Move item in universal space, Handle wrap round.
+    // Move item in universal space.
     // Optinally detect collisions.
     moveItem(detect) {
 
@@ -278,8 +283,6 @@ class Item extends THREE.Group {
 
             // Move boundary object.
             this.boundary.moveTo(this.location);
-
-            this.getUniverse().handleWrap(this.location);
         }
     }
 
@@ -307,7 +310,7 @@ class Item extends THREE.Group {
         // Create line for move.
         let move = new THREE.Line3(Universe.originVector, this.speedFrame);
 
-        for (let that of this.system.items) {
+        for (let that of this.location.system.items) {
 
             let thatBoundary = that.getBoundary();
 
@@ -315,7 +318,6 @@ class Item extends THREE.Group {
 
                 let relLocation = that.getLocation().clone();
                 relLocation.sub(this.location);
-                this.getUniverse().handleWrap(relLocation);
 
                 // For the ship be generous ... has to go through windscreen.
                 let minDist = 0;
@@ -394,21 +396,6 @@ class Item extends THREE.Group {
             return;
         }
 
-        // Make sure speeds differ
-        /*
-        let spd = this.speed.clone();
-        spd.sub(that.speed);
-        if (1 > spd.length()) {
-            spd = this.speed.clone();
-            spd.add(new THREE.Vector3(1, 1, 1));
-            this.setSpeed(spd);
-
-            spd = that.speed.clone();
-            spd.add(new THREE.Vector3(-1, -1, -1));
-            that.setSpeed(spd);
-        }
-        */
-
         // Work out which object is faster.
         let faster;
         if (this.immobile) {
@@ -438,7 +425,7 @@ class Item extends THREE.Group {
         // If even 'faster' not moving.
         if (0 == move.length()) {
             // Move relative to current position.
-            move = slower.getRelativeLocation(faster.location);
+            move = slower.location.getRelative(faster.location);
             if (0 == move.length()) {
                 // If at same location make random  move.
                 move = this.getGame().createRandomVector(1);
@@ -552,7 +539,7 @@ class Item extends THREE.Group {
             // Get position relative to camers       
             let cameraPos = new THREE.Vector3();
             camera.getWorldPosition(cameraPos);
-            let relPos = this.getRelativeLocation(cameraPos);   
+            let relPos = this.location.getRelative(cameraPos);   
             relPos.multiplyScalar(-1);
 
             // If docked. Position relative to parent.
@@ -560,18 +547,11 @@ class Item extends THREE.Group {
                 relPos.sub(this.dockedWith.location);
             }
 
-            this.position.set(relPos.x + cameraPos.x, relPos.y + cameraPos.y, relPos.z + cameraPos.z);
+            // Do non-wraping add for positions.
+            relPos.add(cameraPos, false);
+
+            this.position.set(relPos.x, relPos.y, relPos.z);
         }
-    }
-
-    // Get position relative to something else.
-    // Handle seeing Items > Universe size away.
-    getRelativeLocation(loc) {
-        let rel = loc.clone();
-        rel.sub(this.getLocation());
-
-        this.getUniverse().handleWrap(rel);
-        return (rel);
     }
 
     setupMesh() {
@@ -628,7 +608,7 @@ class Item extends THREE.Group {
         // ToDo : Fix back to PositionalAudio.
 
         // Probably want to hear it as if on the ship even if the camera is elsewhere.
-        let rel = this.getRelativeLocation(this.getShip().location);
+        let rel = this.location.getRelative(this.getShip().location);
         let dist = rel.length();
         volume = volume / (2 ** (dist / AUDIO_HALF_DIST));
         if (volume < 0.01) {

@@ -4,11 +4,10 @@
 //  Extends Goods with a 'status' member.
 //  Always has a Goods.number of '1'. Can't bulk individually damagable objects.
 import ComponentDisplay from "../../Displays/Components/componentDisplay.js";
-import BugError from "../../GameErrors/bugError.js";
+import BugError from "../../Game/bugError.js";
 import Goods from "../../Trade/goods.js";
 import { GoodsType } from "../../Trade/goodsTypes.js";
-import GameError from "../../GameErrors/gameError.js";
-import ComponentSet from "./componentSet.js";
+import GameError from "../../Game/gameError.js";
 
 class ComponentType extends GoodsType {
     maxHp;
@@ -122,7 +121,7 @@ class Component extends Goods {
     mount(ship, alsoBuy) {
         // Check that we can we afford it.
         if (alsoBuy) {
-            if (this.getValueInSystem(ship.system) > ship.getCredits()) {
+            if (this.getValueInSystem(ship.getSystem()) > ship.getCredits()) {
                 throw (new GameError("Not enough credits."));
             }
         }
@@ -136,7 +135,7 @@ class Component extends Goods {
 
         // Now we have added complete financial transaction. 
         if (alsoBuy) {
-            ship.addCredits(-this.getValueInSystem(ship.system));
+            ship.addCredits(-this.getValueInSystem(ship.getSystem()));
         }
 
         // If it is in a bay remove it.
@@ -245,9 +244,9 @@ class Component extends Goods {
             // Doubled if not docked.
             cost = this.type.cost * 2;
         } else {
-            if (this.isAvailableInSystem(ship.system)) {
+            if (this.isAvailableInSystem(ship.getSystem())) {
                 // Cost in this system
-                cost = this.getUnitCostInSystem(ship.system);
+                cost = this.getUnitCostInSystem(ship.getSystem());
             }
         }
         return (cost);
@@ -275,7 +274,7 @@ class Component extends Goods {
             maxRepairable = 50;
         } else {
             // Only upto half in low tech systems.
-            if (ship.system.spec.techLevel < this.getTechLevel()) {
+            if (ship.getSystem().spec.techLevel < this.getTechLevel()) {
                 maxRepairable = 50;
             }
         }

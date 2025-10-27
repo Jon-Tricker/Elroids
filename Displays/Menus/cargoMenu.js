@@ -3,7 +3,7 @@
 // Arguments must be in a form that is in scope when eval()ed by MenuSystem.
 
 import MenuTable from './menuTable.js';
-import BugError from '../../GameErrors/bugError.js';
+import BugError from '../../Game/bugError.js';
 import { GoodsDetailsMenu } from './goodsPurchaseMenu.js'
 import { ComponentDetailsMenu } from './compPurchaseMenu.js';
 import { Component } from '../../Ships/Components/component.js';
@@ -72,10 +72,10 @@ class CargoMenu {
                 row.push(mass);
 
                 if (null != ship.dockedWith) {
-                    row.push(CargoMenu.getButtonText(ship.system, mineral, 1));
-                    row.push(CargoMenu.getButtonText(ship.system, mineral, mass));
+                    row.push(CargoMenu.getButtonText(ship.location.system, mineral, 1));
+                    row.push(CargoMenu.getButtonText(ship.location.system, mineral, mass));
 
-                    let value = Math.floor(ship.system.spec.getMineralValue(mineral) * mass);
+                    let value = Math.floor(ship.location.system.spec.getMineralValue(mineral) * mass);
                     totalValue += value;
                 } else {
                     row.push(mineral.value * mass);
@@ -128,7 +128,7 @@ class CargoMenu {
                 vals.push("<button type=\"button\" onclick=\"CargoMenu.onDetailsClick(this, cursor)\">Show</button>");
                 if (null != ship.dockedWith) {
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onMountCompClick(this, cursor)\">Mount</button>");
-                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellCompClick(this, cursor)\">" + comp.getValueInSystem(ship.system) + "</button>");
+                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellCompClick(this, cursor)\">" + comp.getValueInSystem(ship.location.system) + "</button>");
                 } else {
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onDumpGoodsClick(this, cursor)\">Dump</button>");
                 }
@@ -170,11 +170,11 @@ class CargoMenu {
                 vals.push(good.getMass());
                 vals.push(good.number);
                 vals.push("<button type=\"button\" onclick=\"CargoMenu.onDetailsClick(this, cursor)\">Show</button>");
-                vals.push(good.isLegal(ship.system));
+                vals.push(good.isLegal(ship.location.system));
                 if (null != ship.dockedWith) {
                     vals.push(good.getCost());
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, cursor, 1)\">" + good.getUnitCostInSystem(ship.system) + "</button>");
-                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, cursor, " + good.number + ")\">" + good.getValueInSystem(ship.system) + "</button>");
+                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, cursor, " + good.number + ")\">" + good.getValueInSystem(ship.location.system) + "</button>");
                 } else {
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onDumpGoodsClick(this, cursor)\">Dump</button>");
                 }

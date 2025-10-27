@@ -7,10 +7,10 @@ import NonShipItem from "./nonShipItem.js";
 
 class NonShipItem2 extends NonShipItem {
 
-    constructor(system, locationX, locationY, locationZ, speedX, speedY, speedZ, size, mass, hitPoints, owner, immobile, id) {
+    constructor(location, speed, size, mass, hitPoints, owner, immobile, id) {
         // The important part is to modify OurItem.constructor to NOT call setupMesh(). 
         // For activatable items this will be called each time they are activated.
-        super(system, locationX, locationY, locationZ, speedX, speedY, speedZ, size, mass, hitPoints, owner, immobile, id);
+        super(location, speed, size, mass, hitPoints, owner, immobile, id);
     }
 
     setActive(state) {

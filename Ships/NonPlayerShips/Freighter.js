@@ -20,7 +20,7 @@ const MASS = 100;
 const THRUST = 5000;
 
 class Freighter extends NPShip {
-    constructor(system, location) {
+    constructor(location) {
 
         // Pick a random hull type.
         let hullType = null;
@@ -38,7 +38,7 @@ class Freighter extends NPShip {
                 break;
         }
 
-        super(system, 5, 10, 20, location, hullType, MASS, HP);
+        super(5, 10, 20, location, hullType, MASS, HP);
         this.ai = new FreighterAI(this);
     }
 

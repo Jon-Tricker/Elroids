@@ -1,6 +1,6 @@
 // Component details menu.
 import MenuTable from './menuTable.js';
-import BugError from '../../GameErrors/bugError.js';
+import BugError from '../../Game/bugError.js';
 import { ComponentDetailsMenu } from './compPurchaseMenu.js';
 
 let componentsMenu = "\

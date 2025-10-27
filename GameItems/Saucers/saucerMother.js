@@ -2,7 +2,7 @@
 // Spawns other saucers.
 // Tries to keep away from ship.
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import Saucer from './saucer.js';
@@ -12,6 +12,7 @@ import SaucerShooter from "./saucerShooter.js";
 import SaucerRam from "./saucerRam.js";
 import SaucerHunter from "./saucerHunter.js";
 import SaucerPirate from "./saucerPirate.js";
+import Location from '../../Game/Utils/location.js';
 
 const COLOUR = "#80FF80";
 const SIZE = 70;
@@ -27,8 +28,8 @@ class SaucerMother extends Saucer {
     currentLaunchFrequency = START_LAUNCH_FREQUENCY;
     launchDue = this.currentLaunchFrequency;
 
-    constructor(system, locationX, locationY, locationZ, owner, safe) {
-        super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
+    constructor(location, owner, safe) {
+        super(SIZE, location, MASS, COLOUR, owner, safe);
     }   
     
     toJSON() {
@@ -39,7 +40,7 @@ class SaucerMother extends Saucer {
     }
     
     static fromJSON(json, system) {
-        let newSaucer = new SaucerMother(system, json.location.x, json.location.y, json.location.z, system.owner, json.safe);
+        let newSaucer = new SaucerMother(Location.fromJSON(json.location, system), system.owner, json.safe);
         newSaucer.rotateX(json.rotationx);
         newSaucer.rotateY(json.rotationy);
         newSaucer.rotateZ(json.rotationz);
@@ -56,7 +57,7 @@ class SaucerMother extends Saucer {
 
     destruct() {
         // Remove self from game.
-        this.system.removeMotherSaucer(this);
+        this.location.system.removeMotherSaucer(this);
 
         super.destruct();
     }
@@ -64,10 +65,9 @@ class SaucerMother extends Saucer {
     // Do navigation logic
     navigate() {
         if (!this.safe) {
-            let delta = this.getRelativeLocation(this.getGame().getShip().location);
-            delta.multiplyScalar(-1);
+            let delta = this.getGame().getShip().location.getRelative(this.location);
 
-            if (Math.abs(delta.length) > this.system.systemSize) {
+            if (Math.abs(delta.length) > this.location.system.systemSize) {
                 // Safe to slow down
                 delta = this.speed.clone();
                 delta.multiplyScalar(-0.01);
@@ -131,25 +131,25 @@ class SaucerMother extends Saucer {
                         case 1:
                             if (this.safe) {
                                 // Block up a saucer slot with something useless.
-                                saucer = new SaucerWanderer(this.system, thisLoc.x, thisLoc.y, thisLoc.z, this, this.safe);
+                                saucer = new SaucerWanderer(thisLoc, this, this.safe);
                                 break;
                             }
 
                         case 2:
-                            saucer = new SaucerShooter(this.system, thisLoc.x, thisLoc.y, thisLoc.z, this, this.safe);
+                            saucer = new SaucerShooter(thisLoc, this, this.safe);
                             break;
 
                         case 3:
-                            saucer = new SaucerHunter(this.system, thisLoc.x, thisLoc.y, thisLoc.z, this, this.safe);
+                            saucer = new SaucerHunter(thisLoc, this, this.safe);
                             break; 
                             
                         case 4:
-                            saucer = new SaucerPirate(this.system, thisLoc.x, thisLoc.y, thisLoc.z, this, this.safe);
+                            saucer = new SaucerPirate(thisLoc, this, this.safe);
                             break;
 
                         case 5:
                         default:
-                            saucer = new SaucerRam(this.system, thisLoc.x, thisLoc.y, thisLoc.z, this, this.safe);
+                            saucer = new SaucerRam(thisLoc, this, this.safe);
                             break;
                     }
 

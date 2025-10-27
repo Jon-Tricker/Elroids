@@ -1,4 +1,7 @@
-// Base list class for the components that make up a ship.
+// Base list class for the components that make up a ship./ Copyright (C) Jon Tricker 2023, 2025.
+//
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
 import GoodsSet from '../../Trade/goodsSet.js';
 
 class ComponentSet extends GoodsSet {

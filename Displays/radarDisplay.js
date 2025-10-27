@@ -1,5 +1,4 @@
 // Radar screen just one for the ship.
-import Universe from '../universe.js'
 import * as THREE from 'three';
 import DarkPanel from './Utils/darkPanel.js';
 
@@ -61,11 +60,7 @@ class RadarDisplay extends DarkPanel {
 
         for (let item of this.game.universe.system.items) {
 
-            let relPos = item.getLocation().clone();
-
-            // Handle wrap round relative to ship.
-            relPos.sub(ship.location);
-            this.game.universe.handleWrap(relPos);
+            let relPos = ship.location.getRelative(item.getLocation());
 
             // if not out of range.
             if (relPos.length() < RANGE) {
@@ -73,14 +68,14 @@ class RadarDisplay extends DarkPanel {
 
                 if (null != colour) {
                     // Make it back relative to world and then Rotate to same angle as ship.
-                    relPos.add(ship.location);
+                    relPos.add(ship.location, false);
                     ship.worldToLocal(relPos);
 
                     let basePos = relPos.clone();
                     basePos.z = 0;
 
                     // Scale by x ... attempt at proper perspective.
-                    // Doesn't really work because front, most important, arc becomes smallest.
+                    // Doesn't really work because forward, most important, arc becomes smallest.
                     /*
                     let scaleFactor = 1 + (RANGE + relPos.x); 
                     if (scaleFactor != 0) {

@@ -4,7 +4,7 @@
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
-import JSONSet from "../../Utils/jsonSet.js";
+import JSONSet from "../../Game/Utils/jsonSet.js";
 import Freighter from "./Freighter.js";
 
 class NPShipFactory {
@@ -14,9 +14,9 @@ class NPShipFactory {
     static shipTypes = new JSONSet ([Freighter]);
 
     // Create a random ship
-    static createRandom(system, location) {
+    static createRandom(location) {
         let type = this.shipTypes.getRandomElement();
-        let ship = new type(system, location);
+        let ship = new type(location);
         return(ship);
     }
 }

@@ -1,6 +1,6 @@
 // Star systems menu.
 import MenuTable from './menuTable.js';
-import BugError from '../../GameErrors/bugError.js';
+import BugError from '../../Game/bugError.js';
 import { MineralType, MineralTypes } from "../../GameItems/minerals.js";
 
 let starSystemsMenu = "\

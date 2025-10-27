@@ -2,15 +2,15 @@
 //
 // Also acts as a 'temlate' defining the initial ship component lists.
 //
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
 import { Component } from '../component.js';
 import ComponentSets from '../componentSets.js';
-import GameError from '../../../GameErrors/gameError.js';
-import BugError from '../../../GameErrors/bugError.js';
+import GameError from '../../../Game/gameError.js';
+import BugError from '../../../Game/bugError.js';
 
 const DESCRIPTION = "Each ship had one 'hull'.\n" +
     "The hull has 'slots' into which other components can be fitted.\n" +
@@ -180,7 +180,7 @@ class Hull extends Component {
 
     static fromJSON(json, ship) {
 
-        let hull = ship.system.getGame().componentsList.getByClass(json.class);
+        let hull = ship.getSystem().getGame().componentsList.getByClass(json.class);
         ship.hull.compSets.hullSet.clear();
         // hull = new hull.constructor(hull.getTargetSet(ship));
         hull = new hull.constructor();
@@ -190,7 +190,7 @@ class Hull extends Component {
 
         // Unpack other components
         for (let jsonComp of json.comps) {
-            let comp = ship.system.getGame().componentsList.getByClass(jsonComp.class);
+            let comp = ship.getSystem().getGame().componentsList.getByClass(jsonComp.class);
             comp = new comp.constructor(comp.getTargetSet(ship));
             comp.status = jsonComp.status;
             comp.displayPanel = jsonComp.displayPanel;

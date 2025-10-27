@@ -25,9 +25,9 @@ import { GoodsPurchaseMenu } from './Menus/goodsPurchaseMenu.js';
 import { cargoMenu } from './Menus/cargoMenu.js';
 import { CargoMenu } from './Menus/cargoMenu.js';
 import { starSystemsMenu, StarSystemsMenu } from './Menus/starSystemsMenu.js';
-import Universe from '../universe.js';
-import GameError from '../GameErrors/gameError.js';
-import BugError from '../GameErrors/bugError.js';
+import Universe from '../GameItems/universe.js';
+import GameError from '../Game/gameError.js';
+import BugError from '../Game/bugError.js';
 
 // Result of printing a child element.
 class ElementResult {

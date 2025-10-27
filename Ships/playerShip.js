@@ -1,13 +1,13 @@
 // Players ship graphic and physics.
 // A 'Ship' with everything implemented.
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
 import Ship from './ship.js';
-import MyCamera from '../Scenery/myCamera.js';
+import MyCamera from '../Game/Scenery/myCamera.js';
 import BasicHull from './Components/Hulls/basicHull.js';
 import MediumHull from './Components/Hulls/mediumHull.js';
 import LargeHull from './Components/Hulls/largeHull.js';
@@ -15,6 +15,7 @@ import Mineral from "../GameItems/mineral.js";
 import Station from '../GameItems/System/station.js';
 import WormholeEnd from '../GameItems/System/wormholeEnd.js';
 import GoodsCrate from '../Trade/goodsCrate.js';
+import Location from '../Game/Utils/location.js';
 
 
 class PlayerShip extends Ship {
@@ -26,9 +27,9 @@ class PlayerShip extends Ship {
 
     originalPosition;
 
-    constructor(system, height, width, length, location) {
+    constructor(height, width, length, location) {
 
-        super(system, height, width, length, location);
+        super(height, width, length, location);
 
         this.originalPosition = location.clone();
 
@@ -46,7 +47,7 @@ class PlayerShip extends Ship {
     static fromJSON(json, system) {
         // Make a default ship.
         // Default components will be made. We will replace them latter. 
-        let newShip = new PlayerShip(system, json.height, json.width, json.length, new THREE.Vector3(json.location.x, json.location.y, json.location.z));
+        let newShip = new PlayerShip(json.height, json.width, json.length, Location.fromJSON(json.location, system));
 
         super.fromJSON(json, system, newShip);
 
@@ -100,7 +101,7 @@ class PlayerShip extends Ship {
     }
 
     getMaxSpeed() {
-        return(this.hull.compSets.hullSet.getMaxSpeed());
+        return (this.hull.compSets.hullSet.getMaxSpeed());
     }
 
     setEngineSound(state) {
@@ -194,7 +195,6 @@ class PlayerShip extends Ship {
         }
     }
 
-   
     moveMesh() {
         // Move self (inc camera).
         let loc = this.getLocation();
@@ -283,8 +283,7 @@ class PlayerShip extends Ship {
 
         if (that instanceof WormholeEnd) {
             // Try to traverse wormhole.
-            that.enter(this);
-            return;
+            return (that.enter(this));
         }
 
         return (super.handleCollision(that));
@@ -292,13 +291,13 @@ class PlayerShip extends Ship {
 
     dock(station) {
         if (!super.dock(station)) {
-            return(false);
+            return (false);
         }
 
         this.getTerminal().playSound("poweroff", 0.5);
         this.getGame().displays.terminalEnable(true);
 
-        return(true);
+        return (true);
     }
 
     undock() {
@@ -324,7 +323,7 @@ class PlayerShip extends Ship {
     }
 
     sellMineral(mineral, mass) {
-        let value = Math.floor(this.system.spec.getMineralValue(mineral) * mass);
+        let value = Math.floor(this.location.system.spec.getMineralValue(mineral) * mass);
         this.unloadMineral(mineral, mass);
         this.addCredits(value);
     }
@@ -344,6 +343,7 @@ class PlayerShip extends Ship {
     getTotalMass() {
         return (this.getMass() + this.hull.compSets.baySet.getContentMass())
     }
+
 }
 
 export default PlayerShip;

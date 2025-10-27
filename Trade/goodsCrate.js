@@ -27,11 +27,11 @@ class GoodsCrate extends NonShipItem2 {
   contents;
   expiryTime;
 
-  constructor(system, locationX, locationY, locationZ, speedX, speedY, speedZ, contents) {
+  constructor(location, speed, contents) {
 
     let mass = contents.getMass();
 
-    super(system, locationX, locationY, locationZ, speedX, speedY, speedZ, SIZE, mass, 1);
+    super(location, speed, SIZE, mass, 1);
 
     this.contents = contents;
 

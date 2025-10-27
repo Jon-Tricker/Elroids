@@ -13,8 +13,8 @@ const MAX_SPEED = 300;   // m/s
 const MAX_ACC = 5;   // m/s^2
 
 class SaucerRam extends Saucer {
-    constructor(system, locationX, locationY, locationZ, owner, safe) {
-        super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
+    constructor(location, owner, safe) {
+        super(SIZE, location, MASS, COLOUR, owner, safe);
     } 
 
     getName() {
@@ -26,8 +26,7 @@ class SaucerRam extends Saucer {
     }
     // Do navigation logic to ram ship.
     navigate() {
-        let targetSpeed = this.getRelativeLocation(this.getShip().location);
-        targetSpeed.multiplyScalar(-1);
+        let targetSpeed = this.getShip().location.getRelative(this.location);
 
         // In safe mode always miss.
         if (this.safe) {

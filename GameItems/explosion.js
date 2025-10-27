@@ -24,7 +24,7 @@ class Explosion extends Item {
   constructor(maxSize, that) {
     // With same location and speed as exploding thing
     let thatLoc = that.getLocation();
-    super(that.system, thatLoc.x, thatLoc.y, thatLoc.z, that.speed.x, that.speed.y, that.speed.z);
+    super(thatLoc, that.speed);
 
     if (MAX_SIZE < this.maxSize) {
       this.maxSize = MAX_SIZE;

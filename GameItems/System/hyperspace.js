@@ -4,7 +4,7 @@
 // Univeral location is not used.
 import * as THREE from 'three';
 import { System, SystemSpec } from './system.js'
-import SkyBox from '../../Scenery/skyBox.js';
+import SkyBox from '../../Game/Scenery/skyBox.js';
 
 class Hyperspace extends System {
     // Distance units.

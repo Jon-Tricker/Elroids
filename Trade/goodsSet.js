@@ -1,6 +1,6 @@
 // Base list class for Goods.
-import GameError from "../GameErrors/gameError.js";
-import jsonSet from "../Utils/jsonSet.js"
+import GameError from "../Game/gameError.js";
+import jsonSet from "../Game/Utils/jsonSet.js"
 
 class GoodsSet extends jsonSet {
 
@@ -93,7 +93,7 @@ class GoodsSet extends jsonSet {
     }
 
     getUniverse() {
-        return (this.getShip().system.universe);
+        return (this.getShip().location.system.universe);
     }
 
     getGame() {

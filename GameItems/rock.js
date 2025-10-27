@@ -6,8 +6,8 @@
 
 import * as THREE from 'three';
 import NonShipItem2 from './nonShipItem2.js';
-import Game from '../game.js';
-import FacitRockGeometry from '../facitRockGeometry.js'
+import Game from '../Game/game.js';
+import FacitRockGeometry from '../Game/Scenery/facitRockGeometry.js';
 import { Composition } from './minerals.js';
 import PlayerShip from '../Ships/playerShip.js'
 
@@ -39,8 +39,8 @@ class Rock extends NonShipItem2 {
 
   static rockStyle = Rock.ROCK_STYLE_SPHERE;
 
-  constructor(system, rockSize, locationX, locationY, locationZ, speedX, speedY, speedZ, composition) {
-    super(system, locationX, locationY, locationZ, speedX, speedY, speedZ, rockSize, rockSize * rockSize * rockSize, 1 + rockSize / 10);
+  constructor(rockSize, location, speed, composition) {
+    super(location, speed, rockSize, rockSize * rockSize * rockSize, 1 + rockSize / 10);
 
     BASE_ROCK_MATERIAL.map = Game.getCraterTexture();
     BASE_ROCK_MATERIAL.bumpMap = Game.getCraterTexture();
@@ -59,7 +59,7 @@ class Rock extends NonShipItem2 {
       this.composition = composition;
     }
 
-    // this.setupMesh();
+    let system = this.location.system;
 
     system.rockCount++;
 
@@ -69,7 +69,7 @@ class Rock extends NonShipItem2 {
   }
 
   destruct() {
-    this.system.rockCount--;
+    this.location.system.rockCount--;
     super.destruct();
   }
 
@@ -155,7 +155,7 @@ class Rock extends NonShipItem2 {
       }
 
       if (0 < this.composition.getValue()) {
-        let rock = new Rock(this.system, newSize, loc.x, loc.y, loc.z, spd.x * ratio.x, spd.y * ratio.y, spd.z * ratio.z, this.composition);
+        let rock = new Rock(newSize, loc, new THREE.Vector3(spd.x * ratio.x, spd.y * ratio.y, spd.z * ratio.z), this.composition);
         rock.setActive(true);
 
         // Possible recurse
@@ -165,7 +165,7 @@ class Rock extends NonShipItem2 {
       }
 
       if (0 < newComp.getValue()) {
-        let rock = new Rock(this.system, newSize, loc.x, loc.y, loc.z, spd.x * ratio2.x, spd.y * ratio2.y, spd.z * ratio2.z, newComp);
+        let rock = new Rock(newSize, loc, new THREE.Vector3(spd.x * ratio2.x, spd.y * ratio2.y, spd.z * ratio2.z), newComp);
         rock.setActive(true); 
         
         // Possible recurse

@@ -1,6 +1,6 @@
 // Goods purchase menu.
 import MenuTable from './menuTable.js';
-import BugError from '../../GameErrors/bugError.js';
+import BugError from '../../Game/bugError.js';
 import { ComponentsMenu } from './componentsMenu.js';
 
 let goodsPurchaseMenu = "\

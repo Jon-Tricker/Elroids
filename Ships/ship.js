@@ -1,7 +1,7 @@
 // Base class for any ship that implements the laws of physics.
 // Internal impementation of ship is left to the sun-classes.
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import Item from '../GameItems/item.js';
 import { Hull } from './Components/Hulls/hull.js';
 import Explosion from '../GameItems/explosion.js';
+import Universe from '../GameItems/universe.js';
 
 // Slightly damped attitude contols to allow fine adjustment.
 const ROTATE_RATE_DELTA = 0.125;        // r/s
@@ -32,8 +33,8 @@ class Ship extends Item {
 
     mesh;
 
-    constructor(system, height, width, length, location, mass, hitPoints, owner) {
-        super(system, location.x, location.y, location.z, 0, 0, 0, length, mass, hitPoints, owner);
+    constructor(height, width, length, location, mass, hitPoints, owner) {
+        super(location, Universe.originVector, length, mass, hitPoints, owner);
 
         // Now that we called 'super' can use 'this
         this.height = height;

@@ -1,8 +1,12 @@
 // Base class for all 'systems' (areas that can be navigated.)
-import SkyBox from "../../Scenery/skyBox.js"
+// 
+// Copyright (C) Jon Tricker 2023, 2025.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
+import SkyBox from "../../Game/Scenery/skyBox.js";
 import { MineralTypes } from "../minerals.js";
-import JSONSet from "../../Utils/jsonSet.js";
-import BugError from "../../GameErrors/bugError.js";
+import JSONSet from "../../Game/Utils/jsonSet.js";
+import BugError from "../../Game/bugError.js";
 
 // Specification of a star system.
 class SystemSpec {
@@ -226,6 +230,11 @@ class System {
 
         for (let item of this.items) {
             item.animate(date, keyBoard);
+
+            // IF not still the current system give up.
+            if(this.universe.system != this) {
+                return;
+            }
         }
     }
 }

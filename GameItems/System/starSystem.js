@@ -16,6 +16,8 @@ import Station from './station.js';
 import { SystemSpec } from './system.js';
 import Freighter from '../../Ships/NonPlayerShips/Freighter.js';
 import NPShipFactory from '../../Ships/NonPlayerShips/NonPlayerShipFactory.js';
+import Location from '../../Game/Utils/location.js';
+import Universe from '../universe.js';
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;           // m
@@ -86,7 +88,7 @@ class StarSystem extends System {
     animate(date, keyBoard) {
         // If necesarry top up rocks.
         if (this.rockCount < this.maxRockCount) {
-            this.createRandomRock(this.getGame().getFarAway(this.getShip().location));
+            this.createRandomRock(this.getShip().location.getFarAway());
         }
 
         if (!this.getGame().testMode) {
@@ -101,7 +103,7 @@ class StarSystem extends System {
             if (date > this.nPShipTimer) {
                 // Genrate new NPShip from one of the wormhole ends.
                 let wormholeEnd = this.wormholeEnds.getRandomElement();
-                let npShip = NPShipFactory.createRandom(this, wormholeEnd.location);
+                let npShip = NPShipFactory.createRandom(wormholeEnd.location);
                 npShip.setSpeed(this.getGame().createRandomVector(10));
                 npShip.setActive(true);
                 wormholeEnd.exit(npShip);
@@ -159,20 +161,20 @@ class StarSystem extends System {
             // Create a few test rocks at set locations
 
             // Horizontal colliders
-            // new Rock(this, 20, 100, 50, 0, 0, 0, 0);
-            // new Rock(this, 10, 100, -50, 10, 0, 25, 0);
+            // new Rock(20, new Location(0, 100, 50, this), Universe.originVector);
+            // new Rock(10, new Location(100, -50, 10, this), new THREE.Vector3(0, 25, 0));
 
             // Big target
-            // new Rock(this, 20, 100, 0, 0, 0, 0, 0);
+            // new Rock(20, new Location(100, 0, 0, this), Universe.originVector);
 
             // Small target
-            // new Rock(this, 80, -100, 0, 0, 0, 0, 0);
+            // new Rock(80, new Location(100, 0, 0, this), Universe.originVector);
 
             // Row of rocks
             for (let i = -this.systemSize; i < this.systemSize; i += 211) {
                 let sz = Math.abs(i % this.universe.game.getMaxRockSize());
                 if (sz != 0) {
-                    new Rock(this, sz, i, -100, 0, 0, 0, 0);
+                    new Rock(sz, new Location(i, -100, 0, this), Universe.originVector);
                 }
             }
 
@@ -180,27 +182,27 @@ class StarSystem extends System {
             /*
             for (let i = 0; i < this.systemSize ; i += 211) {
                 let sz = i % MAX_ROCK_SIZE;
-                new Rock(this, sz,  i, i, i, 0, 0, 0);
+                new Rock(sz, new Location(i, i, i), Universe.originVector);
             }
             */
 
             // And a sample mineral
-            new Mineral(this, 100, 250, -10, 50, 0, 0, 0, MineralTypes[2]);
-            new Mineral(this, 100, 500, 50, 50, 0, 0, 0, MineralTypes[3]);
+            new Mineral(100, new Location(250, -10, 50, this), Universe.originVector, MineralTypes[2]);
+            new Mineral(100, new Location(500, 50, 50, this), Universe.originVector, MineralTypes[3]);
 
             // Add sample goods crates.
             let good = new (this.universe.game.goodsList.getByClass("Gun")).constructor();
             good.number = 50;
-            good.makeCrate(this, 250, 10, 50, 0, 0, 0);
+            good.makeCrate(new Location(250, 10, 50, this), Universe.originVector);
 
             let comp = new (this.universe.game.componentsList.getByClass("BasicEngine")).constructor();
             comp.number = 1;
-            comp.makeCrate(this, 270, 10, 70, 0, 0, 0);
+            comp.makeCrate(new Location(270, 10, 70, this), Universe.originVector);
 
         } else {
             // Create a bunch of random rocks
             for (let r = 0; r <= rockCount; r++) {
-                let loc = new THREE.Vector3(Math.random() * this.systemSize * 2 - this.systemSize, Math.random() * this.systemSize * 2 - this.systemSize, Math.random() * this.systemSize * 2 - this.systemSize);
+                let loc = Location.createRandomInSystem(this, true);
                 this.createRandomRock(loc);
             }
 
@@ -213,7 +215,7 @@ class StarSystem extends System {
         let maxVel = game.createRandomVector(game.getMaxRockVelocity());
         let sz = Math.floor((Math.random() * game.getMaxRockSize()) + 10);
 
-        let rock = new Rock(this, sz, loc.x, loc.y, loc.z, maxVel.x, maxVel.y, maxVel.z);
+        let rock = new Rock(sz, loc, maxVel);
     };
 
     createStations(json) {
@@ -221,10 +223,10 @@ class StarSystem extends System {
             // Create new stations.
             let station;
             if (this.getGame().testMode) {
-                station = new Station(this, 1100, 0, 0, null);
-                // station = new Station(200, 0, 0, this, null);
+                // station = new Station(new Location(-4900, 0, 0, this), null);
+                station = new Station(new Location(1100, 0, 0, this), null);
             } else {
-                station = new Station(this, 0, 0, 0, null);
+                station = new Station(new Location(0, 0, 0, this), null);
             }
             this.stations.add(station);
         } else {
@@ -275,7 +277,7 @@ class StarSystem extends System {
 
         // Create it close so we can find it. 
         if (this.getGame().testMode) {
-            loc = new THREE.Vector3(1000, 100, -50);
+            loc = new Location(1000, 100, -50, this);
             safe = true;
         } else {
             if (safe) {
@@ -283,13 +285,13 @@ class StarSystem extends System {
                 let offset = 1000;
                 loc.x += offset;
                 loc.y += offset / 2;
-                this.universe.handleWrap(loc);
+                loc.handleWrap();
             } else {
-                loc = game.getFarAway(this.universe.ship.location);
+                loc = Location.createRandomInSystem(this);
             }
         }
 
-        this.motherSaucers.add(new SaucerMother(this, loc.x, loc.y, loc.z, null, safe));
+        this.motherSaucers.add(new SaucerMother(loc, null, safe));
 
         // Game gradually gets harder.
         game.maxSaucerCount++;

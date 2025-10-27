@@ -1,12 +1,14 @@
 // Pirate saucer
 // Tries to steal minerals.
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
+import * as THREE from 'three';
 import Saucer from './saucer.js';
 import Mineral from '../mineral.js';
 import DumbMissile from '../../GameItems/dumbMissile.js'
+import Location from '../../Game/Utils/location.js';
 
 const COLOUR = "#202060";
 const SIZE = 20;
@@ -30,8 +32,8 @@ class SaucerPirate extends Saucer {
     farAway = null;
     shootDue = 0;
 
-    constructor(system, locationX, locationY, locationZ, owner, safe) {
-        super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
+    constructor(location, owner, safe) {
+        super(SIZE, location, MASS, COLOUR, owner, safe);
     } 
     
     getName() {
@@ -58,7 +60,7 @@ class SaucerPirate extends Saucer {
             // Run away
             if (null == this.farAway) {
                 let game = this.getGame();
-                this.farAway = game.getFarAway(game.getShip().location);
+                this.farAway = game.getShip().location.getFarAway();
             }
             targetLoc = this.farAway;
         } else {
@@ -77,7 +79,7 @@ class SaucerPirate extends Saucer {
         }
 
         // Home on target location 
-        let targetSpeed = this.getRelativeLocation(targetLoc);
+        let targetSpeed = this.location.getRelative(targetLoc);
         this.thrust(THRUST, targetSpeed, MAX_SPEED);
     }
 
@@ -102,11 +104,11 @@ class SaucerPirate extends Saucer {
                 if (this.shootDue++ >= SHOOT_FREQUENCY) {
 
                     // Only fire if vaguley close enough.
-                    let range = this.getRelativeLocation(this.getGame().getShip().location);
+                    let range = this.location.getRelative(this.getGame().getShip().location);
 
                     if (MAX_RANGE > range.length()) {
-                        range.normalize();
-                        new DumbMissile(range, this);
+                        // range.normalize();
+                        new DumbMissile(new THREE.Vector3(range.x, range.y, range.z), this);
                         this.shootDue = 0;
                     }
                 }
@@ -118,7 +120,7 @@ class SaucerPirate extends Saucer {
     // null if none available.
     getTarget() {
         let maxValTarget = null;
-        for (let that of this.system.items) {
+        for (let that of this.location.system.items) {
             if (that instanceof Mineral) {
                 if ((null == maxValTarget) || (that.getValue() > maxValTarget.getValue())) {
                     maxValTarget = that;
@@ -141,7 +143,7 @@ class SaucerPirate extends Saucer {
         this.cargoMass = Math.floor(this.cargoMass);
         if (0 < this.cargoMass) {
             let thisLoc = this.getLocation();
-            new Mineral(this.system, this.cargoMass, thisLoc.x, thisLoc.y, thisLoc.z, this.speed.x, this.speed.y, this.speed.z, this.cargoType);
+            new Mineral(this.cargoMass, new Location(thisLoc.x, thisLoc.y, thisLoc.z, this.system), this.speed, this.cargoType);
         }
         super.destruct();
     }

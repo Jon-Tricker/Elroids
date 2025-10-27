@@ -1,9 +1,9 @@
 // Shooting saucer that tries to target the ship.
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
+import * as THREE from 'three';
 import DumbMissile from '../dumbMissile.js';
 import Saucer from './saucer.js';
 
@@ -27,8 +27,8 @@ class SaucerHunter extends Saucer {
 
     burstCounter = 0;
 
-    constructor(system, locationX, locationY, locationZ, owner, safe) {
-        super(system, SIZE, locationX, locationY, locationZ, MASS, COLOUR, owner, safe);
+    constructor(location, owner, safe) {
+        super(SIZE, location, MASS, COLOUR, owner, safe);
         this.createTargetLocation();
     }
 
@@ -90,17 +90,17 @@ class SaucerHunter extends Saucer {
                 }
 
                 // Only fire if vaguley close enough.
-                let range = this.getRelativeLocation(this.getGame().getShip().location);
+                let range = this.location.getRelative(this.getGame().getShip().location);
 
                 if ((STANDOFF_DISTANCE * 2) > range.length()) {
-                    range.normalize();
+                    // range.normalize();
 
                     // Add a bit of varience
                     range.x *= 1 + Math.random() * 0.1;
                     range.y *= 1 + Math.random() * 0.1;
                     range.z *= 1 + Math.random() * 0.1;
 
-                    new DumbMissile(range, this);
+                    new DumbMissile(new THREE.Vector3(range.x, range.y, range.z), this);
                 }
             }
         }

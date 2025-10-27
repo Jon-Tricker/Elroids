@@ -1,11 +1,11 @@
 // Graphics for the facited rock
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import Universe from './universe.js'
+import Universe from '../../GameItems/universe.js';
 
 class FacitRockGeometry extends THREE.BufferGeometry {
     vertices;

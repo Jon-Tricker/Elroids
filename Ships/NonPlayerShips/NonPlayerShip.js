@@ -21,8 +21,8 @@ class NPShip extends Ship {
     // Minimal components set
     components;
 
-    constructor(system, height, width, length, location, hull, mass, hitPoints) {
-        super(system, height, width, length, location, mass, hitPoints);
+    constructor(height, width, length, location, hull, mass, hitPoints) {
+        super(height, width, length, location, mass, hitPoints);
         this.components = new ComponentSets(this, 1, 0, 0 ,0, 0);
         this.hull = new hull(this.components.hullSet);
     }

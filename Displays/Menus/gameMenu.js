@@ -2,7 +2,7 @@
 //
 // Arguments must be in a form that is in scope when eval()ed by MenuSystem.
 
-import GameError from '../../GameErrors/gameError.js';
+import GameError from '../../Game/gameError.js';
 
 let gameMenu = "\
 <BODY>\
