@@ -43,6 +43,9 @@ class NavMode {
     // Destroy ship
     static DESTRUCT = new NavMode("destruct", this.destruct, undefined, undefined);
 
+    // Pick up cargo
+    static CARGO = new NavMode("cargo pickup", this.navigateTo, this.getDestCargo, undefined);
+
     constructor(name, animateFn, getDestFn, maxSpeed) {
         this.animateFn = animateFn;
         this.getDestFn = getDestFn;
@@ -66,8 +69,15 @@ class NavMode {
         return (this.animateFn.call(ai, date));
     }
 
+    // Does this mode have a destination.
+    // Some, like 'undock', dont.
+    hasDest() {
+        return (undefined != this.getDestFn)
+    }
+
+    // Return destination (if any).
     getDest(ai) {
-        if (undefined == this.getDestFn) {
+        if (!this.hasDest()) {
             return (undefined);
         }
         return (this.getDestFn.call(ai));
@@ -89,14 +99,27 @@ class NavMode {
         return (this.myShip.getGame().createRandomVector(this.myShip.location.system.systemSize));
     }
 
+    static getDestCargo() {
+        return (this.myShip.location.system.getValuable(undefined, this.myShip.location));
+    }
+
     // Rest are implementarions of the individual animate fucntions..
     static navigateTo() {
+        if (undefined == this.destination) {
+            // Cant navigate to an undefined ... give up.
+            return (true);
+        }
+
         // We know what where we want to go.
         // Let individual AI decide how to get there.
         return (this.navigateToDest(this.destination));
     }
 
     static navigateThrough() {
+        if (undefined == this.destination) {
+            // Cant navigate to an undefined ... give up.
+            return (true);
+        }
         // We know what where we want to go.
         // Let individual AI decide how to get there.
         return (this.navigateThroughDest(this.destination));
@@ -105,7 +128,7 @@ class NavMode {
     static dock() {
         // If docking blocked give up.
         if (this.getShip().getLocation().distanceTo(this.destination.getLocation()) > this.getShip().getGame().getShip().getLocation().distanceTo(this.destination.getLocation())) {
-            return(true);
+            return (true);
         }
 
         if (null != this.myShip.dockedWith) {
@@ -145,7 +168,7 @@ class BasicAI {
     // Navigation program.
     // Loops until it hits STOP.
     program = new Array(
-        // NavMode.RANDOM,
+        NavMode.RANDOM,
         NavMode.STATION_APPROACH,
         NavMode.STATION_DOCK,
         NavMode.WAIT,
@@ -168,7 +191,6 @@ class BasicAI {
     constructor(myShip) {
         this.myShip = myShip;
         this.pc = 0;
-        this.destination = this.program[this.pc].getDest(this);
     }
 
     getShip() {
@@ -176,12 +198,18 @@ class BasicAI {
     }
 
     animate(date) {
-        let done = this.program[this.pc].animate(this, date);
+        let navMode = this.program[this.pc];
+
+        if ((navMode.hasDest()) && (undefined == this.destination)) {
+            this.destination = navMode.getDest(this);
+        }
+
+        let done = navMode.animate(this, date);
 
         if (done) {
             // Got there. 
             this.incPc();
-            this.destination = this.program[this.pc].getDest(this);
+            this.destination = undefined;
         }
     }
 
@@ -219,7 +247,7 @@ class BasicAI {
         }
         return (this.navigateToLoc(dest, false));
     }
- 
+
     // Navigate to a location. 
     // Return 'true' on arrival.
     navigateToLoc(loc, stop) {
@@ -261,15 +289,15 @@ class BasicAI {
         let done = Math.abs(dist) < 1;
         return (done);
     }
-   
+
     // Get shortest vector to a location. May be through wrap round.
     getShortestVec(loc) {
         let vec = loc.clone();
         vec.sub(this.myShip.location);
         vec.add(this.myShip.location);
-        return(vec);
+        return (vec);
     }
-    
+
     // Rotate towards a relative vector.
     // Return true if in the fwd arc and angle is acceptable.
     rotateTowardsVector(loc) {
@@ -313,11 +341,11 @@ class BasicAI {
         }
 
         if (stop && rotated) {
-            return(false);
+            return (false);
         }
 
         return (delta.x > 0);
     }
 }
 
-export default BasicAI;
+export { BasicAI, NavMode };

@@ -7,10 +7,13 @@ import { MineralType } from '../../../GameItems/minerals.js';
 import GoodsSet from '../../../Trade/goodsSet.js';
 import { Component } from '../component.js';
 import BugError from '../../../Game/bugError.js';
+import { MineralTypes } from '../../../GameItems/minerals.js';
+import PlayerShip from '../../playerShip.js';
 
 class BaySet extends ComponentSet {
 
-    // Capacity
+    // Cached values
+    contentMass;
     capacity;
 
     // Stored stuff.
@@ -21,9 +24,6 @@ class BaySet extends ComponentSet {
     //   Key = An instance of the good in the catalog.
     //   Value = The number of the good.
     tradeGoods;
-
-    // Mass of contents
-    contentMass = 0;
 
     constructor(sets, slots) {
         super("Cargo bays", "Cargo bay", sets, slots);
@@ -104,6 +104,23 @@ class BaySet extends ComponentSet {
         this.contentMass += this.tradeGoods.getMass();
     }
 
+    getTotalMass() {
+        return (this.mass + this.getContentMass());
+    }
+
+    // Get total current mass of contents.
+    getContentMass() {
+        return (this.contentMass);
+    }
+
+    getCapacity() {
+        return (this.capacity);
+    }
+
+    getAvailableCapacity() {
+        return (this.getCapacity() - this.getContentMass());
+    }
+
     loadMineral(mineral, mass) {
 
         // Load it all.
@@ -119,8 +136,6 @@ class BaySet extends ComponentSet {
 
         // Dump any overspill.
         this.level();
-
-        this.recalc();
     }
 
     loadGoods(goods) {
@@ -158,10 +173,6 @@ class BaySet extends ComponentSet {
         this.level();
     }
 
-    getAvailableCapacity() {
-        return (this.capacity - this.getContentMass());
-    }
-
     unloadGoods(goods, number) {
         if (goods instanceof Component) {
             if (!this.components.has(goods)) {
@@ -195,7 +206,9 @@ class BaySet extends ComponentSet {
 
         let spaceReqd = this.getContentMass() - this.capacity;
         if (0 < spaceReqd) {
-            this.getGame().displays.addMessage("Bay full. Dumping surplus " + spaceReqd + "(t)");
+            if (this.getShip() instanceof PlayerShip) {
+                this.getGame().displays.addMessage("Bay full. Dumping surplus " + spaceReqd + "(t)");
+            }
         }
 
         // First dump minerals
@@ -242,7 +255,7 @@ class BaySet extends ComponentSet {
             let dumpNumber = cheapest.getNumber();
             if (spaceReqd < cheapest.getMass()) {
                 // Do partial dump
-                dumpNumber = Math.ceil(spaceReqd/(cheapest.getMass()/cheapest.getNumber()));
+                dumpNumber = Math.ceil(spaceReqd / (cheapest.getMass() / cheapest.getNumber()));
             }
 
             // Delete it.
@@ -252,7 +265,6 @@ class BaySet extends ComponentSet {
 
         this.recalc();
     }
-
 
     takeDamage(hits, that) {
         super.takeDamage(hits, that);
@@ -276,8 +288,10 @@ class BaySet extends ComponentSet {
         min.setActive(true);
 
         min.separateFrom(ship);
-    } 
-    
+
+        this.recalc();
+    }
+
     dumpGoods(goods, number) {
 
         if (undefined === number) {
@@ -298,6 +312,50 @@ class BaySet extends ComponentSet {
 
         crate.setActive(true);
         crate.separateFrom(ship);
+
+        this.recalc();
+    }
+
+    dumpAll() {
+        for (let good of this.tradeGoods) {
+            this.dumpGoods(good);
+        }
+
+        for (let [mineral, mass] of this.minerals) {
+            this.dumpMineral(mineral);
+        }
+    }
+
+    // Load random cargo up to a given value.
+    loadRandomCargo(value) {
+        while (value > 10) {
+            let cost = Math.floor(value * Math.random());
+            value -= cost;
+
+            switch (Math.floor(Math.random() * 4)) {
+                case 0:
+                    // Make mineral
+                    let type = MineralTypes[1 + Math.floor(Math.random() * (MineralTypes.length - 1))];
+                    let mass = Math.ceil(cost / type.value);
+                    this.loadMineral(type, mass);
+                    break;
+
+                case 1:
+                    // Make goods.
+                    let good = new (this.getGame().goodsList.getRandomElement()).constructor();
+                    good.number = Math.ceil(cost / good.type.cost);
+                    this.loadGoods(good);
+                    break;
+
+                case 2:
+                    // Todo make component.
+                    break;
+
+                default:
+                    // Don't make anything.
+                    break;
+            }
+        }
     }
 
     // Unload a mineral.
@@ -326,10 +384,6 @@ class BaySet extends ComponentSet {
         return (mass);
     }
 
-    // Get total current mass of contents.
-    getContentMass() {
-        return (this.contentMass);
-    }
 }
 
 export default BaySet;

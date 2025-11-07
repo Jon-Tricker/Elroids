@@ -4,17 +4,25 @@ import ComponentSet from '../componentSet.js'
 
 class EngineSet extends ComponentSet {
 
+    // Cached total thrust
+    thrust;
+
     constructor(sets, slots) {
         super("Engines", "Engine", sets, slots);
         this.recalc();
     }
 
-    getThrust() {
-        let thrust = 0;
+    recalc() { 
+        super.recalc();
+        
+        this.thrust = 0;
         for (let engine of this) { 
-            thrust += engine.getThrust();
+            this.thrust += engine.getThrust();
         }
-        return (thrust);
+    }
+
+    getTotalThrust() {
+        return(this.thrust);
     }
 }
 

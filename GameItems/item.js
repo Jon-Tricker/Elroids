@@ -46,11 +46,7 @@ class Item extends THREE.Group {
     dockedWith = null;
 
     // Construct with optional mass
-    constructor(location, speed, size, mass, hitPoints, owner, immobile, buffer) {
-        if (undefined != buffer) {
-            throw new BugError("Too many args for Item.")
-        }
-
+    constructor(location, speed, size, mass, hitPoints, owner, immobile) {
         super();
         this.location = location.clone();
         this.setSpeed(speed);
@@ -257,7 +253,7 @@ class Item extends THREE.Group {
         return (this.mass);
     }
 
-    // Get mass including any contents.
+    // Most things don't have any content
     getTotalMass() {
         return (this.mass);
     }
@@ -635,6 +631,17 @@ class Item extends THREE.Group {
         if (undefined != sound) {
             sound.stop();
         }
+    }     
+    
+    // Get relative value with optional weigthing for proximity.
+    getRelativeValue(loc) {
+        let value = this.getValue();
+        if (undefined == loc) {
+            return(value);
+        } 
+
+        let dist = loc.getRelative(this.location).length();
+        return(value/(dist + 100));
     }
 }
 

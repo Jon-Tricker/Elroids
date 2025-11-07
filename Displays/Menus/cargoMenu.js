@@ -20,8 +20,7 @@ class CargoMenu {
         let doc = "";
 
         doc += "<P>"
-        doc += "<P>Total capacity " + ship.getCargoCapacity() + "(t)</P>"
-        doc += "<P>Current load " + ship.hull.compSets.baySet.getContentMass() + "(t)</P>"
+        doc += "<P>Total capacity " + ship.getCargoCapacity() + "(t), Current load " + ship.hull.compSets.baySet.getContentMass() + "(t)</P>"
         doc += "<BR />"
 
         doc += CargoMenu.displayMinerals(ship);
@@ -155,6 +154,9 @@ class CargoMenu {
             heads.push("Name");
             heads.push("Mass(t)");
             heads.push("Number");
+            if (null == ship.dockedWith) {
+                heads.push("Value");
+            }
             heads.push("Details");
             heads.push("Legal")
             if (null != ship.dockedWith) {
@@ -169,6 +171,9 @@ class CargoMenu {
                 vals.push(good.getName());
                 vals.push(good.getMass());
                 vals.push(good.number);
+                if (null == ship.dockedWith) {
+                    vals.push(good.getValueInSystem(ship.location.system));
+                }
                 vals.push("<button type=\"button\" onclick=\"CargoMenu.onDetailsClick(this, cursor)\">Show</button>");
                 vals.push(good.isLegal(ship.location.system));
                 if (null != ship.dockedWith) {

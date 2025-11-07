@@ -9,10 +9,6 @@ class WeaponSet extends ComponentSet {
         this.recalc();
     }
 
-    recalc() {
-        super.recalc();
-    }
-
     // Fire all selected weapons.
     fire(target, date) {
 

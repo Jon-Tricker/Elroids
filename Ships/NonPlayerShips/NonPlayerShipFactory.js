@@ -6,12 +6,13 @@
 
 import JSONSet from "../../Game/Utils/jsonSet.js";
 import Freighter from "./Freighter.js";
+import Smuggler from "./Smuggler.js";
 
 class NPShipFactory {
 
     // List of all ship types.
     // JSONSet is used for it's utilities. It is not stored as JSON.
-    static shipTypes = new JSONSet ([Freighter]);
+    static shipTypes = new JSONSet ([Freighter, Smuggler]);
 
     // Create a random ship
     static createRandom(location) {

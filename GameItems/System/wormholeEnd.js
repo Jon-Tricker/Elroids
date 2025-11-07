@@ -37,7 +37,7 @@ const HALO_MATERIAL = new THREE.MeshStandardMaterial(
 // One end of a wormhole. Including the graphics.
 // Since it exists in one System this can be an Item.
 class WormholeEnd extends NonShipItem {
-    
+
     // Parent
     wormhole;
 
@@ -54,7 +54,7 @@ class WormholeEnd extends NonShipItem {
             backgroundColour = new THREE.Color("black");
         }
         this.backgroundColour = backgroundColour;
-        
+
         this.setupMesh();
 
         this.addLabel(name);
@@ -75,30 +75,33 @@ class WormholeEnd extends NonShipItem {
     // Return true if sucessful.
     // For now only Ships go through wormholes.
     enter(that) {
+        // Remove that from current system.
+        this.location.system.removeItem(that);
+
+        if (!(that instanceof PlayerShip)) {
+            that.destruct();
+            return (true);
+        }
+
         // Get far end
         let farEnd = this.wormhole.getFarEnd(this.location.system);
 
         // Do 'warp' animation.
         this.getGame().displays.addMessage("Entering " + farEnd.location.system.getName());
 
-        // Remove that from current system.
-        this.location.system.removeItem(that);
+        // Deactivate current system.
+        this.location.system.setActive(false);
 
-        if (that instanceof PlayerShip) {
-            // Deactivate current system.
-            this.location.system.setActive(false);            
-
-            // Place in limbo.
-            this.location.system.universe.system = undefined;
-            that.location.system = this.undefined;
-        }
+        // Place in limbo.
+        this.location.system.universe.system = undefined;
+        that.location.system = this.undefined;
 
         farEnd.exit(that);
 
-        return(true);
+        return (true);
     }
 
-    exit(that) {  
+    exit(that) {
         if (that instanceof PlayerShip) {
 
             // Switch universe to far system
@@ -122,7 +125,7 @@ class WormholeEnd extends NonShipItem {
         that.location = loc;
 
         // Move it outside
-        that.separateFrom(this);  
+        that.separateFrom(this);
     }
 
     getRadarColour() {
@@ -137,9 +140,9 @@ class WormholeEnd extends NonShipItem {
                 color: "white",
                 roughness: 1,
                 opacity: 1,
-        
+
                 map: new StarFieldTexture(RADIUS * 10, RADIUS * 10, 0.5, this.backgroundColour).getTexture(),
-        
+
                 // Show back of sphere.
                 side: THREE.BackSide,
                 metalness: 0,
@@ -155,7 +158,7 @@ class WormholeEnd extends NonShipItem {
         holeGeom.computeVertexNormals();
         haloGeom.computeVertexNormals();
 
-        this.holeMesh = new THREE.Mesh(holeGeom, holeMaterial);   
+        this.holeMesh = new THREE.Mesh(holeGeom, holeMaterial);
         this.holeMesh.castShadow = false;
         this.holeMesh.receiveShadow = false;
         this.haloMesh = new THREE.Mesh(haloGeom, HALO_MATERIAL);

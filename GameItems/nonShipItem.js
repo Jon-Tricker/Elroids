@@ -1,4 +1,9 @@
 // Items that ane not the ship
+
+// Copyright (C) Jon Tricker 2023, 2025.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import Item from './item.js';
 import Explosion from './explosion.js';
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
@@ -57,7 +62,9 @@ class NonShipItem extends Item {
     // Return 'true' if destroyed.
     takeDamage(hits, that) {
         let destroyed = super.takeDamage(hits, that);
+
         if (destroyed) {
+            // Has to be here because otherwise a circular dependancy between Item and Explosion.
             new Explosion(this.size, this);
         }
         return (destroyed);

@@ -25,10 +25,6 @@ class HullSet extends ComponentSet {
 
         }
     }
-
-    getHp() {
-        return(this.totalHp);
-    }  
     
     getMaxSpeed() {
         return(this.maxSpeed);

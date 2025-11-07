@@ -1,5 +1,9 @@
 // A group of component sets, for example, a shopping catalogue.
 
+// Copyright (C) Jon Tricker 2023, 2025.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import EngineSet from "./Engines/engineSet.js";
 import AvionicsSet from "./Avionics/avionicsSet.js";
 import HullSet from "./Hulls/hullSet.js";
@@ -18,6 +22,10 @@ class ComponentSets extends JSONSet {
     weaponSet;
     baySet;
 
+    // Cached values
+    mass;
+    hp;
+
     constructor(ship, hullSlots, engineSlots, weaponSlots, baySlots, avionicsSlots) {
         super();
         this.ship = ship;
@@ -33,6 +41,8 @@ class ComponentSets extends JSONSet {
         super.add(this.baySet); 
         this.avionicsSet = new AvionicsSet(this, avionicsSlots);
         super.add(this.avionicsSet);
+
+        this.recalc();
     }
 
     toJSON(skip) {
@@ -48,6 +58,28 @@ class ComponentSets extends JSONSet {
         return (json)
     }
 
+    recalc() {
+        this.mass = 0;
+        this.hp = 0;
+        for (let set of this) {
+            set.recalc();
+            this.mass += set.getMass(); 
+            this.hp += set.getCurrentHp();
+        }
+    }  
+    
+    getMass() {
+        return (this.mass);
+    }
+
+    getTotalMass() {
+        return(this.mass + this.baySet.getContentMass());
+    }
+
+    getTotalThrust() {
+        return(this.engineSet.getTotalThrust());
+    }
+
     getGame() {
         return (this.ship.getGame());
     }
@@ -57,6 +89,8 @@ class ComponentSets extends JSONSet {
             // Damage a random set.
             hits -= this.getRandomElement().takeDamage(1);
         }
+
+        this.recalc();
     }
 
     // Get a component by class name.
@@ -85,25 +119,12 @@ class ComponentSets extends JSONSet {
     }
 
     getCurrentHp() {
-        let hp = 0;
-        for (let set of this) {
-            hp += set.getCurrentHp();
-        }
-        return (hp);
-    }
-
-    getMass() {
-        let mass = 0;
-
-        for (const set of this) {
-            mass += set.getMass();
-        }
-
-        return (mass);
+        return (this.hp);
     }
 
     delete(comp) {
         comp.getSet.delete(comp);
+        this.recalc();
     }
 
 }

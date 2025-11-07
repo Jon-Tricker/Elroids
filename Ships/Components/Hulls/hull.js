@@ -123,6 +123,10 @@ class Hull extends Component {
     width;
     length;
 
+    // Cached values. Only recalculate when hull changes.
+    totalMass;
+
+    maxSpeed;
 
     // Create ship material.
     static shipMaterial = new THREE.MeshStandardMaterial(
@@ -148,9 +152,6 @@ class Hull extends Component {
             side: THREE.FrontSide,
         }
     )
-
-
-    maxSpeed;
 
     mesh = new THREE.Group();
 
@@ -200,6 +201,10 @@ class Hull extends Component {
         hull.compSets.baySet.loadFromJSON(json.cargo);
 
         return (hull);
+    }
+
+    recalc() {
+        this.compSets.recalc();
     }
 
     getDescription() {

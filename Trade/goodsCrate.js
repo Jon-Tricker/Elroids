@@ -40,6 +40,10 @@ class GoodsCrate extends NonShipItem2 {
     this.expiryTime = this.getUniverse().getTime() + TTL;
   }
 
+  getValue() {
+    return(this.contents.getValueInSystem(this.location.system));
+  }
+  
   getRadarColour() {
     return (COLOUR);
   }

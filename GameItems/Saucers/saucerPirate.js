@@ -64,12 +64,12 @@ class SaucerPirate extends Saucer {
             }
             targetLoc = this.farAway;
         } else {
-            if ((null == this.target) || this.target.isDestructed()) {
+            if ((undefined == this.target) || this.target.isDestructed()) {
                 // Find a new target
-                this.target = this.getTarget();
+                this.target = this.location.system.getValuable(Mineral, this.location);
             }
 
-            if (null == this.target) {
+            if (undefined == this.target) {
                 // Loiter
                 this.farAway = this.createLoiterLocation();
                 targetLoc = this.farAway;
@@ -83,7 +83,7 @@ class SaucerPirate extends Saucer {
         this.thrust(THRUST, targetSpeed, MAX_SPEED);
     }
 
-    getMass() {
+    getTotalMass() {
         return(this.mass + this.cargoMass);
     }
 
@@ -116,20 +116,6 @@ class SaucerPirate extends Saucer {
         }
     }
 
-    // Get high value target.
-    // null if none available.
-    getTarget() {
-        let maxValTarget = null;
-        for (let that of this.location.system.items) {
-            if (that instanceof Mineral) {
-                if ((null == maxValTarget) || (that.getValue() > maxValTarget.getValue())) {
-                    maxValTarget = that;
-                }
-            }
-        }
-        return (maxValTarget);
-    }
-
     handleCollision(that) {
         if (that instanceof Mineral) {
             return (this.mineralPickup(that));
@@ -142,8 +128,8 @@ class SaucerPirate extends Saucer {
         // If cargo on board make new mineral.
         this.cargoMass = Math.floor(this.cargoMass);
         if (0 < this.cargoMass) {
-            let thisLoc = this.getLocation();
-            new Mineral(this.cargoMass, new Location(thisLoc.x, thisLoc.y, thisLoc.z, this.system), this.speed, this.cargoType);
+            let min = new Mineral(this.cargoMass, this.location, this.speed, this.cargoType);
+            min.setActive(true);
         }
         super.destruct();
     }

@@ -7,6 +7,8 @@ import SkyBox from "../../Game/Scenery/skyBox.js";
 import { MineralTypes } from "../minerals.js";
 import JSONSet from "../../Game/Utils/jsonSet.js";
 import BugError from "../../Game/bugError.js";
+import GoodsCrate from "../../Trade/goodsCrate.js";
+import Mineral from "../mineral.js";
 
 // Specification of a star system.
 class SystemSpec {
@@ -127,7 +129,7 @@ class System {
 
         this.createSkyBox(background, json)
     }
-    
+
     createSkyBox(background, json) {
         if (undefined === json) {
             // Create static elements.
@@ -147,7 +149,7 @@ class System {
             skyBox: this.skyBox.toJSON()
         }
 
-        return(json);
+        return (json);
     }
 
     static fromJSON(json, universe) {
@@ -204,7 +206,7 @@ class System {
                 }
             }
         }
-        throw(new BugError("Cannot find item ID " + id + " in " + this.name + " system."))
+        throw (new BugError("Cannot find item ID " + id + " in " + this.name + " system."))
     }
 
     addWormholeEnd(hole) {
@@ -232,10 +234,45 @@ class System {
             item.animate(date, keyBoard);
 
             // IF not still the current system give up.
-            if(this.universe.system != this) {
+            if (this.universe.system != this) {
                 return;
             }
         }
+    }
+
+    // Gets this most valuable floating item of a given class.
+    // Class 'undefined' is a wild card.
+    // If a location is passes weights the result for closeness. 
+    // Returns undefined if nothing available.
+    getValuable(type, location) {
+        let maxValTarget;
+
+        if (undefined == type) {
+            let minTarget = this.getValuable(Mineral, location);
+            let crateTarget = this.getValuable(GoodsCrate, location);
+            if (undefined != minTarget) {
+                if ((undefined == crateTarget) || (minTarget.getRelativeValue(location) > crateTarget.getRelativeValue(location))) {
+                    return(minTarget);
+                }
+            }
+            return(crateTarget);
+        }
+
+        for (let that of this.items) {
+            if (that instanceof type) {
+
+                let value = that.getValue();
+                if (undefined != location) {
+                    value = that.getRelativeValue(location)
+                }
+
+                if ((undefined == maxValTarget) || (value > maxValTarget.getValue())) {
+                    maxValTarget = that;
+                }
+            }
+        }
+
+        return (maxValTarget);
     }
 }
 

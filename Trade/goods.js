@@ -225,7 +225,7 @@ class Goods {
 
         this.unloadFromShip(number);
 
-        if(!this.isLegal(ship.system)) {
+        if(!this.isLegal(ship.location.system)) {
             // ToDo: Add more complex penalties/benefits fro illegal sales.=
             if(Math.random() < 0.5) {
                 ship.playSound("police");

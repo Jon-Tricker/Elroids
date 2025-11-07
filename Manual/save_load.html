@@ -21,7 +21,6 @@
 
 	<H2>Introduction.</H2>
 	<P>The game Save/Load mechanism is a little complex.</P>
-	<P>This is currently a work in progress. Ship interal state and cargo are not yet saved.</P>
 
 	<H2>The technical stuff.</H2>
 	<P>Elroids is a 'javascript' game. The good thing about javascript is that it runs in a browser and has very little access to the host machine (i.e. your computer) resources. Paticulary it's file system.</P>
@@ -30,7 +29,7 @@
 	<P>The mechanism used may be browser specific. I have tested on Chrome, Edge and Firefox. On other browsers results may be unpredictable.</P>
 	<P>So how does it work?</P>
 	<UL>
-		<LI>Save - Uses the 'download' functionality. It drops a single file 'ElroidSav.txt' into your 'downloads' folder (the only place it can write).</LI>
+		<LI>Save - Uses the 'download' functionality. It drops a single file 'ElroidSav.txt' into your 'downloads' folder (the only place it is allowed to write).</LI>
 		<LI>Load - Invokes your local file selector. You can then pick a file, normally the save image, to upload. It can only read the selcted file.</LI>
 	</UL>
 
@@ -38,6 +37,7 @@
 	<P>Save files are simple (JSON) text.</P>
 	<P>They can be renamed/moved (e.g. for backup or multiple save postions) and should still load without problems.</P>
 	<P>They can also be examined/edited with any text editor ... Yes you can 'cheat' but, in a single player game, what's the point?</P>
+	<P>Only a subset of game config is saved. NPShip/Rock etc. detalis are lost and ramdomly re-created on reload.</P>
 
 </BODY>
 </HTML>

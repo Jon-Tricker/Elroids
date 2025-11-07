@@ -9,14 +9,7 @@ import * as THREE from 'three';
 import Ship from './ship.js';
 import MyCamera from '../Game/Scenery/myCamera.js';
 import BasicHull from './Components/Hulls/basicHull.js';
-import MediumHull from './Components/Hulls/mediumHull.js';
-import LargeHull from './Components/Hulls/largeHull.js';
-import Mineral from "../GameItems/mineral.js";
-import Station from '../GameItems/System/station.js';
-import WormholeEnd from '../GameItems/System/wormholeEnd.js';
-import GoodsCrate from '../Trade/goodsCrate.js';
 import Location from '../Game/Utils/location.js';
-
 
 class PlayerShip extends Ship {
 
@@ -32,8 +25,6 @@ class PlayerShip extends Ship {
         super(height, width, length, location);
 
         this.originalPosition = location.clone();
-
-        this.buildShip();
 
         this.createCameras();
     }
@@ -52,25 +43,18 @@ class PlayerShip extends Ship {
         super.fromJSON(json, system, newShip);
 
         return (newShip);
+    }    
+    
+    // Build/Rebuild ship components.
+    buildShip() {
+        // Create hull
+        // Will also create all other components, for that hull type, and add them to our components sets.
+        super.buildShip(BasicHull);
     }
 
     // Work round for circular dependency with Item class.
     isShip() {
         return (true);
-    }
-
-    // Build/Rebuild ship components.
-    buildShip() {
-        // Create hull
-        // Will also create all other components, for that hull type, and add them to our components sets.
-        this.hull = new BasicHull();
-        // this.hull = new MediumHull();
-        //this.hull = new LargeHull();
-
-        this.hull.buildShip(this);
-
-        // Add in weight of all components.
-        this.mass = this.getMass();
     }
 
     createCameras() {
@@ -93,15 +77,6 @@ class PlayerShip extends Ship {
 
     getChaseCamera() {
         return (this.chaseCamera);
-    }
-
-    // Get total available thrust
-    getThrust() {
-        return (this.hull.compSets.engineSet.getThrust());
-    }
-
-    getMaxSpeed() {
-        return (this.hull.compSets.hullSet.getMaxSpeed());
     }
 
     setEngineSound(state) {
@@ -193,6 +168,8 @@ class PlayerShip extends Ship {
         } else {
             this.playSound('clang');
         }
+
+        this.recalc();
     }
 
     moveMesh() {
@@ -215,11 +192,6 @@ class PlayerShip extends Ship {
         this.setSpeed(new THREE.Vector3(0, 0, 0));
     }
 
-    // Get cargo bay
-    getBays() {
-        return (this.hull.compSets.baySet);
-    }
-
     // Get termnal (if active)
     getTerminal() {
         return (this.getGame().displays.terminal);
@@ -228,9 +200,9 @@ class PlayerShip extends Ship {
     // Pick up a mineral.
     // Return true if successful.
     mineralPickup(mineral) {
-        let mass = Math.ceil(mineral.mass);
         let res = super.mineralPickup(mineral)
         if (res) {
+            let mass = Math.ceil(mineral.mass);
             this.getGame().displays.addMessage("Loaded " + mineral.type.name + " " + mass + "(t)");
             this.playSound('thud');
         }
@@ -240,17 +212,12 @@ class PlayerShip extends Ship {
     // Pick up a goods crate.
     // Return true if successful.
     cratePickup(crate) {
-        this.getGame().displays.addMessage("Loaded " + crate.contents.number + " X " + crate.contents.getName());
-
-        // Store goods
         let res = super.cratePickup(crate);
-        this.playSound('thud');
+        if (res) {
+            this.getGame().displays.addMessage("Loaded " + crate.contents.number + " X " + crate.contents.getName());
+            this.playSound('thud');
+        }
         return (res);
-    }
-
-    // Load goods into bay.
-    loadGoods(goods) {
-        this.hull.compSets.baySet.loadGoods(goods);
     }
 
     addCredits(score) {
@@ -266,28 +233,6 @@ class PlayerShip extends Ship {
         return (this.getGame().player.getCredits());
     }
 
-    handleCollision(that) {
-        if (that instanceof Mineral) {
-            return (this.mineralPickup(that));
-        }
-
-        if (that instanceof GoodsCrate) {
-            return (this.cratePickup(that));
-        }
-
-        if (that instanceof Station) {
-            if (that.collideWithShip(this)) {
-                return;
-            }
-        }
-
-        if (that instanceof WormholeEnd) {
-            // Try to traverse wormhole.
-            return (that.enter(this));
-        }
-
-        return (super.handleCollision(that));
-    }
 
     dock(station) {
         if (!super.dock(station)) {
@@ -313,37 +258,11 @@ class PlayerShip extends Ship {
         super.undock();
     }
 
-    loadMineral(mineral, mass) {
-        this.hull.compSets.baySet.loadMineral(mineral, mass);
-    }
-
-    // Return mass unloaded.
-    unloadMineral(mineral, mass) {
-        return (this.hull.compSets.baySet.unloadMineral(mineral, mass));
-    }
-
     sellMineral(mineral, mass) {
         let value = Math.floor(this.location.system.spec.getMineralValue(mineral) * mass);
         this.unloadMineral(mineral, mass);
         this.addCredits(value);
     }
-
-    getCargoCapacity() {
-        return (this.hull.compSets.baySet.capacity)
-    }
-
-    getCargo() {
-        return (this.hull.compSets.baySet)
-    }
-
-    getMass() {
-        return (this.hull.compSets.getMass());
-    }
-
-    getTotalMass() {
-        return (this.getMass() + this.hull.compSets.baySet.getContentMass())
-    }
-
 }
 
 export default PlayerShip;

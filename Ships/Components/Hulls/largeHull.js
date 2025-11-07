@@ -39,6 +39,8 @@ class LargeHull extends Hull {
         new BasicBay(this.compSets.baySet);
         new BasicRadar(this.compSets.avionicsSet);
         new BasicCompass(this.compSets.avionicsSet);
+
+        this.recalc();
     }
 
     getMesh() {

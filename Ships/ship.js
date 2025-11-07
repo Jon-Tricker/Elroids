@@ -10,6 +10,10 @@ import Item from '../GameItems/item.js';
 import { Hull } from './Components/Hulls/hull.js';
 import Explosion from '../GameItems/explosion.js';
 import Universe from '../GameItems/universe.js';
+import Mineral from '../GameItems/mineral.js';
+import GoodsCrate from '../Trade/goodsCrate.js';
+import Station from '../GameItems/System/station.js';
+import WormholeEnd from '../GameItems/System/wormholeEnd.js';
 
 // Slightly damped attitude contols to allow fine adjustment.
 const ROTATE_RATE_DELTA = 0.125;        // r/s
@@ -40,6 +44,8 @@ class Ship extends Item {
         this.height = height;
         this.width = width;
         this.length = length;
+
+        this.buildShip();
     }
 
     toJSON() {
@@ -69,6 +75,19 @@ class Ship extends Item {
         // Make new hull.
         // Will also add it to ship.
         Hull.fromJSON(json.hull, ship);
+
+        ship.recalc();
+    }
+
+    recalc() {
+        this.hull.recalc();
+    }
+   
+    buildShip(hullType) {
+        this.hull = new hullType();
+        this.hull.buildShip(this);
+
+        this.recalc();
     }
 
     setActive(state) {
@@ -106,11 +125,16 @@ class Ship extends Item {
 
     // Get total available thrust
     getThrust() {
-        return (0);
+        return (this.hull.compSets.getTotalThrust());
     }
 
     getMaxSpeed() {
         return (this.hull.getMaxSpeed());
+    }
+
+    // Get cargo bay
+    getBays() {
+        return (this.hull.compSets.baySet);
     }
 
     accelerate() {
@@ -215,6 +239,9 @@ class Ship extends Item {
         if (destroyed) {
             new Explosion(this.size, this);
         }
+
+        this.recalc();
+
         return (destroyed);
     }
 
@@ -225,7 +252,6 @@ class Ship extends Item {
         }
     }
 
-
     // Some on line magic to get the current directions X access
     getOrientation() {
         let e = this.matrixWorld.elements;
@@ -235,13 +261,32 @@ class Ship extends Item {
         return (xDirection);
     }
 
-    handleCollision(that) {
+    handleCollision(that) { 
         // Can't get hit while docked.
         if (null != this.dockedWith) {
             return (false)
         }
 
-        super.handleCollision(that);
+        if (that instanceof Mineral) {
+            return (this.mineralPickup(that));
+        }
+
+        if (that instanceof GoodsCrate) {
+            return (this.cratePickup(that));
+        }
+
+        if (that instanceof Station) {
+            if (that.collideWithShip(this)) {
+                return;
+            }
+        }
+
+        if (that instanceof WormholeEnd) {
+            // Try to traverse wormhole.
+            return (that.enter(this));
+        }
+
+        return (super.handleCollision(that));
     }
 
     dock(station) {
@@ -286,10 +331,6 @@ class Ship extends Item {
         return (true);
     }
 
-    // Load goods into bay.
-    loadGoods(goods) {
-    }
-
     // Pick up a mineral.
     // Return true if successful.
     mineralPickup(mineral) {
@@ -297,9 +338,41 @@ class Ship extends Item {
         this.loadMineral(mineral.type, mass);
         mineral.destruct();
         return (true);
+    }    
+    
+    loadMineral(mineral, mass) {
+        this.hull.compSets.baySet.loadMineral(mineral, mass);
+
+        this.recalc();
     }
 
-    loadMineral(mineral, mass) {
+    // Return mass unloaded.
+    unloadMineral(mineral, mass) {
+        let unloaded = this.hull.compSets.baySet.unloadMineral(mineral, mass);
+        this.recalc();
+        return (unloaded);
+    }
+
+    // Load goods into bay.
+    loadGoods(goods) {
+        this.hull.compSets.baySet.loadGoods(goods);
+        this.recalc();
+    }
+
+    getCargoCapacity() {
+        return (this.hull.compSets.baySet.getCapacity())
+    }
+
+    getCargo() {
+        return (this.hull.compSets.baySet)
+    }
+
+    getMass() {
+        return (this.hull.compSets.getMass());
+    }
+
+    getTotalMass() {
+        return (this.getMass() + this.hull.compSets.baySet.getContentMass())
     }
 }
 

@@ -6,9 +6,22 @@ import GoodsSet from '../../Trade/goodsSet.js';
 
 class ComponentSet extends GoodsSet {
 
+    // Cached values
+    hp;
+
     // If slots is undefined can have an unlimited number of components.
     constructor(plural, singular, sets, slots) {
         super(plural, singular, sets, slots);
+    }
+
+    recalc() {   
+        super.recalc();
+        
+        this.hp = 0;
+        this.mass
+        for (let comp of this) {
+            this.hp += comp.getCurrentHp()
+        }
     }
 
     takeDamage(hits) {
@@ -60,11 +73,7 @@ class ComponentSet extends GoodsSet {
     }
 
     getCurrentHp() {
-        let hp = 0;
-        for (let comp of this) {
-            hp += comp.getCurrentHp()
-        }
-        return (hp);
+        return(this.hp);
     }
 }
 

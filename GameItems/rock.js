@@ -64,7 +64,7 @@ class Rock extends NonShipItem2 {
     system.rockCount++;
 
     if (system == system.universe.system) {
-        this.setActive(true);
+      this.setActive(true);
     }
   }
 
@@ -132,6 +132,10 @@ class Rock extends NonShipItem2 {
     }
   }
 
+  getValue() {
+    return(this.composition.getValue() * this.getMass())
+  }
+
   split() {
     let newSize = Math.floor(this.rockSize / 2);
 
@@ -166,8 +170,8 @@ class Rock extends NonShipItem2 {
 
       if (0 < newComp.getValue()) {
         let rock = new Rock(newSize, loc, new THREE.Vector3(spd.x * ratio2.x, spd.y * ratio2.y, spd.z * ratio2.z), newComp);
-        rock.setActive(true); 
-        
+        rock.setActive(true);
+
         // Possible recurse
         if (Math.random() < 0.1) {
           rock.split();
