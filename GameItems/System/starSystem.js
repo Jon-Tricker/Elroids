@@ -23,7 +23,7 @@ import Universe from '../universe.js';
 const RESPAWN_SIZE = 250;           // m
 
 // How often (average) are NPShips spawned.
-const NP_SHIP_FREQUENCY = 120000     // ms
+const NP_SHIP_FREQUENCY = 60000     // ms
 
 class StarSystem extends System {
     saucerCount = 0;

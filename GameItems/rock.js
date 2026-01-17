@@ -1,6 +1,6 @@
 // Rocks
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -59,13 +59,9 @@ class Rock extends NonShipItem2 {
       this.composition = composition;
     }
 
-    let system = this.location.system;
+    this.location.system.rockCount++;
 
-    system.rockCount++;
-
-    if (system == system.universe.system) {
-      this.setActive(true);
-    }
+    super.activateIfRequired();
   }
 
   destruct() {
@@ -160,7 +156,6 @@ class Rock extends NonShipItem2 {
 
       if (0 < this.composition.getValue()) {
         let rock = new Rock(newSize, loc, new THREE.Vector3(spd.x * ratio.x, spd.y * ratio.y, spd.z * ratio.z), this.composition);
-        rock.setActive(true);
 
         // Possible recurse
         if (Math.random() < 0.1) {
@@ -170,7 +165,6 @@ class Rock extends NonShipItem2 {
 
       if (0 < newComp.getValue()) {
         let rock = new Rock(newSize, loc, new THREE.Vector3(spd.x * ratio2.x, spd.y * ratio2.y, spd.z * ratio2.z), newComp);
-        rock.setActive(true);
 
         // Possible recurse
         if (Math.random() < 0.1) {

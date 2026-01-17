@@ -178,7 +178,7 @@ class CargoMenu {
                 vals.push(good.isLegal(ship.location.system));
                 if (null != ship.dockedWith) {
                     vals.push(good.getCost());
-                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, cursor, 1)\">" + good.getUnitCostInSystem(ship.system) + "</button>");
+                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, cursor, 1)\">" + good.getUnitCostInSystem(ship.location.system) + "</button>");
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, cursor, " + good.number + ")\">" + good.getValueInSystem(ship.location.system) + "</button>");
                 } else {
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onDumpGoodsClick(this, cursor)\">Dump</button>");

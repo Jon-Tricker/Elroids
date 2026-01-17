@@ -1,6 +1,6 @@
 // Goods container
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -38,6 +38,8 @@ class GoodsCrate extends NonShipItem2 {
     this.rotationRate = new THREE.Vector3(this.generateRotationRate(), this.generateRotationRate(), this.generateRotationRate());
 
     this.expiryTime = this.getUniverse().getTime() + TTL;
+
+    super.activateIfRequired();
   }
 
   getValue() {

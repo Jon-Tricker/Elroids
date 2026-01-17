@@ -3,6 +3,7 @@
 // Copyright (C) Jon Tricker 2023.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
+import * as THREE from 'three';
 import BugError from '../../Game/bugError.js';
 import Item from '../../GameItems/item.js';
 import Station from '../../GameItems/System/station.js';
@@ -126,15 +127,47 @@ class NavMode {
     }
 
     static dock() {
+        let ship = this.getShip();
+
         // If docking blocked give up.
-        if (this.getShip().getLocation().distanceTo(this.destination.getLocation()) > this.getShip().getGame().getShip().getLocation().distanceTo(this.destination.getLocation())) {
+        if (ship.getLocation().distanceTo(this.destination.getLocation()) > ship.getGame().getShip().getLocation().distanceTo(this.destination.getLocation())) {
             return (true);
         }
 
-        if (null != this.myShip.dockedWith) {
+        if (null != ship.dockedWith) {
             return (true);
         }
-        return (this.navigateToDest(this.destination));
+
+        if (this.navigateToDest(this.destination)) {
+            return (true)
+        }
+
+        NavMode.matchRotation(ship, this.destination);
+
+        return (false);
+    }
+
+    // Match rotation with station.
+    // Station bay is on the -x side. So actually rotating in the same direction.
+    // Return true if matched.
+    static matchRotation(ship, dest) {
+
+        // Due to rest of code X axes should be roughly aligned.
+        let rot = ship.getRelXAngle(dest);
+
+        // If close don't rotate.
+        if (Math.abs(rot) > 0.1) {
+            // +ive radians = counter clockwise.
+            if (rot > 0) {
+                ship.rollL();
+            } else {
+                ship.rollR();
+            }
+            return (false);
+        } else {
+            ship.rollRate = 0;
+        }
+        return (true);
     }
 
     static undock() {
@@ -227,11 +260,11 @@ class BasicAI {
             if (dest.isDestructed()) {
                 // It's gone
                 return (true)
-            } else {
-                return (this.navigateToLoc(dest.getLocation(), true));
             }
         }
-        return (this.navigateToLoc(dest, true));
+
+        let loc = this.getTargetLocation(dest);
+        return (this.navigateToLoc(loc, true));
     }
 
     // Navigate to a destination. Do not stop on arrival.
@@ -241,11 +274,27 @@ class BasicAI {
             if (dest.isDestructed()) {
                 // It's gone
                 return (true)
-            } else {
-                return (this.navigateToLoc(dest.getLocation(), false));
             }
         }
-        return (this.navigateToLoc(dest, false));
+
+        let loc = this.getTargetLocation(dest);
+        return (this.navigateToLoc(loc, false));
+    }
+
+    // Get 'location' we want to get to for a 'destination'.
+    // i.e. It's true location mofified by it's speed and our speed.
+    getTargetLocation(dest) {
+        let loc;
+        if (dest instanceof Item) {
+            loc = dest.getLocation().clone();
+            loc.add(dest.speed);
+        } else {
+            loc = dest.clone();
+        }
+
+        loc.sub(this.myShip.speed);
+
+        return (loc);
     }
 
     // Navigate to a location. 
@@ -313,17 +362,13 @@ class BasicAI {
         if (delta.y > THRESHOLD) {
             this.myShip.yawL();
             // Spaceships dont need to roll.
-            // Fake something, like an aircraft, so it looks right.
-            this.myShip.rollL();
             rotated = true;
         } else {
             if (delta.y < -THRESHOLD) {
                 this.myShip.yawR();
-                this.myShip.rollR();
                 rotated = true;
             } else {
                 this.myShip.yawRate = 0;
-                this.myShip.rollRate = 0;
             }
         }
 

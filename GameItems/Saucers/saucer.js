@@ -149,7 +149,6 @@ class Saucer extends NonShipItem {
                 let type = MineralTypes[1 + Math.floor(Math.random() * (MineralTypes.length -1))];
                 let mass = Math.ceil(value / type.value);
                 let mineral = new Mineral(mass, thisLoc, this.speed, type);
-                mineral.setActive(true);
                 break;
 
             case 1:
@@ -157,7 +156,6 @@ class Saucer extends NonShipItem {
                 let good = new (this.getGame().goodsList.getRandomElement()).constructor();
                 good.number = Math.ceil(value / good.type.cost);
                 let crate = good.makeCrate(thisLoc, this.speed);
-                crate.setActive(true);
                 break;
 
             case 2:

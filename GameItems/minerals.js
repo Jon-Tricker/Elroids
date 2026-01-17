@@ -182,7 +182,6 @@ class Composition {
           let bang = new THREE.Vector3((Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, (Math.random() * SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE, Math.random() * (SPLIT_VIOLENCE * 2) - SPLIT_VIOLENCE);
 
           let min = new Mineral(newMass, location, new THREE.Vector3(speed.x * speedRatio + bang.x, speed.y * speedRatio + bang.y, speed.z * speedRatio + bang.z), component.type);
-          min.setActive(true);
         }
       }
     }

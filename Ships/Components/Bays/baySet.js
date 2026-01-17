@@ -310,7 +310,6 @@ class BaySet extends ComponentSet {
         let shipLoc = ship.getLocation();
         let crate = good.makeCrate(shipLoc, new THREE.Vector3(ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random()));
 
-        crate.setActive(true);
         crate.separateFrom(ship);
 
         this.recalc();

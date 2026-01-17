@@ -34,9 +34,9 @@ class Mineral extends NonShipItem2 {
 
     this.type = type;
 
-    // this.setupMesh();
-
     this.expiryTime = this.getUniverse().getTime() + TTL;
+
+    super.activateIfRequired();
   }
 
   getRadarColour() {

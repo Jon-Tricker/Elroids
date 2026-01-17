@@ -19,7 +19,7 @@ import Displays from '../Displays/displays.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "9.4";
+const VERSION = "9.5";
 
 const ANIMATE_RATE = 25;            // frames/second
 

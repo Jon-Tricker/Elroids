@@ -129,7 +129,6 @@ class SaucerPirate extends Saucer {
         this.cargoMass = Math.floor(this.cargoMass);
         if (0 < this.cargoMass) {
             let min = new Mineral(this.cargoMass, this.location, this.speed, this.cargoType);
-            min.setActive(true);
         }
         super.destruct();
     }

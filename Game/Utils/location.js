@@ -196,13 +196,12 @@ class Location extends THREE.Vector3 {
 
     // Validate that two Locations are compatible.
     validate(a, b) {
-        if ((undefined == a.system) || (undefined == b.system)) {
-            // Probably adding a normal Vector3.
-            return;
-        }
-
         // ToDo : Remove this once re-factoring complete.
-        if ((!a instanceof Location) || (!b instanceof Location)) {
+        if ((!(a instanceof Location)) || (!(b instanceof Location))) {
+            if ((a instanceof THREE.Vector3) && (b instanceof THREE.Vector3)) {
+                // OK. Operation with a normal Vectors.
+                return;
+            }
             throw new BugError("Dodgy location types.")
         }
 
@@ -210,7 +209,6 @@ class Location extends THREE.Vector3 {
             throw new BugError("Locations not in same system.")
         }
     }
-
 }
 
 export default Location;

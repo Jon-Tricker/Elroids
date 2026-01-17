@@ -133,7 +133,7 @@ class MediumHull extends Hull {
             size = this.height;
         }
 
-        let geometry = new THREE.SphereGeometry(size * 0.8, 20, 20);
+        let geometry = new THREE.SphereGeometry(size * 0.7, 20, 20);
 
         // compute vertex normals
         geometry.computeVertexNormals();

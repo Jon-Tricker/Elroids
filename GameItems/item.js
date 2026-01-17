@@ -1,6 +1,6 @@
 // In game 'Objects'. But the word 'Object' is overloaded ... so call them 'Items'.
 
-// Copyright (C) Jon Tricker 2023, 2024.
+// Copyright (C) Jon Tricker 2023, 2024, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -110,7 +110,7 @@ class Item extends THREE.Group {
         };
     }
 
-    // By default jus add/remove from scene.
+    // By default just add/remove from scene.
     // Override in Items that support (in)activate when not in use. 
     setActive(state) {
         let scene = this.getGame().getScene();
@@ -172,7 +172,7 @@ class Item extends THREE.Group {
     }
 
     getSystem() {
-        return(this.location.system);
+        return (this.location.system);
     }
 
     // Normally the class name but in some cases has to be overridden.
@@ -214,7 +214,7 @@ class Item extends THREE.Group {
     }
 
     isDestructed() {
-        return(this.hitPoints == 0);
+        return (this.hitPoints == 0);
     }
 
     // Push item. Thrust in kN, mass in Tonnes. This should work without scaling.
@@ -535,7 +535,7 @@ class Item extends THREE.Group {
             // Get position relative to camers       
             let cameraPos = new THREE.Vector3();
             camera.getWorldPosition(cameraPos);
-            let relPos = this.location.getRelative(cameraPos);   
+            let relPos = this.location.getRelative(cameraPos);
             relPos.multiplyScalar(-1);
 
             // If docked. Position relative to parent.
@@ -631,17 +631,50 @@ class Item extends THREE.Group {
         if (undefined != sound) {
             sound.stop();
         }
-    }     
-    
+    }
+
     // Get relative value with optional weigthing for proximity.
     getRelativeValue(loc) {
         let value = this.getValue();
         if (undefined == loc) {
-            return(value);
-        } 
+            return (value);
+        }
 
         let dist = loc.getRelative(this.location).length();
-        return(value/(dist + 100));
+        return (value / (dist + 100));
+    }
+
+    // Get the relative X rotation of another Item.
+    // 
+    // Doc says you can get local X angles as item.rotation.x.
+    // Howver this does not seem to work. All 3 rotation indexes change when rotateX() is called.
+    // Not even sure 'relative X rotation' means much in two seperate local coordinate system.
+    //
+    // So, after a days hacking, I cooked my own. 
+    //
+    // This assumes X axes are roughly alligned.
+    getRelXAngle(that) {
+
+        // Create Z axis vector in 'that' space.
+        let v = new THREE.Vector3(0, 0, 1);
+
+        // Convert to global space.
+        v = that.localToWorld(v);
+
+        // Subtract location difference. i.e make vector relative to 'this'.
+        let diff = that.location.clone();
+        diff.sub(this.location);
+        v.sub(diff);
+
+        // Convert into this space.
+        v = this.worldToLocal(v);
+
+        // Angle is angle between the vector and 'this' z axis.
+        // Should rotate the vector in the direction of x=0. 
+        // However Since x axes are roughly aligned just dont use x.
+        let angle = Math.atan2(v.y, v.z);
+
+        return (angle);
     }
 }
 

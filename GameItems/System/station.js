@@ -299,11 +299,13 @@ class Station extends NonShipItem {
     }
 
     createBayTexture(width, height, side) {
-        let baseCol = new THREE.Color('black');
+        let baseCol = new THREE.Color('darkGrey');
         switch (side) {
+            /*
             case BoxSides.BOTTOM:
                 baseCol = new THREE.Color('darkGrey');
                 break;
+            */
 
             case BoxSides.TOP:
                 baseCol = new THREE.Color('lightGrey');

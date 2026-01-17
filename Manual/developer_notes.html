@@ -45,11 +45,8 @@
 	<H2>ToDos (In some sort of priority order)</H2>
 
 	<H3>V9.x Create Non Player Ships.</H3>
-	<P>Move setActive() from individual classes to NonShipItem2.</P>
 	<P>Fix NP ship navigation.</P>
 	<UL>
-		<LI>Fix NavThrough to not stop or orbit. Test with Smugglers. Test on moving targets. Maybe work out 'target speed' and thrust in a direction delta from current speed.</LI>
-		<LI>Rotate to same angle as station on aproach.</LI>
 		<LI>Make NP ship AI more like regular Javascript code (with branches, loops etc.) . Rather than NavModes.</LI>
 	</UL>
 	<P>Give NP ships</P>
@@ -63,7 +60,6 @@
 	<P>Convert GoodsList and ComponentsList to use classes ... like shipTypes in NPShipFactory.</P>
 	<P>Make saucers a sub class of NPShip. Convert makeLoot() to loadRandom().</P>
 	<P>Do a sweep of use of null. In most cases change to undefned.</P>
-	<P>Maybe delete non essential Items from inactive systems ... save memory.</P>
 	<P></P>
 
 	<H3>V10.x legal system.</H3>
@@ -131,7 +127,7 @@
 	</UL>
 	<LI>Do something about saucer 'seeking' target location behaviour ... or maybe just leave it since it looks like
 		defensive manouvering.</LI>
-	<LI>Componentize sacucer</LI>
+	<LI>Maybe delete non essential Items from inactive systems ... save memory.</LI>
 	<LI>Sort out menu system:</LI>
 	<UL>
 		<LI>Current code for buttons and scripts is ugly. Works in the context of MenuSystem, where it is evaled,
@@ -178,6 +174,7 @@
 		<LI>Add joystick/tablet controls (maybe via on screen buttons reproducing keyboard keys). Maybe use tilt sensor
 			for movement.</LI>
 	</UL>
+		<LI>Make key assignments configurable.</LI>
 	</LI>
 
 	<LI>Extensions:
