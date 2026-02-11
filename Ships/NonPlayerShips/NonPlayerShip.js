@@ -26,6 +26,12 @@ class NPShip extends Ship {
     takeDamage(hits, that) {
         let destroyed = super.takeDamage(hits, that);
 
+        if ((that.owner == this.getShip()) || (that == this.getShip())) {
+            // Now it's war!
+            this.getGame().setSafe(false);
+            this.setHostile(true);
+        }
+
         if (destroyed) {
             // Dump all cargo.
             this.hull.compSets.baySet.dumpAll();
@@ -33,6 +39,22 @@ class NPShip extends Ship {
         }
 
         return (destroyed);
+    }
+
+    isHostile() {
+        return(this.ai.isHostile())
+    }
+
+    setHostile(hostile) {
+        this.ai.setHostile(hostile);
+    }
+
+    getRadarColour() {
+        if (this.isHostile()) {
+            return("#FF0000")
+        } else {
+            return(super.getRadarColour());
+        }
     }
 }
 

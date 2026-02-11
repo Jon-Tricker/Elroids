@@ -10,14 +10,9 @@ class WeaponSet extends ComponentSet {
     }
 
     // Fire all selected weapons.
-    fire(target, date) {
-
-        if (undefined == date) {
-            date = this.getUniverse().getTime();
-        }
-        
+    shoot(target, date) {
         for(let weapon of this) {
-            weapon.fire(target, date);
+            weapon.shoot(target, date);
         }
     }
 }

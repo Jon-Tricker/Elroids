@@ -13,8 +13,8 @@ const TTL = 60000;
 
 class SaucerWanderer extends Saucer {
 
-    constructor(location, owner, safe) {
-        super(SIZE, location, MASS, COLOUR, owner, safe);
+    constructor(location, owner) {
+        super(SIZE, location, MASS, COLOUR, owner);
     } 
 
     getName() {

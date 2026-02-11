@@ -174,8 +174,12 @@ class Displays {
         this.controlsCtx.fillRect(0, 0, this.controls.width, this.controls.height);
         this.controlsCtx.globalAlpha = 1;
         this.controlsCtx.fillStyle = this.defaultColour;
+        let text = "V" + this.game.getVersion() + "    Score:" + this.printNum(this.game.player.getScore()) + "    Credits:" + this.printNum(this.game.player.getCredits()) + "    Frame rate:" + this.printNum(this.game.universe.getActualAnimateRate()) + "/s";
+        if (this.game.isSafe()) {
+            text += "     Safe Mode: On";
+        }
 
-        this.controlsCtx.strokeText("V" + this.game.getVersion() + "    Score:" + this.printNum(this.game.player.getScore()) + "    Credits:" + this.printNum(this.game.player.getCredits()) + "    Frame rate:" + this.printNum(this.game.universe.getActualAnimateRate()) + "/s", 20, this.textHeight * 0.9);
+        this.controlsCtx.strokeText(text, 20, this.textHeight * 0.9);
     }
 
     hudEnable(state) {

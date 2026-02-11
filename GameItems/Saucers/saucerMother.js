@@ -28,19 +28,18 @@ class SaucerMother extends Saucer {
     currentLaunchFrequency = START_LAUNCH_FREQUENCY;
     launchDue = this.currentLaunchFrequency;
 
-    constructor(location, owner, safe) {
-        super(SIZE, location, MASS, COLOUR, owner, safe);
-    }   
-    
+    constructor(location, owner) {
+        super(SIZE, location, MASS, COLOUR, owner);
+    }
+
     toJSON() {
         let json = super.toJSON();
-        json.safe = this.safe;
         // json.stationSpecific = ....
-        return(json);
+        return (json);
     }
-    
+
     static fromJSON(json, system) {
-        let newSaucer = new SaucerMother(Location.fromJSON(json.location, system), system.owner, json.safe);
+        let newSaucer = new SaucerMother(Location.fromJSON(json.location, system), system.owner);
         newSaucer.rotateX(json.rotationx);
         newSaucer.rotateY(json.rotationy);
         newSaucer.rotateZ(json.rotationz);
@@ -48,12 +47,16 @@ class SaucerMother extends Saucer {
     }
 
     getName() {
-        return("Mother Saucer");
+        return ("Mother Saucer");
     }
-    
+
     getMaxSpeed() {
-        return(MAX_SPEED);
-    } 
+        return (MAX_SPEED);
+    }
+
+    getRadarColour() {
+        return(COLOUR);
+    }
 
     destruct() {
         // Remove self from game.
@@ -64,7 +67,7 @@ class SaucerMother extends Saucer {
 
     // Do navigation logic
     navigate() {
-        if (!this.safe) {
+        if (!this.getGame().isSafe()) {
             let delta = this.getGame().getShip().location.getRelative(this.location);
 
             if (Math.abs(delta.length) > this.location.system.systemSize) {
@@ -74,7 +77,7 @@ class SaucerMother extends Saucer {
             } else {
                 // Run
                 delta.normalize();
-                delta.multiplyScalar(MAX_ACC/this.getGame().getAnimateRate());
+                delta.multiplyScalar(MAX_ACC / this.getGame().getAnimateRate());
 
                 // Add a bit of randomness. 
                 switch (Math.floor(Math.random() * 3)) {
@@ -107,7 +110,9 @@ class SaucerMother extends Saucer {
 
     // Do shooting (in our case ship creation) logic
     shoot() {
-        if (!this.safe) {
+        let game = this.getGame();
+
+        if (!game.isSafe()) {
             if (this.launchDue++ >= this.currentLaunchFrequency) {
                 this.launchDue = 0;
 
@@ -116,7 +121,6 @@ class SaucerMother extends Saucer {
                     this.currentLaunchFrequency--;
                 }
 
-                let game = this.getGame();
                 if (game.getSystem().saucerCount < game.maxSaucerCount) {
                     let saucer;
                     let thisLoc = this.getLocation();
@@ -129,33 +133,27 @@ class SaucerMother extends Saucer {
                         // Don't bother with statics ... fall through.
 
                         case 1:
-                            if (this.safe) {
-                                // Block up a saucer slot with something useless.
-                                saucer = new SaucerWanderer(thisLoc, this, this.safe);
-                                break;
-                            }
+                            // Block up a saucer slot with something useless.
+                            saucer = new SaucerWanderer(thisLoc, this);
+                            break;
 
                         case 2:
-                            saucer = new SaucerShooter(thisLoc, this, this.safe);
+                            saucer = new SaucerShooter(thisLoc, this);
                             break;
 
                         case 3:
-                            saucer = new SaucerHunter(thisLoc, this, this.safe);
-                            break; 
-                            
+                            saucer = new SaucerHunter(thisLoc, this);
+                            break;
+
                         case 4:
-                            saucer = new SaucerPirate(thisLoc, this, this.safe);
+                            saucer = new SaucerPirate(thisLoc, this);
                             break;
 
                         case 5:
                         default:
-                            saucer = new SaucerRam(thisLoc, this, this.safe);
+                            saucer = new SaucerRam(thisLoc, this);
                             break;
                     }
-
-                    // Match speed and, avoid immediaate collision, move child towards target ship
-                    // If this is left in there are frequent collisions betweer mother and child ... so do without.
-                    // saucer.speed = this.speed.clone(); 
 
                     saucer.separateFrom(this);
                 }

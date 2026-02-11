@@ -19,9 +19,9 @@ class DumbMissileWeapon extends MissileWeapon {
         return (super.getDescription() + "\n\n'" + this.getName() + "' is " + DESCRIPTION.toLowerCase());
     }
 
-    fire(target, date) {
+    shoot(target, date) {
         if (this.isReady(date)) {
-            super.fire(target, date);
+            super.shoot(target, date);
             new DumbMissile(target, this.getShip());
         }
     }

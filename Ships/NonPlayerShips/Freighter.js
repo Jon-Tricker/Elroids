@@ -1,11 +1,11 @@
-// Non player freighter.
+// Non player freighter. Starts with cargo takes it to the station via a random location.
 
 // Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-import NPShip from './NonPlayerShip.js';
+import NPShip from './nonPlayerShip.js';
 import LargeHull from '../Components/Hulls/largeHull.js';
-import {BasicAI, NavMode} from './BasicAI.js';
+import {BasicAI} from './basicAI.js';
 
 class FreighterAI extends BasicAI {
 }

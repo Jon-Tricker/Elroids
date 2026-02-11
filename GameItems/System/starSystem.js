@@ -14,8 +14,8 @@ import SaucerStatic from '../Saucers/saucerStatic.js';
 import SaucerWanderer from '../Saucers/saucerWanderer.js';
 import Station from './station.js';
 import { SystemSpec } from './system.js';
-import Freighter from '../../Ships/NonPlayerShips/Freighter.js';
-import NPShipFactory from '../../Ships/NonPlayerShips/NonPlayerShipFactory.js';
+import Freighter from '../../Ships/NonPlayerShips/freighter.js';
+import NPShipFactory from '../../Ships/NonPlayerShips/nPShipFactory.js';
 import Location from '../../Game/Utils/location.js';
 import Universe from '../universe.js';
 
@@ -95,21 +95,21 @@ class StarSystem extends System {
             // If mother saucer detroyed periodicaly re-create
             if (0 == this.motherSaucers.size) {
                 if ((Math.random() * 1000) < 1) {
-                    this.createMotherSaucer(this.safe);
+                    this.createMotherSaucer();
                 }
             }
         }
 
-            if (date > this.nPShipTimer) {
-                // Genrate new NPShip from one of the wormhole ends.
-                let wormholeEnd = this.wormholeEnds.getRandomElement();
-                let npShip = NPShipFactory.createRandom(wormholeEnd.location);
-                npShip.setSpeed(this.getGame().createRandomVector(10));
-                npShip.setActive(true);
-                wormholeEnd.exit(npShip);
+        if ((date > this.nPShipTimer) && (!this.getGame().testMode)) {
+            // Genrate new NPShip from one of the wormhole ends.
+            let wormholeEnd = this.wormholeEnds.getRandomElement();
+            let npShip = NPShipFactory.createRandom(wormholeEnd.location);
+            npShip.setSpeed(this.getGame().createRandomVector(10));
+            npShip.setActive(true);
+            wormholeEnd.exit(npShip);
 
-                this.nPShipTimer = date + NP_SHIP_FREQUENCY * (1 + Math.random()) * 0.5;
-            }
+            this.nPShipTimer = date + NP_SHIP_FREQUENCY * (1 + Math.random()) * 0.5;
+        }
 
         super.animate(date, keyBoard)
     }
@@ -186,6 +186,15 @@ class StarSystem extends System {
             }
             */
 
+            // One of each ship type.
+            let count = 0;
+            for (let type of NPShipFactory.shipTypes) {
+                let yLoc = (NPShipFactory.shipTypes.size/2 - count) * 100;
+                let location = new Location(2000, yLoc, 200, this);
+                new type(location);
+                count ++;
+            }
+
             // And a sample mineral
             new Mineral(100, new Location(250, -10, 50, this), Universe.originVector, MineralTypes[2]);
             new Mineral(100, new Location(500, 50, 50, this), Universe.originVector, MineralTypes[3]);
@@ -240,12 +249,7 @@ class StarSystem extends System {
 
     createSaucers(json) {
         if (undefined === json) {
-            if (this.getGame().testMode) {
-                // New saucer
-                //new SaucerPirate(new Location(-1500, 200, -50, this), null, true);
-            }
-            // First mother ship in home system always in safe mode.
-            this.createMotherSaucer(this.spec.name == "Sol");   // Ugg!
+            this.createMotherSaucer();
         } else {
             // Restore old saucers.
             for (let saucer of json.saucers) {
@@ -264,27 +268,18 @@ class StarSystem extends System {
         }
     }
 
-    createMotherSaucer(safe) {
+    createMotherSaucer() {
         let loc;
         let game = this.getGame();
 
         // Create it close so we can find it. 
         if (this.getGame().testMode) {
             loc = new Location(1000, 100, -50, this);
-            safe = true;
         } else {
-            if (safe) {
-                loc = this.universe.ship.getLocation().clone();
-                let offset = 1000;
-                loc.x += offset;
-                loc.y += offset / 2;
-                loc.handleWrap();
-            } else {
-                loc = Location.createRandomInSystem(this);
-            }
+            loc = Location.createRandomInSystem(this);
         }
 
-        this.motherSaucers.add(new SaucerMother(loc, null, safe));
+        this.motherSaucers.add(new SaucerMother(loc, null));
 
         // Game gradually gets harder.
         game.maxSaucerCount++;

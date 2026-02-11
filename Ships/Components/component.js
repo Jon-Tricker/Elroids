@@ -44,7 +44,8 @@ class Component extends Goods {
 
     // Buy from list.
     buy(ship, isFree) {
-        return (super.buy(ship, 1, isFree));
+        let res = super.buy(ship, 1, isFree)
+        return (res);
     }
 
     sell() {
@@ -75,6 +76,7 @@ class Component extends Goods {
 
         if (this.isMounted()) {
             this.set.delete(this);
+            this.getShip().recalc();
         } else {
             this.set.sets.baySet.unloadGoods(this, number);
         }
@@ -158,6 +160,8 @@ class Component extends Goods {
             ship.getTerminal().playSound("anvil", 0.5);
         }
 
+        ship.recalc();
+
         return (comp);
     }
 
@@ -178,6 +182,8 @@ class Component extends Goods {
 
         // Put in ships bay
         ship.getBays().components.add(this);
+
+        ship.recalc();
     }
 
     upgrade() {
@@ -201,6 +207,9 @@ class Component extends Goods {
         }
 
         this.status -= dam;
+
+        this.getShip().recalc();
+
         return (hits)
     }
 
@@ -218,6 +227,8 @@ class Component extends Goods {
             if (!silent) {
                 ship.getTerminal().playSound("anvil", 0.5);
             }
+
+            ship.recalc();
         }
     }
 

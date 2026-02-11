@@ -19,7 +19,7 @@ import Displays from '../Displays/displays.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "9.5";
+const VERSION = "9.6";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -81,7 +81,7 @@ class Game {
 
     constructor(uniSize, systemSize, maxRockCount, rockStyle, safe, soundOn, startDocked) {
 
-        this.safe = safe;
+        this.setSafe(safe);
         this.player = new Player();
 
         if ((soundOn != null) && (soundOn.toLowerCase() == "true")) {
@@ -166,6 +166,7 @@ class Game {
             testMode: this.testMode,
             soundOn: this.soundOn,
             maxSaucerCount: this.maxSaucerCount,
+            safe: this.safe,
             player: this.player.toJSON(),
             universe: this.universe.toJSON()
         }
@@ -211,6 +212,7 @@ class Game {
         this.testMode = json.testMode;
         this.soundOn = json.soundOn;
         this.maxSaucerCount = json.maxSaucerCount;
+        this.safe = json.safe;
 
         this.player = Player.fromJSON(json.player);
         this.universe = Universe.fromJSON(json.universe, this);
@@ -358,6 +360,14 @@ class Game {
 
     getSystem() {
         return (this.universe.system);
+    }
+
+    isSafe() {
+        return(this.safe);
+    }
+
+    setSafe(safe) {
+        this.safe = safe;
     }
 
     animate(date) {

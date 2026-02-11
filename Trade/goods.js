@@ -213,6 +213,7 @@ class Goods {
 
     loadToShip(ship, good) {
         ship.loadGoods(good);
+        ship.recalc();
     }
 
     sell(number) {
@@ -235,6 +236,8 @@ class Goods {
 
         // Add value to wallet.
         ship.addCredits(this.getUnitCostInSystem(this.getShip().system) * number);
+
+        ship.recalc();
     }
 
     unloadFromShip(number) {

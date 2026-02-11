@@ -35,28 +35,19 @@ class Saucer extends NonShipItem {
     rotateRate;
     colour;
 
-    // Safe mode ... leathality reduced.
-    safe;
-
     // Time to self destruct.
     // 0 if never.
     destructTime = 0;
 
-    constructor(size, location, mass, colour, owner, safe) {
+    constructor(size, location, mass, colour, owner) {
         super(location, Universe.originVector, size, mass, SAUCER_HP, owner);
         this.colour = colour;
 
         this.setupMesh();
         this.rotateRate = Math.random() * MAX_ROTATE_RATE * 2 - MAX_ROTATE_RATE;
 
-        if (safe === undefined) {
-            this.safe = false;
-        } else {
-            this.safe = safe;
-        }
-
         let ttl = this.getTtl();
-        if ((0 != ttl) && (!safe)) {
+        if ((0 != ttl) && (!this.getGame().isSafe())) {
             this.destructTime = this.getUniverse().getTime() + Math.floor(ttl / 2 + Math.random() * ttl / 2);
         }
 
@@ -79,7 +70,7 @@ class Saucer extends NonShipItem {
     }
 
     getRadarColour() {
-        return (this.colour);
+        return ("#00D0D0");
     }
 
     getMaxSpeed() {
@@ -132,11 +123,14 @@ class Saucer extends NonShipItem {
     takeDamage(hits, that) {
         let destroyed = super.takeDamage(hits, that);
 
-        if (destroyed) {
-            if ((that.owner == this.getShip()) || (that == this.getShip())) {
+        if ((that.owner == this.getShip()) || (that == this.getShip())) {
+            if (destroyed) {
                 // For now only make loot if destroyed by ship.
                 this.makeLoot();
             }
+
+            // Now it's war!
+            this.getGame().setSafe(false);
         }
     }
 
@@ -146,7 +140,7 @@ class Saucer extends NonShipItem {
         switch (Math.floor(Math.random() * 4)) {
             case 0:
                 // Make mineral
-                let type = MineralTypes[1 + Math.floor(Math.random() * (MineralTypes.length -1))];
+                let type = MineralTypes[1 + Math.floor(Math.random() * (MineralTypes.length - 1))];
                 let mass = Math.ceil(value / type.value);
                 let mineral = new Mineral(mass, thisLoc, this.speed, type);
                 break;

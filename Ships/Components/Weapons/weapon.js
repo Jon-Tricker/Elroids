@@ -27,7 +27,7 @@ class Weapon extends Component {
     }
 
     // Target may be a direction or an Item.
-    fire(target, date) {
+    shoot(target, date) {
         this.fireLast = date;
 
         if (!this.isWorking()) {
@@ -46,7 +46,7 @@ class Weapon extends Component {
     }
 
     // Determine loaded and ready to fire.
-    // No sur we really need this ... just fire() and throw if it fails.
+    // No sure we really need this ... just shoot() and throw if it fails.
     isReady(date) {
         if (undefined != this.maxAmmo) {
             if (0 == this.ammo) {

@@ -111,7 +111,7 @@ class PlayerShip extends Ship {
                 if (keyboard.getState(">") || keyboard.getState(".")) {
                     this.rollR();
                 } else {
-                    this.rollRate = 0;
+                    this.rollRate.zero();
                 }
             }
 
@@ -121,7 +121,7 @@ class PlayerShip extends Ship {
                 if (keyboard.getState("X") || keyboard.getState("x")) {
                     this.dive();
                 } else {
-                    this.pitchRate = 0;
+                    this.pitchRate.zero();
                 }
             }
 
@@ -131,13 +131,13 @@ class PlayerShip extends Ship {
                 if (keyboard.getState("C") || keyboard.getState("c")) {
                     this.yawR();
                 } else {
-                    this.yawRate = 0;
+                    this.yawRate.zero();
                 }
             }
 
             // if (keyboard.getClearState("M") || keyboard.getClearState("m")) { 
             if (keyboard.getState("M") || keyboard.getState("m")) {
-                this.hull.compSets.weaponSet.fire(this.getOrientation(), date);
+                this.shoot(date);
             }
         }
 

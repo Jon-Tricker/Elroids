@@ -27,8 +27,8 @@ class SaucerHunter extends Saucer {
 
     burstCounter = 0;
 
-    constructor(location, owner, safe) {
-        super(SIZE, location, MASS, COLOUR, owner, safe);
+    constructor(location, owner) {
+        super(SIZE, location, MASS, COLOUR, owner);
         this.createTargetLocation();
     }
 
@@ -78,7 +78,7 @@ class SaucerHunter extends Saucer {
 
     // Do shooting logic
     shoot() {
-        if (!this.safe) {
+        if (!this.getGame().isSafe()) {
             if (this.shootDue++ >= SHOOT_FREQUENCY) {
                 if (this.burstCounter > 0) {
                     if (--this.burstCounter == 0) {

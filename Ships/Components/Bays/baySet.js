@@ -173,6 +173,23 @@ class BaySet extends ComponentSet {
         this.level();
     }
 
+    // Empty everything
+    empty() {
+        for (let comp of this.components) {
+            this.components.delete(comp);
+        }
+        
+        for (let goods of this.tradeGoods) {
+            this.tradeGoods.delete(goods);
+        }
+
+        for (const [mineral, mass] of this.minerals) {
+            this.minerals.delete(mineral);
+        }
+
+        this.recalc();
+    }
+
     unloadGoods(goods, number) {
         if (goods instanceof Component) {
             if (!this.components.has(goods)) {

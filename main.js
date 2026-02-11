@@ -16,7 +16,7 @@ var uniSize = parseInt(scriptName.getAttribute('uniSize'));
 var rockStyle = scriptName.getAttribute('rockStyle');
 var startDocked = scriptName.getAttribute('startDocked');
 var soundOn = scriptName.getAttribute('soundOn');
-var safe = false;
+var safe = true;
 
 // Create the game objects
 // For the moment universe and system are the same size.

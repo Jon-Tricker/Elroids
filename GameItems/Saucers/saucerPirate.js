@@ -32,8 +32,8 @@ class SaucerPirate extends Saucer {
     farAway = null;
     shootDue = 0;
 
-    constructor(location, owner, safe) {
-        super(SIZE, location, MASS, COLOUR, owner, safe);
+    constructor(location, owner) {
+        super(SIZE, location, MASS, COLOUR, owner);
     } 
     
     getName() {
@@ -100,7 +100,7 @@ class SaucerPirate extends Saucer {
     shoot() {
         // Only shoot if running
         if (0 != this.cargoMass) {
-            if (!this.safe) {
+            if (!this.getGame().isSafe()) {
                 if (this.shootDue++ >= SHOOT_FREQUENCY) {
 
                     // Only fire if vaguley close enough.

@@ -1,5 +1,5 @@
-// Base class for any ship that implements the laws of physics.
-// Internal impementation of ship is left to the sun-classes.
+// Base class for any ship (i.e. something with 'ends' that implements the laws of physics).
+// Internal impementation of ship is left to the sub-classes.
 
 // Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
@@ -19,6 +19,59 @@ import WormholeEnd from '../GameItems/System/wormholeEnd.js';
 const ROTATE_RATE_DELTA = 0.125;        // r/s
 const ROTATE_RATE_MAX = 5;              // r/s
 
+class TurnRate {
+    rate = 0;
+    game;
+
+    constructor(game) {
+        this.game = game;
+    }
+
+    inc(power) {
+        let ar = this.game.getAnimateRate();
+
+        let delta = ROTATE_RATE_DELTA / ar;
+        if (undefined != power) {
+            if (power > 100) {
+                power = 100;
+            }
+            delta *= power / 100;
+        }
+
+        if (this.rate < ROTATE_RATE_MAX) {
+            this.rate += delta;
+        }
+    }
+
+    dec(power) {
+        let ar = this.game.getAnimateRate();
+
+        let delta = ROTATE_RATE_DELTA / ar;
+        if (undefined != power) {
+            if (power > 100) {
+                power = 100;
+            }
+            delta *= power / 100;
+        }
+
+        if (this.rate > -ROTATE_RATE_MAX) {
+            this.rate -= delta;
+        }
+    }
+
+    zero() {
+        this.rate = 0;
+    }
+
+    getRate() {
+        return (this.rate);
+    }
+
+    getDelta() {
+        return(ROTATE_RATE_DELTA);
+    }
+}
+
 class Ship extends Item {
 
     // ToDo : These really should be part of the 'Hull' sub classes.
@@ -27,9 +80,9 @@ class Ship extends Item {
     width;
     length;
 
-    pitchRate = 0;
-    yawRate = 0;
-    rollRate = 0;
+    pitchRate;
+    yawRate;
+    rollRate;
 
     hull;
 
@@ -44,6 +97,10 @@ class Ship extends Item {
         this.height = height;
         this.width = width;
         this.length = length;
+
+        this.pitchRate = new TurnRate(location.system.getGame());
+        this.yawRate = new TurnRate(location.system.getGame());
+        this.rollRate = new TurnRate(location.system.getGame());
 
         this.buildShip();
     }
@@ -82,7 +139,7 @@ class Ship extends Item {
     recalc() {
         this.hull.recalc();
     }
-   
+
     buildShip(hullType) {
         this.hull = new hullType();
         this.hull.buildShip(this);
@@ -154,7 +211,7 @@ class Ship extends Item {
         this.hull.setFlameState(false);
         if (1 > this.getSpeed()) {
             // Stop
-            this.speed.multiplyScalar(0);
+            this.setSpeed(Universe.originVector);
             this.engineOff();
             return;
         }
@@ -175,46 +232,34 @@ class Ship extends Item {
 
     // In general to rotate. Asjust relative to our own axis.
     // Positive is clockwise when looking at the origin. So needs to be reversed for roll and pitch when we a re looking away from origin.
-    rollL() {
-        if (this.rollRate > -ROTATE_RATE_MAX / this.getGame().getAnimateRate()) {
-            this.rollRate -= ROTATE_RATE_DELTA / this.getGame().getAnimateRate();
-        }
-        this.rotateX(this.rollRate);
+    rollL(power) {
+        this.rollRate.dec(power);
+        this.rotateX(this.rollRate.getRate());
     }
 
-    rollR() {
-        if (this.rollRate < ROTATE_RATE_MAX / this.getGame().getAnimateRate()) {
-            this.rollRate += ROTATE_RATE_DELTA / this.getGame().getAnimateRate();
-        }
-        this.rotateX(this.rollRate);
+    rollR(power) {
+        this.rollRate.inc(power);
+        this.rotateX(this.rollRate.getRate());
     }
 
-    climb() {
-        if (this.pitchRate > -ROTATE_RATE_MAX / this.getGame().getAnimateRate()) {
-            this.pitchRate -= ROTATE_RATE_DELTA / this.getGame().getAnimateRate();
-        }
-        this.rotateY(this.pitchRate);
+    climb(power) {
+        this.pitchRate.dec(power);
+        this.rotateY(this.pitchRate.getRate());
     }
 
-    dive() {
-        if (this.pitchRate < ROTATE_RATE_MAX / this.getGame().getAnimateRate()) {
-            this.pitchRate += ROTATE_RATE_DELTA / this.getGame().getAnimateRate();
-        }
-        this.rotateY(this.pitchRate);
+    dive(power) {
+        this.pitchRate.inc(power);
+        this.rotateY(this.pitchRate.getRate());
     }
 
-    yawL() {
-        if (this.yawRate < ROTATE_RATE_MAX / this.getGame().getAnimateRate()) {
-            this.yawRate += ROTATE_RATE_DELTA / this.getGame().getAnimateRate();
-        }
-        this.rotateZ(this.yawRate);
+    yawL(power) {
+        this.yawRate.inc(power);
+        this.rotateZ(this.yawRate.getRate())
     }
 
-    yawR() {
-        if (this.yawRate > -ROTATE_RATE_MAX / this.getGame().getAnimateRate()) {
-            this.yawRate -= ROTATE_RATE_DELTA / this.getGame().getAnimateRate();
-        }
-        this.rotateZ(this.yawRate);
+    yawR(power) {
+        this.yawRate.dec(power);
+        this.rotateZ(this.yawRate.getRate())
     }
 
     engineOff() {
@@ -261,7 +306,7 @@ class Ship extends Item {
         return (xDirection);
     }
 
-    handleCollision(that) { 
+    handleCollision(that) {
         // Can't get hit while docked.
         if (null != this.dockedWith) {
             return (false)
@@ -292,7 +337,7 @@ class Ship extends Item {
     dock(station) {
         // Docking failed.
         if (!station.dock(this)) {
-            return(false);
+            return (false);
         }
 
         this.engineOff();
@@ -301,17 +346,17 @@ class Ship extends Item {
 
         this.moveMesh();
 
-        return(true)
+        return (true)
     }
 
     undock() {
         // Skip if not really docked
-        if(null == this.dockedWith) {
+        if (null == this.dockedWith) {
             return;
         }
-        
+
         this.dockedWith.undock(this);
-        this.dockedWith = null;   
+        this.dockedWith = null;
 
 
         this.moveMesh();
@@ -338,32 +383,32 @@ class Ship extends Item {
         this.loadMineral(mineral.type, mass);
         mineral.destruct();
         return (true);
-    }    
-    
+    }
+
     loadMineral(mineral, mass) {
-        this.hull.compSets.baySet.loadMineral(mineral, mass);
+        this.getCargoBay().loadMineral(mineral, mass);
 
         this.recalc();
     }
 
     // Return mass unloaded.
     unloadMineral(mineral, mass) {
-        let unloaded = this.hull.compSets.baySet.unloadMineral(mineral, mass);
+        let unloaded = this.getCargoBay().unloadMineral(mineral, mass);
         this.recalc();
         return (unloaded);
     }
 
     // Load goods into bay.
     loadGoods(goods) {
-        this.hull.compSets.baySet.loadGoods(goods);
+        this.getCargoBay().loadGoods(goods);
         this.recalc();
     }
 
     getCargoCapacity() {
-        return (this.hull.compSets.baySet.getCapacity())
+        return (this.getCargoBay().getCapacity())
     }
 
-    getCargo() {
+    getCargoBay() {
         return (this.hull.compSets.baySet)
     }
 
@@ -372,7 +417,40 @@ class Ship extends Item {
     }
 
     getTotalMass() {
-        return (this.getMass() + this.hull.compSets.baySet.getContentMass())
+        return (this.getMass() + this.getCargoBay().getContentMass())
+    }
+
+    // Fire selected weapons
+    shoot(date) {
+        this.hull.compSets.weaponSet.shoot(this.getOrientation(), date);
+    }
+
+    // Get angle to a location.
+    angleTo(loc) {
+        // Work out delta in ship space.
+        let delta = this.getShortestVec(loc);
+        this.worldToLocal(delta);
+
+        return(new THREE.Vector3(1, 0, 0).angleTo(delta));
+    }
+
+    // Get shortest vector to a location.
+    getShortestVec(loc) {
+        let vec = loc.clone();
+
+        // Handle wrap round.
+        vec.sub(this.location);
+        vec.add(this.location);
+
+        return (vec);
+    }
+
+    // Get speed in direction of travel
+    getFwdSpeed() {
+        let spd = this.speed.clone();
+        spd.add(this.location);
+        this.worldToLocal(spd);
+        return(spd.x);
     }
 }
 

@@ -4,7 +4,6 @@
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import * as THREE from 'three';
-import BugError from '../../Game/bugError.js';
 import Item from '../../GameItems/item.js';
 import Station from '../../GameItems/System/station.js';
 
@@ -13,124 +12,204 @@ import Station from '../../GameItems/System/station.js';
 // TODO: Someone who is better at control theory than me please fix.
 const THRESHOLD = 0.1;
 
-// Meta language instructions for ship navigation 'programs'.
-class NavMode {
-    name;
-    maxSpeed;
-    animateFn;
-    getDestFn;
+// Maximum range to open fire.
+// ToDO : Possibly should be weapon dependant.
+const MAX_FIRE_RANGE = 500;
 
-    // Stop
-    static STOP = new NavMode("stop", this.navigateTo, this.getDestUndefined, 0);
+// Max angle to open fire.
+const MAX_FIRE_ANGLE = Math.PI / 100;
 
-    // Navigate to station aproach point
-    static STATION_APPROACH = new NavMode("approach", this.navigateThrough, this.getDestApproachPoint, undefined);
+// Max angle to thrust.
+const MAX_THRUST_ANGLE = Math.PI / 16;
 
-    // Dock with station.
-    static STATION_DOCK = new NavMode("dock", this.dock, this.getDestStaion, Station.getMaxDockingSpeed() / 2);
+// Optimal fire range.
+const FIRE_RANGE = 300;
 
-    // Undock with station.
-    static UNDOCK = new NavMode("undock", this.undock, undefined, undefined);
+// Average fire frequency
+const FIRE_FREQ = 1000;  // ms
 
-    // Go to wormhole.
-    static WORMHOLE = new NavMode("wormhole", this.navigateThrough, this.getDestWormhole, undefined);
+class BasicAI {
+    // Attitude to player.
+    hostile = false;
 
-    // Wait for a short period.
-    static WAIT = new NavMode("wait", this.wait, undefined, undefined);
+    // Program counter.
+    pc = 0;
 
-    // Go to a random location.
-    static RANDOM = new NavMode("random", this.navigateThrough, this.getDestRandom, undefined);
+    // Wait timer
+    expire = undefined;
 
-    // Destroy ship
-    static DESTRUCT = new NavMode("destruct", this.destruct, undefined, undefined);
+    myShip;
 
-    // Pick up cargo
-    static CARGO = new NavMode("cargo pickup", this.navigateTo, this.getDestCargo, undefined);
+    // Destination may be an item or a location.
+    dest = undefined;
 
-    constructor(name, animateFn, getDestFn, maxSpeed) {
-        this.animateFn = animateFn;
-        this.getDestFn = getDestFn;
-        this.name = name;
-        this.maxSpeed = maxSpeed;
+    constructor(myShip) {
+        this.myShip = myShip;
     }
 
-    getMaxSpeed() {
-        return (this.maxSpeed);
-    }
+    animate(date) {
+        let step = false;
 
-    getNavTo() {
-        return (this.navTo)
-    }
-
-    // Call an instruction.
-    animate(ai, date) {
-        if (undefined == this.animateFn) {
-            throw (new BugError("Undefined operation in ship AI."))
-        }
-        return (this.animateFn.call(ai, date));
-    }
-
-    // Does this mode have a destination.
-    // Some, like 'undock', dont.
-    hasDest() {
-        return (undefined != this.getDestFn)
-    }
-
-    // Return destination (if any).
-    getDest(ai) {
-        if (!this.hasDest()) {
-            return (undefined);
-        }
-        return (this.getDestFn.call(ai));
-    }
-
-    static getDestApproachPoint() {
-        return (this.myShip.location.system.stations.values().next().value.getApproachPoint());
-    }
-
-    static getDestStaion() {
-        return (this.myShip.location.system.stations.values().next().value);
-    }
-
-    static getDestWormhole() {
-        return (this.myShip.location.system.wormholeEnds.values().next().value);
-    }
-
-    static getDestRandom() {
-        return (this.myShip.getGame().createRandomVector(this.myShip.location.system.systemSize));
-    }
-
-    static getDestCargo() {
-        return (this.myShip.location.system.getValuable(undefined, this.myShip.location));
-    }
-
-    // Rest are implementarions of the individual animate fucntions..
-    static navigateTo() {
-        if (undefined == this.destination) {
-            // Cant navigate to an undefined ... give up.
-            return (true);
+        if (this.hostile) {
+            step = this.hostileProgram(date);
+        } else {
+            step = this.program(date);
         }
 
-        // We know what where we want to go.
-        // Let individual AI decide how to get there.
-        return (this.navigateToDest(this.destination));
-    }
-
-    static navigateThrough() {
-        if (undefined == this.destination) {
-            // Cant navigate to an undefined ... give up.
-            return (true);
+        if (step) {
+            this.incPc();
         }
-        // We know what where we want to go.
-        // Let individual AI decide how to get there.
-        return (this.navigateThroughDest(this.destination));
     }
 
-    static dock() {
-        let ship = this.getShip();
+    // The 'program' for this AI type. Used when not in hostile mode.
+    //
+    // Return 'true' if pc should advance.
+    //
+    // This used to be a list of defined 'Navigation modes' however this was found to be too inflexible (couldn't do arbitary loops, branches etc.).
+    // So now each time it is called exeutes a block of code based on a 'pc' and updates the 'pc' dependant on the result.
+    //
+    // Copy/modify code blocks for differing ship types.
+    //
+    // ToDo: Ideally this should become some sort of, single stepable, meta language (possibly some sort of java script 'thread').
+    program(date) {
+
+        // Is step complete?
+        // Also set to 'false' is step has explicitly modified the 'pc' (e.g. for a loop).
+        let done = false;
+
+        switch (this.pc) {
+            case 0:
+                done = this.navToRandomLocation(date);
+                break;
+
+            case 1:
+                done = this.navToApproachPoint(date);
+                break;
+
+            case 2:
+                done = this.dock(date);
+                break;
+
+            case 3:
+                // Wait a while
+                done = this.wait(date);
+                break;
+
+            case 4:
+                // Undock.
+                done = this.undock(date);
+                break;
+
+            case 5:
+                done = this.navToWormhole(date);
+                break;
+
+            // Loop forever.
+            default:
+                this.pc = 0;
+                break;
+        }
+
+        return(done);
+    }
+
+    // Alternate program used when in hostile mode.
+    hostileProgram(date) {      
+        let done = false;
+
+        switch (this.pc) {
+            case 0:
+                // Run or fight?
+                if (0.5 < Math.random()) {
+                    this.pc = 1;
+                } else {
+                    this.pc = 2;
+                }
+                done = false;
+                break;
+        
+            case 1:
+                done = this.attackShip(date);
+                if (done) {
+                    this.setHostile(false);
+                }
+                break; 
+                
+            case 2:
+                done = this.navToWormhole(date);
+                break;
+
+            // Loop forever.
+            default:
+                this.pc = 0;
+                break;
+        }
+
+        return(done);
+    }
+
+    incPc() {
+        // No longer have dest
+        this.dest = undefined;
+
+        // If step done by default just inc the pc.
+        this.pc++;
+    }
+
+    // Navigate to a random location.
+    navToRandomLocation(date) {
+        if (!this.haveDest()) {
+            this.dest = this.myShip.getGame().createRandomVector(this.myShip.location.system.systemSize);
+        }
+
+        return (this.navigateThrough(this.dest));
+    }
+
+    // Navigate to station aproach point.
+    navToApproachPoint(date) {
+        if (!this.haveDest()) {
+            this.dest = this.myShip.location.system.stations.values().next().value.getApproachPoint();
+        }
+
+        return (this.navigateThrough(this.dest));
+    }
+
+    // Navigate to wormhole.
+    navToWormhole(date) {
+        if (!this.haveDest()) {
+            this.dest = this.myShip.location.system.wormholeEnds.values().next().value;
+        }
+
+        return (this.navigateThrough(this.dest));
+    }
+
+    // Navigate to cargo.
+    navToCargo(date) {
+        if (!this.haveDest()) {
+            this.dest = this.myShip.location.system.getValuable(undefined, this.myShip.location);
+        }
+
+        return (this.navigateThrough(this.dest));
+    }
+
+    // Attack player ship
+    attackShip(date) {
+        if (!this.isHostile()) {
+            // Nay worries mate!
+            return(true);
+        }
+        return (this.attack(this.myShip.getGame().getShip(), date));
+    }
+
+    dock(date) {
+        let ship = this.myShip;
+
+        if (!this.haveDest()) {
+            this.dest = ship.location.system.stations.values().next().value;
+        }
 
         // If docking blocked give up.
-        if (ship.getLocation().distanceTo(this.destination.getLocation()) > ship.getGame().getShip().getLocation().distanceTo(this.destination.getLocation())) {
+        if (ship.getLocation().distanceTo(this.dest.getLocation()) > ship.getGame().getShip().getLocation().distanceTo(this.dest.getLocation())) {
             return (true);
         }
 
@@ -138,49 +217,16 @@ class NavMode {
             return (true);
         }
 
-        if (this.navigateToDest(this.destination)) {
+        if (this.navigateToDest(this.dest, Station.getMaxDockingSpeed() / 2)) {
             return (true)
         }
 
-        NavMode.matchRotation(ship, this.destination);
+        this.matchRotation(ship, this.dest);
 
         return (false);
     }
 
-    // Match rotation with station.
-    // Station bay is on the -x side. So actually rotating in the same direction.
-    // Return true if matched.
-    static matchRotation(ship, dest) {
-
-        // Due to rest of code X axes should be roughly aligned.
-        let rot = ship.getRelXAngle(dest);
-
-        // If close don't rotate.
-        if (Math.abs(rot) > 0.1) {
-            // +ive radians = counter clockwise.
-            if (rot > 0) {
-                ship.rollL();
-            } else {
-                ship.rollR();
-            }
-            return (false);
-        } else {
-            ship.rollRate = 0;
-        }
-        return (true);
-    }
-
-    static undock() {
-        this.myShip.undock();
-        return (true);
-    }
-
-    static destruct() {
-        this.myShip.destruct();
-        return (true);
-    }
-
-    static wait(date) {
+    wait(date) {
         if (undefined == this.expire) {
             // Set a new expiry time
             this.expire = date + 2000 + Math.random() * 3000;
@@ -194,68 +240,136 @@ class NavMode {
         }
         return (false);
     }
-}
 
-class BasicAI {
-
-    // Navigation program.
-    // Loops until it hits STOP.
-    program = new Array(
-        NavMode.RANDOM,
-        NavMode.STATION_APPROACH,
-        NavMode.STATION_DOCK,
-        NavMode.WAIT,
-        NavMode.UNDOCK,
-        NavMode.WORMHOLE,
-        NavMode.STOP
-    )
-
-    // Program counter.
-    pc;
-
-    // Wait timer
-    expire = undefined;
-
-    myShip;
-
-    // Destination may be an item or a location.
-    destination = undefined;
-
-    constructor(myShip) {
-        this.myShip = myShip;
-        this.pc = 0;
+    undock(date) {
+        this.myShip.undock();
+        return (true);
     }
 
-    getShip() {
-        return (this.myShip);
+    destruct(date) {
+        this.myShip.destruct();
+        return (true);
     }
 
-    animate(date) {
-        let navMode = this.program[this.pc];
+    // Attack an Item
+    attack(dest, date) {
+        let ship = this.myShip;
 
-        if ((navMode.hasDest()) && (undefined == this.destination)) {
-            this.destination = navMode.getDest(this);
+        let range = ship.getLocation().distanceTo(dest.getLocation());
+
+        // If too far away navigate towards.
+        if (range > MAX_FIRE_RANGE) {
+            return (this.navigateThroughDest(dest));
+        } else {
+            // If necessry get closer. Do not change firing angle.
+            // ToDo : Not quite right. But shoud cause some interesting behaviour.
+            if (range > FIRE_RANGE) {
+                ship.accelerate();
+            } else {
+                ship.decelerate();
+            }
         }
 
-        let done = navMode.animate(this, date);
+        // Close enough. Calculate lead direction.
+        let delta = ship.getLocation().getRelative(dest.getLocation()).normalize();
 
-        if (done) {
-            // Got there. 
-            this.incPc();
-            this.destination = undefined;
+        let destDir = dest.speed.clone().normalize();
+        let missileSpeed = 600;
+        missileSpeed += ship.getSpeed();
+        destDir.multiplyScalar(dest.getSpeed() / missileSpeed);
+
+        delta.add(destDir);
+        delta.add(ship.getLocation());
+
+        // Rotate towards lead.
+        let angle = this.rotateTowardsLoc(delta, false);
+
+        // If close enough fire.
+        if (angle < MAX_FIRE_ANGLE) {
+            if ((undefined == this.expire) || (this.expire < date)) {
+                if (ship.getGame().isSafe()) {
+                    // Play nicely.
+                    return(true);
+                }
+                ship.shoot(date);
+
+                // Set a new expiry time
+                this.expire = date + (FIRE_FREQ * (1 + Math.random() * 2));
+            }
         }
+
+        // If target destroyed we are done.
+        if (dest.isDestructed()) {
+            this.expire = undefined;
+            return (true);
+        }
+
+        return (false);
     }
 
-    incPc() {
-        this.pc++;
-        if (this.pc >= this.program.length) {
-            this.pc = 0;
+    // Is current destination set and still valid?
+    haveDest() {
+        if (this.dest == undefined) {
+            return (false);
         }
+
+        if ((this.dest instanceof Item) && (this.dest.isDestructed())) {
+            // It's gone
+            return (false);
+        }
+
+        return (true);
+    }
+
+    // Rest are implementarions of the individual animate fucntions..
+    navigateTo(dest, maxSpeed) {
+        if (undefined == dest) {
+            // Cant navigate to an undefined ... give up.
+            return (true);
+        }
+
+        // We know what where we want to go.
+        // Let individual AI decide how to get there.
+        return (this.navigateToDest(dest, maxSpeed));
+    }
+
+    navigateThrough(dest, maxSpeed) {
+        if (undefined == dest) {
+            // Cant navigate to an undefined ... give up.
+            return (true);
+        }
+
+        // We know what where we want to go.
+        // Let individual AI decide how to get there.
+        return (this.navigateThroughDest(dest, maxSpeed));
+    }
+
+
+    // Match rotation with anther Item.
+    // Station bay is on the -x side. So actually rotating in the same direction.
+    // Return true if matched.
+    matchRotation(ship, dest) {
+        // Due to rest of code X axes should be roughly aligned.
+        let rot = ship.getRelXAngle(dest);
+
+        // If close don't rotate.
+        if (Math.abs(rot) > 0.1) {
+            // +ive radians = counter clockwise.
+            if (rot > 0) {
+                ship.rollL();
+            } else {
+                ship.rollR();
+            }
+            return (false);
+        } else {
+            ship.rollRate.zero();
+        }
+        return (true);
     }
 
     // Navigate to a destination. Stop on arrival.
     // Return 'true' om arrival.
-    navigateToDest(dest) {
+    navigateToDest(dest, maxSpeed) {
         if (dest instanceof Item) {
             if (dest.isDestructed()) {
                 // It's gone
@@ -264,21 +378,14 @@ class BasicAI {
         }
 
         let loc = this.getTargetLocation(dest);
-        return (this.navigateToLoc(loc, true));
+        return (this.navigateToLoc(loc, true, maxSpeed));
     }
 
     // Navigate to a destination. Do not stop on arrival.
     // Return 'true' om arrival.
-    navigateThroughDest(dest) {
-        if (dest instanceof Item) {
-            if (dest.isDestructed()) {
-                // It's gone
-                return (true)
-            }
-        }
-
+    navigateThroughDest(dest, maxSpeed) {
         let loc = this.getTargetLocation(dest);
-        return (this.navigateToLoc(loc, false));
+        return (this.navigateToLoc(loc, false, maxSpeed));
     }
 
     // Get 'location' we want to get to for a 'destination'.
@@ -299,24 +406,22 @@ class BasicAI {
 
     // Navigate to a location. 
     // Return 'true' on arrival.
-    navigateToLoc(loc, stop) {
-        let res = false;
+    navigateToLoc(loc, stop, maxSpeed) {
 
         // Orient ship towards
-        let dist = this.getShip().getLocation().distanceTo(loc);
-        if (this.rotateTowardsVector(loc)) {
+        let dist = this.myShip.getLocation().distanceTo(loc);
+        if (this.rotateTowardsLoc(loc, true) < MAX_THRUST_ANGLE) {
             // If in forward arc thust.
             if (!stop || (dist > this.myShip.getSpeed() * 5)) {
                 // Thrust even when we get there.
-                if (this.myShip.getSpeed() < (this.myShip.getMaxSpeed() * 0.9)) {
+                if (this.myShip.getFwdSpeed() < (this.myShip.getMaxSpeed() * 0.9)) {
                     this.myShip.accelerate()
                 } else {
                     this.myShip.hull.setFlameState(false);
                 }
             } else {
-                let maxSpeed = 10;
-                if (undefined != this.program[this.pc].getMaxSpeed()) {
-                    maxSpeed = this.program[this.pc].getMaxSpeed();
+                if (undefined == maxSpeed) {
+                    maxSpeed = 10;
                 }
 
                 // Try to slow down.
@@ -330,67 +435,94 @@ class BasicAI {
             this.myShip.decelerate();
         }
 
-        /*
-        console.log("dist " + dist + " speed " + this.myShip.getSpeed() + " stop " + stop + " maxSpeed " + this.program[this.pc].getMaxSpeed() + " dest " + loc.x + " " + loc.y + " " + loc.z + " ship loc " + 
-        this.myShip.getLocation().x + " " + this.myShip.getLocation().y + " " + this.myShip.getLocation().z)
-        */
-
         let done = Math.abs(dist) < 1;
         return (done);
     }
 
-    // Get shortest vector to a location. May be through wrap round.
-    getShortestVec(loc) {
-        let vec = loc.clone();
-        vec.sub(this.myShip.location);
-        vec.add(this.myShip.location);
-        return (vec);
-    }
-
-    // Rotate towards a relative vector.
-    // Return true if in the fwd arc and angle is acceptable.
-    rotateTowardsVector(loc) {
+    // Rotate towards world location.
+    // Return new angle to location.
+    rotateTowardsLoc(loc, damp) {
         // Work out delta in ship space.
-        let delta = this.getShortestVec(loc);
+        let delta = this.myShip.getShortestVec(loc);
         this.myShip.worldToLocal(delta);
 
-        delta.normalize();
+        this.rotateTowardsVector(delta, damp);
+
+        return (this.myShip.angleTo(loc));
+    }
+
+    // Rotate towards a vector
+    // Return true if rotated.
+    // damp set to true if a 'dead zone' is required when roughly aligned.
+    rotateTowardsVector(delta, damp) {
+        let ship = this.myShip;
         let rotated = false;
-        // console.log("deltas" + delta.x + " " + delta.y + " " + delta.z);
 
-        // Work out yaw
-        if (delta.y > THRESHOLD) {
-            this.myShip.yawL();
-            // Spaceships dont need to roll.
+        let xVec = new THREE.Vector2(1, 0);
+
+        // Work out required angle adjustments.
+        let yawDelta = new THREE.Vector2(delta.x, delta.y);
+        yawDelta = yawDelta.angleTo(xVec);
+        if (0 > delta.y) {
+            yawDelta = -yawDelta;
+        }
+
+        let pitchDelta = new THREE.Vector2(delta.x, delta.z);
+        pitchDelta = pitchDelta.angleTo(xVec);
+        // Don't know why this is wrong way up.
+        if (0 < delta.z) {
+            pitchDelta = -pitchDelta;
+        }
+
+        // If it's in the rear arc ignore damping
+        let threshold = THRESHOLD;
+        if (delta.x < 0) {
+            threshold = 0;
+        }
+
+        // Work out if we are going to get there or not with current rotate rates.
+        if (!damp || (Math.abs(yawDelta) > threshold)) {
             rotated = true;
-        } else {
-            if (delta.y < -THRESHOLD) {
+            let yr = ship.yawRate.getRate();
+            let yawEst = this.myShip.getGame().getAnimateRate() * (yr * yr) / (ship.yawRate.getDelta() * 2);
+            if (0 > yr) {
+                yawEst = -yawEst;
+            }
+            if (yawEst < yawDelta) {
+                this.myShip.yawL();
+            } else {
                 this.myShip.yawR();
-                rotated = true;
-            } else {
-                this.myShip.yawRate = 0;
             }
         }
 
-        // Work out pitch 
-        if (delta.z > THRESHOLD) {
-            this.myShip.climb();
+        if (!damp || (Math.abs(pitchDelta) > threshold)) {
             rotated = true;
-        } else {
-            if (delta.z < -THRESHOLD) {
-                this.myShip.dive();
-                rotated = true;
+            let pr = ship.pitchRate.getRate();
+            let pitchEst = this.myShip.getGame().getAnimateRate() * (pr * pr) / (ship.pitchRate.getDelta() * 2);
+            if (0 > pr) {
+                pitchEst = -pitchEst;
+            }
+            if (pitchEst > pitchDelta) {
+                this.myShip.climb();
             } else {
-                this.myShip.pitchRate = 0;
+                this.myShip.dive();
             }
         }
 
-        if (stop && rotated) {
-            return (false);
-        }
+        return (rotated);
+    }   
+    
+    isHostile() {
+        return(this.hostile)
+    }
 
-        return (delta.x > 0);
+    setHostile(hostile) {
+        if (this.hostile != hostile) {
+            // Start from beginning of new program.
+            this.pc = 0;
+        }
+        this.hostile = hostile;
     }
 }
 
-export { BasicAI, NavMode };
+export { BasicAI };

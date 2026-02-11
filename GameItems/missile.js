@@ -42,7 +42,7 @@ class Missile extends NonShipItem {
 
     // Move it clear of parents new position. 
     let thatBoundary = owner.getBoundary()
-    //thatBoundary.translate(owner.speedFrame)
+    thatBoundary.translate(owner.speedFrame)
     while (this.getBoundary().intersects(thatBoundary)) {
       this.moveItem(false);
     }

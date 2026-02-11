@@ -25,8 +25,8 @@ class SaucerShooter extends Saucer {
     moveDue = 0;
     targetLocation;
 
-    constructor(location, owner, safe) {
-        super(SIZE, location, MASS, COLOUR, owner, safe);
+    constructor(location, owner) {
+        super(SIZE, location, MASS, COLOUR, owner);
         this.createTargetLocation();
     }   
 
@@ -78,7 +78,7 @@ class SaucerShooter extends Saucer {
 
     // Do shooting logic
     shoot() {
-        if (!this.safe) {
+        if (!this.getGame().isSafe()) {
             if (this.shootDue++ >= SHOOT_FREQUENCY) {
                 this.shootDue = 0;
 

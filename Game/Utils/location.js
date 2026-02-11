@@ -44,23 +44,27 @@ class Location extends THREE.Vector3 {
         this.validate(this, that);
         super.add(that);
         this.handleWrap(wrap);
+        return(this);
     }
 
     sub(that, wrap) {
         this.validate(this, that);
         super.sub(that);
         this.handleWrap(wrap);
+        return(this);
     }
 
     addVectors(a, b, wrap) {
         this.validate(a, b);
         super.addVectors(a, b);
         this.handleWrap(wrap);
+        return(this);
     }
 
     copy(that) {
         super.copy(that);
         this.system = that.system;
+        return(this);
     }
 
     setSystem(system) {
@@ -79,34 +83,40 @@ class Location extends THREE.Vector3 {
         this.validate(this, that);
         super.divide(that);
         this.handleWrap(wrap);
+        return(this);
     }
 
     divideScalar(that, wrap) {
         super.divideScalar(that);
         this.handleWrap(wrap);
+        return(this);
     }
 
     multiply(that, wrap) {
         this.validate(this, that);
         super.multiply(that);
         this.handleWrap(wrap);
+        return(this);
     }
 
     multiplyScalar(that, wrap) {
         super.multiplyScalar(that);
         this.handleWrap(wrap);
+        return(this);
     }
 
     multiplyVectors(a, b, wrap) {
         this.validate(a, b);
         super.multiplyVectors(a, b);
         this.handleWrap(wrap);
+        return(this);
     }
 
     subVectors(a, b, wrap) {
         this.validate(a, b);
         super.subVectors(a, b);
         this.handleWrap(wrap);
+        return(this);
     }
 
     // Get location relative to this.
