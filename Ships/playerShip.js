@@ -8,7 +8,7 @@
 import * as THREE from 'three';
 import Ship from './ship.js';
 import MyCamera from '../Game/Scenery/myCamera.js';
-import BasicHull from './Components/Hulls/basicHull.js';
+import SmallHull from './Components/Hulls/smallHull.js';
 import Location from '../Game/Utils/location.js';
 
 class PlayerShip extends Ship {
@@ -49,7 +49,7 @@ class PlayerShip extends Ship {
     buildShip() {
         // Create hull
         // Will also create all other components, for that hull type, and add them to our components sets.
-        super.buildShip(BasicHull);
+        super.buildShip(SmallHull);
     }
 
     // Work round for circular dependency with Item class.

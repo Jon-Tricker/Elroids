@@ -68,7 +68,7 @@ class TurnRate {
     }
 
     getDelta() {
-        return(ROTATE_RATE_DELTA);
+        return (ROTATE_RATE_DELTA);
     }
 }
 
@@ -297,12 +297,14 @@ class Ship extends Item {
         }
     }
 
-    // Some on line magic to get the current directions X access
+    // Get the current directions X axis.
     getOrientation() {
-        let e = this.matrixWorld.elements;
-        let xDirection = new THREE.Vector3();
-        xDirection.set(e[0], e[1], e[2])
-        xDirection = xDirection.normalize()
+        let xDirection = this.localToWorld(new THREE.Vector3(1,0,0));
+
+        // Above will have included ship position ... remove it.
+        xDirection.sub(this.position);
+        xDirection.normalize()
+
         return (xDirection);
     }
 
@@ -431,7 +433,7 @@ class Ship extends Item {
         let delta = this.getShortestVec(loc);
         this.worldToLocal(delta);
 
-        return(new THREE.Vector3(1, 0, 0).angleTo(delta));
+        return (new THREE.Vector3(1, 0, 0).angleTo(delta));
     }
 
     // Get shortest vector to a location.
@@ -450,7 +452,7 @@ class Ship extends Item {
         let spd = this.speed.clone();
         spd.add(this.location);
         this.worldToLocal(spd);
-        return(spd.x);
+        return (spd.x);
     }
 }
 

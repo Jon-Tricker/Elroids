@@ -74,7 +74,6 @@
 							<LI>Wormholes</LI>
 							<LI>Floating minerals and goods crates.</LI>
 						</UL>
-						<P>I should have passed the location and speed of Items is as Vector3. Not individual x,y and z components. However fixing this is a long process. For now I am just doing it 'right' for new sub classes.</P>
 					</LI>
 					<LI>List of stations.</LI>
 					<LI>List of wormholes</LI>
@@ -91,13 +90,14 @@
 			</UL>
 		</LI>
 
-		<LI>Maunal - Offline ocumentation.</LI>
+		<LI>Maunal - Offline documentation.</LI>
 	</UL>
 
 	<H2>Save/Load mechanism.</H2>
 	<P>Game images are saved as JSON files.</P>
-	<P>Each object persists only none recreatable members. i.e NOT stuff, like meshes, that don't change and can be
+	<P>Each object persists only non-recreatable members. i.e NOT stuff, like meshes, that don't change and can be
 		dynamically re-created.</P>
+	<P>Also not Items, like Rocks, NPShips .etc, which can be randomly cretaed.</P>
 	<P>Each persistable object has two methods:</P>
 	<UL>
 		<LI>toJSON() - Converts the non-recreateble members into JSON objects. This is built into one big JSON image and

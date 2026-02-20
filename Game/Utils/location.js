@@ -62,8 +62,15 @@ class Location extends THREE.Vector3 {
     }
 
     copy(that) {
-        super.copy(that);
+        // Using super copy does not seem to work. Think it's doing something via reference rather than value.
+        //super.copy(that);
+
+        this.x = that.x;
+        this.y = that.y;
+        this.z = that.z;
+
         this.system = that.system;
+        
         return(this);
     }
 

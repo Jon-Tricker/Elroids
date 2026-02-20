@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import Item from '../../GameItems/item.js';
 import Station from '../../GameItems/System/station.js';
+import PlayerShip from '../playerShip.js';
 
 // Minimum turn threshold
 // Found, by experimentation, to prevent 'seeking'. 
@@ -101,20 +102,16 @@ class BasicAI {
                 break;
 
             case 5:
-                done = this.navToWormhole(date);
-                break;
-
-            // Loop forever.
             default:
-                this.pc = 0;
+                done = this.navToWormhole(date);
                 break;
         }
 
-        return(done);
+        return (done);
     }
 
     // Alternate program used when in hostile mode.
-    hostileProgram(date) {      
+    hostileProgram(date) {
         let done = false;
 
         switch (this.pc) {
@@ -127,14 +124,14 @@ class BasicAI {
                 }
                 done = false;
                 break;
-        
+
             case 1:
                 done = this.attackShip(date);
                 if (done) {
                     this.setHostile(false);
                 }
-                break; 
-                
+                break;
+
             case 2:
                 done = this.navToWormhole(date);
                 break;
@@ -145,7 +142,7 @@ class BasicAI {
                 break;
         }
 
-        return(done);
+        return (done);
     }
 
     incPc() {
@@ -196,7 +193,7 @@ class BasicAI {
     attackShip(date) {
         if (!this.isHostile()) {
             // Nay worries mate!
-            return(true);
+            return (true);
         }
         return (this.attack(this.myShip.getGame().getShip(), date));
     }
@@ -287,14 +284,17 @@ class BasicAI {
         // If close enough fire.
         if (angle < MAX_FIRE_ANGLE) {
             if ((undefined == this.expire) || (this.expire < date)) {
-                if (ship.getGame().isSafe()) {
+                if ((dest instanceof PlayerShip) && ship.getGame().isSafe()) {
                     // Play nicely.
-                    return(true);
+                    return (true);
                 }
                 ship.shoot(date);
 
-                // Set a new expiry time
-                this.expire = date + (FIRE_FREQ * (1 + Math.random() * 2));
+                // Set a new expiry time 
+                this.expire = date
+                if (dest instanceof PlayerShip) {
+                    this.expire += (FIRE_FREQ * (1 + Math.random() * 2));
+                }
             }
         }
 
@@ -384,6 +384,13 @@ class BasicAI {
     // Navigate to a destination. Do not stop on arrival.
     // Return 'true' om arrival.
     navigateThroughDest(dest, maxSpeed) {
+        if (dest instanceof Item) {
+            if (dest.isDestructed()) {
+                // It's gone
+                return (true)
+            }
+        }
+
         let loc = this.getTargetLocation(dest);
         return (this.navigateToLoc(loc, false, maxSpeed));
     }
@@ -510,10 +517,10 @@ class BasicAI {
         }
 
         return (rotated);
-    }   
-    
+    }
+
     isHostile() {
-        return(this.hostile)
+        return (this.hostile)
     }
 
     setHostile(hostile) {

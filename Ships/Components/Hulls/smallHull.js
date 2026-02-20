@@ -15,12 +15,12 @@ import { ComponentType } from '../component.js';
 
 const DESCRIPTION = "A small hull used for scouts and light freighters.";
 
-class BasicHull extends Hull {
+class SmallHull extends Hull {
 
     static type = new ComponentType("GP1", 1, 50, 1000, 3);
 
     constructor(set) {
-        super(BasicHull.type, set, 200, 0.8);
+        super(SmallHull.type, set, 200, 0.8);
         super.buildSets(set, 1, 1, 1, 2, 3);
     }
 
@@ -148,4 +148,4 @@ class BasicHull extends Hull {
 
 }
 
-export default BasicHull;
+export default SmallHull;

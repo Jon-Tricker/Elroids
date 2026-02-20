@@ -197,7 +197,7 @@ class Item extends THREE.Group {
     }
 
     setLocation(loc) {
-        this.location.copy(loc);
+        this.location = loc.clone();
     }
 
     getRadarColour() {
@@ -634,14 +634,15 @@ class Item extends THREE.Group {
     }
 
     // Get relative value with optional weigthing for proximity.
-    getRelativeValue(loc) {
+    getRelativeValue(loc, perTonne) {
         let value = this.getValue();
         if (undefined == loc) {
             return (value);
         }
 
         let dist = loc.getRelative(this.location).length();
-        return (value / (dist + 100));
+        value /= (dist/100) * this.getMass();
+        return (value);
     }
 
     // Get the relative X rotation of another Item.

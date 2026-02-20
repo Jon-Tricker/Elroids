@@ -244,14 +244,15 @@ class System {
     // Class 'undefined' is a wild card.
     // If a location is passes weights the result for closeness. 
     // Returns undefined if nothing available.
-    getValuable(type, location) {
+    getValuable(type, location, perTonne) {
         let maxValTarget;
+        let maxVal = 0;
 
         if (undefined == type) {
             let minTarget = this.getValuable(Mineral, location);
             let crateTarget = this.getValuable(GoodsCrate, location);
             if (undefined != minTarget) {
-                if ((undefined == crateTarget) || (minTarget.getRelativeValue(location) > crateTarget.getRelativeValue(location))) {
+                if ((undefined == crateTarget) || (minTarget.getRelativeValue(location, perTonne) > crateTarget.getRelativeValue(location, perTonne))) {
                     return(minTarget);
                 }
             }
@@ -263,11 +264,12 @@ class System {
 
                 let value = that.getValue();
                 if (undefined != location) {
-                    value = that.getRelativeValue(location)
+                    value = that.getRelativeValue(location, perTonne)
                 }
 
-                if ((undefined == maxValTarget) || (value > maxValTarget.getValue())) {
+                if ((undefined == maxValTarget) || (value > maxVal)) {
                     maxValTarget = that;
+                    maxVal = value;
                 }
             }
         }

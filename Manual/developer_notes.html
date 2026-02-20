@@ -44,21 +44,19 @@
 
 	<H2>ToDos (In some sort of priority order)</H2>
 
-	<H3>V9.x Create Non Player Ships.</H3>
-	<P>Give NP ships</P>
-	<UL>
-		<LI>Ability to mine. Use system.getValuable(Rock, loc) to find target.</LI>
-		<LI>Check in fwd arc for collision avoidance.</LI>
-	</UL>
-	<P>Fix wormholes to give spawned ships velocity away from hole. Less chance of re-entry.</P>
-	<P>Spawn mother saucers from wormhole.</P>
-	
 	<H3>V10.x legal system.</H3>
 	<P>Add player reputation.</P>
 	<P>Add police ships.</P>
 	<P>Once there is a penalty for piracy increase value of NPShips.</P>
 
-	<H3>V11.x General tidy up.</H3>
+	<H3>V11.x Improve NP ships</H3>
+	<P>Less 'wild' navigation. Modify navigateThroughDest() to add lead. Possibly common code with attack().</P>
+	<P>Check in fwd arc for collision avoidance. Maybe change all collision detection to ray tracing.</P>
+	<P>Make miners less stupid. Dont charge in before all sub-rocks destroyed.</P>
+
+	<H3>V12.x General tidy up.</H3>
+	<P>Allow >1 ship to dock at the same time.</P>
+	
 	<P>Move Back, Exit etc. to top of menus.</P>
 	<P>Sort problem with extra blank lines in menu system.</P>
 	<P>Convert GoodsList and ComponentsList to use classes ... like shipTypes in NPShipFactory.</P>
@@ -66,10 +64,10 @@
 	<P>Do a sweep of use of null. In most cases change to undefned.</P>
 	<P>Modify flame cones to grow/shrink when pulsed. Not flicker.</P>
 
-	<H3>V12.x Fix game launch problems.</H3>
+	<H3>V13.x Fix game launch problems.</H3>
 	<P>Add 'loading' screen.</P>
 
-	<H3>V13.x Add extra ship components.</H3>
+	<H3>V14.x Add extra ship components.</H3>
 	<UL>
 		<LI>'Elite style' (over heating) beam weapon.</LI>
 		<LI>Thrusters (directional control)</LI>
@@ -89,20 +87,20 @@
 		<LI>Improved terminal (but keep VT100 as default).</LI>
 	</UL>
 
-	<H3>V14.x Bulk up.</H3>
+	<H3>V15.x Bulk up.</H3>
 	<P>Add many more:
-		<UL>
-			<LI>Goods Types.</LI>
-			<LI>Systems.</LI>
-			<LI>Hull types.</LI>
-		</UL>
+	<UL>
+		<LI>Goods Types.</LI>
+		<LI>Systems.</LI>
+		<LI>Hull types.</LI>
+	</UL>
 	</P>
 
 	<H3>Documentation.</H3>
 	<P>Add screen shot with various display panels labled.</P>
 	<P>Add images (screen shots) of Items in place of game logo.</P>
 
-	<H3>General 'good stuff' ... Post V13.0</H3>
+	<H3>General 'good stuff' ... Post V15.0</H3>
 	<UL>
 		<LI>Game mechanics:
 			<UL>
@@ -154,12 +152,6 @@
 		<LI>Add 'tunnel' graphics when going through wormholes.</LI>
 	</UL>
 
-	<LI>Additional features:
-		<UL>
-			<LI>Implement mother ships spawning more mother ships?</LI>
-		</UL>
-	</LI>
-
 	<LI>UI improvements:
 	<LI>Abstract keyboard controls to Events (Roll left, Pause, etc.) rather than characters. Makes switch to other
 		UIs easier.</LI>
@@ -169,7 +161,7 @@
 		<LI>Add joystick/tablet controls (maybe via on screen buttons reproducing keyboard keys). Maybe use tilt sensor
 			for movement.</LI>
 	</UL>
-		<LI>Make key assignments configurable.</LI>
+	<LI>Make key assignments configurable.</LI>
 	</LI>
 
 	<LI>Extensions:

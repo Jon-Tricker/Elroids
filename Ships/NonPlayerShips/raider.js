@@ -4,7 +4,7 @@
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import NPShip from './nonPlayerShip.js';
-import BasicHull from '../Components/Hulls/basicHull.js';
+import SmallHull from '../Components/Hulls/smallHull.js';
 import { BasicAI } from './basicAI.js';
 
 class RaiderAI extends BasicAI {
@@ -48,7 +48,7 @@ class Raider extends NPShip {
     buildShip() {
         // Create hull
         // Will also create all other components, for that hull type, and add them to our components sets.
-        super.buildShip(BasicHull);
+        super.buildShip(SmallHull);
     }
 
     getClass() {

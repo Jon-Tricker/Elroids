@@ -88,7 +88,7 @@ class StarSystem extends System {
     animate(date, keyBoard) {
         // If necesarry top up rocks.
         if (this.rockCount < this.maxRockCount) {
-            this.createRandomRock(this.getShip().location.getFarAway());
+            this.createRandomRock(this.getGame().getShip().location.getFarAway());
         }
 
         if (!this.getGame().testMode) {
@@ -103,8 +103,7 @@ class StarSystem extends System {
         if ((date > this.nPShipTimer) && (!this.getGame().testMode)) {
             // Genrate new NPShip from one of the wormhole ends.
             let wormholeEnd = this.wormholeEnds.getRandomElement();
-            let npShip = NPShipFactory.createRandom(wormholeEnd.location);
-            npShip.setSpeed(this.getGame().createRandomVector(10));
+            let npShip = NPShipFactory.createRandom(wormholeEnd.location, true);
             npShip.setActive(true);
             wormholeEnd.exit(npShip);
 
@@ -191,7 +190,7 @@ class StarSystem extends System {
             for (let type of NPShipFactory.shipTypes) {
                 let yLoc = (NPShipFactory.shipTypes.size/2 - count) * 100;
                 let location = new Location(2000, yLoc, 200, this);
-                new type(location);
+                NPShipFactory.createShip(type, location, true);
                 count ++;
             }
 
@@ -276,13 +275,23 @@ class StarSystem extends System {
         if (this.getGame().testMode) {
             loc = new Location(1000, 100, -50, this);
         } else {
-            loc = Location.createRandomInSystem(this);
+            // Spawn from a wormhole.
+            loc = this.wormholeEnds.getRandomElement().location;
         }
 
-        this.motherSaucers.add(new SaucerMother(loc, null));
+        let saucer = new SaucerMother(loc, null);
+        this.motherSaucers.add(saucer);
 
         // Game gradually gets harder.
         game.maxSaucerCount++;
+
+        if (!this.getGame().testMode) { 
+            // Give it some speed.
+            let speed = this.getGame().createRandomVector(1, false);
+            speed.normalize();
+            speed.multiplyScalar(saucer.getMaxSpeed());
+            saucer.setSpeed(speed);
+        }
     }
 
     removeMotherSaucer(saucer) {
