@@ -4,6 +4,7 @@ import CompassDisplay from "./compassDisplay.js";
 import ComponentDisplays from "./Components/componentDisplays.js";
 import Terminal from './terminal.js'
 import MenuSystem from './menuSystem.js'
+import Reputation from "../Game/reputation.js";
 
 const PAD_LENGTH = 5;
 const DEFAULT_DURATION = 2000;
@@ -86,11 +87,11 @@ class Displays {
     }
 
     getGame() {
-        return(this.game);
+        return (this.game);
     }
 
     getShip() {
-        return(this.getGame().getShip());
+        return (this.getGame().getShip());
     }
 
     resize() {
@@ -174,7 +175,9 @@ class Displays {
         this.controlsCtx.fillRect(0, 0, this.controls.width, this.controls.height);
         this.controlsCtx.globalAlpha = 1;
         this.controlsCtx.fillStyle = this.defaultColour;
-        let text = "V" + this.game.getVersion() + "    Score:" + this.printNum(this.game.player.getScore()) + "    Credits:" + this.printNum(this.game.player.getCredits()) + "    Frame rate:" + this.printNum(this.game.universe.getActualAnimateRate()) + "/s";
+        let text = "V" + this.game.getVersion() + "    Score:" + this.printNum(this.game.player.getScore()) + "    Credits:" + this.printNum(this.game.player.getCredits()) +
+            "    Reputation: " + Reputation.getRepInSystem(this.game.player, this.game.getSystem()).getText() + " (" + Number(this.game.player.getReputation()).toFixed(1).padStart(0) + ")"
+            "    Frame rate:" + this.printNum(this.game.universe.getActualAnimateRate()) + "/s";
         if (this.game.isSafe()) {
             text += "     Safe Mode: On";
         }
@@ -238,7 +241,7 @@ class Displays {
         this.statusCtx.clearRect(0, 0, this.status.width, this.status.height);
 
         let ship = this.game.ship;
-        
+
         if (this.hudIsOn) {
             this.radar.animate();
             this.compass.animate();

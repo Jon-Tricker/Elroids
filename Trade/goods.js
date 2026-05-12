@@ -2,9 +2,12 @@
 //
 // Can also represent multiple goods.
 // Goods dont have status. If they are damaged the number is reduced.
+
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
 import GameError from "../Game/gameError.js";
 import GoodsCrate from "./goodsCrate.js";
-
 
 class Goods {
     type;
@@ -33,13 +36,13 @@ class Goods {
     }
 
     // Make a crate containing this type of goods/
-    makeCrate(location, speed) {  
-        let crate = new GoodsCrate(location, speed, this); 
-        return(crate)
+    makeCrate(location, speed) {
+        let crate = new GoodsCrate(location, speed, this);
+        return (crate)
     }
 
     getNumber() {
-        return(this.number);
+        return (this.number);
     }
 
     // Is this legal in a given system.
@@ -120,14 +123,14 @@ class Goods {
         if (plural || (1 != this.number)) {
             return (this.type.plural);
         }
-        
+
         return (this.type.singular);
     }
 
     // Get mass. Handle some dodgy javascript rounding in the calculation.
     getMass() {
         let mass = this.type.mass * this.number;
-        mass = Math.round(mass * 1000000)/1000000;
+        mass = Math.round(mass * 1000000) / 1000000;
         return (mass);
     }
 
@@ -155,7 +158,7 @@ class Goods {
 
     // Is this available in a given system.
     isAvailableInSystem(system) {
-        return((this.type.getTechLevel() <= system.getTechLevel()) && (this.type.getMagicLevel() <= system.getMagicLevel()));
+        return ((this.type.getTechLevel() <= system.getTechLevel()) && (this.type.getMagicLevel() <= system.getMagicLevel()));
     }
 
     // Get cost of a unit in a given system.
@@ -185,14 +188,16 @@ class Goods {
             isFree = false;
         }
 
-        // Check that we can we afford it.
-        if ((!isFree) && (this.getValueInSystem(ship.system) * number > ship.getCredits())) {
-            throw (new GameError("Not enough credits."));
-        }
-
         // Check that there is capacity.
         if (this.getMass() > ship.hull.compSets.baySet.getAvailableCapacity()) {
             throw (new GameError("Insufficient bay capacity."))
+        }
+
+        // Check that we can we afford it.
+        if (!isFree) {
+            if (!ship.getPlayer().addCredits(-this.getValueInSystem(ship.system))) {
+                return (false);
+            }
         }
 
         // Make copy of purchace menu item.
@@ -202,11 +207,6 @@ class Goods {
 
         // Put it in bay.
         this.loadToShip(ship, good);
-
-        // Now we have added complete financial transaction. 
-        if (!isFree) {
-            ship.addCredits(-this.getValueInSystem(ship.system) * number);
-        }
 
         return (good);
     }
@@ -226,16 +226,21 @@ class Goods {
 
         this.unloadFromShip(number);
 
-        if(!this.isLegal(ship.location.system)) {
-            // ToDo: Add more complex penalties/benefits fro illegal sales.=
-            if(Math.random() < 0.5) {
+        let pay = true;
+        if (!this.isLegal(ship.location.system)) {
+            // ToDo: Add more complex penalties/benefits fro illegal sales.
+            if (Math.random() < 0.5) {
                 ship.playSound("police");
+                ship.getPlayer().decReputation();
+                pay = false;
                 throw new GameError("'Elo 'elo 'elo. That's a bit dodgy! ... Goods confiscated.");
             }
         }
 
-        // Add value to wallet.
-        ship.addCredits(this.getUnitCostInSystem(this.getShip().system) * number);
+        if (pay) {
+            // Add value to wallet.
+            ship.getPlayer().addCredits(this.getUnitCostInSystem(this.getShip().system) * number);
+        }
 
         ship.recalc();
     }

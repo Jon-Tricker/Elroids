@@ -17,7 +17,7 @@ const DESCRIPTION = "A large used for heavy freighters.";
 
 class LargeHull extends Hull {
 
-    static type = new ComponentType("GP3", 3, 100, 10000, 6);
+    static type = new ComponentType("GP3", 7, 100, 10000, 6);
 
     constructor(set) {
         super(LargeHull.type, set, 250);

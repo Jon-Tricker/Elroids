@@ -24,6 +24,7 @@ import { goodsPurchaseMenu } from './Menus/goodsPurchaseMenu.js';
 import { GoodsPurchaseMenu } from './Menus/goodsPurchaseMenu.js';
 import { cargoMenu } from './Menus/cargoMenu.js';
 import { CargoMenu } from './Menus/cargoMenu.js';
+import { playerMenu, PlayerMenu } from './Menus/playerMenu.js';
 import { starSystemsMenu, StarSystemsMenu } from './Menus/starSystemsMenu.js';
 import Universe from '../GameItems/universe.js';
 import GameError from '../Game/gameError.js';

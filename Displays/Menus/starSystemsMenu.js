@@ -2,6 +2,7 @@
 import MenuTable from './menuTable.js';
 import BugError from '../../Game/bugError.js';
 import { MineralType, MineralTypes } from "../../GameItems/minerals.js";
+import Reputation from '../../Game/reputation.js';
 
 let starSystemsMenu = "\
 <BODY>\
@@ -20,9 +21,24 @@ class StarSystemsMenu {
         doc += "<P>";
         doc += "<BR />";
 
+        let tab = new MenuTable();
+
+        let heads = new Array();
+        heads.push("System");
+        heads.push("Reputation");
+        heads.push("Can dock")
+        tab.addHeadings(heads);
+
         for (let system of systems) {
-            doc += "<P><button type=\"button\" onclick=\"StarSystemsMenu.onDetailsClick(this, cursor)\">\t" + system.spec.name + "</button></P>";
+            let vals = new Array();
+            vals.push("<button type=\"button\" onclick=\"StarSystemsMenu.onDetailsClick(this, cursor)\">" + system.spec.name + "</button>");
+            let rep = Reputation.getRepInSystem(game.player, system);
+            vals.push(rep.getText());
+            vals.push(rep.getCanDock());
+            tab.addRow(vals);
         }
+
+        doc += tab.toString();
 
         doc += "</P>";
 
@@ -77,7 +93,7 @@ class StarSystemDetailsMenu {
         let tab = new MenuTable;
         let heads = new Array();
         let vals = new Array();
-        for (let type = 0; type < MineralTypes.length; type ++) {
+        for (let type = 0; type < MineralTypes.length; type++) {
             let mineral = MineralTypes[type];
             heads.push(mineral.name);
             vals.push(Math.floor(system.spec.getMineralAbundance(mineral) * 100));

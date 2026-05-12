@@ -1,7 +1,7 @@
 // Players ship graphic and physics.
 // A 'Ship' with everything implemented.
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -10,8 +10,11 @@ import Ship from './ship.js';
 import MyCamera from '../Game/Scenery/myCamera.js';
 import SmallHull from './Components/Hulls/smallHull.js';
 import Location from '../Game/Utils/location.js';
+import Reputation from '../Game/reputation.js';
+import GameError from '../Game/gameError.js';
 
 class PlayerShip extends Ship {
+    game;
 
     // Ship cameras are creted once and permanently attached to ship. 
     // Will be added to renderer when needed.
@@ -20,9 +23,10 @@ class PlayerShip extends Ship {
 
     originalPosition;
 
-    constructor(height, width, length, location) {
-
+    constructor(game, height, width, length, location) {
         super(height, width, length, location);
+
+        this.game = game;
 
         this.originalPosition = location.clone();
 
@@ -35,16 +39,16 @@ class PlayerShip extends Ship {
         return (json);
     }
 
-    static fromJSON(json, system) {
+    static fromJSON(game, json, system) {
         // Make a default ship.
         // Default components will be made. We will replace them latter. 
-        let newShip = new PlayerShip(json.height, json.width, json.length, Location.fromJSON(json.location, system));
+        let newShip = new PlayerShip(game, json.height, json.width, json.length, Location.fromJSON(json.location, system));
 
         super.fromJSON(json, system, newShip);
 
         return (newShip);
-    }    
-    
+    }
+
     // Build/Rebuild ship components.
     buildShip() {
         // Create hull
@@ -154,7 +158,7 @@ class PlayerShip extends Ship {
             msg += "by " + name.toLowerCase();
         }
         msg += "!"
-        this.getGame().displays.addMessage(msg);
+        this.game.displays.addMessage(msg);
 
         // Dont call 'super'. We want to re-use the same ship. So don't want it to destruct.
         this.hull.compSets.takeDamage(hits);
@@ -164,7 +168,7 @@ class PlayerShip extends Ship {
             this.setEngineSound(false);
 
             // new Explosion(this.size, this);
-            this.getGame().shipDestroyed(that);
+            this.game.shipDestroyed(that);
         } else {
             this.playSound('clang');
         }
@@ -194,7 +198,7 @@ class PlayerShip extends Ship {
 
     // Get termnal (if active)
     getTerminal() {
-        return (this.getGame().displays.terminal);
+        return (this.game.displays.terminal);
     }
 
     // Pick up a mineral.
@@ -203,7 +207,7 @@ class PlayerShip extends Ship {
         let res = super.mineralPickup(mineral)
         if (res) {
             let mass = Math.ceil(mineral.mass);
-            this.getGame().displays.addMessage("Loaded " + mineral.type.name + " " + mass + "(t)");
+            this.game.displays.addMessage("Loaded " + mineral.type.name + " " + mass + "(t)");
             this.playSound('thud');
         }
         return (res);
@@ -214,25 +218,19 @@ class PlayerShip extends Ship {
     cratePickup(crate) {
         let res = super.cratePickup(crate);
         if (res) {
-            this.getGame().displays.addMessage("Loaded " + crate.contents.number + " X " + crate.contents.getName());
+            this.game.displays.addMessage("Loaded " + crate.contents.number + " X " + crate.contents.getName());
             this.playSound('thud');
         }
         return (res);
     }
 
-    addCredits(score) {
-        this.getGame().player.addCredits(score);
-        if (0 < score) {
-            this.playSound('coin');
-        } else {
-            this.playSound('till');
-        }
+    getPlayer() {
+        return (this.game.player);
     }
 
     getCredits() {
-        return (this.getGame().player.getCredits());
+        return (this.game.player.getCredits());
     }
-
 
     dock(station) {
         if (!super.dock(station)) {
@@ -240,20 +238,18 @@ class PlayerShip extends Ship {
         }
 
         this.getTerminal().playSound("poweroff", 0.5);
-        this.getGame().displays.terminalEnable(true);
+        this.game.displays.terminalEnable(true);
 
         return (true);
     }
 
     undock() {
-        let game = this.getGame();
-
         this.getTerminal().playSound("poweron", 0.5);
-        if (game.paused) {
-            game.togglePaused();
+        if (this.game.paused) {
+            this.game.togglePaused();
         }
 
-        game.displays.terminalEnable(false);
+        this.game.displays.terminalEnable(false);
 
         super.undock();
     }
@@ -261,7 +257,7 @@ class PlayerShip extends Ship {
     sellMineral(mineral, mass) {
         let value = Math.floor(this.location.system.spec.getMineralValue(mineral) * mass);
         this.unloadMineral(mineral, mass);
-        this.addCredits(value);
+        this.getPlayer().addCredits(value);
     }
 }
 

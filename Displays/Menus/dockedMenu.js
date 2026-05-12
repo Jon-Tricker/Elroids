@@ -22,6 +22,7 @@ let dockedMenu = "\
     <LI><A HREF=\"compPurchaseMenu\">Components Purchase Menu.</A></LI>\
     <LI><A HREF=\"goodsPurchaseMenu\">Goods Purchase Menu.</A></LI>\
     <LI><A HREF=\"starSystemsMenu\">Guide to the Galaxy.</A></LI>\
+    <LI><A HREF=\"playerMenu\">Player Menu.</A></LI>\
     <LI><A HREF=\"gameMenu\">Game Configuration Menu.</A></LI>\
     <LI><A HREF=\"aboutMenu\">About \"Elroids\".</A></LI>\
 </UL>\

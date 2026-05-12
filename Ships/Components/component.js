@@ -137,7 +137,7 @@ class Component extends Goods {
 
         // Now we have added complete financial transaction. 
         if (alsoBuy) {
-            ship.addCredits(-this.getValueInSystem(ship.getSystem()));
+            ship.getPlayer().addCredits(-this.getValueInSystem(ship.getSystem()));
         }
 
         // If it is in a bay remove it.
@@ -152,7 +152,6 @@ class Component extends Goods {
             comp.setSet(set);
         } else {
             // Make copy of purchace menu item.
-            // Seems to work ... but not sure why.
             comp = new this.constructor(this.getSet());
         }
 
@@ -222,7 +221,7 @@ class Component extends Goods {
             this.status += percent;
 
             // Pay for it.
-            ship.addCredits(-cost);
+            ship.getPlayer().addCredits(-cost);
 
             if (!silent) {
                 ship.getTerminal().playSound("anvil", 0.5);

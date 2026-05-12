@@ -16,10 +16,10 @@ import BugError from '../Game/bugError.js';
 import Location from '../Game/Utils/location.js';
 
 const SYSTEM_SPECS = [
-    new SystemSpec("Sol", 1, 0, 2, "Mostly harmless."),
-    new SystemSpec("Asteel", 2, 0, 1, "Industrial society"),
-    new SystemSpec("Kessel", 3, 0, 2, "High tech society"),
-    new SystemSpec("Endor", 0, 1, 1, "Magical society. Guess some trading house built them a station.")
+    new SystemSpec("Sol", 6, 2, 5, "Mostly harmless."),
+    new SystemSpec("Asteel", 6, 1, 4, "Industrial society"),
+    new SystemSpec("Kessel", 7, 1, 6, "High tech society"),
+    new SystemSpec("Endor", 2, 3, 2, "Magical society. Guess some trading house built them a station.")
 ];
 
 class Universe {
@@ -261,7 +261,7 @@ class Universe {
 
         if (undefined === json) {
             if (this.game.testMode) {
-                this.ship = new PlayerShip(5, 10, 20, new Location(0, 0, 0, system));
+                this.ship = new PlayerShip(this.game, 5, 10, 20, new Location(0, 0, 0, system));
 
                 // Do some damage
                 this.ship.hull.compSets.takeDamage(1);
@@ -316,10 +316,10 @@ class Universe {
                     count++;
                 }
             } else {
-                this.ship = new PlayerShip(5, 10, 20, new Location(-200, 100, 0, system));
+                this.ship = new PlayerShip(this.game, 5, 10, 20, new Location(-200, 100, 0, system));
             }
         } else {
-            this.ship = PlayerShip.fromJSON(json.ship, system);
+            this.ship = PlayerShip.fromJSON(this.game, json.ship, system);
         }
     }
 

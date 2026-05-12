@@ -25,6 +25,7 @@ let topMenu = "\
     <LI><A HREF=\"componentsMenu\">Ship Components Menu.</A></LI>\
     <LI><A HREF=\"starSystemsMenu\">Guide to the Galaxy.</A></LI>\
     <LI><A HREF=\"gameMenu\">Game Configuration Menu.</A></LI>\
+    <LI><A HREF=\"playerMenu\">Player Menu.</A></LI>\
     <LI><A HREF=\"aboutMenu\">About \"Elroids\".</A></LI>\
 </UL>\
 </BODY>"

@@ -13,6 +13,7 @@ import BoxSides from '../../Game/Utils/boxSides.js'
 import PlateTexture from '../../Game/Utils/plateTexture.js';
 import JSONSet from '../../Game/Utils/jsonSet.js';
 import Location from '../../Game/Utils/location.js';
+import Reputation from '../../Game/reputation.js';
 
 
 const ROTATE_RATE = 0.1;    // r/s
@@ -109,10 +110,10 @@ class Station extends NonShipItem {
 
     // Dock something to us.
     // Return true if sucessfull.
-    dock(that) {  
+    dock(that) {
         if (this.dockedItems.size != 0) {
             // Something already docked. For now we only allow one Item
-            return(false);
+            return (false);
         }
 
         this.dockedItems.add(that);
@@ -127,19 +128,19 @@ class Station extends NonShipItem {
         // Switch to station coordinates.
         // this.getGame().getScene().remove(that);
         this.add(that);
-    
+
         // Rotate to face exit. Use station coordionates.
         that.rotation.set(0, 0, Math.PI);
 
-        return(true);
+        return (true);
     }
 
-    undock(that) {   
+    undock(that) {
         // Skip if not really docked
-        if(!this.dockedItems.has(that)) {
+        if (!this.dockedItems.has(that)) {
             throw new BugError("Trying to undock a non-docked Item.");
         }
-        
+
         this.dockedItems.delete(that);
 
         // No longer move with station.
@@ -286,8 +287,8 @@ class Station extends NonShipItem {
 
         let loc = new Location(point.x, point.y, point.z, this.location.system);
         return (loc);
-    } 
-    
+    }
+
     // Get a turning point for approach.
     getApproachPoint() {
         let point = this.bayMesh.position.clone();
@@ -431,10 +432,18 @@ class Station extends NonShipItem {
                     return (false);
                 }
 
+                // Check legaility
+                if (ship instanceof PlayerShip) {  // Check legality
+                    if (!Reputation.getRepInSystem(this.getGame().player, this.getSystem()).getCanDock()) {
+                        this.getGame().displays.addMessage("Docking denided. Reputation too low.");
+                        return (false);
+                    }
+                }
+
                 // ToDo: Check rotation speed match.
 
                 // Dock.
-                return(ship.dock(this));
+                return (ship.dock(this));
             }
         } else {
             // Ship is not really inside station.
@@ -444,7 +453,7 @@ class Station extends NonShipItem {
     }
 
     static getMaxDockingSpeed() {
-        return(MAX_DOCKING_SPEED);
+        return (MAX_DOCKING_SPEED);
     }
 
     animate() {

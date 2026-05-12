@@ -281,39 +281,44 @@ class Hull extends Component {
             shipCurs = shipIter.next()
         }
 
+        // Make copy of purchace menu item. Unitil constructed set not know.
+        let newHull = new this.constructor(undefined);
+        // Set now know.
+        newHull.set = newHull.compSets.hullSet;
+
         // Move compomemt sets into this.
-        thisIter = this.compSets.keys();
-        thisCurs = thisIter.next()
+        let newIter = newHull.compSets.keys();
+        let newCurs = newIter.next()
         shipIter = ship.hull.compSets.keys();
         shipCurs = shipIter.next()
-        while ((!thisCurs.done) && (!shipCurs.done)) {
-            let thisSet = thisCurs.value;
-            thisSet.clear();
+        while ((!newCurs.done) && (!shipCurs.done)) {
+            let newSet = newCurs.value;
+            newSet.clear();
             for (let comp of shipCurs.value) {
-                thisSet.add(comp);
+                newSet.add(comp);
             }
-            thisCurs = thisIter.next()
+            newCurs = newIter.next()
             shipCurs = shipIter.next()
         }
 
         // Move cargo to new hull.
-        this.compSets.baySet.minerals = ship.hull.compSets.baySet.minerals;
-        this.compSets.baySet.components = ship.hull.compSets.baySet.components;
-        this.compSets.baySet.tradeGoods = ship.hull.compSets.baySet.tradeGoods;
+        newHull.compSets.baySet.minerals = ship.hull.compSets.baySet.minerals;
+        newHull.compSets.baySet.components = ship.hull.compSets.baySet.components;
+        newHull.compSets.baySet.tradeGoods = ship.hull.compSets.baySet.tradeGoods;
 
         // Fiddle hull sets set.
-        this.compSets.hullSet.clear();
-        this.compSets.hullSet.add(this);
+        newHull.compSets.hullSet.clear();
+        newHull.compSets.hullSet.add(newHull);
 
         // Set ship to use this hull. Old one will go out of scope and GC.
-        this.compSets.ship = ship;
-        ship.setHull(this);
+        newHull.compSets.ship = ship;
+        ship.setHull(newHull);
 
         // Recalculate
-        this.set.recalc();
+        newHull.set.recalc();
 
         // Charge acount.
-        if (ship.getGame().player.addCredits(-cost));
+        if (ship.getPlayer().addCredits(-cost));
     }
 
     getUpgradeCost(ship) {

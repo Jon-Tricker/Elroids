@@ -27,6 +27,11 @@ class NPShip extends Ship {
         let destroyed = super.takeDamage(hits, that);
 
         if ((that.owner == this.getShip()) || (that == this.getShip())) {
+            if (!this.isHostile() && (this.getSystem().getLawLevel() > 1) ) {
+                this.getGame().displays.addMessage("Piracy is illegal. Reputation reduced.");
+                this.getShip().getPlayer().decReputation();
+            }
+
             // Now it's war!
             this.getGame().setSafe(false);
             this.setHostile(true);
