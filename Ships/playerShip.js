@@ -207,7 +207,7 @@ class PlayerShip extends Ship {
         let res = super.mineralPickup(mineral)
         if (res) {
             let mass = Math.ceil(mineral.mass);
-            this.game.displays.addMessage("Loaded " + mineral.type.name + " " + mass + "(t)");
+            this.game.displays.addMessage("Loaded " + mineral.type.name.toLowerCase() + " " + mass + "(t)");
             this.playSound('thud');
         }
         return (res);
@@ -218,7 +218,7 @@ class PlayerShip extends Ship {
     cratePickup(crate) {
         let res = super.cratePickup(crate);
         if (res) {
-            this.game.displays.addMessage("Loaded " + crate.contents.number + " X " + crate.contents.getName());
+            this.game.displays.addMessage("Loaded " + crate.contents.number + " X " + crate.contents.getName().toLowerCase());
             this.playSound('thud');
         }
         return (res);

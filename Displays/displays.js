@@ -175,8 +175,8 @@ class Displays {
         this.controlsCtx.fillRect(0, 0, this.controls.width, this.controls.height);
         this.controlsCtx.globalAlpha = 1;
         this.controlsCtx.fillStyle = this.defaultColour;
-        let text = "V" + this.game.getVersion() + "    Score:" + this.printNum(this.game.player.getScore()) + "    Credits:" + this.printNum(this.game.player.getCredits()) +
-            "    Reputation: " + Reputation.getRepInSystem(this.game.player, this.game.getSystem()).getText() + " (" + Number(this.game.player.getReputation()).toFixed(1).padStart(0) + ")"
+        let text = "V" + this.game.getVersion() + "    Credits:" + this.printNum(this.game.player.getCredits()) +
+            "    Reputation: " + Reputation.getRepInSystem(this.game.player, this.game.getSystem()).getText() + " (" + Number(this.game.player.getReputation()).toFixed(2).padStart(0) + ")"
             "    Frame rate:" + this.printNum(this.game.universe.getActualAnimateRate()) + "/s";
         if (this.game.isSafe()) {
             text += "     Safe Mode: On";

@@ -10,19 +10,25 @@ import Freighter from "./freighter.js";
 import Smuggler from "./smuggler.js";
 import Raider from "./raider.js";
 import Miner from "./miner.js";
+import PoliceShip from './policeShip.js';
 
 class NPShipFactory {
 
     // List of all ship types.
     // JSONSet is used for it's utilities. It is not stored as JSON.
-    static shipTypes = new JSONSet ([Freighter, Smuggler, Raider, Miner]);
+    static shipTypes = new JSONSet([Freighter, Smuggler, Raider, Miner, PoliceShip]);
     // static shipTypes = new JSONSet ([Miner]);
 
     // Create a random ship
     static createRandom(location, moving) {
-        let type = this.shipTypes.getRandomElement();
+        let type;
+        // Don't auto create police ships.
+        do {
+            type = this.shipTypes.getRandomElement();
+        } while (type == PoliceShip);
+
         let ship = this.createShip(type, location, moving);
-        return(ship);
+        return (ship);
     }
 
     static createShip(type, location, moving) {
@@ -33,8 +39,8 @@ class NPShipFactory {
         ship.rotateX(angle);
 
         angle = (Math.random() - 0.5) * 2 * Math.PI;
-        ship.rotateY(angle);     
-        
+        ship.rotateY(angle);
+
         angle = (Math.random() - 0.5) * 2 * Math.PI;
         ship.rotateZ(angle);
 
@@ -46,7 +52,7 @@ class NPShipFactory {
             ship.setSpeed(speed);
         }
 
-        return(ship);
+        return (ship);
     }
 }
 

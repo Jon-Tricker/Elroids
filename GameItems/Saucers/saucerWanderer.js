@@ -45,7 +45,7 @@ class SaucerWanderer extends Saucer {
     }
 
     getScore() {
-        return(40);
+        return(20);
     }
 }
 

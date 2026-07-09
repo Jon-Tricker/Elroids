@@ -125,31 +125,26 @@ class SaucerMother extends Saucer {
                     let saucer;
                     let thisLoc = this.getLocation();
 
-                    let type = Math.floor(Math.random() * 6)
+                    let type = Math.floor(Math.random() * 5)
                     switch (type) {
                         case 0:
-                        // saucer = new SaucerStatic(thisLoc.x, thisLoc.y, thisLoc.z, this.getGame(), this.safe);
-                        // break;
-                        // Don't bother with statics ... fall through.
-
-                        case 1:
                             // Block up a saucer slot with something useless.
                             saucer = new SaucerWanderer(thisLoc, this);
                             break;
 
-                        case 2:
+                        case 1:
                             saucer = new SaucerShooter(thisLoc, this);
                             break;
 
-                        case 3:
+                        case 2:
                             saucer = new SaucerHunter(thisLoc, this);
                             break;
 
-                        case 4:
+                        case 3:
                             saucer = new SaucerPirate(thisLoc, this);
                             break;
 
-                        case 5:
+                        case 4:
                         default:
                             saucer = new SaucerRam(thisLoc, this);
                             break;

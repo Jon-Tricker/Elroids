@@ -94,7 +94,7 @@ class SaucerShooter extends Saucer {
     }
 
     getScore() {
-        return (60);
+        return (80);
     }
 }
 

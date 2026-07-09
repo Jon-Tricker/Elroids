@@ -128,8 +128,8 @@ class Hull extends Component {
 
     maxSpeed;
 
-    // Create ship material.
-    static shipMaterial = new THREE.MeshStandardMaterial(
+    // Create base ship material.
+    static baseShipMaterial = new THREE.MeshStandardMaterial(
         {
             color: "#B0B0B0",
             roughness: 0.2,
@@ -141,11 +141,13 @@ class Hull extends Component {
         }
     )
 
+    // Actual ship material.
+    hullMaterial;
+
     // Create glass material.
     static glassMaterial = new THREE.MeshStandardMaterial(
         {
             color: "#00D0D0",
-            //color: "#ffffff",
             roughness: 0,
             opacity: 0.01,
             metalness: 0,
@@ -157,14 +159,28 @@ class Hull extends Component {
 
     engineMeshes = new Set();
 
-    constructor(type, set, maxSpeed) {
+    constructor(type, set, maxSpeed, hullColour) {
         super(type, set);
         this.maxSpeed = maxSpeed;
         this.displayPanel = true;
+
+        if (undefined === hullColour) {
+            // Use default material
+            this.shipMaterial = Hull.baseShipMaterial;
+        } else {
+            // Cook our own material.
+            this.shipMaterial = Hull.baseShipMaterial.clone();
+            this.shipMaterial.color=hullColour;
+        }
+
         if (undefined != set) {
             set.recalc();
         }
 
+    }
+
+    getShipMaterial() {
+        return(this.shipMaterial);
     }
 
     toJSON() {

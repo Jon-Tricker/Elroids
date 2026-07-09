@@ -8,20 +8,19 @@ import Reputation from "./reputation.js";
 
 class Player {
     game;
-    score;
     credits;
 
-    // Reputation (0 - 99 but displayed as x.x).
+    // Reputation (0 - 1 but displayed as 0.xx - 10).
     reputation;
 
-    constructor(game, score, credits, reputation) {
+    lastAnimate = 0;
+
+    constructor(game, credits, reputation) {
         this.game = game;
-        if (undefined === score) {
-            this.score = 0;
+        if (undefined === credits) {
             this.credits = 0;
-            this.reputation = 50;
+            this.reputation = 0.40;
         } else {
-            this.score = score;
             this.credits = credits;
             this.reputation = reputation;
         }
@@ -29,18 +28,22 @@ class Player {
 
     toJSON() {
         return {
-            score: this.score,
             credits: this.credits,
             reputation: this.reputation
         }
     }
 
     static fromJSON(json, game) {
-        return (new Player(game, json.score, json.credits, json.reputation));
+        return (new Player(game, json.credits, json.reputation));
     }
 
-    getScore() {
-        return (this.score);
+    animate() {
+        let time = this.game.universe.getTime();
+
+        // Gradually increase rep.
+        this.incReputation(false, 0.0001 * (time - this.lastAnimate) / 1000);
+
+        this.lastAnimate = time;
     }
 
     getCredits() {
@@ -48,23 +51,41 @@ class Player {
     }
 
     getReputation() {
-        return (this.reputation / 10);
+        return (this.reputation * 10);
     }
 
-    incReputation() {
-        if (this.reputation < Reputation.MAX_REPUTATION) {
-            if (!this.addCredits(-Reputation.REP_INC_COST)) {
-                return (false);
-            }
-            this.reputation++;
-            return (true);
+    incReputation(charge, inc) {
+        if (undefined == inc) {
+            inc = 0.01;
+        } else {
+            inc /= 10;
         }
+
+        if (charge) {
+            if (this.reputation < Reputation.MAX_REPUTATION) {
+                if (!this.addCredits(-Reputation.REP_INC_COST)) {
+                    return (false);
+                }
+            }
+        }
+
+        this.reputation += inc;
+        this.game.universe.system.recalcPoliceHostility();
+        return (true);
+
         return (false);
     }
 
-    decReputation() {
+    decReputation(inc) {
+        if (undefined == inc) {
+            inc = 0.01;
+        } else {
+            inc /= 10;
+        }
+
         if (this.reputation > 0) {
-            this.reputation--;
+            this.reputation -= inc;
+            this.game.universe.system.recalcPoliceHostility();
             return (true);
         }
         return (false);

@@ -60,6 +60,8 @@ class Terminal extends DarkPanel {
         if (undefined != cols) {
             this.cols = cols;
         }
+
+        this.clearScreen();
     }
 
     resize(parentWidth, parentHeight) {
@@ -107,7 +109,6 @@ class Terminal extends DarkPanel {
     }
 
     print(text, highlight, centered) {
-
         if (highlight === undefined) {
             highlight = false;
         }
@@ -191,11 +192,6 @@ class Terminal extends DarkPanel {
 
     // Get row for current cursor position.
     getCurrentRow() {
-        // Create any missing rows
-        while (this.lineBuffer.length <= this.cursor.y) {
-            let row = new Array();
-            this.lineBuffer.push(row);
-        }
         return (this.lineBuffer[this.cursor.y]);
     }
 
@@ -212,14 +208,25 @@ class Terminal extends DarkPanel {
         row.push(cell);
 
         // Handle row wrap
-        if (this.cols < this.cursor.x++) {
+        //if (this.cols < this.cursor.x++) {
+        if (this.cols <= row.length) {
+            this.linefeed();
+            /*
             this.cursor.y++;
             this.cursor.x = 0;
+
+            // New row.
+            this.lineBuffer.push(new Array());
+            */
         }
     }
 
     clearScreen() {
         this.lineBuffer = new Array();
+
+        // Create first row.
+        this.lineBuffer.push(new Array());
+
         this.cursor.x = 0;
         this.cursor.y = 0;
     }
@@ -283,7 +290,7 @@ class Terminal extends DarkPanel {
     }
 
     scrollDown() {
-        if (this.lineBuffer.length > this.firstLine + this.rows) {
+        if (this.lineBuffer.length > this.firstLine + this.rows + 1) {
             this.firstLine++;
         }
     }
@@ -305,7 +312,7 @@ class Terminal extends DarkPanel {
                 // Moving up ... cursor line at top.
                 this.firstLine = this.cursor.y;
             } else {
-                if (this.cursor.y > this.firstLine + this.rows) {
+                if (this.cursor.y >= this.firstLine + this.rows) {
                     // Moving down ... cursor line at bottom.
                     this.firstLine = this.cursor.y - this.rows + 1;
                 }

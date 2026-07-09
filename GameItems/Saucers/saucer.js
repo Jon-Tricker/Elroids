@@ -127,6 +127,7 @@ class Saucer extends NonShipItem {
             if (destroyed) {
                 // For now only make loot if destroyed by ship.
                 this.makeLoot();
+                this.getGame().getPlayer().incReputation(false, 0.01);
             }
 
             // Now it's war!

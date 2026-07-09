@@ -19,8 +19,8 @@ class SmallHull extends Hull {
 
     static type = new ComponentType("GP1", 5, 50, 1000, 3);
 
-    constructor(set) {
-        super(SmallHull.type, set, 200, 0.8);
+    constructor(set, hullColour) {
+        super(SmallHull.type, set, 200, hullColour);
         super.buildSets(set, 1, 1, 1, 2, 3);
     }
 
@@ -114,7 +114,7 @@ class SmallHull extends Hull {
         // compute vertex normals
         geometry.computeVertexNormals();
 
-        let mesh = new THREE.Mesh(geometry, Hull.shipMaterial);
+        let mesh = new THREE.Mesh(geometry, this.getShipMaterial());
 
         mesh.castShadow = true;
         mesh.receiveShadow = true;

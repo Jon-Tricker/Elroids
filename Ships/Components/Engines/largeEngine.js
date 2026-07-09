@@ -1,15 +1,15 @@
-// Medium engine
+// Large engine
 import Engine from './engine.js'
 import { ComponentType } from '../component.js';
 
-const DESCRIPTION = "Medium power engine.";
+const DESCRIPTION = "High power engine.";
 
-class MediumEngine extends Engine {
+class LargeEngine extends Engine {
 
-    static type = new ComponentType("Pootle", 6, 10, 2000, 2);
+    static type = new ComponentType("Starfire", 7, 15, 4000, 2);
 
     constructor(set) {
-        super(MediumEngine.type, set, 6000);
+        super(LargeEngine.type, set, 8000);
     }
 
     getDescription() {
@@ -17,4 +17,4 @@ class MediumEngine extends Engine {
     }
 }
 
-export default MediumEngine;
+export default LargeEngine;

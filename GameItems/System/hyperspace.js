@@ -11,7 +11,7 @@ class Hyperspace extends System {
     units = "ly";
 
     constructor(universe, systemSize) {
-        super(universe, new SystemSpec("Hyperspace", 0, 0), systemSize, universe.game.originVector, new THREE.Color(0x000020), undefined);
+        super(universe, new SystemSpec("Hyperspace", 0, 0, 0, "The void between the stars."), systemSize, universe.game.originVector, new THREE.Color(0x000020), undefined);
     }
 
     createSkyBox(background, json) {

@@ -242,12 +242,12 @@ class MineralType {
 // 1st item is valueless.
 // TOTAL OF ALL ABUNDANCES SHOULD ADD UP TO 1 (ish)
 const MineralTypes = new Array(
-  new MineralType("potch", new THREE.Color(0x808080), 0.6, 10, 0.5, 0, false),
-  new MineralType("iron", new THREE.Color(0xB06000), 0.3, 15, 0.25, 20, false),
-  new MineralType("copper", new THREE.Color(0x00D080), 0.2, 15, 0.16, 40, false),
-  new MineralType("gold", new THREE.Color(0xFFF000), 0.3, 15, 0.04, 80, false),
-  new MineralType("dilithium", new THREE.Color(0x0080D0), 0.8, 20, 0.02, 200, false),
-  new MineralType("octarine", new THREE.Color(0xD000D0), 0.8, 20, 0.01, 500, true)
+  new MineralType("Silica", new THREE.Color(0x808080), 0.6, 10, 0.5, 0, false),
+  new MineralType("Iron", new THREE.Color(0xB06000), 0.3, 15, 0.25, 20, false),
+  new MineralType("Copper", new THREE.Color(0x00D080), 0.2, 15, 0.16, 40, false),
+  new MineralType("Gold", new THREE.Color(0xFFF000), 0.3, 15, 0.04, 80, false),
+  new MineralType("Dilithium", new THREE.Color(0x0080D0), 0.8, 20, 0.02, 200, false),
+  new MineralType("Octarine", new THREE.Color(0xD000D0), 0.8, 20, 0.01, 500, true)
 )
 
 export { MineralType, MineralComponent, Composition, MineralTypes };

@@ -20,6 +20,7 @@ class RaiderAI extends BasicAI {
 
             case 1:
                 done = this.navToRandomLocation(date);
+                break;
                 
             case 2:
                 done = this.navToWormhole(date);

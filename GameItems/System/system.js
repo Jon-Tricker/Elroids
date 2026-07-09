@@ -217,6 +217,10 @@ class System {
         return (this.wormholeEnds);
     }
 
+    // By default no police.
+    recalcPoliceHostility() {
+    }
+
     animate(date, keyBoard) {
         let game = this.getGame();
         let scene = game.getScene();
@@ -244,7 +248,7 @@ class System {
     // Class 'undefined' is a wild card.
     // If a location is passes weights the result for closeness. 
     // Returns undefined if nothing available.
-    getValuable(type, location, perTonne) {
+    getValuable(type, location) {
         let maxValTarget;
         let maxVal = 0;
 
@@ -252,11 +256,11 @@ class System {
             let minTarget = this.getValuable(Mineral, location);
             let crateTarget = this.getValuable(GoodsCrate, location);
             if (undefined != minTarget) {
-                if ((undefined == crateTarget) || (minTarget.getRelativeValue(location, perTonne) > crateTarget.getRelativeValue(location, perTonne))) {
-                    return(minTarget);
+                if ((undefined == crateTarget) || (minTarget.getRelativeValue(location) > crateTarget.getRelativeValue(location))) {
+                    return (minTarget);
                 }
             }
-            return(crateTarget);
+            return (crateTarget);
         }
 
         for (let that of this.items) {
@@ -264,7 +268,7 @@ class System {
 
                 let value = that.getValue();
                 if (undefined != location) {
-                    value = that.getRelativeValue(location, perTonne)
+                    value = that.getRelativeValue(location)
                 }
 
                 if ((undefined == maxValTarget) || (value > maxVal)) {
@@ -275,6 +279,23 @@ class System {
         }
 
         return (maxValTarget);
+    }
+
+    // Get closest item of a given class.
+    getClosest(type, loc) {
+        let dist;
+        let closest;
+        for (let that of this.items) {
+            if (that instanceof type) {
+                let thatDist = that.location.distanceTo(loc)
+                if ((undefined == closest) || (dist > thatDist)) {
+                    closest = that;
+                    dist = thatDist;
+                }
+            }
+        }
+
+        return (closest);
     }
 }
 

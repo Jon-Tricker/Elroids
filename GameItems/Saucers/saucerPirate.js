@@ -145,7 +145,7 @@ class SaucerPirate extends Saucer {
     }
 
     getScore() {
-        return (60);
+        return (100);
     }
 }
 

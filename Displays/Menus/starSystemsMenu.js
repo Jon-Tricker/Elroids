@@ -29,13 +29,15 @@ class StarSystemsMenu {
         heads.push("Can dock")
         tab.addHeadings(heads);
 
+        let index = 0;
         for (let system of systems) {
             let vals = new Array();
-            vals.push("<button type=\"button\" onclick=\"StarSystemsMenu.onDetailsClick(this, cursor)\">" + system.spec.name + "</button>");
+            vals.push("<button type=\"button\" onclick=\"StarSystemsMenu.onDetailsClick(this, " + index + ")\">" + system.spec.name + "</button>");
             let rep = Reputation.getRepInSystem(game.player, system);
             vals.push(rep.getText());
             vals.push(rep.getCanDock());
             tab.addRow(vals);
+            index ++;
         }
 
         doc += tab.toString();
@@ -46,29 +48,15 @@ class StarSystemsMenu {
 
     }
 
-    static onDetailsClick(menuSystem, cursor) {
+    static onDetailsClick(menuSystem, index) {
         let game = menuSystem.getGame();
-        let system = StarSystemsMenu.getCompForCursor(game, cursor);
+        let system = game.universe.systems.get(index);
 
         StarSystemsMenu.displayDetails(menuSystem, system);
     }
 
     static displayDetails(menuSystem, system) {
         menuSystem.pushScript(StarSystemDetailsMenu, system);
-    }
-
-    static getCompForCursor(game, cursor) {
-        let systemNumber = 0;
-        let systems = game.universe.systems;
-
-        for (let system of systems) {
-            if (systemNumber == cursor.y) {
-                return (system);
-            } else {
-                systemNumber++;
-            }
-        }
-        throw (new BugError("No system at cursor."));
     }
 }
 

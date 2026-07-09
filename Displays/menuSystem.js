@@ -44,9 +44,10 @@ class TableData {
 
 class PushedMenu {
     menu;
+
+    // Parent target cursor.
     cursor;
 
-    // Optional arguments if this is a script.
     args;
 
     constructor(menu, cursor, args) {
@@ -54,6 +55,10 @@ class PushedMenu {
         this.cursor = cursor;
         this.args = args;
     }
+}
+
+// Thrown if we shoulg give up current animation.
+class AbortError extends Error {
 }
 
 class MenuSystem {
@@ -77,10 +82,19 @@ class MenuSystem {
 
     constructor(display) {
         this.display = display;
-        if (null != this.getShip().getDockedWith()) {
-            this.pushMenu(dockedMenu);
-        } else {
-            this.pushMenu(topMenu);
+        try {
+            if (null != this.getShip().getDockedWith()) {
+                this.pushMenu(dockedMenu);
+            } else {
+                this.pushMenu(topMenu);
+            }
+        }
+        catch (e) {
+            if (e instanceof AbortError) {
+                return;
+            } else {
+                throw (e);
+            }
         }
     }
 
@@ -93,16 +107,22 @@ class MenuSystem {
     }
 
     pushMenu(menu) {
-        this.targetCursor = new THREE.Vector2(0, 0);
         this.menuStack.push(new PushedMenu(menu, this.targetCursor));
+
+        // Set up new menu.
+        this.targetCursor = new THREE.Vector2(0, 0);
         this.resetMenu();
     }
 
     popMenu() {
-        if (this.menuStack.length > 1) {
-            this.menuStack.pop();
+        if (this.menuStack.length <= 1) {
+            throw new BugError("No menu to pop.")
         }
-        this.resetMenu()
+
+        // Restore old menu.
+        let poppedMenu = this.menuStack.pop();
+        this.targetCursor = poppedMenu.cursor;
+        this.resetMenu();
     }
 
     // Push a script (dynamically generated with an argument list menu), as if it was a static menu.
@@ -119,16 +139,18 @@ class MenuSystem {
         for (var i = 1; i < arguments.length; i++) {
             args.push(arguments[i]);
         }
-        this.targetCursor = new THREE.Vector2(0, 0);
         this.menuStack.push(new PushedMenu(script, this.targetCursor, args));
+
+        // Set up new menu.
+        this.targetCursor = new THREE.Vector2(0, 0);
         this.resetMenu();
     }
 
     resetMenu() {
-        this.targetCursor = this.menuStack[this.menuStack.length - 1].cursor;
-        this.maxYCursor = 0;
-
         this.display.terminal.resetScreen();
+
+        // Give up current animation.
+        throw new AbortError("Give up!");
     }
 
     animate(date, keyboard) {
@@ -150,7 +172,17 @@ class MenuSystem {
 
         this.liCount = 0;
 
-        this.printDoc(doc, keyboard);
+        try {
+            this.printDoc(doc, keyboard);
+        }
+
+        catch (e) {
+            if (e instanceof AbortError) {
+                return;
+            } else {
+                throw e;
+            }
+        }
 
         // Handle other keyboard actions.
         this.handleKeyboard(keyboard);
@@ -218,53 +250,55 @@ class MenuSystem {
         // Cursor to first field
         let cursor = new THREE.Vector2(0, 0);
 
+        // Add default elements.
+        this.addDefaults(doc);
+
         let tableData = new TableData();
 
         this.printChildren(doc.children[0], keyboard, cursor, false, false, tableData);
 
-        this.printDefaults(keyboard, cursor);
+        // Limit cursor movement to selectable items.
+        this.maxYCursor = cursor.y - 1;
+
+        // If prevously selected beyond current end
+        if (this.targetCursor.y > this.maxYCursor) {
+            this.targetCursor.y = this.maxYCursor
+        }
     }
 
-    // Print default, back, exit etc. buttons.
-    printDefaults(keyboard, cursor) {
+    // Add default child to doc.
+    addDefaults(doc) {
+
+        // Generate text
+        let text = "<P>"
         if (this.menuStack.length > 1) {
-            cursor.x = 0;
-            let selected = this.targetCursor.equals(cursor);
-            this.display.terminal.print("\t", false);
-            this.display.terminal.print("Back", selected);
-            if (selected) {
-                this.display.terminal.scrollToCursor();
-                if (this.isClicked(keyboard)) {
-                    this.popMenu();
-                    return;
-                }
-            }
-            cursor.x++;
+            text += "\t<button type=\"button\" onclick=\"this.defaultBackClick()\">Back</button>"
         }
 
-        this.display.terminal.print("\t", false);
-        let selected = this.targetCursor.equals(cursor);
         if (null == this.getShip().getDockedWith()) {
-            this.display.terminal.print("Exit", selected);
-            if (selected && this.isClicked(keyboard)) {
-                this.display.game.togglePaused();
-                return;
-            }
+            text += "\t<button type=\"button\" onclick=\"this.defaultExitClick()\">Exit</button>"
         } else {
-            this.display.terminal.print("Undock", selected);
-            if (selected && this.isClicked(keyboard)) {
-                this.getShip().undock();
-                return;
-            }
+            text += "\t<button type=\"button\" onclick=\"this.defaultUndockClick()\">Undock</button>"
         }
-        cursor.x++;
-        if (selected) {
-            this.display.terminal.scrollToCursor();
-        }
+        text += "</P>";
 
-        this.limitX(cursor);
+        // Convert to new doc.
+        let childDoc = MenuSystem.parser.parseFromString(text, "text/xml");
 
-        this.maxYCursor = cursor.y;
+        // Paste new doc child element at start of main doc.
+        doc.firstChild.insertBefore(childDoc.firstChild, doc.firstChild.firstChild);
+    }
+
+    defaultExitClick() {
+        this.display.game.togglePaused();
+    }
+
+    defaultBackClick() {
+        this.popMenu();
+    }
+
+    defaultUndockClick() {
+        this.getShip().undock();
     }
 
     // Print the child elements

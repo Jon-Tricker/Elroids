@@ -19,8 +19,8 @@ class MediumHull extends Hull {
 
     static type =  new ComponentType("GP2", 6, 50, 5000, 4);
 
-    constructor(set) {
-        super(MediumHull.type, set, 250);
+    constructor(set, hullColour) {
+        super(MediumHull.type, set, 250, hullColour);
         super.buildSets(set, 1, 2, 1, 2, 4);  
     }
 
@@ -119,7 +119,7 @@ class MediumHull extends Hull {
         // compute vertex normals
         geometry.computeVertexNormals();
 
-        let mesh = new THREE.Mesh(geometry, Hull.shipMaterial);
+        let mesh = new THREE.Mesh(geometry, this.getShipMaterial());
 
         mesh.castShadow = true;
         mesh.receiveShadow = true;

@@ -53,7 +53,7 @@ class SaucerRam extends Saucer {
     }
 
     getScore() {
-        return (60);
+        return (30);
     }
 }
 

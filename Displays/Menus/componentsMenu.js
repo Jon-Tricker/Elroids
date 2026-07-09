@@ -20,13 +20,22 @@ class ComponentsMenu {
         doc += "<P>Mass Unladen " + ship.getMass() + "(t), Total " + ship.getTotalMass() + "(t)</P>";
         doc += "<BR />";
 
+        let setIndex = 0;
+        let first = true;
         for (let set of sets) {
             if (set.size > 0) {
+
+                if (!first) {
+                    doc += "<BR />";
+                }
+                first = false;
+
                 doc += "<P>" + set.plural + " (Slots = " + set.getSlots() + ")" + "</P>";
 
                 let tab = new MenuTable();
 
                 let printHeads = true;
+                let compIndex = 0;
                 for (let comp of set) {
                     if (printHeads) {
                         let heads = new Array();
@@ -50,24 +59,27 @@ class ComponentsMenu {
                     vals.push(comp.getName());
                     vals.push(comp.getMass());
                     vals.push(comp.status);
-                    vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onDetailsClick(this, cursor)\">Show</button>");
-                    vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onEnableClick(this, cursor)\">" + ComponentsMenu.onOff(comp.displayPanel) + "</button>");
+                    vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onDetailsClick(this, " + setIndex + ", " + compIndex + ")\">Show</button>");
+                    vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onEnableClick(this, " + setIndex + ", " + compIndex + ")\">" + ComponentsMenu.onOff(comp.displayPanel) + "</button>");
                     if (null != ship.dockedWith) {
                         if (!(sets.hullSet == set)) {
-                            vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onUnmountClick(this, cursor)\">Unmount</button>");
-                            vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, cursor)\">" + comp.getValueInSystem(ship.system) + "</button>");
+                            vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onUnmountClick(this, " + setIndex + ", " + compIndex + ")\">Unmount</button>");
+                            vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, " + setIndex + ", " + compIndex + ")\">" + comp.getValueInSystem(ship.system) + "</button>");
                         }
-                        vals.push("10%=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, cursor, 10)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 10) + "</button>" +
-                            " All=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, cursor, 100)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 100) + "</button>");
+                        vals.push("10%=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, " + setIndex + ", " + compIndex + ", 10)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 10) + "</button>" +
+                            " All=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, " + setIndex + ", " + compIndex + ", 100)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 100) + "</button>");
                     } else {
-                        vals.push("10%=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, cursor, 10)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 10) + "</button>" +
-                            " Max=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, cursor, 100)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 100)  + "</button>");
+                        vals.push("10%=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, " + setIndex + ", " + compIndex + ", 10)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 10) + "</button>" +
+                            " Max=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, " + setIndex + ", " + compIndex + ", 100)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 100) + "</button>");
                     }
                     tab.addRow(vals);
+
+                    compIndex++;
                 }
+
                 doc += tab.toString();
-                doc += "<BR />";
             }
+            setIndex++;
         }
 
         doc += "</P>"
@@ -80,10 +92,10 @@ class ComponentsMenu {
         let cost = comp.getRepairCost(percent, ship)
 
         if (0 == cost) {
-            return("N/A");
+            return ("N/A");
         }
 
-        return(cost);
+        return (cost);
     }
 
     static onOff(bool) {
@@ -93,51 +105,43 @@ class ComponentsMenu {
         return ("Off");
     }
 
-    static onRepairClick(menuSystem, cursor, percent) {
+    static onRepairClick(menuSystem, setIndex, compIndex, percent) {
         let ship = menuSystem.getShip();
-        let comp = ComponentsMenu.getCompForCursor(ship, cursor, false);
+        let comp = ComponentsMenu.getCompForIndex(ship, setIndex, compIndex, false);
         comp.repair(percent, ship, false);
     }
 
-    static onUnmountClick(menuSystem, cursor) {
+    static onUnmountClick(menuSystem, setIndex, compIndex) {
         let ship = menuSystem.getShip();
-        let comp = ComponentsMenu.getCompForCursor(ship, cursor);
+        let comp = ComponentsMenu.getCompForIndex(ship, setIndex, compIndex);
         comp.unmount();
     }
 
-    static onSellClick(menuSystem, cursor) {
+    static onSellClick(menuSystem, setIndex, compIndex) {
         let ship = menuSystem.getShip();
-        let comp = ComponentsMenu.getCompForCursor(ship, cursor);
+        let comp = ComponentsMenu.getCompForIndex(ship, setIndex, compIndex);
         comp.sell();
     }
 
-    static onEnableClick(menuSystem, cursor) {
+    static onEnableClick(menuSystem, setIndex, compIndex) {
         let ship = menuSystem.getShip();
-        let comp = ComponentsMenu.getCompForCursor(ship, cursor);
+        let comp = ComponentsMenu.getCompForIndex(ship, setIndex, compIndex);
         comp.displayPanel = !comp.displayPanel;
 
         // Re-layout displays.
         ship.getGame().displays.compDisplays.recalc(true);
     }
 
-    static onDetailsClick(menuSystem, cursor) {
+    static onDetailsClick(menuSystem, setIndex, compIndex) {
         let ship = menuSystem.getShip();
-        let comp = ComponentsMenu.getCompForCursor(ship, cursor);
+        let comp = ComponentsMenu.getCompForIndex(ship, setIndex, compIndex);
         menuSystem.pushScript(ComponentDetailsMenu, comp);
     }
 
-    static getCompForCursor(ship, cursor) {
-        let compNumber = 0;
-        for (let set of ship.hull.compSets) {
-            for (let comp of set) {
-                if (compNumber == cursor.y) {
-                    return (comp);
-                } else {
-                    compNumber++;
-                }
-            }
-        }
-        throw (new BugError("No component at cursor."));
+    static getCompForIndex(ship, setIndex, compIndex) {
+        let set = ship.hull.compSets.get(setIndex);
+        let comp = set.get(compIndex);
+        return (comp);
     }
 }
 

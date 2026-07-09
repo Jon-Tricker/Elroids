@@ -38,27 +38,21 @@
 	<H2>The 'Test Universe'</H2>
 	<P>If the game is launched with parameter 'rockCount="0"' a 'Test Universe' is generated.</P>
 	<P>This contains a populated Universe and Ship with test versions of most things. Can be used for code testing.</P>
-	<P>"'Someone else' can add unittests later." ... as 'idiots', who have no place in any comptent development
-		environment, like to say :-)</P>
+	<P>"'Someone else' can add unittests later." ... as 'idiots' like to say :-)</P>
 	<P>For notes on code operation/stucture see the <A HREF="developer_code_notes.html">Developer Code notes.</A>.</P>
 
 	<H2>ToDos (In some sort of priority order)</H2>
 
-	<H3>V10.x legal system.</H3>
-	<P>Add police ships. Make them patrol and hunt saucers.</P>
-	<P>Once there is a penalty for piracy increase value of NPShips.</P>
-	<P>Add rep increase for trading and killing saucers. Or maybe just increases over time.</P>
-	<P>Fix problem of cursor beyonr end of terminal terminal after all minerals sold.</P>
-
 	<H3>V11.x Improve NP ships</H3>
+	<P>To decrease memory footprint deactivate systems when ship not in them. Use To/FromJSON mechanism to compress them into a text image.</P>
 	<P>Less 'wild' navigation. Modify navigateThroughDest() to add lead. Possibly common code with attack().</P>
-	<P>Check in fwd arc for collision avoidance. Maybe change all collision detection to ray tracing.</P>
+	<P>Check in fwd arc for collision avoidance. Build into existing collision detection so dont need a 2nd pass. Ray tracing wont work because wrap graphics round is done rel player ship NOT NP ship.</P>
 	<P>Make miners less stupid. Dont charge in before all sub-rocks destroyed.</P>
 
 	<H3>V12.x General tidy up.</H3>
 	<P>Allow >1 ship to dock at the same time.</P>
-	
-	<P>Move Back, Exit etc. to top of menus.</P>
+	<P>Add station aproach lights. Green - OK. Red - No docking. Yellow - Bad approach.</P>
+	<P>Don't show existing hull type in purchace list.</P>
 	<P>Sort problem with extra blank lines in menu system.</P>
 	<P>Convert GoodsList and ComponentsList to use classes ... like shipTypes in NPShipFactory.</P>
 	<P>Make saucers a sub class of NPShip. Convert makeLoot() to loadRandom().</P>
@@ -121,8 +115,8 @@
 		<LI>In flight ship repairs based on expenditure of, purchable, 'univeral shunt' modules (goods) rather than
 			credits. </LI>
 	</UL>
-	<LI>Add station aproach lights. Green - OK. Red - No docking. Yellow - Bad approach.</LI>
 	<LI>Maybe delete non essential Items from inactive systems ... save memory.</LI>
+	<LI>Possibly add reputation increase for trading.</LI>
 	<LI>Sort out menu system:</LI>
 	<UL>
 		<LI>Current code for buttons and scripts is ugly. Works in the context of MenuSystem, where it is evaled,
@@ -144,6 +138,7 @@
 	<UL>
 		<LI>Create 'exploding ship' animation. (Exploding Mesh? Then it could also do rocks/saucers etc.)</LI>
 		<LI>Add surface texture to ship.</LI>
+		<LI>Add lights to ships.</LI>
 		<LI>Make saucers more 'shiny'. Probably involves MeshPhongMaterial ... but for me that just comes out white.
 		</LI>
 		<LI>Add extra vt100 features (e.g. block graphics) to ship control terminal.</LI>
@@ -172,7 +167,7 @@
 			<LI>Move code under npm repository.</LI>
 			<LI>Make it multi-player (AJAX?).</LI>
 			<LI>Add optional gravity effects (like Gravitar).</LI>
-			<LI>Add on line high score table?</LI>
+			<LI>Add on line high score (credits) table?</LI>
 			<LI>Maybe collision damage should be proportional to mass and relative speed of colliding object. Common for
 				all items apart from 'rock on rock' impacts.</LI>
 			<LI>Revisit inline 'ToDos'.</LI>

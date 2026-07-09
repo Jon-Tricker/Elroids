@@ -93,6 +93,10 @@ class Smuggler extends NPShip {
         // Create hull
         // Will also create all other components, for that hull type, and add them to our components sets.
         super.buildShip(MediumHull);
+    }  
+    
+    getInitialCargoValue() {
+        return(200);
     }
 
     getClass() {

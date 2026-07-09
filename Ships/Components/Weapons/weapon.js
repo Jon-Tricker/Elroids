@@ -62,7 +62,7 @@ class Weapon extends Component {
 
     getHeadings() {
         let heads = super.getHeadings();
-        heads.push("Fire rate(/s)");
+        heads.push("Rate(/s)");
         heads.push("Max ammo");
         if (undefined != this.maxAmmo) {
             heads.push("Ammo");
@@ -78,7 +78,6 @@ class Weapon extends Component {
         } else {
             vals.push(this.maxAmmo);
             vals.push(this.ammo);
-
         }
         return (vals);
     }

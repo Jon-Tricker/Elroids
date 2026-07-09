@@ -10,7 +10,6 @@ import SaucerMother from '../Saucers/saucerMother.js';
 import SaucerRam from '../Saucers/saucerRam.js';
 import SaucerPirate from '../Saucers/saucerPirate.js';
 import SaucerShooter from '../Saucers/saucerShooter.js';
-import SaucerStatic from '../Saucers/saucerStatic.js';
 import SaucerWanderer from '../Saucers/saucerWanderer.js';
 import Station from './station.js';
 import { SystemSpec } from './system.js';
@@ -18,6 +17,7 @@ import Freighter from '../../Ships/NonPlayerShips/freighter.js';
 import NPShipFactory from '../../Ships/NonPlayerShips/nPShipFactory.js';
 import Location from '../../Game/Utils/location.js';
 import Universe from '../universe.js';
+import PoliceShip from '../../Ships/NonPlayerShips/policeShip.js';
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;           // m
@@ -26,7 +26,6 @@ const RESPAWN_SIZE = 250;           // m
 const NP_SHIP_FREQUENCY = 60000     // ms
 
 class StarSystem extends System {
-    saucerCount = 0;
     rockCount = 0;
     maxRockCount;
 
@@ -36,6 +35,7 @@ class StarSystem extends System {
     // Special items in the system.
     motherSaucers = new Set();
     stations = new Set();
+    policeShips = new Set();
 
     constructor(universe, spec, systemSize, maxRockCount, uniLocation, background, json) {
         super(universe, spec, systemSize, uniLocation, background, json);
@@ -85,6 +85,24 @@ class StarSystem extends System {
         return (this.stations);
     }
 
+    addPolice(ship) {
+        this.policeShips.add(ship);
+    }
+
+    deletePolice(ship) {
+        this.policeShips.delete(ship);
+    }
+
+    getPolice() {
+        return (this.policeShips);
+    }
+
+    recalcPoliceHostility() {
+        for(let police of this.policeShips) {
+            police.recalcHostility();
+        }
+    }
+
     animate(date, keyBoard) {
         // If necesarry top up rocks.
         if (this.rockCount < this.maxRockCount) {
@@ -106,6 +124,13 @@ class StarSystem extends System {
             let npShip = NPShipFactory.createRandom(wormholeEnd.location, true);
             npShip.setActive(true);
             wormholeEnd.exit(npShip);
+
+            // Top up police ships.
+            if (this.policeShips.size < Math.floor(this.getLawLevel() / 2)) {
+                let police = new PoliceShip(this.getGame().getShip().location.getFarAway());
+                police.setActive(true);
+                this.addPolice(police);
+            }
 
             this.nPShipTimer = date + NP_SHIP_FREQUENCY * (1 + Math.random()) * 0.5;
         }
@@ -188,10 +213,10 @@ class StarSystem extends System {
             // One of each ship type.
             let count = 0;
             for (let type of NPShipFactory.shipTypes) {
-                let yLoc = (NPShipFactory.shipTypes.size/2 - count) * 100;
+                let yLoc = (NPShipFactory.shipTypes.size / 2 - count) * 100;
                 let location = new Location(2000, yLoc, 200, this);
                 NPShipFactory.createShip(type, location, true);
-                count ++;
+                count++;
             }
 
             // And a sample mineral
@@ -258,15 +283,6 @@ class StarSystem extends System {
         }
     }
 
-    createNPShips(json) {
-        // Don't restore NP ships.
-        if (undefined === json) {
-            if (this.getGame().testMode) {
-                // new Freighter(this, new THREE.Vector3(200, -100, 50));
-            }
-        }
-    }
-
     createMotherSaucer() {
         let loc;
         let game = this.getGame();
@@ -285,7 +301,7 @@ class StarSystem extends System {
         // Game gradually gets harder.
         game.maxSaucerCount++;
 
-        if (!this.getGame().testMode) { 
+        if (!this.getGame().testMode) {
             // Give it some speed.
             let speed = this.getGame().createRandomVector(1, false);
             speed.normalize();

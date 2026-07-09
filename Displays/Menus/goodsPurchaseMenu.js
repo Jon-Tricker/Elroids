@@ -21,6 +21,7 @@ class GoodsPurchaseMenu {
             let tab = new MenuTable();
 
             let printHeads = true;
+            let index = 0;
             for (let goods of game.goodsList) {
                 if (goods.isLegal(game.universe.system)) {
                     if (printHeads) {
@@ -37,12 +38,13 @@ class GoodsPurchaseMenu {
                     if (goods.isAvailableInSystem(game.universe.system)) {
                         let vals = new Array();
                         vals.push(goods.getName(true));
-                        vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onDetailsClick(this, cursor)\">Show</button>");
-                        vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onBuyClick(this, cursor, 1)\">" + goods.getValueInSystem(game.universe.system) + "</button>");
-                        vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onBuyClick(this, cursor, 10)\">" + goods.getValueInSystem(game.universe.system) * 10 + "</button>");
+                        vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onDetailsClick(this, " + index + ")\">Show</button>");
+                        vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onBuyClick(this, " + index + ", 1)\">" + goods.getValueInSystem(game.universe.system) + "</button>");
+                        vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onBuyClick(this, " + index + ", 10)\">" + goods.getValueInSystem(game.universe.system) * 10 + "</button>");
                         tab.addRow(vals);
                     }
                 }
+                index ++;
             }
             doc += tab.toString();
             doc += "<BR />";
@@ -54,32 +56,23 @@ class GoodsPurchaseMenu {
         return (doc);
     }
 
-    static onDetailsClick(menuSystem, cursor) {
+    static onDetailsClick(menuSystem, index) {
         let game = menuSystem.getGame();
-        let goods = GoodsPurchaseMenu.getGoodsForCursor(game, cursor);
+        let goods = GoodsPurchaseMenu.getGoodsForIndex(game, index);
         menuSystem.pushScript(GoodsDetailsMenu, goods);
     }
 
-    static onBuyClick(menuSystem, cursor, number) {
+    static onBuyClick(menuSystem, index, number) {
         let game = menuSystem.getGame();
-        let goods = GoodsPurchaseMenu.getGoodsForCursor(game, cursor);
+        let goods = GoodsPurchaseMenu.getGoodsForIndex(game, index);
         let ship = game.getShip();
 
         goods.buy(ship, number);
     }
 
-    static getGoodsForCursor(game, cursor) {
-        let goodsNumber = 0;
-        for (let goods of game.goodsList) {
-            if (goods.isAvailableInSystem(game.universe.system)) {
-                if (goodsNumber == cursor.y) {
-                    return (goods);
-                } else {
-                    goodsNumber++;
-                }
-            }
-        }
-        throw (new BugError("No goods at cursor."));
+    static getGoodsForIndex(game, index) {
+        let goods = game.goodsList.get(index);
+        return(goods);
     }
 }
 

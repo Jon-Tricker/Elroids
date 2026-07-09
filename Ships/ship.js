@@ -140,8 +140,8 @@ class Ship extends Item {
         this.hull.recalc();
     }
 
-    buildShip(hullType) {
-        this.hull = new hullType();
+    buildShip(hullType, hullColour) {
+        this.hull = new hullType(undefined, hullColour);
         this.hull.buildShip(this);
 
         this.recalc();

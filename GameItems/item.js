@@ -634,7 +634,7 @@ class Item extends THREE.Group {
     }
 
     // Get relative value with optional weigthing for proximity.
-    getRelativeValue(loc, perTonne) {
+    getRelativeValue(loc) {
         let value = this.getValue();
         if (undefined == loc) {
             return (value);

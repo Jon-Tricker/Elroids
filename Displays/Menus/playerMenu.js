@@ -17,7 +17,7 @@ class PlayerMenu {
         doc += "<P>";
         doc += "<BR />"
 
-        doc += "<P>Reputation=" + Number(game.getPlayer().getReputation()).toFixed(1) + "</P>";
+        doc += "<P>Reputation=" + Number(game.getPlayer().getReputation()).toFixed(2) + "</P>";
 
         doc += "<P>Improve reputation (Pay fines/make 'donation') <button type=\"button\" onclick=\"PlayerMenu.incRepClick(this.display.game)\">" + Reputation.REP_INC_COST + "</button></P>";
 
@@ -28,7 +28,7 @@ class PlayerMenu {
     }
 
     static incRepClick(game) {
-        game.getPlayer().incReputation();
+        game.getPlayer().incReputation(true);
     }
 
 }

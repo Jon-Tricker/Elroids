@@ -15,7 +15,11 @@ class NPShip extends Ship {
     constructor(height, width, length, location, mass, hitPoints) {
         super(height, width, length, location, mass, hitPoints);
 
-        this.hull.compSets.baySet.loadRandomCargo(100);
+        this.hull.compSets.baySet.loadRandomCargo(this.getInitialCargoValue());
+    }
+
+    getInitialCargoValue() {
+        return(0);
     }
 
     animate(date, keyboard) {
@@ -26,7 +30,7 @@ class NPShip extends Ship {
     takeDamage(hits, that) {
         let destroyed = super.takeDamage(hits, that);
 
-        if ((that.owner == this.getShip()) || (that == this.getShip())) {
+        if (that.owner == this.getShip()) {
             if (!this.isHostile() && (this.getSystem().getLawLevel() > 1) ) {
                 this.getGame().displays.addMessage("Piracy is illegal. Reputation reduced.");
                 this.getShip().getPlayer().decReputation();

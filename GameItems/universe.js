@@ -19,7 +19,8 @@ const SYSTEM_SPECS = [
     new SystemSpec("Sol", 6, 2, 5, "Mostly harmless."),
     new SystemSpec("Asteel", 6, 1, 4, "Industrial society"),
     new SystemSpec("Kessel", 7, 1, 6, "High tech society"),
-    new SystemSpec("Endor", 2, 3, 2, "Magical society. Guess some trading house built them a station.")
+    new SystemSpec("Endor", 2, 4, 2, "Magical society. Guess some trading house built them a station."),
+    new SystemSpec("Coruscant",7, 2, 7, "High tech authoritarian world.")
 ];
 
 class Universe {
@@ -116,9 +117,6 @@ class Universe {
         // Now we have a ship to target can create saucers.
         this.createSaucers(json);
 
-        // Add non player ships.
-        this.createNPShips(json);
-
         // Make current system graphics active.
         this.system.setActive(true);
     }
@@ -188,18 +186,6 @@ class Universe {
         } else {
             for (let jsonSystem of json.systems) {
                 this.getSystemByName(jsonSystem.spec.name).createSaucers(jsonSystem);
-            }
-        }
-    }
-
-    createNPShips(json) {
-        if (undefined === json) {
-            for (let system of this.systems) {
-                system.createNPShips();
-            }
-        } else {
-            for (let jsonSystem of json.systems) {
-                this.getSystemByName(jsonSystem.spec.name).createNPShips(jsonSystem);
             }
         }
     }
