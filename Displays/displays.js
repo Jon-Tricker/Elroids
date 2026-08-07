@@ -1,4 +1,9 @@
 // Game and ship display overlays.
+//
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import RadarDisplay from "./radarDisplay.js";
 import CompassDisplay from "./compassDisplay.js";
 import ComponentDisplays from "./Components/componentDisplays.js";
@@ -177,7 +182,7 @@ class Displays {
         this.controlsCtx.fillStyle = this.defaultColour;
         let text = "V" + this.game.getVersion() + "    Credits:" + this.printNum(this.game.player.getCredits()) +
             "    Reputation: " + Reputation.getRepInSystem(this.game.player, this.game.getSystem()).getText() + " (" + Number(this.game.player.getReputation()).toFixed(2).padStart(0) + ")"
-            "    Frame rate:" + this.printNum(this.game.universe.getActualAnimateRate()) + "/s";
+        "    Frame rate:" + this.printNum(this.game.universe.getActualAnimateRate()) + "/s";
         if (this.game.isSafe()) {
             text += "     Safe Mode: On";
         }
@@ -215,12 +220,20 @@ class Displays {
         let ctx = this.hudCtx;
         ctx.clearRect(0, 0, this.hud.width, this.hud.height);
         if (this.hudIsOn) {
-            let left = this.hud.width / 2 - this.textHeight;
-            let top = this.hud.height / 2 - this.textHeight;
-            let right = left + this.textHeight * 2;
-            let bottom = top + this.textHeight * 2;
-            let len = this.textHeight / 2;
-            ctx.strokeRect(left, top, this.textHeight * 2, this.textHeight * 2);
+            let sz = this.textHeight;
+            let list = this.getShip().getAheadList();
+
+            let left = this.hud.width / 2 - sz;
+            let top = this.hud.height / 2 - sz;
+            let right = left + sz * 2;
+            let bottom = top + sz * 2;
+
+            ctx.strokeRect(left, top, sz * 2, sz * 2);
+
+            let len = sz / 4;
+            if ((undefined === list) || (list.length == 0)) {
+                len /= 2;
+            }
 
             ctx.beginPath();
             ctx.moveTo(left - len, top - len);

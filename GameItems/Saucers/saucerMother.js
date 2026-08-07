@@ -26,7 +26,7 @@ const MAX_LAUNCH_FREQUENCY = 100;
 class SaucerMother extends Saucer {
 
     currentLaunchFrequency = START_LAUNCH_FREQUENCY;
-    launchDue = this.currentLaunchFrequency;
+    launchDue = 0;
 
     constructor(location, owner) {
         super(SIZE, location, MASS, COLOUR, owner);

@@ -145,7 +145,7 @@ class PlayerShip extends Ship {
             }
         }
 
-        super.animate(date);
+        super.animate(date);  
     }
 
     // Take damage to internal systems.

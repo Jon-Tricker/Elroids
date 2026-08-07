@@ -35,8 +35,6 @@ class GoodsCrate extends NonShipItem2 {
 
     this.contents = contents;
 
-    this.rotationRate = new THREE.Vector3(this.generateRotationRate(), this.generateRotationRate(), this.generateRotationRate());
-
     this.expiryTime = this.getUniverse().getTime() + TTL;
 
     super.activateIfRequired();

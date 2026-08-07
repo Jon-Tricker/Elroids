@@ -44,27 +44,28 @@
 	<H2>ToDos (In some sort of priority order)</H2>
 
 	<H3>V11.x Improve NP ships</H3>
+	<P>Make 'sights' (hud) into electronic components. Add 'mining sight' etc.</P>
+	<P>Add 'Elite style' (over heating) beam weapons + weapon switch. Fit beams to some NP ships.</LI>
 	<P>To decrease memory footprint deactivate systems when ship not in them. Use To/FromJSON mechanism to compress them into a text image.</P>
 	<P>Less 'wild' navigation. Modify navigateThroughDest() to add lead. Possibly common code with attack().</P>
-	<P>Check in fwd arc for collision avoidance. Build into existing collision detection so dont need a 2nd pass. Ray tracing wont work because wrap graphics round is done rel player ship NOT NP ship.</P>
 	<P>Make miners less stupid. Dont charge in before all sub-rocks destroyed.</P>
+	<P>Don't 'stop' when attacking. Makes attacker an easy target.</P>
 
 	<H3>V12.x General tidy up.</H3>
 	<P>Allow >1 ship to dock at the same time.</P>
 	<P>Add station aproach lights. Green - OK. Red - No docking. Yellow - Bad approach.</P>
 	<P>Don't show existing hull type in purchace list.</P>
-	<P>Sort problem with extra blank lines in menu system.</P>
 	<P>Convert GoodsList and ComponentsList to use classes ... like shipTypes in NPShipFactory.</P>
 	<P>Make saucers a sub class of NPShip. Convert makeLoot() to loadRandom().</P>
 	<P>Do a sweep of use of null. In most cases change to undefned.</P>
 	<P>Modify flame cones to grow/shrink when pulsed. Not flicker.</P>
+	<P>Possibly don't need extra 2D layer for lables ... make them part of instumentation layer.</P>
 
 	<H3>V13.x Fix game launch problems.</H3>
 	<P>Add 'loading' screen.</P>
 
 	<H3>V14.x Add extra ship components.</H3>
 	<UL>
-		<LI>'Elite style' (over heating) beam weapon.</LI>
 		<LI>Thrusters (directional control)</LI>
 		<LI>Extra avionics including:
 			<UL>

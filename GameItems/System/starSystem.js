@@ -29,6 +29,8 @@ class StarSystem extends System {
     rockCount = 0;
     maxRockCount;
 
+    saucerCount = 0;
+
     // Non player ship timer.
     nPShipTimer = 0;
 
@@ -185,8 +187,8 @@ class StarSystem extends System {
             // Create a few test rocks at set locations
 
             // Horizontal colliders
-            // new Rock(20, new Location(0, 100, 50, this), Universe.originVector);
-            // new Rock(10, new Location(100, -50, 10, this), new THREE.Vector3(0, 25, 0));
+            // new Rock(20, new Location(200, 100, 50, this), Universe.originVector);
+            // new Rock(10, new Location(200, -50, 50, this), new THREE.Vector3(0, 25, 0));
 
             // Big target
             // new Rock(20, new Location(100, 0, 0, this), Universe.originVector);
@@ -288,11 +290,12 @@ class StarSystem extends System {
         let game = this.getGame();
 
         // Create it close so we can find it. 
+        let hole = this.wormholeEnds.getRandomElement();
         if (this.getGame().testMode) {
             loc = new Location(1000, 100, -50, this);
         } else {
             // Spawn from a wormhole.
-            loc = this.wormholeEnds.getRandomElement().location;
+            loc = hole.location;
         }
 
         let saucer = new SaucerMother(loc, null);
@@ -302,11 +305,7 @@ class StarSystem extends System {
         game.maxSaucerCount++;
 
         if (!this.getGame().testMode) {
-            // Give it some speed.
-            let speed = this.getGame().createRandomVector(1, false);
-            speed.normalize();
-            speed.multiplyScalar(saucer.getMaxSpeed());
-            saucer.setSpeed(speed);
+            hole.exit(saucer);
         }
     }
 

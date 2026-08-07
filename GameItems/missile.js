@@ -46,7 +46,6 @@ class Missile extends NonShipItem {
     while (this.getBoundary().intersects(thatBoundary)) {
       this.moveItem(false);
     }
-    //this.moveItem(false);
 
     // Once launched add in relative speed of owner
     let newSpeed = this.speed.clone();
@@ -80,8 +79,7 @@ class Missile extends NonShipItem {
   }
 
   animate(date) {
-    this.moveItem(true);
-    this.moveMesh();
+    super.animate();
     if (date > this.expiryTime) {
       new Explosion(1, this);
       this.destruct();

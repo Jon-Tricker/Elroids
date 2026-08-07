@@ -20,7 +20,8 @@ const SYSTEM_SPECS = [
     new SystemSpec("Asteel", 6, 1, 4, "Industrial society"),
     new SystemSpec("Kessel", 7, 1, 6, "High tech society"),
     new SystemSpec("Endor", 2, 4, 2, "Magical society. Guess some trading house built them a station."),
-    new SystemSpec("Coruscant",7, 2, 7, "High tech authoritarian world.")
+    new SystemSpec("Coruscant",7, 2, 7, "High tech authoritarian world."),
+    new SystemSpec("Oz", 3, 4, 7, "Magical authoritarian society.")
 ];
 
 class Universe {

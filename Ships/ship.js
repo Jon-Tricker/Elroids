@@ -1,4 +1,4 @@
-// Base class for any ship (i.e. something with 'ends' that implements the laws of physics).
+// Base class for any ship (i.e. something with an 'orientation' that implements the laws of physics).
 // Internal impementation of ship is left to the sub-classes.
 
 // Copyright (C) Jon Tricker 2023, 2025.
@@ -89,6 +89,9 @@ class Ship extends Item {
     engineSoundOn = false;
 
     mesh;
+
+    // Array of Items that we would collide with if went straight forward.
+    aheadList = undefined;
 
     constructor(height, width, length, location, mass, hitPoints, owner) {
         super(location, Universe.originVector, length, mass, hitPoints, owner);
@@ -194,6 +197,10 @@ class Ship extends Item {
         return (this.hull.compSets.baySet);
     }
 
+    getAheadList() {
+        return(this.aheadList);
+    }
+
     accelerate() {
         let xDirection = this.getOrientation();
 
@@ -292,9 +299,14 @@ class Ship extends Item {
 
     animate(date) {
         if (null == this.dockedWith) {
-            this.moveItem(true);
-            this.moveMesh();
-        }
+            this.genAheadList();
+            super.animate();
+        }  
+    }
+
+    // Builds a list of Items straight ahead.
+    genAheadList() {
+        this.aheadList = this.genPathList(this.getOrientation());
     }
 
     // Get the current directions X axis.

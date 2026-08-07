@@ -1,6 +1,6 @@
 // Base class for all 'systems' (areas that can be navigated.)
 // 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import SkyBox from "../../Game/Scenery/skyBox.js";
@@ -178,6 +178,10 @@ class System {
 
     getGame() {
         return (this.universe.game);
+    }
+
+    getSize() {
+        return(this.systemSize);
     }
 
     // Switch this system on/off

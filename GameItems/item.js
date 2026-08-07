@@ -15,6 +15,25 @@ const COLOUR = "#FFFFFF";
 // Distance for audio volume to half
 const AUDIO_HALF_DIST = 500;
 
+// Items we could collide with.
+class CollideItem {
+    item;
+    dist;
+
+    constructor(item, dist) {
+        this.item = item;
+        this.dist = dist;
+    }
+
+    getDist() {
+        return (this.dist);
+    }
+
+    getItem() {
+        return(this.item);
+    }
+}
+
 class Item extends THREE.Group {
 
     speed;              // m/s
@@ -44,6 +63,9 @@ class Item extends THREE.Group {
 
     // Set if docked with something.
     dockedWith = null;
+
+    // Array of Items in direction of travel that we could collide with.
+    collideList = undefined;
 
     // Construct with optional mass
     constructor(location, speed, size, mass, hitPoints, owner, immobile) {
@@ -285,70 +307,12 @@ class Item extends THREE.Group {
     // Detects if a colisions will occur in next move.
     //
     // Return true if hit something.
-    // 
-    // Collides if a cylinder, described by our boundary over the next move, intersects with the target.
-    // Fortunatly this can be handled by determining if the vector of the next move is closer to the targets location than the sum of the radii.
-    //
-    // This cheap 'aproximate' detection. If true, and in cases where it matters, a more expensive check will be done using ray tracing.
     detectCollisions() {
-        // Things that don't move don't hit things
-        if (0 == this.getSpeed()) {
-            return (false);
-        }
+        if ((undefined != this.collideList) && (this.collideList.length > 0) && (this.collideList[0].getDist() < this.speedFrame.length())) {
+            this.handleCollision(this.collideList[0].getItem());
 
-        let thisBoundary = this.getBoundary();
-
-        if (null == thisBoundary) {
-            // Not checking collisions
-            return;
-        }
-
-        // Create line for move.
-        let move = new THREE.Line3(Universe.originVector, this.speedFrame);
-
-        for (let that of this.location.system.items) {
-
-            let thatBoundary = that.getBoundary();
-
-            if (null != thatBoundary) {
-
-                let relLocation = that.getLocation().clone();
-                relLocation.sub(this.location);
-
-                // For the ship be generous ... has to go through windscreen.
-                let minDist = 0;
-                if (this.isShip()) {
-                    // console.log("X " + thisBoundary.getSize() + " " + thatBoundary.getSize())
-                    minDist += thisBoundary.getSize() / 4;
-                } else {
-                    minDist += thisBoundary.getSize();
-                }
-
-                if (that.isShip()) {
-                    minDist += thatBoundary.getSize() / 4;
-                } else {
-                    minDist += thatBoundary.getSize();
-                }
-
-
-                // This would be a load of math ... however threeJS does it for us.
-                let closestPoint = new THREE.Vector3(0, 0, 0);
-                move.closestPointToPoint(relLocation, true, closestPoint);
-                let dist = closestPoint.distanceTo(relLocation);
-
-                if (dist <= minDist) {
-                    // Don't collide with self.
-                    if (this != that) {
-                        // Don't collide with docked items.
-                        if (null == that.getDockedWith()) {
-                            if (this.handleCollision(that)) {
-                                // Only collide with one thing per frame.
-                                return (true);
-                            }
-                        }
-                    }
-                }
-            }
+            // Only collide with one thing per frame.
+            return (true);
         }
         return (false);
     }
@@ -441,11 +405,16 @@ class Item extends THREE.Group {
     handleCollision(that) {
         this.transferMomentum(that);
 
-        // If overlapping separate ... even if one of us is about to be destroyed.
-        this.separateFrom(that);
-
         // Do any damage
-        this.collideWith(that);
+        this.collideWith(that);        
+        
+        // If overlapping separate.
+        if ((!this.isDestructed()) && (!that.isDestructed())) {
+            this.separateFrom(that);
+        }
+
+        // Collide list now invalid
+        this.collideList = undefined;
 
         return (true);
     }
@@ -555,7 +524,104 @@ class Item extends THREE.Group {
     }
 
     animate() {
-        console.log("Item had no animate() override. Probably a bug");
+        // Update collide list
+        this.genCollideList();
+        this.moveItem(true);
+        this.moveMesh();
+    }
+
+    // Builds a list of Items in the direction of travel that we may collide with.
+    genCollideList() {
+        // Static things don't collide.
+        if (0 == this.getSpeed()) {
+            this.collideList = new Array();
+            return; 
+        }
+
+        this.collideList = this.genPathList(this.speedFrame);
+    }
+
+    // Builds a list of Items in a sepcific direction from this that we may collide with. List is ordered by distance from this.
+    //
+    // Collides if a cylinder, described by our boundary over the width of the System, intersects with the target boundary.
+    //
+    // Also build a list of Items directly ahead. That should really be in a superclass handled by 'Ship' which has a concept of 'Ahead'.
+    //
+    // This cheap 'aproximate' detection. If true, and in cases where it matters, a more expensive check will be done using ray tracing.
+    genPathList(path) {
+        let list = new Array();
+
+        let thisBoundary = this.getBoundary();
+
+        if (null == thisBoundary) {
+            // Not checking collisions
+            return(list);
+        }
+
+        // Search for collisions up to half the system size away.
+        let rod = path.clone();
+        rod.normalize();
+        rod.multiplyScalar(this.location.system.getSize());
+        let move = new THREE.Line3(Universe.originVector, rod);
+
+        for (let that of this.location.system.items) {
+            let thatBoundary = that.getBoundary();
+
+            if (null != thatBoundary) {
+
+                let relLocation = that.getLocation().clone();
+                relLocation.sub(this.location);
+
+                // For the ship be generous ... has to go through windscreen.
+                let minDist = 0;
+                if (this.isShip()) {
+                    // console.log("X " + thisBoundary.getSize() + " " + thatBoundary.getSize())
+                    minDist += thisBoundary.getSize() / 4;
+                } else {
+                    minDist += thisBoundary.getSize();
+                }
+
+                if (that.isShip()) {
+                    minDist += thatBoundary.getSize() / 4;
+                } else {
+                    minDist += thatBoundary.getSize();
+                }
+
+
+                // This would be a load of math ... however threeJS does it for us.
+                let closestPoint = new THREE.Vector3(0, 0, 0);
+                move.closestPointToPoint(relLocation, true, closestPoint);
+                let dist = closestPoint.distanceTo(relLocation);
+
+                if (dist <= minDist) {
+                    // Don't collide with self.
+                    if (this != that) {
+                        // Don't collide with docked items.
+                        if (null == that.getDockedWith()) {
+                            let thatDist = this.location.distanceTo(that.location) - minDist;
+
+                            // Skip closer things.
+                            let index = 0;
+                            for (let elem of list) {
+                                if (elem.getDist() < thatDist) {
+                                    break;
+                                }
+                                index ++;
+                            }
+
+                            // Insert into array.
+                            let item = new CollideItem(that, thatDist);
+                            list.splice(index, 0, item);
+                        }
+                    }
+                }
+            }
+        }
+        return(list);
+    }
+
+    getCollideList() {
+        return (this.collideList);
     }
 
     // Play a sound optional volume (0 - 1) and loop if it is to repeat.
@@ -641,7 +707,7 @@ class Item extends THREE.Group {
         }
 
         let dist = loc.getRelative(this.location).length();
-        value /= (dist/100) * this.getMass();
+        value /= (dist / 100) * this.getMass();
         return (value);
     }
 

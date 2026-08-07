@@ -48,8 +48,6 @@ class Rock extends NonShipItem2 {
     this.rockSize = rockSize;
     this.originalHP = this.hitPoints;
 
-    this.rotationRate = new THREE.Vector3(this.generateRotationRate(), this.generateRotationRate(), this.generateRotationRate());
-
     // Get mineral composition
     if (composition === undefined) {
       // Random composition.

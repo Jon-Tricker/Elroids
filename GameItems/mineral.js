@@ -30,8 +30,6 @@ class Mineral extends NonShipItem2 {
 
     super(location, speed, size, mass, 1);
 
-    this.rotationRate = new THREE.Vector3(this.generateRotationRate(), this.generateRotationRate(), this.generateRotationRate());
-
     this.type = type;
 
     this.expiryTime = this.getUniverse().getTime() + TTL;

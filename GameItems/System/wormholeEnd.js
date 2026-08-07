@@ -41,7 +41,7 @@ class WormholeEnd extends NonShipItem {
     // Parent
     wormhole;
 
-    letholeMesh;
+    holeMesh;
     haloMesh;
 
     backgroundColour;
@@ -57,8 +57,10 @@ class WormholeEnd extends NonShipItem {
 
         this.setupMesh();
 
-        this.addLabel(name);
-
+        //if (wormhole.hyperspaceEnd == location.system) {
+            this.addLabel(name);
+        //}
+        
         // So other items can get relative positions.
         this.moveMesh();
     }
@@ -202,9 +204,12 @@ class WormholeEnd extends NonShipItem {
         // Kill any momentum obtained.
         this.setSpeed(Universe.originVector);
 
-        this.moveMesh();
+        super.animate();
+    }
 
-        this.moveItem(true);
+    // Outside of wormholes don't rotate
+    generateRotationRate() {
+        return (0);
     }
 }
 

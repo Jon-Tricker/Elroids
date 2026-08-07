@@ -49,6 +49,16 @@ class BasicAI {
     }
 
     animate(date) {
+
+        // If we dont hava a lists generate one for the "think" phase.
+        // This is expensive. So, if it already exists, think based on data from previous animation frame.
+        if (undefined === this.myShip.getCollideList()) {
+            this.myShip.genCollideList();
+        }
+        if (undefined === this.myShip.getAheadList()) {
+            this.myShip.genAheadList();
+        }
+
         let step = false;
 
         if (this.hostile) {
@@ -60,6 +70,18 @@ class BasicAI {
         if (step) {
             this.incPc();
         }
+    }
+
+    // Get a loction away from Item.
+    avoidLoc(that) {
+        // Get realtive vector
+        let vec = this.myShip.location.getRelative(that.location);
+
+        // Go in oposite direction.
+        vec.multiplyScalar(-1);
+        vec.add(this.myShip.location);
+
+        return(vec);
     }
 
     // The 'program' for this AI type. Used when not in hostile mode.
@@ -168,7 +190,7 @@ class BasicAI {
             this.dest = this.myShip.location.system.stations.values().next().value.getApproachPoint();
         }
 
-        return (this.navigateThrough(this.dest));
+        return (this.navigateTo(this.dest));
     }
 
     // Navigate to wormhole.
@@ -414,6 +436,26 @@ class BasicAI {
     // Navigate to a location. 
     // Return 'true' on arrival.
     navigateToLoc(loc, stop, maxSpeed) {
+
+        // Collision avoidance.
+        if (this.myShip.getCollideList().length > 0) {
+            let that = this.myShip.getCollideList()[0];
+
+            // Supposed to collide with destination.
+            if (that.getItem() != this.dest) {
+
+                // Only avoid if close.
+                if (that.getDist() < this.myShip.getSpeed()) {
+                    // Slow down anyhow.
+                    // this.myShip.decelerate();
+
+                    // If it's not also in fwd arc. Just thrus out as normal.
+                    if ((0 != this.myShip.getAheadList().length) && (that == this.myShip.getAheadList()[0])) {
+                        loc = this.avoidLoc(that.getItem());
+                    }
+                }
+            }
+        }
 
         // Orient ship towards
         let dist = this.myShip.getLocation().distanceTo(loc);

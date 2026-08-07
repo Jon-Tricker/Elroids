@@ -4,6 +4,7 @@
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
+import * as THREE from 'three';
 import Item from './item.js';
 import Explosion from './explosion.js';
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
@@ -31,6 +32,8 @@ class NonShipItem extends Item {
         } else {
             this.myId = id;
         }
+
+        this.rotationRate = new THREE.Vector3(this.generateRotationRate(), this.generateRotationRate(), this.generateRotationRate());
     }
 
     toJSON() {
@@ -81,8 +84,8 @@ class NonShipItem extends Item {
         this.rotateY(this.rotationRate.y / ar);
         this.rotateZ(this.rotationRate.z / ar);
 
-        this.moveItem(true);
-        this.moveMesh();
+        super.animate();
+
     }
 }
 
