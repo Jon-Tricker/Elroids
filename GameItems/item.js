@@ -6,7 +6,6 @@
 
 import * as THREE from 'three';
 import Universe from './universe.js';
-import ItemBoundary from './itemBoundary.js';
 import BugError from "../Game/bugError.js";
 import Location from '../Game/Utils/location.js';
 
@@ -30,7 +29,7 @@ class CollideItem {
     }
 
     getItem() {
-        return(this.item);
+        return (this.item);
     }
 }
 
@@ -47,11 +46,8 @@ class Item extends THREE.Group {
     hitPoints;
     owner;
 
-    // Some sort of 'size' indicating average 'radius'.
+    // Maximum dimension size for initial collision detection.
     size;               // m
-
-    // Bounding volume for collision detectionn.
-    boundary = null;
 
     // PositionalAudio objects for this Item. 
     // Create and attch once when first used.
@@ -97,9 +93,6 @@ class Item extends THREE.Group {
             this.immobile = immobile;
         }
 
-        // Set default boundary
-        this.setBoundary(size);
-
         // Add self to system
         location.system.addItem(this);
 
@@ -109,17 +102,29 @@ class Item extends THREE.Group {
         }
 
         // Deal with situation where Item created inside another Item.
-        if (null != this.getBoundary()) {
-            for (let that of this.location.system.items) {
-                if (that != this) {
-                    if (null != that.getBoundary()) {
-                        if (this.getBoundary().intersects(that.getBoundary())) {
-                            this.separateFrom(that);
-                        }
-                    }
-                }
+        for (let that of this.location.system.items) {
+            if (this.intersects(that)) {
+                this.separateFrom(that);
             }
         }
+    }
+
+    // Returns true if this intersects with that.
+    intersects(that) {
+        // Don't interect with self.
+        if (that == this) {
+            return (false);
+        }
+
+        // Fast, crude, check based on size.
+        if (this.location.distanceTo(that.getLocation()) <= (this.size + that.getSize())) {
+            return(true);
+        }
+        
+        return(false);
+
+        // ToDo: Possibly more detaled check based on shape.
+        // Possibly use this.isPointInside()
     }
 
     // Stuff saved to all items.
@@ -160,6 +165,10 @@ class Item extends THREE.Group {
         return (this.dockedWith);
     }
 
+    getSize() {
+        return (this.size);
+    }
+
     // Move item between systems.
     setSystem(newSystem) {
         // If already in a system remove it.
@@ -176,15 +185,6 @@ class Item extends THREE.Group {
         return (this.getSystem().universe);
     }
 
-    // Get boundary.
-    getBoundary() {
-        return (this.boundary)
-    }
-
-    setBoundary(size) {
-        this.boundary = new ItemBoundary(this.location, size);
-    }
-
     getGame() {
         return (this.getSystem().getGame());
     }
@@ -195,6 +195,10 @@ class Item extends THREE.Group {
 
     getSystem() {
         return (this.location.system);
+    }
+
+    getLocation() {
+        return(this.location);
     }
 
     // Normally the class name but in some cases has to be overridden.
@@ -298,9 +302,6 @@ class Item extends THREE.Group {
             let loc = this.getLocation();
             loc.addVectors(loc, this.speedFrame);
             this.setLocation(loc);
-
-            // Move boundary object.
-            this.boundary.moveTo(this.location);
         }
     }
 
@@ -350,7 +351,7 @@ class Item extends THREE.Group {
         }
 
         // Work out how much we need to move things by.
-        let reqdDelta = (this.getBoundary().getSize() + that.getBoundary().getSize()) * 1.1;
+        let reqdDelta = (this.getSize() + that.getSize()) + 1;
         if (0 >= reqdDelta) {
             // Already separated.
             return;
@@ -406,8 +407,8 @@ class Item extends THREE.Group {
         this.transferMomentum(that);
 
         // Do any damage
-        this.collideWith(that);        
-        
+        this.collideWith(that);
+
         // If overlapping separate.
         if ((!this.isDestructed()) && (!that.isDestructed())) {
             this.separateFrom(that);
@@ -464,6 +465,8 @@ class Item extends THREE.Group {
         if ((this.owner != that) && (that.owner != this)) {
             this.doDamage(that);
             that.doDamage(this);
+        } else {
+            console.log("XXX")
         }
     }
 
@@ -523,11 +526,14 @@ class Item extends THREE.Group {
         console.log("Item had no setupMesh() override. Probably a bug");
     }
 
-    animate() {
+    animate() { 
+        // Draw at current, possibly starting, position.
+        // If still exists after move will be drawn there on next frame.
+        this.moveMesh();
+
         // Update collide list
         this.genCollideList();
         this.moveItem(true);
-        this.moveMesh();
     }
 
     // Builds a list of Items in the direction of travel that we may collide with.
@@ -535,7 +541,7 @@ class Item extends THREE.Group {
         // Static things don't collide.
         if (0 == this.getSpeed()) {
             this.collideList = new Array();
-            return; 
+            return;
         }
 
         this.collideList = this.genPathList(this.speedFrame);
@@ -543,20 +549,13 @@ class Item extends THREE.Group {
 
     // Builds a list of Items in a sepcific direction from this that we may collide with. List is ordered by distance from this.
     //
-    // Collides if a cylinder, described by our boundary over the width of the System, intersects with the target boundary.
+    // Collides if a cylinder, described by our size over the width of the System, intersects with the target size.
     //
     // Also build a list of Items directly ahead. That should really be in a superclass handled by 'Ship' which has a concept of 'Ahead'.
     //
     // This cheap 'aproximate' detection. If true, and in cases where it matters, a more expensive check will be done using ray tracing.
     genPathList(path) {
         let list = new Array();
-
-        let thisBoundary = this.getBoundary();
-
-        if (null == thisBoundary) {
-            // Not checking collisions
-            return(list);
-        }
 
         // Search for collisions up to half the system size away.
         let rod = path.clone();
@@ -565,59 +564,54 @@ class Item extends THREE.Group {
         let move = new THREE.Line3(Universe.originVector, rod);
 
         for (let that of this.location.system.items) {
-            let thatBoundary = that.getBoundary();
 
-            if (null != thatBoundary) {
+            let relLocation = that.getLocation().clone();
+            relLocation.sub(this.location);
 
-                let relLocation = that.getLocation().clone();
-                relLocation.sub(this.location);
+            // For the ship be generous ... has to go through windscreen.
+            let minDist = 0;
+            if (this.isShip()) {
+                minDist += this.getSize() / 4;
+            } else {
+                minDist += this.getSize();
+            }
 
-                // For the ship be generous ... has to go through windscreen.
-                let minDist = 0;
-                if (this.isShip()) {
-                    // console.log("X " + thisBoundary.getSize() + " " + thatBoundary.getSize())
-                    minDist += thisBoundary.getSize() / 4;
-                } else {
-                    minDist += thisBoundary.getSize();
-                }
-
-                if (that.isShip()) {
-                    minDist += thatBoundary.getSize() / 4;
-                } else {
-                    minDist += thatBoundary.getSize();
-                }
+            if (that.isShip()) {
+                minDist += that.getSize() / 4;
+            } else {
+                minDist += that.getSize();
+            }
 
 
-                // This would be a load of math ... however threeJS does it for us.
-                let closestPoint = new THREE.Vector3(0, 0, 0);
-                move.closestPointToPoint(relLocation, true, closestPoint);
-                let dist = closestPoint.distanceTo(relLocation);
+            // This would be a load of math ... however threeJS does it for us.
+            let closestPoint = new THREE.Vector3(0, 0, 0);
+            move.closestPointToPoint(relLocation, true, closestPoint);
+            let dist = closestPoint.distanceTo(relLocation);
 
-                if (dist <= minDist) {
-                    // Don't collide with self.
-                    if (this != that) {
-                        // Don't collide with docked items.
-                        if (null == that.getDockedWith()) {
-                            let thatDist = this.location.distanceTo(that.location) - minDist;
+            if (dist <= minDist) {
+                // Don't collide with self.
+                if (this != that) {
+                    // Don't collide with docked items.
+                    if (null == that.getDockedWith()) {
+                        let thatDist = this.location.distanceTo(that.location) - minDist;
 
-                            // Skip closer things.
-                            let index = 0;
-                            for (let elem of list) {
-                                if (elem.getDist() < thatDist) {
-                                    break;
-                                }
-                                index ++;
+                        // Skip closer things.
+                        let index = 0;
+                        for (let elem of list) {
+                            if (elem.getDist() > thatDist) {
+                                break;
                             }
-
-                            // Insert into array.
-                            let item = new CollideItem(that, thatDist);
-                            list.splice(index, 0, item);
+                            index++;
                         }
+
+                        // Insert into array.
+                        let item = new CollideItem(that, thatDist);
+                        list.splice(index, 0, item);
                     }
                 }
             }
         }
-        return(list);
+        return (list);
     }
 
     getCollideList() {

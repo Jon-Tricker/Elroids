@@ -119,14 +119,7 @@ class WormholeEnd extends NonShipItem {
         // Add that to far system.
         this.location.system.addItem(that);
 
-        // Move it outside far wormhole end.
-        let loc = this.getLocation().clone();
-
-        // Move it beyond middle.
-        loc.add(that.speed);
-        that.location = loc;
-
-        // Move it outside
+        // Move it outside far wormhole end.#
         that.separateFrom(this);
     }
 

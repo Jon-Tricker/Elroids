@@ -166,9 +166,9 @@
 		</LI>
 		<LI>There are problems with 'quantized' time. A slower moving object can catch up with and collide with a faster
 			one if it gets a move phase 'first'. Some messy work round have been required.</LI>
-		<LI>Sound support on Chrome is a pain. In an attempt to block audio spam audio components can only ne
+		<LI>Sound support on Chrome is a pain. In an attempt to block audio spam audio components can only be
 			initialized from within user events. So sounds have to be loaded on the first key/mouse click. Which means
-			they are not yet ready if this event wans to make a sound,</LI>
+			they are not yet ready if this event wants to make a sound,</LI>
 		<LI>'statics' are slow. Require an instance of the class to be created? For better performance create a single
 			instance as part of a top level object (e.g. Game) and call by reference.</LI>
 	</UL>

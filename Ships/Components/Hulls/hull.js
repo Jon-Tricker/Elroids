@@ -1,13 +1,13 @@
 // Base class for hulls
 //
-// Also acts as a 'temlate' defining the initial ship component lists.
+// Also acts as a 'template' defining the initial ship component lists.
 //
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import { Component } from '../component.js';
+import { Component, ComponentAct } from '../component.js';
 import ComponentSets from '../componentSets.js';
 import GameError from '../../../Game/gameError.js';
 import BugError from '../../../Game/bugError.js';
@@ -211,6 +211,9 @@ class Hull extends Component {
             comp = new comp.constructor(comp.getTargetSet(ship));
             comp.status = jsonComp.status;
             comp.displayPanel = jsonComp.displayPanel;
+            if (comp instanceof ComponentAct) {
+                comp.setActive(jsonComp.active);
+            }
         }
 
         // Unpack cargo
@@ -225,6 +228,10 @@ class Hull extends Component {
 
     getDescription() {
         return (DESCRIPTION);
+    }
+
+    setActive(active) {
+        throw new GameError("Hulls can't be de-activated.")
     }
 
     // Build a ship for this hull type.

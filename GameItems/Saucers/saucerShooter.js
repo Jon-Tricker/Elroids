@@ -4,10 +4,10 @@
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
-import DumbMissile from '../dumbMissile.js';
+import DumbMissile from '../Projectiles/dumbMissile.js';
 import Saucer from './saucer.js';
 
-const COLOUR = "#F0C0C0";
+const COLOUR = "#C0C0C0";
 const SIZE = 10;
 const MASS = 50;
 

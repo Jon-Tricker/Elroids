@@ -9,7 +9,7 @@ import NonShipItem from '../nonShipItem.js';
 import Mineral from '../mineral.js';
 import { MineralTypes } from '../minerals.js';
 import Explosion from '../explosion.js';
-import DumbMissile from '../dumbMissile.js';
+import DumbMissile from '../Projectiles/dumbMissile.js';
 import Universe from '../universe.js';
 
 const MAX_ROTATE_RATE = 2.5;    // r/s
@@ -185,12 +185,10 @@ class Saucer extends NonShipItem {
             }
         }
 
-        this.moveMesh();
-
         this.navigate();
         this.shoot();
 
-        this.moveItem(true);
+        super.animate(date);
 
         if ((0 != this.destructTime) && (date > this.destructTime)) {
             this.explode();

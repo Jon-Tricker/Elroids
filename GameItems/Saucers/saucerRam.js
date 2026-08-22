@@ -6,7 +6,7 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import Saucer from './saucer.js';
 
-const COLOUR = "#FF2020";
+const COLOUR = "#C03030";
 const SIZE = 20;
 const MASS = 20;
 const MAX_SPEED = 100;   // m/s

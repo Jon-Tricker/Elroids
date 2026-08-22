@@ -1,10 +1,10 @@
 // Base class for weapons
-import { Component } from "../component.js";
+import { ComponentAct } from "../component.js";
 import GameError from "../../../Game/gameError.js";
 
 const DESCRIPTION = "'Weapons' are used for damaging things."
 
-class Weapon extends Component {
+class Weapon extends ComponentAct {
     fireRate;   // Per second
     fireLast;   // Last firing time.
 
@@ -27,12 +27,17 @@ class Weapon extends Component {
     }
 
     // Target may be a direction or an Item.
+    // Return 'true' if OK to fire.
     shoot(target, date) {
         this.fireLast = date;
 
         if (!this.isWorking()) {
-            this.set.getShip().playSound("click");
-            throw (new GameError("Weapon failed"));
+            if (this.isActive()) {
+                this.set.getShip().playSound("click");
+                throw (new GameError(this.getName() + " failed."));
+            } else {
+                return(false);
+            }
         }
 
         if (undefined != this.maxAmmo) {
@@ -40,9 +45,10 @@ class Weapon extends Component {
                 this.ammo--;
             } else {
                 this.set.getShip().playSound("click");
-                throw (new GameError("Out of ammo"));
+                throw (new GameError(this.getName() + "no ammo"));
             }
         }
+        return(true);
     }
 
     // Determine loaded and ready to fire.

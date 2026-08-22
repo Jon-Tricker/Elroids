@@ -3,9 +3,12 @@ import * as THREE from 'three';
 import Missile from './missile.js';
 
 const COLOUR = "#ff00ff"
+const SPEED = 600;          // m/s
+const DAMAGE = 1;           // hp
+const RANGE = SPEED * 3;    // m
 
 // Create material.
-const missileMaterial = new THREE.MeshStandardMaterial(
+const material = new THREE.MeshStandardMaterial(
   {
     color: COLOUR,
     emissive: COLOUR,
@@ -15,17 +18,10 @@ const missileMaterial = new THREE.MeshStandardMaterial(
   }
 )
 
-// Damage (hp)
-const MISSILE_DAMAGE = 1;
-
 class DumbMissile extends Missile {
 
-  constructor(direction, owner, silent) {
-    super(direction, owner, MISSILE_DAMAGE, COLOUR, missileMaterial);
-
-    if ((undefined == silent) || (!silent)) {
-      this.playSound('pew', 0.2); 
-    }
+  constructor(direction, owner) {
+    super(direction, owner, DAMAGE, COLOUR, SPEED, RANGE, material,'pew');
   }
 }
 

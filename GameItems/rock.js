@@ -83,10 +83,8 @@ class Rock extends NonShipItem2 {
     let rockGeometry;
     if (Rock.rockStyle == ROCK_STYLE_SPHERE) {
       rockGeometry = new THREE.SphereGeometry(this.rockSize, 64, 64);
-      this.setBoundary(this.rockSize);
     } else {
       rockGeometry = new FacitRockGeometry(this.rockSize, this.composition);
-      this.setBoundary(rockGeometry.getAverageSize());
     }
 
     // compute vertex normals

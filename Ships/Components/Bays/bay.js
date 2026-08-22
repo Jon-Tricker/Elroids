@@ -25,6 +25,10 @@ class Bay extends Component {
     getDescription() {
         return (DESCRIPTION);
     }
+
+    setActive(active) {
+        throw new GameError("Bays can't be de-activated.")
+    }
     
     repair(percent, ship, silent) {
         super.repair(percent, ship, silent);

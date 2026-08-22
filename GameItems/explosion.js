@@ -48,24 +48,22 @@ class Explosion extends Item {
 
     this.add(explosionMesh);
 
-    this.playSound('explosion', this.maxSize/(MAX_SIZE * 3));
-  }  
-  
-  // Don't check collisions with explosions
-  getBoundary() {
-    return (null);
+    this.playSound('explosion', this.maxSize / (MAX_SIZE * 3));
   }
+
 
   animate() {
     if (this.currentSize > this.maxSize) {
       this.destruct();
     } else {
-      this.scale.set(this.currentSize, this.currentSize, this.currentSize );
+      this.scale.set(this.currentSize, this.currentSize, this.currentSize);
+      
+      // Don't check collisions with explosions
       this.moveItem(false);
       this.moveMesh();
-      
+
       // Grow
-      this.currentSize += 250/this.getGame().getAnimateRate();
+      this.currentSize += 250 / this.getGame().getAnimateRate();
     }
   }
 }

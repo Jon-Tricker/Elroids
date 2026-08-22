@@ -44,7 +44,6 @@ class Mineral extends NonShipItem2 {
 
   setupMesh() {
     let geometry = new THREE.CylinderGeometry(this.size/2, this.size/2, this.size);
-    this.setBoundary(this.size);
 
     // compute vertex normals
     geometry.computeVertexNormals();

@@ -1,12 +1,12 @@
 // Base class for avionic
-import { Component } from "../component.js";
+import { ComponentAct } from "../component.js";
 
 const DESCRIPTION = "Avionics are the 'brains' of the ship.\n" +
                     "Includes things like Radar, Compass and Computers.\n" +
                     "If multiple versions of a type are installed then the 'best' (and least damaged)\n" +
                     "is used."
  
-class Avionic extends Component {
+class Avionic extends ComponentAct {
 
     constructor(type, set) {
         super(type, set);

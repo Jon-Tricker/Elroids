@@ -1,6 +1,6 @@
 // Base class for dumb missile weapons (DML)
 import MissileWeapon from './missileWeapon.js'
-import DumbMissile from '../../../GameItems/dumbMissile.js'
+import DumbMissile from '../../../GameItems/Projectiles/dumbMissile.js'
 import { ComponentType } from '../component.js';
 
 const FIRE_RATE = 4;
@@ -21,8 +21,9 @@ class DumbMissileWeapon extends MissileWeapon {
 
     shoot(target, date) {
         if (this.isReady(date)) {
-            super.shoot(target, date);
-            new DumbMissile(target, this.getShip());
+            if (super.shoot(target, date)) {
+                new DumbMissile(target, this.getShip());
+            }
         }
     }
 

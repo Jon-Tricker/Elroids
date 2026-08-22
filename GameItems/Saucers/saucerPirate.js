@@ -7,10 +7,10 @@
 import * as THREE from 'three';
 import Saucer from './saucer.js';
 import Mineral from '../mineral.js';
-import DumbMissile from '../../GameItems/dumbMissile.js'
+import DumbMissile from '../Projectiles/dumbMissile.js'
 import Location from '../../Game/Utils/location.js';
 
-const COLOUR = "#202060";
+const COLOUR = "#303060";
 const SIZE = 20;
 const MASS = 20;
 const MAX_SPEED = 100;  // m/s

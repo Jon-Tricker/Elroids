@@ -1,5 +1,5 @@
 // Base class for engines
-import { Component } from "../component.js";
+import { ComponentAct } from "../component.js";
 
 const DESCRIPTION = "Engines provide 'thrust' to accelerate the ship.\n" +
                     "The ship accelerates (according to F=ma) up to it's maxmum speed.\n" +
@@ -7,7 +7,7 @@ const DESCRIPTION = "Engines provide 'thrust' to accelerate the ship.\n" +
                     "The ships total thrust is the sum of all it's engine thrusts.\n" +
                     "'Deceleration' is 'magic' ... Engines thrust against current speed."
  
-class Engine extends Component {
+class Engine extends ComponentAct {
 
     thrust;         // kN
 
@@ -24,6 +24,10 @@ class Engine extends Component {
     }
 
     getThrust() {
+        if (!this.isActive()) {
+            return(0);
+        }
+        
         return(this.thrust * this.status/100);
     }
 

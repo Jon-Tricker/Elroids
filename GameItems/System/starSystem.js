@@ -10,7 +10,6 @@ import SaucerMother from '../Saucers/saucerMother.js';
 import SaucerRam from '../Saucers/saucerRam.js';
 import SaucerPirate from '../Saucers/saucerPirate.js';
 import SaucerShooter from '../Saucers/saucerShooter.js';
-import SaucerWanderer from '../Saucers/saucerWanderer.js';
 import Station from './station.js';
 import { SystemSpec } from './system.js';
 import Freighter from '../../Ships/NonPlayerShips/freighter.js';
@@ -154,8 +153,7 @@ class StarSystem extends System {
         let sz = this.systemSize / 2;
         for (let item of this.items) {
             if (!(item instanceof PlayerShip) && !(item instanceof Station)) {
-                let thatBoundary = item.getBoundary();
-                if ((null != thatBoundary) && (thatBoundary.intersectsBox(clearBox))) {
+                if (clearBox.containsPoint(item.getLocation())) {
                     let loc = item.getLocation();
 
                     // Bounce it far away.
@@ -187,8 +185,11 @@ class StarSystem extends System {
             // Create a few test rocks at set locations
 
             // Horizontal colliders
-            // new Rock(20, new Location(200, 100, 50, this), Universe.originVector);
-            // new Rock(10, new Location(200, -50, 50, this), new THREE.Vector3(0, 25, 0));
+            new Rock(20, new Location(200, 100, 50, this), Universe.originVector);
+            new Rock(10, new Location(200, -50, 50, this), new THREE.Vector3(0, 25, 0));
+
+            // Point blank shot
+            // new Rock(5, new Location(20, 0, 0, this), new THREE.Vector3(0, 0, 0));
 
             // Big target
             // new Rock(20, new Location(100, 0, 0, this), Universe.originVector);
@@ -303,10 +304,6 @@ class StarSystem extends System {
 
         // Game gradually gets harder.
         game.maxSaucerCount++;
-
-        if (!this.getGame().testMode) {
-            hole.exit(saucer);
-        }
     }
 
     removeMotherSaucer(saucer) {

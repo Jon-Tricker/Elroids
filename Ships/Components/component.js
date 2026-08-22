@@ -20,7 +20,6 @@ class ComponentType extends GoodsType {
 }
 
 class Component extends Goods {
-
     status;     // % of maxHp. May result in non integer number of HPs.
 
     // Set if componentDisplay to be shown.
@@ -302,4 +301,37 @@ class Component extends Goods {
     }
 }
 
-export { ComponentType, Component };
+// Superclass of component that can be deactivated.
+class ComponentAct extends Component
+{ 
+    active;     // Is it switched on.
+
+    constructor(type, set) {
+        super(type, set);
+        this.active = true;
+    }
+
+    toJSON() {
+        let json = super.toJSON();
+        json.active = this.active;
+        return (json);
+    }
+
+    isActive() {
+        return(this.active);
+    }
+
+    setActive(active) {
+        this.active = active;
+        this.getShip().recalc();
+    }
+    
+    isWorking() {
+        if (!this.isActive()) {
+            return(false);
+        }
+        return (super.isWorking());
+    }
+}
+
+export { ComponentType, Component, ComponentAct };

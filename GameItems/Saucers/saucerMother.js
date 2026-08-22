@@ -7,7 +7,6 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import Saucer from './saucer.js';
 
-import SaucerWanderer from "./saucerWanderer.js";
 import SaucerShooter from "./saucerShooter.js";
 import SaucerRam from "./saucerRam.js";
 import SaucerHunter from "./saucerHunter.js";
@@ -15,7 +14,7 @@ import SaucerPirate from "./saucerPirate.js";
 import Location from '../../Game/Utils/location.js';
 
 const COLOUR = "#80FF80";
-const SIZE = 70;
+const SIZE = 50;
 const MASS = 1000;
 const MAX_SPEED = 40;     // m/s
 const MAX_ACC = 1;      // m/s^s
@@ -125,32 +124,25 @@ class SaucerMother extends Saucer {
                     let saucer;
                     let thisLoc = this.getLocation();
 
-                    let type = Math.floor(Math.random() * 5)
+                    let type = Math.floor(Math.random() * 4)
                     switch (type) {
                         case 0:
-                            // Block up a saucer slot with something useless.
-                            saucer = new SaucerWanderer(thisLoc, this);
-                            break;
-
-                        case 1:
                             saucer = new SaucerShooter(thisLoc, this);
                             break;
 
-                        case 2:
+                        case 1:
                             saucer = new SaucerHunter(thisLoc, this);
                             break;
 
-                        case 3:
+                        case 2:
                             saucer = new SaucerPirate(thisLoc, this);
                             break;
 
-                        case 4:
+                        case 3:
                         default:
                             saucer = new SaucerRam(thisLoc, this);
                             break;
                     }
-
-                    saucer.separateFrom(this);
                 }
             }
         }

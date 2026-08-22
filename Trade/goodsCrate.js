@@ -50,7 +50,6 @@ class GoodsCrate extends NonShipItem2 {
 
   setupMesh() {
     let geometry = new THREE.BoxGeometry(this.size/2, this.size/2, this.size);
-    this.setBoundary(this.size);
 
     // compute vertex normals
     geometry.computeVertexNormals();

@@ -2,6 +2,7 @@
 import MenuTable from './menuTable.js';
 import BugError from '../../Game/bugError.js';
 import { ComponentDetailsMenu } from './compPurchaseMenu.js';
+import { ComponentAct } from '../../Ships/Components/component.js';
 
 let componentsMenu = "\
 <BODY>\
@@ -41,6 +42,9 @@ class ComponentsMenu {
                         let heads = new Array();
                         heads.push("Name");
                         heads.push("Mass(t)");
+                        if (comp instanceof ComponentAct) {
+                            heads.push("Active");
+                        }
                         heads.push("Status(%)");
                         heads.push("Details");
                         heads.push("Display");
@@ -58,6 +62,9 @@ class ComponentsMenu {
                     let vals = new Array();
                     vals.push(comp.getName());
                     vals.push(comp.getMass());
+                    if (comp instanceof ComponentAct) {
+                        vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onActiveClick(this, " + setIndex + ", " + compIndex + ")\">" + comp.isActive() + "</button>");
+                    }
                     vals.push(comp.status);
                     vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onDetailsClick(this, " + setIndex + ", " + compIndex + ")\">Show</button>");
                     vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onEnableClick(this, " + setIndex + ", " + compIndex + ")\">" + ComponentsMenu.onOff(comp.displayPanel) + "</button>");
@@ -136,6 +143,12 @@ class ComponentsMenu {
         let ship = menuSystem.getShip();
         let comp = ComponentsMenu.getCompForIndex(ship, setIndex, compIndex);
         menuSystem.pushScript(ComponentDetailsMenu, comp);
+    }
+
+    static onActiveClick(menuSystem, setIndex, compIndex) {
+        let ship = menuSystem.getShip();
+        let comp = ComponentsMenu.getCompForIndex(ship, setIndex, compIndex);
+        comp.setActive(!comp.isActive());
     }
 
     static getCompForIndex(ship, setIndex, compIndex) {
