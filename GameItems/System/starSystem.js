@@ -15,8 +15,8 @@ import { SystemSpec } from './system.js';
 import Freighter from '../../Ships/NonPlayerShips/freighter.js';
 import NPShipFactory from '../../Ships/NonPlayerShips/nPShipFactory.js';
 import Location from '../../Game/Utils/location.js';
-import Universe from '../universe.js';
 import PoliceShip from '../../Ships/NonPlayerShips/policeShip.js';
+import Utils from '../../Game/Utils/utilities.js';
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;           // m
@@ -185,23 +185,23 @@ class StarSystem extends System {
             // Create a few test rocks at set locations
 
             // Horizontal colliders
-            new Rock(20, new Location(200, 100, 50, this), Universe.originVector);
+            new Rock(20, new Location(200, 100, 50, this), new THREE.Vector3());
             new Rock(10, new Location(200, -50, 50, this), new THREE.Vector3(0, 25, 0));
 
             // Point blank shot
             // new Rock(5, new Location(20, 0, 0, this), new THREE.Vector3(0, 0, 0));
 
             // Big target
-            // new Rock(20, new Location(100, 0, 0, this), Universe.originVector);
+            // new Rock(20, new Location(100, 0, 0, this),new THREE.Vector3() );
 
             // Small target
-            // new Rock(80, new Location(100, 0, 0, this), Universe.originVector);
+            // new Rock(80, new Location(100, 0, 0, this), new THREE.Vector3());
 
             // Row of rocks
             for (let i = -this.systemSize; i < this.systemSize; i += 211) {
                 let sz = Math.abs(i % this.universe.game.getMaxRockSize());
                 if (sz != 0) {
-                    new Rock(sz, new Location(i, -100, 0, this), Universe.originVector);
+                    new Rock(sz, new Location(i, -100, 0, this), new THREE.Vector3());
                 }
             }
 
@@ -209,7 +209,7 @@ class StarSystem extends System {
             /*
             for (let i = 0; i < this.systemSize ; i += 211) {
                 let sz = i % MAX_ROCK_SIZE;
-                new Rock(sz, new Location(i, i, i), Universe.originVector);
+                new Rock(sz, new Location(i, i, i), new THREE.Vector3());
             }
             */
 
@@ -218,22 +218,22 @@ class StarSystem extends System {
             for (let type of NPShipFactory.shipTypes) {
                 let yLoc = (NPShipFactory.shipTypes.size / 2 - count) * 100;
                 let location = new Location(2000, yLoc, 200, this);
-                NPShipFactory.createShip(type, location, true);
+                NPShipFactory.createShip(type, location, undefined);
                 count++;
             }
 
             // And a sample mineral
-            new Mineral(100, new Location(250, -10, 50, this), Universe.originVector, MineralTypes[2]);
-            new Mineral(100, new Location(500, 50, 50, this), Universe.originVector, MineralTypes[3]);
+            new Mineral(100, new Location(250, -10, 50, this), new THREE.Vector3(), MineralTypes[2]);
+            new Mineral(100, new Location(500, 50, 50, this), new THREE.Vector3(), MineralTypes[3]);
 
             // Add sample goods crates.
             let good = new (this.universe.game.goodsList.getByClass("Gun")).constructor();
             good.number = 50;
-            good.makeCrate(new Location(250, 10, 50, this), Universe.originVector);
+            good.makeCrate(new Location(250, 10, 50, this), new THREE.Vector3());
 
             let comp = new (this.universe.game.componentsList.getByClass("BasicEngine")).constructor();
             comp.number = 1;
-            comp.makeCrate(new Location(270, 10, 70, this), Universe.originVector);
+            comp.makeCrate(new Location(270, 10, 70, this), new THREE.Vector3());
 
         } else {
             // Create a bunch of random rocks
@@ -248,7 +248,7 @@ class StarSystem extends System {
 
     createRandomRock(loc) {
         let game = this.universe.game;
-        let maxVel = game.createRandomVector(game.getMaxRockVelocity());
+        let maxVel = Utils.createRandomVector(game.getMaxRockVelocity());
         let sz = Math.floor((Math.random() * game.getMaxRockSize()) + 10);
 
         let rock = new Rock(sz, loc, maxVel);

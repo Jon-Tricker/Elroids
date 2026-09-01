@@ -1,8 +1,9 @@
 // Non player smuggler. Picks up valuables and takes them to the station.
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import NPShip from './nonPlayerShip.js';
 import MediumHull from '../Components/Hulls/mediumHull.js';
 import { BasicAI } from './basicAI.js';
@@ -83,8 +84,8 @@ class SmugglerAI extends BasicAI {
 const HP = 3;
 
 class Smuggler extends NPShip {
-    constructor(location) {
-        super(5, 10, 20, location, undefined, HP);
+    constructor(location, speed) {
+        super(5, 10, 20, location, speed, undefined, HP);
         this.ai = new SmugglerAI(this);
     }
 

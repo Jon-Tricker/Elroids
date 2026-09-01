@@ -1,7 +1,7 @@
 // Non player ship graphic and physics.
 // Minumum necessary implemented.
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -12,10 +12,14 @@ class NPShip extends Ship {
     // Brain of NP ship.
     ai;
 
-    constructor(height, width, length, location, mass, hitPoints) {
-        super(height, width, length, location, mass, hitPoints);
+    constructor(height, width, length, location, speed, mass, hitPoints) {
+        super(height, width, length, location, speed, mass, hitPoints);
 
         this.hull.compSets.baySet.loadRandomCargo(this.getInitialCargoValue());
+    }
+
+    destruct() {
+        super.destruct();
     }
 
     getInitialCargoValue() {
@@ -23,8 +27,10 @@ class NPShip extends Ship {
     }
 
     animate(date, keyboard) {
-        this.ai.animate(date);
+        // Move, at existing speed, first so we don't run over anything created.
         super.animate(date);
+        
+        this.ai.animate(date);
     }
 
     takeDamage(hits, that) {

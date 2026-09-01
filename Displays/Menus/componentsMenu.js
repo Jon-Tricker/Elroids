@@ -1,6 +1,5 @@
 // Component details menu.
 import MenuTable from './menuTable.js';
-import BugError from '../../Game/bugError.js';
 import { ComponentDetailsMenu } from './compPurchaseMenu.js';
 import { ComponentAct } from '../../Ships/Components/component.js';
 
@@ -63,7 +62,7 @@ class ComponentsMenu {
                     vals.push(comp.getName());
                     vals.push(comp.getMass());
                     if (comp instanceof ComponentAct) {
-                        vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onActiveClick(this, " + setIndex + ", " + compIndex + ")\">" + comp.isActive() + "</button>");
+                        vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onActiveClick(this, " + setIndex + ", " + compIndex + ")\">" + comp.isOn() + "</button>");
                     }
                     vals.push(comp.status);
                     vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onDetailsClick(this, " + setIndex + ", " + compIndex + ")\">Show</button>");
@@ -148,7 +147,7 @@ class ComponentsMenu {
     static onActiveClick(menuSystem, setIndex, compIndex) {
         let ship = menuSystem.getShip();
         let comp = ComponentsMenu.getCompForIndex(ship, setIndex, compIndex);
-        comp.setActive(!comp.isActive());
+        comp.setOn(!comp.isOn());
     }
 
     static getCompForIndex(ship, setIndex, compIndex) {

@@ -11,7 +11,7 @@ class AvionicsSet extends ComponentSet {
     compass;        // The one and only compass.
 
     constructor(sets, slots) {
-        super("Avionics", "Avionic", sets, slots);
+        super("Avionics", "Avionic", sets, slots, true);
         this.recalc();
     }
 

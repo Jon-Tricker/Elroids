@@ -5,23 +5,17 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import NonShipItem from '../nonShipItem.js';
+import NonShipItem2 from '../nonShipItem2.js';
 import Universe from '../universe.js';
-import Explosion from '../explosion.js'
 
 const MISSILE_SIZE = 1;     // m
-const MISSILE_SPEED = 600;   // m/s
 const MISSILE_MASS = 0.1;
 
-const MISSILE_DAMAGE = 1;
-
-// Tine to live ms.
-const MISSILE_TTL = 7000;   // ms
-
-class Projectile extends NonShipItem {
+class Projectile extends NonShipItem2 {
 
   colour;
   damage;
+  material;
 
   // Max range
   range;      // m
@@ -30,28 +24,28 @@ class Projectile extends NonShipItem {
 
     // Set speed.
     direction = direction.normalize()
-    let startSpeed = direction.multiplyScalar(speed);
 
-    // Start at owners location.
-    let startLocation = owner.getLocation().clone();
+    // Start at owners gun location.
+    let startLocation = owner.getGunPoint();
 
-    // Create
-    super(startLocation, startSpeed, MISSILE_SIZE / Universe.CBRT_THREE, MISSILE_MASS, 1, owner);
+    let startSpeed = direction.clone();
+    startSpeed.multiplyScalar(speed);
+
+    // Add in relative speed of owner
+    // I belive relativity says we also do this for energy beams.
+    startSpeed.add(owner.speed);
+
+    // Create. Create at our speed so graphics do not include owners seed.
+    super(startLocation, startSpeed, MISSILE_SIZE / Universe.CBRT_THREE, MISSILE_MASS, 1, owner, false, undefined, false);
 
     this.range = range;
-
-    // Tweak internals
     this.colour = colour;
     this.damage = damage;
+    this.material = material;
 
-    // Create graphic.
-    this.setupMesh(material);
+    this.playSound(sound, 0.2);
 
-    this.playSound(sound, 0.2); 
-
-    // Owner WILL move first (we a currently animating). Don't get run over.
-    this.animate();
-    //this.location.add(this.owner.speedFrame);
+    this.activateIfRequired();
   }
 
   animate() {
@@ -70,26 +64,31 @@ class Projectile extends NonShipItem {
       // Don't plot
       return (null);
     }
-  } 
-  
-  setupMesh(material) {
-      // Create a sphere.
-      let geometry = this.getGeometry();
-  
-      // compute vertex normals
-      geometry.computeVertexNormals();
-  
-      let mesh = new THREE.Mesh(geometry, material);
-  
-      mesh.castShadow = false;
-      mesh.receiveShadow = false;
-  
-      this.add(mesh);
-    }
+  }
+
+  // Default spherical geometry.
+  setupMesh() {
+    // Create the geometry.
+    let geometry = this.getGeometry();
+
+    // compute vertex normals
+    geometry.computeVertexNormals();
+
+    let mesh = new THREE.Mesh(geometry, this.material);
+
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
+
+    this.add(mesh);
+  }
+
+  getGeometry() {
+    return (new THREE.SphereGeometry(MISSILE_SIZE, 8, 8));
+  }
 
   collideWith(that) {
-      super.collideWith(that);
-      this.destruct();
+    super.collideWith(that);
+    this.destruct();
   }
 
   doDamage(that) {

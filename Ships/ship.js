@@ -1,7 +1,7 @@
 // Base class for any ship (i.e. something with an 'orientation' that implements the laws of physics).
 // Internal impementation of ship is left to the sub-classes.
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -9,7 +9,6 @@ import * as THREE from 'three';
 import Item from '../GameItems/item.js';
 import { Hull } from './Components/Hulls/hull.js';
 import Explosion from '../GameItems/explosion.js';
-import Universe from '../GameItems/universe.js';
 import Mineral from '../GameItems/mineral.js';
 import GoodsCrate from '../Trade/goodsCrate.js';
 import Station from '../GameItems/System/station.js';
@@ -88,13 +87,11 @@ class Ship extends Item {
 
     engineSoundOn = false;
 
-    mesh;
-
     // Array of Items that we would collide with if went straight forward.
     aheadList = undefined;
 
-    constructor(height, width, length, location, mass, hitPoints, owner) {
-        super(location, Universe.originVector, length, mass, hitPoints, owner);
+    constructor(height, width, length, location, speed, mass, hitPoints, owner) {
+        super(location, speed, length, mass, hitPoints, owner);
 
         // Now that we called 'super' can use 'this
         this.height = height;
@@ -168,6 +165,10 @@ class Ship extends Item {
         }
     }
 
+    getGunPoint() {
+        return (this.hull.getGunPoint());
+    }
+
     // Upgrade the hull (and graphics).
     setHull(hull) {
         this.hull = hull;
@@ -218,7 +219,7 @@ class Ship extends Item {
         this.hull.setFlameState(false);
         if (1 > this.getSpeed()) {
             // Stop
-            this.setSpeed(Universe.originVector);
+            this.setSpeed(new THREE.Vector3());
             this.engineOff();
             return;
         }

@@ -85,6 +85,19 @@ class Gun extends Goods {
     }
 }
 
+class Food extends Goods {
+
+    static type = new GoodsType("Food", "Food", 1, 1, 7, 1, 10);
+
+    constructor(set, number) {
+        super(Food.type, set, number);
+    }
+
+    getDescription() {
+        return ("Munchie things.");
+    }
+}
+
 class Narcotic extends Goods {
 
     static type = new GoodsType("Narcotic", "Narcotics", 1, 0, 3, 0.5, 400);
@@ -124,6 +137,7 @@ class GoodsList extends GoodsSet {
         new Tool(this);
         new Luxury(this);
         new Gun(this);
+        new Food(this);
         new Narcotic(this);
         new Crystal(this);
     }

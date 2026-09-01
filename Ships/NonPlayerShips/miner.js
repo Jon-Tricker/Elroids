@@ -120,8 +120,8 @@ class MinerAI extends BasicAI {
 const HP = 3;
 
 class Miner extends NPShip {
-    constructor(location) {
-        super(5, 10, 20, location, undefined, HP);
+    constructor(location, speed) {
+        super(5, 10, 20, location, speed, undefined, HP);
         this.ai = new MinerAI(this);
     }
 

@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import Game from '../game.js';
 import StarFieldTexture from '../Utils/starFieldText.js';
 import JSONSet from '../Utils/jsonSet.js';
+import Utils from '../Utils/utilities.js';
 
 // Sizes as percentage of sky box size.
 const SUN_SIZE = 5;
@@ -190,7 +191,7 @@ class SkyBox extends THREE.Group {
 
           let sz = this.getUniverse().systemSize;
 
-          let position = this.getGame().createRandomIntegerVector(sz);
+          let position = Utils.createRandomVector(sz, true);
 
           // Stick it on a side where the sun isn't.
           switch (Math.floor(Math.random() * 5)) {

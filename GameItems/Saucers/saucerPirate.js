@@ -1,14 +1,15 @@
 // Pirate saucer
 // Tries to steal minerals.
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import * as THREE from 'three';
 import Saucer from './saucer.js';
 import Mineral from '../mineral.js';
 import DumbMissile from '../Projectiles/dumbMissile.js'
-import Location from '../../Game/Utils/location.js';
+import Utils from '../../Game/Utils/utilities.js';
 
 const COLOUR = "#303060";
 const SIZE = 20;
@@ -90,7 +91,7 @@ class SaucerPirate extends Saucer {
     createLoiterLocation() {
         this.targetLocation = this.getGame().getShip().getLocation().clone();
 
-        let offset = this.getGame().createRandomVector(STANDOFF_DISTANCE)
+        let offset = Utils.createRandomVector(STANDOFF_DISTANCE)
         this.targetLocation.add(offset);
 
         return(this.targetLocation);

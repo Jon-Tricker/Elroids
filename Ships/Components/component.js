@@ -2,7 +2,12 @@
 //
 // Components can be damaged/repaired. So:
 //  Extends Goods with a 'status' member.
-//  Always has a Goods.number of '1'. Can't bulk individually damagable objects.
+//  Always has a Goods.number of '1'. Can't bulk individually damagable objects. 
+
+// Copyright (C) Jon Tricker 2023, 2024, 2025, 2026.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import ComponentDisplay from "../../Displays/Components/componentDisplay.js";
 import BugError from "../../Game/bugError.js";
 import Goods from "../../Trade/goods.js";
@@ -302,33 +307,46 @@ class Component extends Goods {
 }
 
 // Superclass of component that can be deactivated.
-class ComponentAct extends Component
-{ 
-    active;     // Is it switched on.
+class ComponentAct extends Component {
+    on;     // Is it switched on.
 
     constructor(type, set) {
         super(type, set);
-        this.active = true;
+        this.setOn(true);
     }
 
     toJSON() {
         let json = super.toJSON();
-        json.active = this.active;
+        json.on = this.on;
         return (json);
     }
 
-    isActive() {
-        return(this.active);
+    isOn() {
+        return (this.on);
     }
 
-    setActive(active) {
-        this.active = active;
-        this.getShip().recalc();
+    setOn(on) {
+        // get ship ... if any.
+        let ship;
+        if (undefined != this.set) {
+            ship = this.set.getShip();
+        }
+
+        if ((undefined != ship) && on && (!this.set.isMultiOn())) {
+            // If switch off others in set
+            this.set.allOff();
+        }
+
+        this.on = on;
+
+        if (undefined != ship) {
+            ship.recalc();
+        }
     }
-    
+
     isWorking() {
-        if (!this.isActive()) {
-            return(false);
+        if (!this.isOn()) {
+            return (false);
         }
         return (super.isWorking());
     }

@@ -26,7 +26,7 @@ class Bay extends Component {
         return (DESCRIPTION);
     }
 
-    setActive(active) {
+    setOn(active) {
         throw new GameError("Bays can't be de-activated.")
     }
     

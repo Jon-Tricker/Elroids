@@ -6,6 +6,7 @@
 
 import DumbMissile from '../Projectiles/dumbMissile.js';
 import Saucer from './saucer.js';
+import Utils from '../../Game/Utils/utilities.js';
 
 const COLOUR = "#C0C0C0";
 const SIZE = 10;
@@ -45,7 +46,7 @@ class SaucerShooter extends Saucer {
     createTargetLocation() {
         this.targetLocation = this.getShip().getLocation().clone();
 
-        let offset = this.getGame().createRandomVector(STANDOFF_DISTANCE)
+        let offset = Utils.createRandomVector(STANDOFF_DISTANCE)
         this.targetLocation.add(offset);
     }
 
@@ -86,7 +87,7 @@ class SaucerShooter extends Saucer {
                 let game = this.getGame();
                 let range = game.getShip().location.getRelative(this.location);
                 if ((STANDOFF_DISTANCE * 2) > range.length()) {
-                    let direction = game.createRandomVector(2);
+                    let direction = Utils.createRandomVector(2);
                     new DumbMissile(direction, this);
                 }
             }

@@ -1,13 +1,12 @@
 // In game 'Objects'. But the word 'Object' is overloaded ... so call them 'Items'.
 
-// Copyright (C) Jon Tricker 2023, 2024, 2025.
+// Copyright (C) Jon Tricker 2023, 2024, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import Universe from './universe.js';
 import BugError from "../Game/bugError.js";
-import Location from '../Game/Utils/location.js';
+import Utils from '../Game/Utils/utilities.js';
 
 const COLOUR = "#FFFFFF";
 
@@ -63,11 +62,19 @@ class Item extends THREE.Group {
     // Array of Items in direction of travel that we could collide with.
     collideList = undefined;
 
+    // Graphics mesh
+    mesh = new THREE.Group();
+
     // Construct with optional mass
     constructor(location, speed, size, mass, hitPoints, owner, immobile) {
         super();
         this.location = location.clone();
+
+        if (undefined == speed) {
+            speed = new THREE.Vector3();
+        }
         this.setSpeed(speed);
+
         this.size = size;
         this.owner = owner;
 
@@ -118,10 +125,10 @@ class Item extends THREE.Group {
 
         // Fast, crude, check based on size.
         if (this.location.distanceTo(that.getLocation()) <= (this.size + that.getSize())) {
-            return(true);
+            return (true);
         }
-        
-        return(false);
+
+        return (false);
 
         // ToDo: Possibly more detaled check based on shape.
         // Possibly use this.isPointInside()
@@ -198,7 +205,7 @@ class Item extends THREE.Group {
     }
 
     getLocation() {
-        return(this.location);
+        return (this.location);
     }
 
     // Normally the class name but in some cases has to be overridden.
@@ -350,54 +357,59 @@ class Item extends THREE.Group {
             throw new BugError("Two immobile Items cannot collide.")
         }
 
-        // Work out how much we need to move things by.
-        let reqdDelta = (this.getSize() + that.getSize()) + 1;
-        if (0 >= reqdDelta) {
+        // Move Item centers apart.
+        let reqdDelta = this.getSize() + that.getSize() + 1;
+        let move = that.location.getRelative(this.location);
+        reqdDelta -= move.length();
+        if (1 >= reqdDelta) {
             // Already separated.
             return;
         }
 
         // Work out which object is faster.
-        let faster;
-        if (this.immobile) {
-            faster = that;
-        } else {
-            if (that.immobile) {
-                faster = this;
-            } else {
-                if (this.getSpeed() > that.getSpeed()) {
-                    faster = this;
-                } else {
-                    faster = that;
-                }
-            }
-        }
+        let speedDiff = this.speed.clone();
+        speedDiff.sub(that.speed)
 
-        let slower = that;
-        if (faster == that) {
-            slower = this;
-        }
-
-        // Move the faster object.
-
-        // Move outside requiredDelta.
-        let move = faster.speed.clone();
-
-        // If even 'faster' not moving.
+        // If there is already a delta just extend it.
         if (0 == move.length()) {
-            // Move relative to current position.
-            move = slower.location.getRelative(faster.location);
-            if (0 == move.length()) {
-                // If at same location make random  move.
-                move = this.getGame().createRandomVector(1);
+            if (0 != speedDiff.length()) {
+                // Fall back on moving the faster object.
+                move = speedDiff;
+            } else {
+                // As a last resort a random move.
+                move = Utils.createRandomVector(1)
             }
         }
+
+        // Dont know the mass yet. So move both by same amount.
+        let thisMove = move;
 
         move.normalize();
         move.multiplyScalar(reqdDelta);
-        let newLoc = slower.getLocation().clone();
-        newLoc.add(move);
-        faster.setLocation(newLoc);
+
+        // Move that opposite direction.
+        let thatMove = move.clone();
+        thatMove.multiplyScalar(-1);
+
+        if (that.immobile) {
+            thatMove = new THREE.Vector3();
+        } else {
+            thisMove.divideScalar(2);  
+        }
+        
+        if (this.immobile) {
+            thisMove = new THREE.Vector3();
+        } else {
+            thatMove.divideScalar(2);
+        }
+
+        let newLoc = this.getLocation().clone();
+        newLoc.add(thisMove);
+        this.setLocation(newLoc); 
+        
+        newLoc = that.getLocation().clone();
+        newLoc.add(thatMove);
+        that.setLocation(newLoc);
     }
 
     // Handle collision physics
@@ -465,8 +477,6 @@ class Item extends THREE.Group {
         if ((this.owner != that) && (that.owner != this)) {
             this.doDamage(that);
             that.doDamage(this);
-        } else {
-            console.log("XXX")
         }
     }
 
@@ -526,7 +536,7 @@ class Item extends THREE.Group {
         console.log("Item had no setupMesh() override. Probably a bug");
     }
 
-    animate() { 
+    animate() {
         // Draw at current, possibly starting, position.
         // If still exists after move will be drawn there on next frame.
         this.moveMesh();
@@ -561,7 +571,7 @@ class Item extends THREE.Group {
         let rod = path.clone();
         rod.normalize();
         rod.multiplyScalar(this.location.system.getSize());
-        let move = new THREE.Line3(Universe.originVector, rod);
+        let move = new THREE.Line3(new THREE.Vector3(), rod);
 
         for (let that of this.location.system.items) {
 

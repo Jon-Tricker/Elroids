@@ -8,7 +8,7 @@ class HullSet extends ComponentSet {
     maxSpeed;
 
     constructor(sets, slots) {
-        super("Hulls", "Hull", sets, slots);
+        super("Hulls", "Hull", sets, slots, false);
         this.recalc();
     }
 

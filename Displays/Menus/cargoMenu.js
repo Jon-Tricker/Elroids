@@ -132,7 +132,7 @@ class CargoMenu {
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onMountCompClick(this, " + index + ")\">Mount</button>");
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellCompClick(this, " + index + ")\">" + comp.getValueInSystem(ship.location.system) + "</button>");
                 } else {
-                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onDumpGoodsClick(this, " + index + ")\">Dump</button>");
+                    vals.push("<button type=\"button\" onclick=\"CargoMenu.onDumpCompClick(this, " + index + ")\">Dump</button>");
                 }
                 tab.addRow(vals);
                 index++;
@@ -277,6 +277,12 @@ class CargoMenu {
         throw (new BugError("No mineral at index."));
     }
 
+    static onDumpCompClick(menuSystem, index) {
+        let ship = menuSystem.getShip();
+        let comp = this.getCompForIndex(ship, index);
+        ship.getBays().dumpGoods(comp);
+    }
+
     static onDumpMineralClick(menuSystem, index) {
         let ship = menuSystem.getShip();
         let mineral = this.getMineralForIndex(ship, index);
@@ -285,7 +291,7 @@ class CargoMenu {
 
     static onDumpGoodsClick(menuSystem, index) {
         let ship = menuSystem.getShip();
-        let goods = CargoMenu.getGoodsForIndex(ship, index);
+        let goods = this.getGoodsForIndex(ship, index);
         ship.getBays().dumpGoods(goods);
     }
 }

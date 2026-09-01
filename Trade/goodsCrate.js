@@ -37,7 +37,7 @@ class GoodsCrate extends NonShipItem2 {
 
     this.expiryTime = this.getUniverse().getTime() + TTL;
 
-    super.activateIfRequired();
+    this.activateIfRequired();
   }
 
   getValue() {

@@ -2,7 +2,8 @@
 import { ComponentAct } from "../component.js";
 import GameError from "../../../Game/gameError.js";
 
-const DESCRIPTION = "'Weapons' are used for damaging things."
+const DESCRIPTION = "'Weapons' are used for damaging things.\n" +
+                    "If a weapon is damaged it may fail to fire."
 
 class Weapon extends ComponentAct {
     fireRate;   // Per second
@@ -32,7 +33,7 @@ class Weapon extends ComponentAct {
         this.fireLast = date;
 
         if (!this.isWorking()) {
-            if (this.isActive()) {
+            if (this.isOn()) {
                 this.set.getShip().playSound("click");
                 throw (new GameError(this.getName() + " failed."));
             } else {

@@ -1,12 +1,11 @@
 // One end of a wormhole
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
 import NonShipItem from '../nonShipItem.js';
-import Universe from '../universe.js';
 import PlayerShip from '../../Ships/playerShip.js';
 import StarFieldTexture from '../../Game/Utils/starFieldText.js';
 
@@ -47,7 +46,7 @@ class WormholeEnd extends NonShipItem {
     backgroundColour;
 
     constructor(location, name, wormhole, backgroundColour) {
-        super(location, Universe.originVector, RADIUS, MASS, HP, null, true);
+        super(location, new THREE.Vector3(), RADIUS, MASS, HP, null, true);
         this.wormhole = wormhole;
 
         if (undefined == backgroundColour) {
@@ -118,9 +117,6 @@ class WormholeEnd extends NonShipItem {
 
         // Add that to far system.
         this.location.system.addItem(that);
-
-        // Move it outside far wormhole end.#
-        that.separateFrom(this);
     }
 
     getRadarColour() {
@@ -195,7 +191,7 @@ class WormholeEnd extends NonShipItem {
         this.haloMesh.rotateX(-ROTATE_RATE / ar);
 
         // Kill any momentum obtained.
-        this.setSpeed(Universe.originVector);
+        this.setSpeed(new THREE.Vector3());
 
         super.animate();
     }

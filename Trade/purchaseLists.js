@@ -6,6 +6,7 @@ import BasicEngine from "../Ships/Components/Engines/basicEngine.js";
 import BasicRadar from "../Ships/Components/Avionics/basicRadar.js";
 import BasicCompass from "../Ships/Components/Avionics/basicCompass.js";
 import DumbMissileWeapon from "../Ships/Components/Weapons/dumbMissileWeapon.js";
+import LaserBeamWeapon from "../Ships/Components/Weapons/LaserBeamWeapon.js";
 import LargeEngine from "../Ships/Components/Engines/largeEngine.js";
 import MediumEngine from "../Ships/Components/Engines/mediumEngine.js";
 import SmallHull from "../Ships/Components/Hulls/smallHull.js";
@@ -27,6 +28,7 @@ class ComponentsList extends ComponentSets {
         new MediumEngine(this.engineSet);
         new LargeEngine(this.engineSet);
         new DumbMissileWeapon(this.weaponSet);
+        new LaserBeamWeapon(this.weaponSet);
         new BasicBay(this.baySet);
         new MediumBay(this.baySet);
         new BasicRadar(this.avionicsSet);

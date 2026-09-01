@@ -1,6 +1,5 @@
 // Star systems menu.
 import MenuTable from './menuTable.js';
-import BugError from '../../Game/bugError.js';
 import { MineralType, MineralTypes } from "../../GameItems/minerals.js";
 import Reputation from '../../Game/reputation.js';
 
@@ -26,7 +25,8 @@ class StarSystemsMenu {
         let heads = new Array();
         heads.push("System");
         heads.push("Reputation");
-        heads.push("Can dock")
+        heads.push("Can dock");
+        heads.push("Hunted");
         tab.addHeadings(heads);
 
         let index = 0;
@@ -36,6 +36,7 @@ class StarSystemsMenu {
             let rep = Reputation.getRepInSystem(game.player, system);
             vals.push(rep.getText());
             vals.push(rep.getCanDock());
+            vals.push(rep.getAttack());
             tab.addRow(vals);
             index ++;
         }

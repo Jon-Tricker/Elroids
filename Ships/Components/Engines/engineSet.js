@@ -8,7 +8,7 @@ class EngineSet extends ComponentSet {
     thrust;
 
     constructor(sets, slots) {
-        super("Engines", "Engine", sets, slots);
+        super("Engines", "Engine", sets, slots, true);
         this.recalc();
     }
 

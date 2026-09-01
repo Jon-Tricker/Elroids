@@ -5,7 +5,7 @@ import ComponentSet from '../componentSet.js'
 class WeaponSet extends ComponentSet {
 
     constructor(sets, slots) {
-        super("Weapons", "Weapon", sets, slots);
+        super("Weapons", "Weapon", sets, slots, false);
         this.recalc();
     }
 

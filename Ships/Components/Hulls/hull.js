@@ -11,6 +11,7 @@ import { Component, ComponentAct } from '../component.js';
 import ComponentSets from '../componentSets.js';
 import GameError from '../../../Game/gameError.js';
 import BugError from '../../../Game/bugError.js';
+import Location from '../../../Game/Utils/location.js';
 
 const DESCRIPTION = "Each ship had one 'hull'.\n" +
     "The hull has 'slots' into which other components can be fitted.\n" +
@@ -212,7 +213,7 @@ class Hull extends Component {
             comp.status = jsonComp.status;
             comp.displayPanel = jsonComp.displayPanel;
             if (comp instanceof ComponentAct) {
-                comp.setActive(jsonComp.active);
+                comp.setOn(jsonComp.on);
             }
         }
 
@@ -228,9 +229,40 @@ class Hull extends Component {
 
     getDescription() {
         return (DESCRIPTION);
+    }  
+    
+    // Get position of gun (maybe eventually one of several hardpoints.)
+    getGunPoint() {
+        let point = this.mesh.position.clone();
+        let ship = this.getShip();
+
+        // Slightly outside mesh.
+        point.x += ship.length + 1;
+
+        // Slightly below camera.
+        point.z -= ship.height/2;
+        
+        ship.localToWorld(point);
+
+        let loc = new Location(point.x, point.y, point.z, ship.location.system);
+        return (loc);
+    }  
+    
+    // Get position at which to dump stuff.
+    getDumpPoint() {
+        let point = this.mesh.position.clone();
+        let ship = this.getShip();
+
+        // Slightly outside mesh.
+        point.x -= ship.length + 1;
+        
+        ship.localToWorld(point);
+
+        let loc = new Location(point.x, point.y, point.z, ship.location.system);
+        return (loc);
     }
 
-    setActive(active) {
+    setOn(active) {
         throw new GameError("Hulls can't be de-activated.")
     }
 

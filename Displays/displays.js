@@ -10,6 +10,7 @@ import ComponentDisplays from "./Components/componentDisplays.js";
 import Terminal from './terminal.js'
 import MenuSystem from './menuSystem.js'
 import Reputation from "../Game/reputation.js";
+import Projectile from "../GameItems/Projectiles/projectile.js";
 
 const PAD_LENGTH = 5;
 const DEFAULT_DURATION = 2000;
@@ -216,7 +217,6 @@ class Displays {
     }
 
     animateHud() {
-        /* TODO: HUD not quite right yet */
         let ctx = this.hudCtx;
         ctx.clearRect(0, 0, this.hud.width, this.hud.height);
         if (this.hudIsOn) {
@@ -231,9 +231,9 @@ class Displays {
             ctx.strokeRect(left, top, sz * 2, sz * 2);
 
             let len = sz / 4;
-            if ((undefined === list) || (list.length == 0)) {
+            if ((undefined === list) || (list.length == 0) || (list[0].getItem() instanceof Projectile)) {
                 len /= 2;
-            }
+            } 
 
             ctx.beginPath();
             ctx.moveTo(left - len, top - len);

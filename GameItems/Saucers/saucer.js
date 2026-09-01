@@ -1,6 +1,6 @@
 // Saaucer graphic and physics
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -10,7 +10,8 @@ import Mineral from '../mineral.js';
 import { MineralTypes } from '../minerals.js';
 import Explosion from '../explosion.js';
 import DumbMissile from '../Projectiles/dumbMissile.js';
-import Universe from '../universe.js';
+import Utils from '../../Game/Utils/utilities.js';
+import Location from '../../Game/Utils/location.js';
 
 const MAX_ROTATE_RATE = 2.5;    // r/s
 const SAUCER_HP = 1;
@@ -31,8 +32,6 @@ const DEFAULT_SAUCER_MATERIAL = new THREE.MeshStandardMaterial(
 )
 
 class Saucer extends NonShipItem {
-
-    rotateRate;
     colour;
 
     // Time to self destruct.
@@ -40,11 +39,13 @@ class Saucer extends NonShipItem {
     destructTime = 0;
 
     constructor(size, location, mass, colour, owner) {
-        super(location, Universe.originVector, size, mass, SAUCER_HP, owner);
+        super(location, new THREE.Vector3(), size, mass, SAUCER_HP, owner, false, undefined, false);
         this.colour = colour;
 
+        // Spin on axis.
+        this.rotationRate = new THREE.Vector3(0, Math.random() * MAX_ROTATE_RATE * 2 - MAX_ROTATE_RATE, 0);
+
         this.setupMesh();
-        this.rotateRate = Math.random() * MAX_ROTATE_RATE * 2 - MAX_ROTATE_RATE;
 
         let ttl = this.getTtl();
         if ((0 != ttl) && (!this.getGame().isSafe())) {
@@ -53,6 +54,17 @@ class Saucer extends NonShipItem {
 
         this.location.system.saucerCount++;
     }
+
+    getGunPoint() {
+        // Fire from centre. separateFrom() should move the projectile to the outside.
+        let point = new THREE.Vector3();
+        
+        this.localToWorld(point);
+
+        let loc = new Location(point.x, point.y, point.z, this.location.system);
+
+        return (loc);
+    }  
 
     // Return time to live.
     // 0 if forever.
@@ -113,9 +125,11 @@ class Saucer extends NonShipItem {
         upperMesh.castShadow = true;
         upperMesh.receiveShadow = true;
 
-        this.add(sphereMesh);
-        this.add(lowerMesh);
-        this.add(upperMesh);
+        this.mesh.add(sphereMesh);
+        this.mesh.add(lowerMesh);
+        this.mesh.add(upperMesh);
+
+        this.add(this.mesh);
 
         this.rotateX(-Math.PI / 2);
     }
@@ -173,9 +187,6 @@ class Saucer extends NonShipItem {
     }
 
     animate(date) {
-        // Spin
-        this.rotation.y += this.rotateRate / this.getGame().getAnimateRate();
-
         // Lean towards direction of travel. Dont wobble.
         // TODO : Not really right but looks pretty ... feel free to improve.
         if (0 != this.getMaxSpeed()) {
@@ -200,7 +211,7 @@ class Saucer extends NonShipItem {
         // Make fragments
         let count = Math.ceil(Math.random() * 100);
         for (let i = 0; i < count; i++) {
-            let direction = this.getGame().createRandomVector(2);
+            let direction = Utils.createRandomVector(2);
             new DumbMissile(direction, this, true);
         }
 

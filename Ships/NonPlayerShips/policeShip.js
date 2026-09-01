@@ -1,12 +1,12 @@
 // Non player police ship.
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
 import NPShip from './nonPlayerShip.js';
-import SmallHull from '../Components/Hulls/smallHull.js';
+import PoliceHull from '../Components/Hulls/policeHull..js';
 import Reputation from '../../Game/reputation.js';
 import Saucer from '../../GameItems/Saucers/saucer.js';
 import { BasicAI } from './basicAI.js';
@@ -87,8 +87,8 @@ class PoliceAI extends BasicAI {
 const HP = 3;
 
 class PoliceShip extends NPShip {
-    constructor(location) {
-        super(5, 10, 20, location, undefined, HP);
+    constructor(location, speed) {
+        super(5, 10, 20, location, speed, undefined, HP);
         this.ai = new PoliceAI(this);
         this.recalcHostility();
         this.location.system.addPolice(this);
@@ -103,7 +103,7 @@ class PoliceShip extends NPShip {
     buildShip() {
         // Create hull
         // Will also create all other components, for that hull type, and add them to our components sets.
-        super.buildShip(SmallHull,  new THREE.Color(0x4040FF));
+        super.buildShip(PoliceHull,  new THREE.Color(0x4040FF));
     }
 
     getClass() {

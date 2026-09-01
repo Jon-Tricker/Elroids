@@ -2,8 +2,6 @@
 //
 // Arguments must be in a form that is in scope when eval()ed by MenuSystem.
 
-import GameError from '../../Game/gameError.js';
-
 let gameMenu = "\
 <BODY>\
     <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Game control Menu</P>\
@@ -26,11 +24,9 @@ class GameInternalsMenu {
 
         doc += "<BR />";
         doc += "<P>Game:</P>";
-        doc += "<P>\t<button type=\"button\" onclick=\"GameInternalsMenu.saveClick(this.display.game)\">Save</button></P>"
-        doc += "<P>\tA save file will be dropped into your local 'downloads' directory.</P>"
+        doc += "<P>\t<button type=\"button\" onclick=\"GameInternalsMenu.saveClick(this.display.game)\">Save</button> - Downloads game state to a file in your 'download' directory.</P>"
         doc += "<BR />";
-        doc += "<P>\t<button type=\"button\" onclick=\"GameInternalsMenu.loadClick(this.display.game)\">Load</button></P>"
-        doc += "<P>\tWhen promted 'open' a peviously downloaded save file.</P>"
+        doc += "<P>\t<button type=\"button\" onclick=\"GameInternalsMenu.loadClick(this.display.game)\">Load</button> - When promted upload a peviously downloaded save file.</P>"
         doc += "<BR />";
         
 

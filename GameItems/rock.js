@@ -1,6 +1,6 @@
 // Rocks
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -57,9 +57,9 @@ class Rock extends NonShipItem2 {
       this.composition = composition;
     }
 
-    this.location.system.rockCount++;
+    this.activateIfRequired();
 
-    super.activateIfRequired();
+    this.location.system.rockCount++;
   }
 
   destruct() {

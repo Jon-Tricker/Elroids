@@ -2,9 +2,10 @@
 // Spawns other saucers.
 // Tries to keep away from ship.
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import Saucer from './saucer.js';
 
 import SaucerShooter from "./saucerShooter.js";
@@ -17,7 +18,7 @@ const COLOUR = "#80FF80";
 const SIZE = 50;
 const MASS = 1000;
 const MAX_SPEED = 40;     // m/s
-const MAX_ACC = 1;      // m/s^s
+const MAX_ACC = 10;      // m/s^s
 
 const START_LAUNCH_FREQUENCY = 300;
 const MAX_LAUNCH_FREQUENCY = 100;

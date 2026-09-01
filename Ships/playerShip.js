@@ -10,8 +10,6 @@ import Ship from './ship.js';
 import MyCamera from '../Game/Scenery/myCamera.js';
 import SmallHull from './Components/Hulls/smallHull.js';
 import Location from '../Game/Utils/location.js';
-import Reputation from '../Game/reputation.js';
-import GameError from '../Game/gameError.js';
 
 class PlayerShip extends Ship {
     game;
@@ -24,7 +22,7 @@ class PlayerShip extends Ship {
     originalPosition;
 
     constructor(game, height, width, length, location) {
-        super(height, width, length, location);
+        super(height, width, length, location, undefined);
 
         this.game = game;
 
@@ -139,13 +137,17 @@ class PlayerShip extends Ship {
                 }
             }
 
+        }
+
+        super.animate(date);
+        
+        // Shoot after moving. So we don't run over new projectile.
+        if (null == this.dockedWith) {
             // if (keyboard.getClearState("M") || keyboard.getClearState("m")) { 
             if (keyboard.getState("M") || keyboard.getState("m")) {
                 this.shoot(date);
             }
         }
-
-        super.animate(date);  
     }
 
     // Take damage to internal systems.

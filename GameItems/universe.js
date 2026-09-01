@@ -1,9 +1,9 @@
 // Everything related to the simulated 'Universe'.
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-import * as THREE from 'three';
+
 import { System, SystemSpec } from './System/system.js';
 import StarSystem from './System/starSystem.js';
 import Hyperspace from './System/hyperspace.js';
@@ -17,11 +17,11 @@ import Location from '../Game/Utils/location.js';
 
 const SYSTEM_SPECS = [
     new SystemSpec("Sol", 6, 2, 5, "Mostly harmless."),
-    new SystemSpec("Asteel", 6, 1, 4, "Industrial society"),
-    new SystemSpec("Kessel", 7, 1, 6, "High tech society"),
-    new SystemSpec("Endor", 2, 4, 2, "Magical society. Guess some trading house built them a station."),
-    new SystemSpec("Coruscant",7, 2, 7, "High tech authoritarian world."),
-    new SystemSpec("Oz", 3, 4, 7, "Magical authoritarian society.")
+    new SystemSpec("Asteel", 6, 1, 4, "Industrial, capitalist society."),
+    new SystemSpec("Kessel", 7, 1, 6, "High tech society."),
+    new SystemSpec("Endor", 2, 4, 2, "Low tech, magical society."),
+    new SystemSpec("Coruscant",7, 2, 7, "High tech, authoritarian society."),
+    new SystemSpec("Oz", 3, 4, 7, "Magical, authoritarian society.")
 ];
 
 class Universe {
@@ -60,7 +60,6 @@ class Universe {
     wormholes = new JSONSet();
 
     static CBRT_THREE = Math.cbrt(3);
-    static originVector = new THREE.Vector3(0, 0, 0);
 
     constructor(game, uniSize, systemSize, maxRockCount) {
         this.game = game;

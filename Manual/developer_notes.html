@@ -34,18 +34,18 @@
 	<H2>The 'Test Universe'</H2>
 	<P>If the game is launched with parameter 'rockCount="0"' a 'Test Universe' is generated.</P>
 	<P>This contains a populated Universe and Ship with test versions of most things. Can be used for code testing.</P>
+	<P>Player ship is conveniently lined up for docking.</P>
+	<P>Ship will be loaded with some random cargo and have some random damge.</P>
 	<P>"'Someone else' can add unittests later." ... as 'idiots' like to say :-)</P>
 	<P>For notes on code operation/stucture see the <A HREF="developer_code_notes.html">Developer Code notes.</A>.</P>
 
 	<H2>ToDos (In some sort of priority order)</H2>
 
 	<H3>V11.x General improvements.</H3>
-	<P>Add 'Elite style' beam weapons (faster but shorter range). Fit beams to some NP ships.<P>
-	<P>Fix problems of 1st projectile position not shown.</P>
-	<P>Doc beams and missiles.</P>
-	<P>Fix text wrap issue on ship componets menu.</P>
 	<P>Thorughly test and make promotional video.</P>
 	<P>Make 'sights' (hud) into avionics components. Add 'mining sight' etc.</P>
+	<P>Add launch option to start in safe mode/or not.</P>
+	<P>Add lables for everything. Always on in safe mode. Add switch to swith on/off (apart from destination HS lables).</P>
 
 	<H3>V12.x Code improvements.</H3>
 	<P>Split Items into</P>
@@ -55,10 +55,11 @@
 	</UL>
 	<P>To decrease memory footprint delete non-persisted items when system deactivated.</P>
 	<P>Modify JSON to store/restore attitudes as Quarterion not Roll, Pitch and Yaw.</P>
+	<P>Fix text wrap issue on ship componets menu ... multi line table headers.</P>
 
 	<H3>V13.x Convert saucers a sub class of NPShip.</H3>
 	<P>Saucers are a cludge left over from early development.</P>
-	<P>Make them NPShips without 'ends'.</P>
+	<P>Make them NPShips. For a saucer the 'front' is probably the 'top' ... and it moves sideways.</P>
 	<P>Convert to use regular AI.</P>
 	<P>Convert makeLoot() to loadRandom().</P>
 
@@ -111,6 +112,7 @@
 	<P>Add images (screen shots) of Items in place of game logo.</P>
 
 	<H3>General 'good stuff' ... Post V18.0</H3>
+	<P>Avoiding rocks were supposed to be a major part of this game. However it turns out that, in a 3D universe, the chance of getting hit is pretty small. I am told this is the case in real asteroid fields ... Maybe do something about it.</P>
 	<UL>
 		<LI>Game mechanics:
 			<UL>

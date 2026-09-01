@@ -1,16 +1,16 @@
 // Static utility for creating non player ships.
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023 - 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
-import * as THREE from 'three';
 import JSONSet from "../../Game/Utils/jsonSet.js";
 import Freighter from "./freighter.js";
 import Smuggler from "./smuggler.js";
 import Raider from "./raider.js";
 import Miner from "./miner.js";
 import PoliceShip from './policeShip.js';
+import Utils from '../../Game/Utils/utilities.js';
 
 class NPShipFactory {
 
@@ -27,30 +27,23 @@ class NPShipFactory {
             type = this.shipTypes.getRandomElement();
         } while (type == PoliceShip);
 
-        let ship = this.createShip(type, location, moving);
+        let ship = this.createShip(type, location, undefined);
         return (ship);
     }
 
-    static createShip(type, location, moving) {
-        let ship = new type(location);
+    static createShip(type, location, speed) {
 
-        // Rotate to a random angle.
-        let angle = (Math.random() - 0.5) * 2 * Math.PI;
-        ship.rotateX(angle);
-
-        angle = (Math.random() - 0.5) * 2 * Math.PI;
-        ship.rotateY(angle);
-
-        angle = (Math.random() - 0.5) * 2 * Math.PI;
-        ship.rotateZ(angle);
-
-        if ((undefined != moving) && moving) {
-            // Max speed forward.
-            let speed = ship.getOrientation();
-            speed.multiplyScalar(ship.getMaxSpeed());
-
-            ship.setSpeed(speed);
+        if (undefined == speed) {
+            // Make up a start speed/direction.
+            speed = Utils.createRandomVector(100, true);
         }
+
+        let ship = new type(location, speed);
+
+        // Look in direction of travel.
+        // Since we have not yet been drawn position = 0,0,0. So don't need to convert to world coords.
+        ship.lookAt(speed);
+        ship.rotateY(-Math.PI/2)
 
         return (ship);
     }

@@ -1,6 +1,6 @@
 // Stuff that's common to the entire game.
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -16,10 +16,11 @@ import MyCamera from './Scenery/myCamera.js';
 import Keyboard from "./Utils/keyboard.js";
 import Player from './player.js';
 import Displays from '../Displays/displays.js';
+import Utils from './Utils/utilities.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "11.1";
+const VERSION = "11.2";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -63,6 +64,7 @@ class Game {
 
     // Sounds buffer bank. Sounds written in once they are loaded.
     static sounds = new Map([
+        ["zap", null],
         ["pew", null],
         ["explosion", null],
         ["clang", null],
@@ -299,31 +301,13 @@ class Game {
         return (this.player);
     }
 
-    createRandomVector(max, integer) {
-        let x = Math.random() * max * 2 - max;
-        let y = Math.random() * max * 2 - max;
-        let z = Math.random() * max * 2 - max;
-
-        if ((undefined != integer) && integer) {
-            x = Math.floor(x);
-            y = Math.floor(y);
-            z = Math.floor(z);
-        }
-
-        return (new THREE.Vector3(x, y, z));
-    }
-
-    createRandomIntegerVector(max) {
-        return (this.createRandomVector(max, true));
-    }
-
     // Get a random location far away from ship. 
     //Let wrap calculation take care if too big.
     getFarAway(location) {
         let sz = location.system.systemSize;
         let loc = location.clone();
 
-        let delta = this.createRandomVector(sz);
+        let delta = Utils.createRandomVector(sz);
 
         // Move it to one edge of the universe.
         switch (Math.floor(Math.random()) * 3) {

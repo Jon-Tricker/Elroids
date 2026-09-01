@@ -1,12 +1,11 @@
 // Space station graphic and physics
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
 import NonShipItem from '../nonShipItem.js';
-import Universe from '../universe.js';
 import PlayerShip from '../../Ships/playerShip.js';
 import Texture from '../../Game/Utils/texture.js';
 import BoxSides from '../../Game/Utils/boxSides.js'
@@ -70,9 +69,9 @@ class Station extends NonShipItem {
 
     constructor(location, owner, json) {
         if (undefined === json) {
-            super(location, Universe.originVector, STATION_SIZE, STATION_MASS, STATION_HP, owner, true);
+            super(location, new THREE.Vector3(), STATION_SIZE, STATION_MASS, STATION_HP, owner, true);
         } else {
-            super(location, Universe.originVector, STATION_SIZE, STATION_MASS, STATION_HP, owner, true, json.id);
+            super(location, new THREE.Vector3(), STATION_SIZE, STATION_MASS, STATION_HP, owner, true, json.id);
         }
 
         this.setupMesh();
@@ -461,7 +460,7 @@ class Station extends NonShipItem {
         this.rotateX(ROTATE_RATE / this.getGame().getAnimateRate());
 
         // Kill any momentum obtained.
-        this.setSpeed(Universe.originVector);
+        this.setSpeed(new THREE.Vector3());
 
         this.moveMesh();
 

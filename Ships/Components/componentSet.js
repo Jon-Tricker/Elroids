@@ -1,7 +1,8 @@
-// Base list class for the components that make up a ship./ Copyright (C) Jon Tricker 2023, 2025.
+// Base list class for the components that make up a ship./ Copyright (C) Jon Tricker 2023, 2025, 2026.
 //
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import GoodsSet from '../../Trade/goodsSet.js';
 
 class ComponentSet extends GoodsSet {
@@ -9,14 +10,31 @@ class ComponentSet extends GoodsSet {
     // Cached values
     hp;
 
+    // Can >1 be active
+    multiOn = true;
+
     // If slots is undefined can have an unlimited number of components.
-    constructor(plural, singular, sets, slots) {
+    constructor(plural, singular, sets, slots, multiOn) {
         super(plural, singular, sets, slots);
+        if (undefined != multiOn) {
+            this.multiOn = multiOn;
+        }
     }
 
-    recalc() {   
+    isMultiOn() {
+        return (this.multiOn);
+    }
+
+    // Switch everything off.
+    allOff() { 
+        for (let comp of this) {
+            comp.setOn(false);
+        }
+    }
+
+    recalc() {
         super.recalc();
-        
+
         this.hp = 0;
         this.mass
         for (let comp of this) {
@@ -73,7 +91,7 @@ class ComponentSet extends GoodsSet {
     }
 
     getCurrentHp() {
-        return(this.hp);
+        return (this.hp);
     }
 }
 

@@ -1,12 +1,14 @@
 // Simple non-player ship AI.
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023 - 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import * as THREE from 'three';
 import Item from '../../GameItems/item.js';
 import Station from '../../GameItems/System/station.js';
 import PlayerShip from '../playerShip.js';
+import Utils from '../../Game/Utils/utilities.js';
 
 // Minimum turn threshold
 // Found, by experimentation, to prevent 'seeking'. 
@@ -178,7 +180,7 @@ class BasicAI {
     // Navigate to a random location.
     navToRandomLocation(date) {
         if (!this.haveDest()) {
-            this.dest = this.myShip.getGame().createRandomVector(this.myShip.location.system.systemSize);
+            this.dest = Utils.createRandomVector(this.myShip.location.system.systemSize);
         }
 
         return (this.navigateThrough(this.dest));

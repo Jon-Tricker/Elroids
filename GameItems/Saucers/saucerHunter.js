@@ -1,11 +1,13 @@
 // Shooting saucer that tries to target the ship.
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import * as THREE from 'three';
 import DumbMissile from '../Projectiles/dumbMissile.js';
 import Saucer from './saucer.js';
+import Utils from '../../Game/Utils/utilities.js';
 
 const COLOUR = "#108010";
 const SIZE = 20;  
@@ -43,7 +45,7 @@ class SaucerHunter extends Saucer {
     createTargetLocation() {
         this.targetLocation = this.getShip().getLocation().clone();
 
-        let offset = this.getGame().createRandomVector(STANDOFF_DISTANCE)
+        let offset = Utils.createRandomVector(STANDOFF_DISTANCE)
         this.targetLocation.add(offset);
     }
 

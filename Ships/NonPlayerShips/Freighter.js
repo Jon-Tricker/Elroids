@@ -1,8 +1,9 @@
 // Non player freighter. Starts with cargo takes it to the station via a random location.
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import NPShip from './nonPlayerShip.js';
 import LargeHull from '../Components/Hulls/largeHull.js';
 import {BasicAI} from './basicAI.js';
@@ -13,8 +14,8 @@ class FreighterAI extends BasicAI {
 const HP = 3;
 
 class Freighter extends NPShip {
-    constructor(location) {
-        super(5, 10, 20, location, undefined, HP);
+    constructor(location, speed) {
+        super(5, 10, 20, location, speed, undefined, HP);
         this.ai = new FreighterAI(this);
     }
     

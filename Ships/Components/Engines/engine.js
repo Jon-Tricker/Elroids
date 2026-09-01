@@ -24,7 +24,7 @@ class Engine extends ComponentAct {
     }
 
     getThrust() {
-        if (!this.isActive()) {
+        if (!this.isWorking()) {
             return(0);
         }
         

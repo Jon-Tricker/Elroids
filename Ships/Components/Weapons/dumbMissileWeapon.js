@@ -5,11 +5,11 @@ import { ComponentType } from '../component.js';
 
 const FIRE_RATE = 4;
 
-const DESCRIPTION = "A cheap launcher that fires unguided missiles.";
+const DESCRIPTION = "A cheap weapon that fires unguided (dumb) missiles.";
 
 class DumbMissileWeapon extends MissileWeapon {
 
-    static type = new ComponentType("DML1", 1, 3, 3000, 2,);
+    static type = new ComponentType("DML1", 3, 3, 3000, 2,);
 
     constructor(set) {
         super(DumbMissileWeapon.type, set, FIRE_RATE);

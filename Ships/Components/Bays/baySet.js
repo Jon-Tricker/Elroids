@@ -26,7 +26,7 @@ class BaySet extends ComponentSet {
     tradeGoods;
 
     constructor(sets, slots) {
-        super("Cargo bays", "Cargo bay", sets, slots);
+        super("Cargo bays", "Cargo bay", sets, slots, true);
 
         this.components = new ComponentSet("Components", "Component", sets);
 
@@ -300,8 +300,7 @@ class BaySet extends ComponentSet {
 
         // Make mineral 
         let ship = this.getShip();
-        let shipLoc = ship.getLocation();
-        let min = new Mineral(mass, shipLoc, new THREE.Vector3(ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random()), mineral);
+        let min = new Mineral(mass, ship.hull.getDumpPoint() , new THREE.Vector3(ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random()), mineral);
         min.setActive(true);
 
         this.recalc();
@@ -323,7 +322,7 @@ class BaySet extends ComponentSet {
         good.number = number;
 
         let shipLoc = ship.getLocation();
-        let crate = good.makeCrate(shipLoc, new THREE.Vector3(ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random()));
+        let crate = good.makeCrate(ship.hull.getDumpPoint(), new THREE.Vector3(ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random()));
 
         this.recalc();
     }

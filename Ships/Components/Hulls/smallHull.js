@@ -10,6 +10,7 @@ import BasicEngine from '../Engines/basicEngine.js';
 import BasicRadar from '../Avionics/basicRadar.js';
 import BasicCompass from '../Avionics/basicCompass.js';
 import DumbMissileWeapon from '../Weapons/dumbMissileWeapon.js';
+import LaserBeamWeapon from '../Weapons/LaserBeamWeapon.js';
 import BasicBay from '../Bays/basicBay.js';
 import { ComponentType } from '../component.js';
 
