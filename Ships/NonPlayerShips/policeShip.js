@@ -106,7 +106,7 @@ class PoliceShip extends NPShip {
         super.buildShip(PoliceHull,  new THREE.Color(0x4040FF));
     }
 
-    getClass() {
+    getName() {
         return ("Police ship");
     }
 

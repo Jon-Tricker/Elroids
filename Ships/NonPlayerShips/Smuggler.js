@@ -99,10 +99,6 @@ class Smuggler extends NPShip {
     getInitialCargoValue() {
         return(200);
     }
-
-    getClass() {
-        return ("Smuggler");
-    }
 }
 
 export default Smuggler;

@@ -1,0 +1,32 @@
+// Ranging HUD.
+// 
+// Copyright (C) Jon Tricker 2026.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
+
+import Hud from './hud.js';
+import RangeHudDisplay from '../../../../Displays/Components/Huds/rangeHudDisplay.js';
+import { ComponentType } from '../../component.js';
+
+const DESCRIPTION = "Adds target identification and range to the HUD.";
+
+class RangeHud extends Hud {
+
+    static type = new ComponentType("RangeHud", 5, 1, 2000, 1);
+
+    constructor(ship) {
+        super(RangeHud.type, ship);
+    }
+
+    getDescription() {
+        return (super.getDescription() + "\n\n'" + this.getName() + "' is " + DESCRIPTION.toLowerCase());
+    }    
+    
+    // Return the HUD display panel for this component.
+    // This is in addition to the Component display panel that all components have.
+    getHudDisplay(ctx, defaultColour) {
+        return (new RangeHudDisplay(this.getShip().game, ctx, defaultColour, this));
+    }
+}
+
+export default RangeHud;

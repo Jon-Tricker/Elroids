@@ -12,6 +12,7 @@ import DumbMissileWeapon from '../Weapons/dumbMissileWeapon.js';
 import BasicBay from '../Bays/basicBay.js';
 import { ComponentType } from '../component.js';
 import BasicCompass from '../Avionics/basicCompass.js';
+import BasicHud from '../Avionics/Huds/basicHud.js';
 
 const DESCRIPTION = "A mid sized hull used for general purpose freighters.";
 
@@ -39,6 +40,7 @@ class MediumHull extends Hull {
         new BasicBay(this.compSets.baySet);
         new BasicRadar(this.compSets.avionicsSet);
         new BasicCompass(this.compSets.avionicsSet);
+        new BasicHud(this.compSets.avionicsSet);
 
         this.recalc();
     }

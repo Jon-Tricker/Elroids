@@ -1,4 +1,8 @@
 // A panel used to overlay controls on top of the screen.
+// 
+// Copyright (C) Jon Tricker 2026.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 class Panel {
     ctx;

@@ -12,6 +12,9 @@ import BasicCompass from '../Avionics/basicCompass.js';
 import DumbMissileWeapon from '../Weapons/dumbMissileWeapon.js';
 import LaserBeamWeapon from '../Weapons/LaserBeamWeapon.js';
 import BasicBay from '../Bays/basicBay.js';
+import BasicHud from '../Avionics/Huds/basicHud.js';
+import RangeHud from '../Avionics/Huds/rangeHud..js';
+import MiningHud from '../Avionics/Huds/miningHud..js';
 import { ComponentType } from '../component.js';
 
 const DESCRIPTION = "A small hull used for scouts and light freighters.";
@@ -39,6 +42,9 @@ class SmallHull extends Hull {
         new BasicBay(this.compSets.baySet);
         new BasicRadar(this.compSets.avionicsSet);
         new BasicCompass(this.compSets.avionicsSet);
+        new BasicHud(this.compSets.avionicsSet);
+        // new RangeHud(this.compSets.avionicsSet);
+        // new MiningHud(this.compSets.avionicsSet);
 
         this.recalc();
     }

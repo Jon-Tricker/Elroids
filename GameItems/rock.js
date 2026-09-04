@@ -79,6 +79,10 @@ class Rock extends NonShipItem2 {
     return (RADAR_COLOUR);
   }
 
+  getComposition() {
+    return(this.composition);
+  }
+
   setupMesh() {
     let rockGeometry;
     if (Rock.rockStyle == ROCK_STYLE_SPHERE) {

@@ -29,10 +29,6 @@ class Freighter extends NPShip {
     getInitialCargoValue() {
         return(500);
     }
-
-    getClass() {
-        return ("Freighter");
-    }
 }
 
 export default Freighter;

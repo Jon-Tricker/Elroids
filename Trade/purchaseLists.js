@@ -12,6 +12,9 @@ import MediumEngine from "../Ships/Components/Engines/mediumEngine.js";
 import SmallHull from "../Ships/Components/Hulls/smallHull.js";
 import MediumHull from "../Ships/Components/Hulls/mediumHull.js";
 import LargeHull from "../Ships/Components/Hulls/largeHull.js";
+import BasicHud from "../Ships/Components/Avionics/Huds/basicHud.js";
+import RangeHud from "../Ships/Components/Avionics/Huds/rangeHud..js";
+import MiningHud from "../Ships/Components/Avionics/Huds/miningHud..js";
 
 class ComponentsList extends ComponentSets {
     game;
@@ -33,6 +36,9 @@ class ComponentsList extends ComponentSets {
         new MediumBay(this.baySet);
         new BasicRadar(this.avionicsSet);
         new BasicCompass(this.avionicsSet);
+        new BasicHud(this.avionicsSet);
+        new RangeHud(this.avionicsSet);
+        new MiningHud(this.avionicsSet);
     }
 
     getGame() {

@@ -1,5 +1,12 @@
 // Manager for ComponentDisplays.
+
+// Copyright (C) Jon Tricker 2026.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import ShipCompDisplay from "./shipCompDisplay.js";
+import Hud from "../../Ships/Components/Avionics/Huds/hud.js";
+import HudDisplay from "./Huds/hudDisplay.js";
 
 class ComponentDisplays extends Set {
 
@@ -8,18 +15,23 @@ class ComponentDisplays extends Set {
     parentHeight;
 
     ctx;
+    hudCtx;
     defaultColour;
 
-    constructor(ctx, defaultColour, displays) {
+    constructor(ctx, hudCtx, defaultColour, displays) {
         super();
         this.defaultColour = defaultColour;
         this.ctx = ctx;
+        this.hudCtx = hudCtx;
         this.displays = displays;
 
         this.recalc(true);
     }
 
     animate() {
+        // Clear HUD area (once for all HUDs).
+        this.hudCtx.clearRect(0, 0, this.hudCtx.canvas.width, this.hudCtx.canvas.height);
+
         for (let disp of this) {
             disp.animate();
         }
@@ -45,6 +57,11 @@ class ComponentDisplays extends Set {
                     if (comp.displayPanel) {
                         this.add(comp.getDisplay(this.ctx, this.defaultColour));
                     }
+
+                    // Also add the HUD display if there is one.
+                    if (comp instanceof Hud) {
+                        this.add(comp.getHudDisplay(this.hudCtx, this.defaultColour));
+                    }
                 }
             }
         }
@@ -55,30 +72,37 @@ class ComponentDisplays extends Set {
         let rowNumber = 0;
 
         for (let disp of this) {
-            let x;
-            let y;
-            let width;
-            let height;
+            if (!(disp instanceof HudDisplay)) {
+                let x;
+                let y;
+                let width;
+                let height;
 
-            // Alternate sides
-            if (left) {
-                x = 0;
-                y = rowHeight * (3 - rowNumber);
-                width = this.displays.radar.x;
-                height = rowHeight;
+                // Alternate sides
+                if (left) {
+                    x = 0;
+                    y = rowHeight * (3 - rowNumber);
+                    width = this.displays.radar.x;
+                    height = rowHeight;
+                } else {
+                    x = this.displays.radar.x + this.displays.radar.width;
+                    y = rowHeight * (3 - rowNumber);
+                    width = this.parentWidth - x;
+                    height = rowHeight;
+                }
+
+                disp.resize(width, height, x, y);
+
+                // Next display
+                left = !left;
+                if (left) {
+                    rowNumber++;
+                }
             } else {
-                x = this.displays.radar.x + this.displays.radar.width;
-                y = rowHeight * (3 - rowNumber);
-                width = this.parentWidth - x;
-                height = rowHeight;
-            }
-
-            disp.resize(width, height, x, y);
-
-            // Next display
-            left = !left;
-            if (left) {
-                rowNumber++;
+                // Give HUD the whole screen.
+                let height = this.displays.hud.height;
+                let width = this.displays.hud.width;
+                disp.resize(width, height, width/2, height/2);
             }
         }
     }

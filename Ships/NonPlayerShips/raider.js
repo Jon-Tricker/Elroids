@@ -51,10 +51,6 @@ class Raider extends NPShip {
         // Will also create all other components, for that hull type, and add them to our components sets.
         super.buildShip(SmallHull);
     }
-
-    getClass() {
-        return ("Raider");
-    }
 }
 
 export default Raider;

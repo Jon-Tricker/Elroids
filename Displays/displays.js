@@ -10,7 +10,6 @@ import ComponentDisplays from "./Components/componentDisplays.js";
 import Terminal from './terminal.js'
 import MenuSystem from './menuSystem.js'
 import Reputation from "../Game/reputation.js";
-import Projectile from "../GameItems/Projectiles/projectile.js";
 
 const PAD_LENGTH = 5;
 const DEFAULT_DURATION = 2000;
@@ -45,7 +44,6 @@ class Displays {
     game;
 
     status;
-    hud;
     hudIsOn = false;
     terminalIsOn = false;
     controls;
@@ -87,7 +85,7 @@ class Displays {
 
         this.radar = new RadarDisplay(this.game, this.statusCtx, DEFAULT_COLOUR);
         this.compass = new CompassDisplay(this.game, this.statusCtx, DEFAULT_COLOUR);
-        this.compDisplays = new ComponentDisplays(this.statusCtx, DEFAULT_COLOUR, this);
+        this.compDisplays = new ComponentDisplays(this.statusCtx, this.hudCtx, DEFAULT_COLOUR, this);
 
         // this.resize();
     }
@@ -155,9 +153,6 @@ class Displays {
 
     animate(date, keyboard) {
         this.animateControls();
-        if (this.hudIsOn) {
-            this.animateHud();
-        }
 
         if (this.msgs.length > 0) {
             this.animateMsg(date);
@@ -194,8 +189,10 @@ class Displays {
     hudEnable(state) {
         this.hudIsOn = state;
 
-        // One animate to allow it to (dis)apear.
-        this.animateHud();
+        if (!state) {
+            // Delete hud grapics.
+            this.hudCtx.clearRect(0, 0, this.hudCtx.canvas.width, this.hudCtx.canvas.height);
+        }
     }
 
     addMessage(message, duration) {
@@ -214,40 +211,6 @@ class Displays {
         let msg = new Message(message, expiry);
 
         this.msgs.push(msg);
-    }
-
-    animateHud() {
-        let ctx = this.hudCtx;
-        ctx.clearRect(0, 0, this.hud.width, this.hud.height);
-        if (this.hudIsOn) {
-            let sz = this.textHeight;
-            let list = this.getShip().getAheadList();
-
-            let left = this.hud.width / 2 - sz;
-            let top = this.hud.height / 2 - sz;
-            let right = left + sz * 2;
-            let bottom = top + sz * 2;
-
-            ctx.strokeRect(left, top, sz * 2, sz * 2);
-
-            let len = sz / 4;
-            if ((undefined === list) || (list.length == 0) || (list[0].getItem() instanceof Projectile)) {
-                len /= 2;
-            } 
-
-            ctx.beginPath();
-            ctx.moveTo(left - len, top - len);
-            ctx.lineTo(left + len, top + len);
-            ctx.moveTo(right + len, top - len);
-            ctx.lineTo(right - len, top + len);
-            ctx.moveTo(left - len, bottom + len);
-            ctx.lineTo(left + len, bottom - len);
-            ctx.moveTo(right + len, bottom + len);
-            ctx.lineTo(right - len, bottom - len);
-
-            ctx.closePath();
-            ctx.stroke();
-        }
     }
 
     animateStatus() {

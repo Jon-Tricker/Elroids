@@ -42,10 +42,11 @@
 	<H2>ToDos (In some sort of priority order)</H2>
 
 	<H3>V11.x General improvements.</H3>
-	<P>Thorughly test and make promotional video.</P>
-	<P>Make 'sights' (hud) into avionics components. Add 'mining sight' etc.</P>
+	<P>Fix text wrap issue on ship componets menu ... multi line table headers.</P>
+	<P>Rework buildShip() to be based on individual ship classes.</P>
 	<P>Add launch option to start in safe mode/or not.</P>
 	<P>Add lables for everything. Always on in safe mode. Add switch to swith on/off (apart from destination HS lables).</P>
+	<P>Revisit comodities pricing.</P>
 
 	<H3>V12.x Code improvements.</H3>
 	<P>Split Items into</P>
@@ -55,13 +56,13 @@
 	</UL>
 	<P>To decrease memory footprint delete non-persisted items when system deactivated.</P>
 	<P>Modify JSON to store/restore attitudes as Quarterion not Roll, Pitch and Yaw.</P>
-	<P>Fix text wrap issue on ship componets menu ... multi line table headers.</P>
 
-	<H3>V13.x Convert saucers a sub class of NPShip.</H3>
+	<H3>V13.x Rework saucers.</H3>
 	<P>Saucers are a cludge left over from early development.</P>
-	<P>Make them NPShips. For a saucer the 'front' is probably the 'top' ... and it moves sideways.</P>
+	<P>Make them NPShips. For a saucer the 'front' is probably the 'top' ... it moves sideways.</P>
 	<P>Convert to use regular AI.</P>
 	<P>Convert makeLoot() to loadRandom().</P>
+	<P>Modify saucer launch frequency to be based on time ... rather than number of animate cycles.</P>
 
 	<H3>V14.x Improve NPShips</H3>
 	<P>Less 'wild' navigation. Modify navigateThroughDest() to add lead. Possibly common code with attack().</P>
@@ -69,6 +70,7 @@
 	<P>Don't 'stop' when attacking. Makes attacker an easy target.</P>
 
 	<H3>V15.x General tidy up.</H3>
+	<P>Make radar and compass components contain their own displays (like Huds).</P>
 	<P>Allow >1 ship to dock at the same time.</P>
 	<P>Add station aproach lights. Green - OK. Red - No docking. Yellow - Bad approach.</P>
 	<P>Don't show existing hull type in purchace list.</P>
@@ -86,9 +88,7 @@
 		<LI>Extra avionics including:
 			<UL>
 				<LI>Docking computer (Base on BasicAI.dock()). Then make docking more difficult.</LI>
-				<LI>Range finder</LI>
-				<LI>Mineral detector</LI>
-				<LI>Missile lock.</LI>
+				<LI>Missile lock HUD.</LI>
 			</UL>
 		</LI>
 		<LI>Homing missile</LI>

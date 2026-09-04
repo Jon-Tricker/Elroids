@@ -7,7 +7,6 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import Saucer from './saucer.js';
-
 import SaucerShooter from "./saucerShooter.js";
 import SaucerRam from "./saucerRam.js";
 import SaucerHunter from "./saucerHunter.js";
@@ -20,8 +19,8 @@ const MASS = 1000;
 const MAX_SPEED = 40;     // m/s
 const MAX_ACC = 10;      // m/s^s
 
-const START_LAUNCH_FREQUENCY = 300;
-const MAX_LAUNCH_FREQUENCY = 100;
+const START_LAUNCH_FREQUENCY = 500;
+const MAX_LAUNCH_FREQUENCY = 200;
 
 class SaucerMother extends Saucer {
 

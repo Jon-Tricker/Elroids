@@ -131,10 +131,6 @@ class Miner extends NPShip {
         // Will also create all other components, for that hull type, and add them to our components sets.
         super.buildShip(MediumHull);
     }
-
-    getClass() {
-        return ("Miner");
-    }
 }
 
 export default Miner;

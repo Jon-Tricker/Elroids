@@ -1,4 +1,8 @@
 // Base class for cargo bays
+// 
+// Copyright (C) Jon Tricker 2023, 2024, 2025, 2026.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import { Component } from "../component.js";
 import BayDisplay from "../../../Displays/Components/bayDisplay.js";

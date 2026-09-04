@@ -1,6 +1,6 @@
 // Details of the mineral types.
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023 - 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -84,16 +84,6 @@ class Composition {
     // this.dump("x")
   }
 
-  /*
-  dump(msg) {
-    for (let i = 0; i < this.composition.length; i++) {
-      msg += this.composition[i].percentage + " ";
-    }
-    console.log(msg);
-  }
-  */
-  
-
   // Split in a way that 'concentrates' minerals.
   // One half is modified 'this' other is a new Composition
   split() {
@@ -103,8 +93,6 @@ class Composition {
       if (this.composition[i].percentage >= this.composition[largest].percentage)
         largest = i;
     }
-
-    // this.dump("was ");
 
     let newComp = new Composition(false);
 
@@ -191,6 +179,7 @@ class Composition {
 class MineralType {
 
   name;
+  symbol;
   colour;
   spikyness;
   facets;
@@ -203,9 +192,10 @@ class MineralType {
   // Modified for each system.
   abundance;
 
-  constructor(name, colour, spikyness, facets, abundance, value, isMagic) {
+  constructor(name, symbol, colour, spikyness, facets, abundance, value, isMagic) {
     this.colour = colour;
     this.name = name;
+    this.symbol = symbol;
     this.spikyness = spikyness;
     this.facets = facets;
     this.abundance = abundance;
@@ -228,6 +218,10 @@ class MineralType {
     return(this.isMagic);
   }
 
+  getSymbol() {
+    return(this.symbol);
+  }
+
   static getByName(name) {
     for(let type of MineralTypes) {
       if(type.name == name) {
@@ -242,12 +236,12 @@ class MineralType {
 // 1st item is valueless.
 // TOTAL OF ALL ABUNDANCES SHOULD ADD UP TO 1 (ish)
 const MineralTypes = new Array(
-  new MineralType("Silica", new THREE.Color(0x808080), 0.6, 10, 0.5, 0, false),
-  new MineralType("Iron", new THREE.Color(0xB06000), 0.3, 15, 0.25, 20, false),
-  new MineralType("Copper", new THREE.Color(0x00D080), 0.2, 15, 0.16, 40, false),
-  new MineralType("Gold", new THREE.Color(0xFFF000), 0.3, 15, 0.04, 80, false),
-  new MineralType("Dilithium", new THREE.Color(0x0080D0), 0.8, 20, 0.02, 200, false),
-  new MineralType("Octarine", new THREE.Color(0xD000D0), 0.8, 20, 0.01, 500, true)
+  new MineralType("Silica", "Si",  new THREE.Color(0x808080), 0.6, 10, 0.5, 0, false),   // OK. I know its not an element!
+  new MineralType("Iron", "Fe", new THREE.Color(0xB06000), 0.3, 15, 0.25, 20, false),
+  new MineralType("Copper", "Cu", new THREE.Color(0x00D080), 0.2, 15, 0.16, 40, false),
+  new MineralType("Gold", "Au", new THREE.Color(0xFFF000), 0.3, 15, 0.04, 80, false),
+  new MineralType("Dilithium", "Li2", new THREE.Color(0x0080D0), 0.8, 20, 0.02, 200, false),
+  new MineralType("Octarine", "Oc", new THREE.Color(0xD000D0), 0.8, 20, 0.01, 500, true)
 )
 
 export { MineralType, MineralComponent, Composition, MineralTypes };
