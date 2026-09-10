@@ -58,12 +58,16 @@ class Projectile extends NonShipItem2 {
   }
 
   getRadarColour() {
-    if (this.getGame().displays.radar.showMissiles) {
+    if (Game.getGame().displays.radar.showMissiles) {
       return (this.colour);
     } else {
       // Don't plot
       return (null);
     }
+  }
+
+  setLabel(label) {
+    // Don't label projectiles
   }
 
   // Default spherical geometry.

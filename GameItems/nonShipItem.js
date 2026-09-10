@@ -3,20 +3,16 @@
 // Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
 import * as THREE from 'three';
+import Game from '../Game/game.js';
 import Item from './item.js';
 import Explosion from './explosion.js';
-import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
 const MAX_ROTATION_RATE = 0.5;    // R/s
 
 class NonShipItem extends Item {
 
     rotationRate;
-
-    // Textual label (if any).
-    label;
 
     // Unique id.
     // During the game Items are passed by reference.
@@ -48,21 +44,6 @@ class NonShipItem extends Item {
         return (this.myId);
     }
 
-    addLabel(label) {
-        let labelDiv = document.createElement('div');
-        labelDiv.className = 'label';
-        labelDiv.textContent = label;
-        // labelDiv.style.backgroundColor = '#FFFFFF';
-        labelDiv.style.color = 'red';
-        // labelDiv.font-family = 'sans-serif';
-        // labelDiv.padding = '2px';
-
-        this.label = new CSS2DObject(labelDiv);
-        this.label.position.set(0, 0, 0);
-        this.add(this.label);
-        this.label.layers.set(0);
-    }
-
     // Take damage to self.
     // Return 'true' if destroyed.
     takeDamage(hits, that) {
@@ -83,7 +64,7 @@ class NonShipItem extends Item {
     animate() {
 
         if (undefined != this.rotationRate) {
-            let ar = this.getGame().getAnimateRate();
+            let ar = Game.getGame().getAnimateRate();
             this.rotateX(this.rotationRate.x / ar);
             this.rotateY(this.rotationRate.y / ar);
             this.rotateZ(this.rotationRate.z / ar);

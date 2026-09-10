@@ -12,8 +12,8 @@ class Weapon extends ComponentAct {
     maxAmmo;    // 0 = unlimited
     ammo;       // If maxAmmo defined
 
-    constructor(type, set, fireRate, maxAmmo) {
-        super(type, set);
+    constructor(set, fireRate, maxAmmo) {
+        super(set);
         this.fireRate = fireRate;
         if (undefined != maxAmmo) {
             this.maxAmmo = maxAmmo;
@@ -90,7 +90,7 @@ class Weapon extends ComponentAct {
     }
 
     getTargetSet(ship) {
-        return (ship.hull.compSets.weaponSet);
+        return (ship.compSets.weaponSet);
     }
 }
 

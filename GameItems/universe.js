@@ -3,7 +3,7 @@
 // Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
+import Game from '../Game/game.js';
 import { System, SystemSpec } from './System/system.js';
 import StarSystem from './System/starSystem.js';
 import Hyperspace from './System/hyperspace.js';
@@ -25,9 +25,6 @@ const SYSTEM_SPECS = [
 ];
 
 class Universe {
-    // Back reference to out parent.
-    game;
-
     // The, one and only, ship.
     ship;
 
@@ -61,12 +58,11 @@ class Universe {
 
     static CBRT_THREE = Math.cbrt(3);
 
-    constructor(game, uniSize, systemSize, maxRockCount) {
-        this.game = game;
+    constructor(uniSize, systemSize, maxRockCount) {
         this.uniSize = uniSize;
         this.systemSize = systemSize;
         this.maxRockCount = maxRockCount;
-        this.actualAnimateRate = game.ANIMATE_RATE;
+        this.actualAnimateRate = Game.getGame().ANIMATE_RATE;
     }
 
     toJSON() {
@@ -82,11 +78,11 @@ class Universe {
         }
     }
 
-    static fromJSON(json, game) {
+    static fromJSON(json) {
         // Restore Item count so any new item IDs don't clash with the saved ones.
         NonShipItem.idCount = json.nextItemId;
 
-        let uni = new Universe(game, json.uniSize, json.systemSize, json.maxRockCount);
+        let uni = new Universe(json.uniSize, json.systemSize, json.maxRockCount);
 
         uni.populate(json);
 
@@ -128,7 +124,7 @@ class Universe {
                 let uniLoc;
                 count++;
 
-                if (this.game.testMode) {
+                if (Game.getGame().testMode) {
                     uniLoc = new Location(500 * count, 0, 0, this.hyperspace);
                 } else {
                     // Locate system randomly in the universe
@@ -197,7 +193,7 @@ class Universe {
                 // Create wormhole between this system and hyperspace.
                 // Locate system end away from origin in system.
                 let sysLoc;
-                if (this.game.testMode) {
+                if (Game.getGame().testMode) {
                     sysLoc = new Location(0, 500 * count, 0, system);
                 } else {
                     // Locate wormhole randomly in the system
@@ -223,7 +219,7 @@ class Universe {
             if (undefined != this.actualAnimateRate) {
                 this.universeTime += 1000 / this.actualAnimateRate;
             }
-            this.nextAnimateTime = date + 1000 / this.game.getAnimateRate();
+            this.nextAnimateTime = date + 1000 / Game.getGame().getAnimateRate();
 
             // Only animate the active system.
             this.system.animate(this.universeTime, keyBoard);
@@ -244,16 +240,17 @@ class Universe {
     // Create a ship.
     createShip(json) {
         let system = this.system;
+        let game = Game.getGame();
 
         if (undefined === json) {
-            if (this.game.testMode) {
-                this.ship = new PlayerShip(this.game, 5, 10, 20, new Location(0, 0, 0, system));
+            if (Game.getGame().testMode) {
+                this.ship = new PlayerShip(5, 10, 20, new Location(0, 0, 0, system));
 
                 // Do some damage
-                this.ship.hull.compSets.takeDamage(1);
+                this.ship.compSets.takeDamage(1);
 
                 // Add another cargo bay
-                for (let bay of this.game.componentsList.baySet) {
+                for (let bay of game.componentsList.baySet) {
                     bay = bay.mount(this.ship, true);
                     bay.takeDamage(1);
                     break;
@@ -267,7 +264,7 @@ class Universe {
 
                 // Add some components to cargo.
                 // Ugg ... just get first element.
-                for (let comp of this.game.componentsList.weaponSet) {
+                for (let comp of game.componentsList.weaponSet) {
                     comp = comp.buy(this.ship, true);
                     comp.takeDamage(1);
                     break;
@@ -275,7 +272,7 @@ class Universe {
 
                 // Add a higher tech component.
                 let first = true;
-                for (let comp of this.game.componentsList.engineSet) {
+                for (let comp of game.componentsList.engineSet) {
                     if (first) {
                         first = false;
                     } else {
@@ -287,7 +284,7 @@ class Universe {
 
                 // Add some goods. 
                 let count = 0;
-                for (let good of this.game.goodsList) {
+                for (let good of game.goodsList) {
                     switch (count) {
                         case 3:
                             good.buy(this.ship, 1, true);
@@ -302,10 +299,10 @@ class Universe {
                     count++;
                 }
             } else {
-                this.ship = new PlayerShip(this.game, 5, 10, 20, new Location(-200, 100, 0, system));
+                this.ship = new PlayerShip(5, 10, 20, new Location(-200, 100, 0, system));
             }
         } else {
-            this.ship = PlayerShip.fromJSON(this.game, json.ship, system);
+            this.ship = PlayerShip.fromJSON(json.ship, system);
         }
     }
 
@@ -324,6 +321,13 @@ class Universe {
             }
         }
         throw (new BugError("Cannot find system named " + name + "."))
+    }
+    
+    // Remove non fixed labels.
+    removeLabels() {
+        for (let system of this.systems) {
+            system.removeLabels();
+        }
     }
 }
 

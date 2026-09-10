@@ -6,13 +6,8 @@
 
 import * as THREE from 'three';
 import { Hull, HullSection } from './hull.js';
-import BasicEngine from '../Engines/basicEngine.js';
-import BasicRadar from '../Avionics/basicRadar.js';
-import DumbMissileWeapon from '../Weapons/dumbMissileWeapon.js';
-import BasicBay from '../Bays/basicBay.js';
 import { ComponentType } from '../component.js';
-import BasicCompass from '../Avionics/basicCompass.js';
-import BasicHud from '../Avionics/Huds/basicHud.js';
+import ComponentSets from '../componentSets.js';
 
 const DESCRIPTION = "A large used for heavy freighters.";
 
@@ -21,28 +16,16 @@ class LargeHull extends Hull {
     static type = new ComponentType("GP3", 7, 100, 10000, 6);
 
     constructor(set, hullColour) {
-        super(LargeHull.type, set, 250, hullColour);
-        super.buildSets(set, 1, 3, 1, 4, 4);
+        super(set, 250, hullColour);
+    } 
+
+    // Customise components sets.
+    setSlots(sets) {
+        super.setSlots(sets, 1, 3, 1, 4, 4);
     }
 
     getDescription() {
         return (super.getDescription() + "\n\n'" + this.getName() + "' is " + DESCRIPTION.toLowerCase());
-    }
-
-    buildShip(ship) {
-        // Do stuff common for all hulls.
-        super.buildShip(ship);
-
-        // Do custom stuff for this hull
-        new BasicEngine(this.compSets.engineSet);
-        new BasicEngine(this.compSets.engineSet);
-        new DumbMissileWeapon(this.compSets.weaponSet);
-        new BasicBay(this.compSets.baySet);
-        new BasicRadar(this.compSets.avionicsSet);
-        new BasicCompass(this.compSets.avionicsSet);
-        new BasicHud(this.compSets.avionicsSet);
-
-        this.recalc();
     }
 
     getMesh() {

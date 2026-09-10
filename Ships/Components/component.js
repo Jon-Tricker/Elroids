@@ -7,7 +7,7 @@
 // Copyright (C) Jon Tricker 2023, 2024, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
+import Game from "../../Game/game.js";
 import ComponentDisplay from "../../Displays/Components/componentDisplay.js";
 import BugError from "../../Game/bugError.js";
 import Goods from "../../Trade/goods.js";
@@ -30,8 +30,8 @@ class Component extends Goods {
     // Set if componentDisplay to be shown.
     displayPanel = false;
 
-    constructor(type, set) {
-        super(type, set, 1);
+    constructor(set) {
+        super(set, 1);
         this.status = 100;
     }
 
@@ -57,7 +57,7 @@ class Component extends Goods {
 
         // Remove display (if present).
         this.displayPanel = false;
-        this.getGame().displays.compDisplays.recalc(true);
+        Game.getGame().displays.compDisplays.recalc(true);
 
         // Allow to go out of scope and GC
     }
@@ -65,7 +65,7 @@ class Component extends Goods {
     // Check if component is mounted.
     // If it's mounted it will be in one of the ship's component sets. If not it will be in a bays componets set.
     isMounted() {
-        for (let set of this.set.sets.ship.hull.compSets) {
+        for (let set of this.set.sets.ship.compSets) {
             if (this.set == set) {
                 return (true);
             }
@@ -121,7 +121,7 @@ class Component extends Goods {
 
     // Return the display panel for this component.
     getDisplay(ctx, defaultColour) {
-        return (new ComponentDisplay(this.getGame(), ctx, defaultColour, this));
+        return (new ComponentDisplay(ctx, defaultColour, this));
     }
 
     mount(ship, alsoBuy) {
@@ -159,7 +159,7 @@ class Component extends Goods {
             comp = new this.constructor(this.getSet());
         }
 
-        if (undefined != ship.getGame().displays) {
+        if (undefined != Game.getGame().displays) {
             ship.getTerminal().playSound("anvil", 0.5);
         }
 
@@ -181,16 +181,12 @@ class Component extends Goods {
 
         // Remove display (if present).
         this.displayPanel = false;
-        ship.getGame().displays.compDisplays.recalc(true);
+        Game.getGame().displays.compDisplays.recalc(true);
 
         // Put in ships bay
         ship.getBays().components.add(this);
 
         ship.recalc();
-    }
-
-    upgrade() {
-        throw (new BugError("Can only upgrade hulls."));
     }
 
     // Determine if working.
@@ -310,8 +306,8 @@ class Component extends Goods {
 class ComponentAct extends Component {
     on;     // Is it switched on.
 
-    constructor(type, set) {
-        super(type, set);
+    constructor(set) {
+        super(set);
         this.setOn(true);
     }
 
@@ -330,8 +326,8 @@ class ComponentAct extends Component {
         let ship;
         if (undefined != this.set) {
             ship = this.set.getShip();
-        }
-
+        }   
+  
         if ((undefined != ship) && on && (!this.set.isMultiOn())) {
             // If switch off others in set
             this.set.allOff();

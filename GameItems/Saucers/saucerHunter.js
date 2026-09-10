@@ -5,6 +5,7 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
+import Game from '../../Game/game.js';
 import DumbMissile from '../Projectiles/dumbMissile.js';
 import Saucer from './saucer.js';
 import Utils from '../../Game/Utils/utilities.js';
@@ -61,7 +62,7 @@ class SaucerHunter extends Saucer {
         let delta = targetSpeed.clone();
         delta.sub(this.speed);
 
-        let ar = this.getGame().getAnimateRate();
+        let ar = Game.getGame().getAnimateRate();
         if (delta.length() > MAX_ACC/ar) {
             delta.normalize;
             delta.multiplyScalar(MAX_ACC/ar);
@@ -80,7 +81,7 @@ class SaucerHunter extends Saucer {
 
     // Do shooting logic
     shoot() {
-        if (!this.getGame().isSafe()) {
+        if (!Game.getGame().isSafe()) {
             if (this.shootDue++ >= SHOOT_FREQUENCY) {
                 if (this.burstCounter > 0) {
                     if (--this.burstCounter == 0) {
@@ -92,7 +93,7 @@ class SaucerHunter extends Saucer {
                 }
 
                 // Only fire if vaguley close enough.
-                let range = this.location.getRelative(this.getGame().getShip().location);
+                let range = this.location.getRelative(Game.getGame().getShip().location);
 
                 if ((STANDOFF_DISTANCE * 2) > range.length()) {
                     // range.normalize();

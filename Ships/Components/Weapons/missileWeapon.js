@@ -6,8 +6,8 @@ const DESCRIPTION = "'Missile weapons' fire physical projectiles.\n" +
 
 class MissileWeapon extends Weapon {
 
-    constructor(type, set, fireRate, maxAmmo) {
-        super(type, set, fireRate, maxAmmo);
+    constructor(set, fireRate, maxAmmo) {
+        super(set, fireRate, maxAmmo);
     }   
     
     getDescription() {

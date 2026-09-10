@@ -3,8 +3,8 @@
 // Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
 import * as THREE from 'three';
+import Game from '../../Game/game.js';
 import NonShipItem from '../nonShipItem.js';
 import PlayerShip from '../../Ships/playerShip.js';
 import StarFieldTexture from '../../Game/Utils/starFieldText.js';
@@ -56,9 +56,9 @@ class WormholeEnd extends NonShipItem {
 
         this.setupMesh();
 
-        //if (wormhole.hyperspaceEnd == location.system) {
-            this.addLabel(name);
-        //}
+        if (Game.getGame().getUniverse().hyperspace == location.system) {
+            this.setLabel(name, true);
+        }
         
         // So other items can get relative positions.
         this.moveMesh();
@@ -70,6 +70,10 @@ class WormholeEnd extends NonShipItem {
 
     getWormhole() {
         return (this.wormhole);
+    }
+
+    getName() {
+        return("Worm hole")
     }
 
     // Traverse the wormhole.
@@ -88,7 +92,7 @@ class WormholeEnd extends NonShipItem {
         let farEnd = this.wormhole.getFarEnd(this.location.system);
 
         // Do 'warp' animation.
-        this.getGame().displays.addMessage("Entering " + farEnd.location.system.getName());
+        Game.getGame().displays.addMessage("Entering " + farEnd.location.system.getName());
 
         // Deactivate current system.
         this.location.system.setActive(false);
@@ -186,7 +190,7 @@ class WormholeEnd extends NonShipItem {
 
     animate() {
         // Spin
-        let ar = this.getGame().getAnimateRate();
+        let ar = Game.getGame().getAnimateRate();
         this.holeMesh.rotateX(ROTATE_RATE / ar);
         this.haloMesh.rotateX(-ROTATE_RATE / ar);
 

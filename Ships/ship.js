@@ -6,13 +6,16 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
+import Game from '../Game/game.js';
 import Item from '../GameItems/item.js';
-import { Hull } from './Components/Hulls/hull.js';
 import Explosion from '../GameItems/explosion.js';
 import Mineral from '../GameItems/mineral.js';
 import GoodsCrate from '../Trade/goodsCrate.js';
 import Station from '../GameItems/System/station.js';
 import WormholeEnd from '../GameItems/System/wormholeEnd.js';
+import BugError from '../Game/bugError.js';
+import ComponentSets from './Components/componentSets.js';
+import { ComponentAct } from './Components/component.js';
 
 // Slightly damped attitude contols to allow fine adjustment.
 const ROTATE_RATE_DELTA = 0.125;        // r/s
@@ -20,14 +23,12 @@ const ROTATE_RATE_MAX = 5;              // r/s
 
 class TurnRate {
     rate = 0;
-    game;
 
-    constructor(game) {
-        this.game = game;
+    constructor() {
     }
 
     inc(power) {
-        let ar = this.game.getAnimateRate();
+        let ar = Game.getGame().getAnimateRate();
 
         let delta = ROTATE_RATE_DELTA / ar;
         if (undefined != power) {
@@ -43,7 +44,7 @@ class TurnRate {
     }
 
     dec(power) {
-        let ar = this.game.getAnimateRate();
+        let ar = Game.getGame().getAnimateRate();
 
         let delta = ROTATE_RATE_DELTA / ar;
         if (undefined != power) {
@@ -83,6 +84,9 @@ class Ship extends Item {
     yawRate;
     rollRate;
 
+    // Components in ship.
+    compSets;
+
     hull;
 
     engineSoundOn = false;
@@ -98,11 +102,16 @@ class Ship extends Item {
         this.width = width;
         this.length = length;
 
-        this.pitchRate = new TurnRate(location.system.getGame());
-        this.yawRate = new TurnRate(location.system.getGame());
-        this.rollRate = new TurnRate(location.system.getGame());
+        // All the same for now.
+        this.pitchRate = new TurnRate();
+        this.yawRate = new TurnRate();
+        this.rollRate = new TurnRate();
 
-        this.buildShip();
+        this.compSets = new ComponentSets(this);
+    }
+
+    buildShip() {
+        throw new BugError("Abstract ship cannot be built.")
     }
 
     toJSON() {
@@ -115,7 +124,10 @@ class Ship extends Item {
             json.dockedWith = this.dockedWith.getId();
         }
 
-        json.hull = this.hull.toJSON();
+        json.comps = this.compSets.toJSON(this);
+
+        // Pack cargo.
+        json.cargo = this.compSets.baySet.cargoToJSON();
 
         return (json);
     }
@@ -129,23 +141,84 @@ class Ship extends Item {
             ship.dock(system.getItemById(json.dockedWith));
         }
 
-        // Make new hull.
-        // Will also add it to ship.
-        Hull.fromJSON(json.hull, ship);
+        // Build component sets.
+        ship.compSets = new ComponentSets(ship);
+
+        // Unpack components
+        for (let jsonComp of json.comps) {
+            let comp = Game.getGame().componentsList.getByClass(jsonComp.class);
+            comp = new comp.constructor(comp.getTargetSet(ship));
+            comp.status = jsonComp.status;
+
+            if (comp.getTargetSet(ship) == ship.compSets.hullSet) {
+                // Do extra stuff for hull. 
+                ship.hull = comp;
+                ship.hull.setSlots(ship.compSets);
+            }
+
+            comp.displayPanel = jsonComp.displayPanel;
+            if (comp instanceof ComponentAct) {
+                comp.setOn(jsonComp.on);
+            }
+        }
+
+        // Unpack cargo
+        ship.compSets.baySet.loadFromJSON(json.cargo);
 
         ship.recalc();
     }
 
     recalc() {
-        this.hull.recalc();
+        this.compSets.recalc();
     }
 
-    buildShip(hullType, hullColour) {
-        this.hull = new hullType(undefined, hullColour);
-        this.hull.buildShip(this);
+    getCompSets() {
+        return(this.compSets);
+    }
 
+    // Upgrade to a new hull
+    upgradeHull(upHullType) {
+
+        // Check we can afford it.
+        let cost = upHullType.getUpgradeCost(this);
+        if (Game.getGame().player.getCredits() < cost) {
+            throw (new GameError("Not enough credits"));
+        }  
+
+        // Check existing components will fit in new hull.
+
+        // New experimental component set with new slot limits.
+        let upCompSets = new ComponentSets;
+        upHullType.setSlots(upCompSets);
+
+        // Need to iterate both set of sets.
+        let upIter = upCompSets.keys();
+        let upCurs = upIter.next()
+        let thisIter = this.compSets.keys();
+        let thisCurs = thisIter.next()
+        while ((!thisCurs.done) && (!upCurs.done)) {
+            if (upCurs.value.slots < thisCurs.value.size) {
+                throw (new GameError("Not enough slots in " + thisCurs.value.plural + ". Unmount/Sell something first."));
+            }
+            thisCurs = thisIter.next()
+            upCurs = upIter.next()
+        }
+
+        // Now we know that it can fit just modify the limits on existing component sets ... don't need to copy components. 
+        upHullType.setSlots(this.compSets);
+
+        // Make copy of purchace menu item.
+        this.compSets.hullSet.clear();
+        let upHull = new upHullType.constructor(this.compSets.hullSet, this.hull.getColour())
+        this.setHull(upHull);
+
+        // Charge acount.
+        if (this.getPlayer().addCredits(-cost));
+
+        // Recalculate
         this.recalc();
     }
+
 
     setActive(state) {
         if (!state) {
@@ -171,6 +244,9 @@ class Ship extends Item {
 
     // Upgrade the hull (and graphics).
     setHull(hull) {
+        this.compSets.hullSet.clear();
+        this.compSets.hullSet.add(hull);
+        this.compSets.hullSet.recalc();
         this.hull = hull;
         this.setupMesh();
     }
@@ -186,7 +262,7 @@ class Ship extends Item {
 
     // Get total available thrust
     getThrust() {
-        return (this.hull.compSets.getTotalThrust());
+        return (this.compSets.getTotalThrust());
     }
 
     getMaxSpeed() {
@@ -195,11 +271,11 @@ class Ship extends Item {
 
     // Get cargo bay
     getBays() {
-        return (this.hull.compSets.baySet);
+        return (this.compSets.baySet);
     }
 
     getAheadList() {
-        return(this.aheadList);
+        return (this.aheadList);
     }
 
     accelerate() {
@@ -302,7 +378,7 @@ class Ship extends Item {
         if (null == this.dockedWith) {
             this.genAheadList();
             super.animate();
-        }  
+        }
     }
 
     // Builds a list of Items straight ahead.
@@ -312,7 +388,7 @@ class Ship extends Item {
 
     // Get the current directions X axis.
     getOrientation() {
-        let xDirection = this.localToWorld(new THREE.Vector3(1,0,0));
+        let xDirection = this.localToWorld(new THREE.Vector3(1, 0, 0));
 
         // Above will have included ship position ... remove it.
         xDirection.sub(this.position);
@@ -424,11 +500,11 @@ class Ship extends Item {
     }
 
     getCargoBay() {
-        return (this.hull.compSets.baySet)
+        return (this.compSets.baySet)
     }
 
     getMass() {
-        return (this.hull.compSets.getMass());
+        return (this.compSets.getMass());
     }
 
     getTotalMass() {
@@ -437,7 +513,7 @@ class Ship extends Item {
 
     // Fire selected weapons
     shoot(date) {
-        this.hull.compSets.weaponSet.shoot(this.getOrientation(), date);
+        this.compSets.weaponSet.shoot(this.getOrientation(), date);
     }
 
     // Get angle to a location.

@@ -1,6 +1,11 @@
 // Explosion
 // For now simple spheres.
+ 
+// Copyright (C) Jon Tricker 2023.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
 import * as THREE from 'three';
+import Game from '../Game/game.js';
 import Item from './item.js';
 
 // Create material.
@@ -51,19 +56,22 @@ class Explosion extends Item {
     this.playSound('explosion', this.maxSize / (MAX_SIZE * 3));
   }
 
+  setLabel(label) {
+    // Don't label explosions.
+  }
 
   animate() {
     if (this.currentSize > this.maxSize) {
       this.destruct();
     } else {
       this.scale.set(this.currentSize, this.currentSize, this.currentSize);
-      
+
       // Don't check collisions with explosions
       this.moveItem(false);
       this.moveMesh();
 
       // Grow
-      this.currentSize += 250 / this.getGame().getAnimateRate();
+      this.currentSize += 250 / Game.getGame().getAnimateRate();
     }
   }
 }

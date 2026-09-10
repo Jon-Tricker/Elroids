@@ -18,8 +18,8 @@ class Bay extends Component {
 
     capacity;
 
-    constructor(type, set, capacity) {
-        super(type, set);
+    constructor(set, capacity) {
+        super(set);
         this.capacity = capacity;
         if (undefined != set) {
             set.recalc();
@@ -41,7 +41,7 @@ class Bay extends Component {
 
     // Return the display panel for this component.
     getDisplay(ctx, defaultColour) {
-        return (new BayDisplay(this.getShip().game, ctx, defaultColour, this));
+        return (new BayDisplay(ctx, defaultColour, this));
     }
 
     getCapacity() {
@@ -88,7 +88,7 @@ class Bay extends Component {
     }
 
     getTargetSet(ship) {
-        return (ship.hull.compSets.baySet);
+        return (ship.compSets.baySet);
     }
 }
 

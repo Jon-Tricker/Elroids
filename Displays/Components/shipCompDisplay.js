@@ -3,24 +3,22 @@
 // Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
+import Game from '../../Game/game.js';
 import DarkPanel from '../Utils/darkPanel.js';
 import TextPanel from '../Utils/textPanel.js';
 import BarPanel from '../Utils/barPanel.js';
 
 class ShipCompDisplay extends DarkPanel {
-    game;
     ship;
 
     speedPanel;
 
-    constructor(game, ctx, defaultColour) {
+    constructor(ctx, defaultColour) {
         super(ctx, defaultColour, true);
-        this.game = game;
-        this.ship = game.getShip();
+        this.ship = Game.getGame().getShip();
 
         this.add(new TextPanel(ctx, defaultColour, false));
-        this.speedPanel = new BarPanel(ctx, defaultColour, false, "Speed", this.getUnits(), this.ship.hull.compSets.hullSet.getMaxSpeed(), false);
+        this.speedPanel = new BarPanel(ctx, defaultColour, false, "Speed", this.getUnits(), this.ship.compSets.hullSet.getMaxSpeed(), false);
         this.add(this.speedPanel);
     }
 
@@ -52,13 +50,13 @@ class ShipCompDisplay extends DarkPanel {
         }
         this.subPanels[0].setText(text);
 
-        this.speedPanel.setMax(this.ship.hull.compSets.hullSet.getMaxSpeed());
+        this.speedPanel.setMax(this.ship.compSets.hullSet.getMaxSpeed());
         this.speedPanel.setValue(Math.floor(this.ship.getSpeed()));
         this.speedPanel.setUnits(this.getUnits());
     }
 
     printNum(num) {
-        return (this.game.displays.printNum(num));
+        return (Game.getGame().displays.printNum(num));
     }
 }
 

@@ -1,5 +1,6 @@
 // Compass screen just one for the ship
 import * as THREE from 'three';
+import Game from '../Game/game.js';
 import DarkPanel from './Utils/darkPanel.js';
 
 const SCALE = 0.05;
@@ -14,12 +15,10 @@ const WH_FRONT_COL = "cyan";
 const WH_REAR_COL = "yellow";
 
 class CompassDisplay extends DarkPanel {
-    game;
     radius;
 
-    constructor(game, ctx, defaultColour) {
+    constructor(ctx, defaultColour) {
         super(ctx, defaultColour, true);
-        this.game = game;
     }
 
     animate() {
@@ -38,7 +37,7 @@ class CompassDisplay extends DarkPanel {
         }   
         
         // Check we have a working compass component.
-        let compass = thisship.hull.compSets.avionicsSet.getCompass();
+        let compass = thisship.compSets.avionicsSet.getCompass();
         if ((undefined == compass) || (!compass.isWorking())) {
             return;
         }
@@ -46,12 +45,14 @@ class CompassDisplay extends DarkPanel {
         // List of dots
         let dots = new Array();
 
+        let universe = Game.getGame().universe;
+
         // Populate dots. 
-        if (typeof this.game.universe.system.getStations === "function") { 
+        if (typeof universe.system.getStations === "function") { 
             // We may have stations.
-            this.addDots(dots, this.game.universe.system.getStations(), STA_FRONT_COL, STA_REAR_COL);
+            this.addDots(dots, universe.system.getStations(), STA_FRONT_COL, STA_REAR_COL);
         }
-        this.addDots(dots, this.game.universe.system.getWormholeEnds(), WH_FRONT_COL, WH_REAR_COL);
+        this.addDots(dots, universe.system.getWormholeEnds(), WH_FRONT_COL, WH_REAR_COL);
 
         // Sort dots into size order. Largest first.
         dots.sort(function(a, b){return b.size - a.size});
@@ -124,7 +125,7 @@ class CompassDisplay extends DarkPanel {
     }
 
     getShip() {
-        return (this.game.universe.ship);
+        return (Game.getGame().universe.ship);
     }
 
     resize(parentWidth, parentHeight) {
@@ -139,7 +140,8 @@ class CompassDisplay extends DarkPanel {
             width = parentHeight;
         }
 
-        let x = this.game.displays.radar.x + this.game.displays.radar.width - width;
+        let game = Game.getGame();
+        let x = game.displays.radar.x + game.displays.radar.width - width;
         let y = 0;
 
         super.resize(width, width, x, y);

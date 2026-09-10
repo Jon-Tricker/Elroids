@@ -45,7 +45,7 @@ class ComponentSet extends GoodsSet {
     takeDamage(hits) {
         // Damage a random comp.
         let comp = this.getRandomElement();
-        if (comp.status > 0) {
+        if ((undefined != comp) && (comp.status > 0)) {
             let taken = comp.takeDamage(hits)
             this.recalc();
             return (taken);

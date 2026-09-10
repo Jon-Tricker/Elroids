@@ -5,6 +5,7 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
+import Game from '../game.js';
 import MyCamera from './myCamera.js'
 import WrapBox from "./wrapBox.js";
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
@@ -22,15 +23,12 @@ class MyScene extends THREE.Scene {
   labelRenderer;
 
   sizes;
-  game;
   myCanvas;
   wrapBox;
 
 
-  constructor(game, wrapBoxOn) {
+  constructor(wrapBoxOn) {
     super();
-
-    this.game = game;
 
     // Resize to fit entire window
     this.sizes = {
@@ -55,7 +53,7 @@ class MyScene extends THREE.Scene {
     document.body.appendChild(this.labelRenderer.domElement);
 
     if (wrapBoxOn) {
-      let wrapBoxSize = this.game.universe.systemSize * 2;
+      let wrapBoxSize = Game.getGame().universe.systemSize * 2;
       this.wrapBox = new WrapBox(wrapBoxSize, true);
       this.add(this.wrapBox);
     }
@@ -80,7 +78,7 @@ class MyScene extends THREE.Scene {
     this.ambientLight = new THREE.AmbientLight(0xfffffff, 0.5);
 
     // Move light away from scene
-    this.light.position.set(0, 0, this.game.universe.systemSize * 2);
+    this.light.position.set(0, 0, Game.getGame().universe.systemSize * 2);
 
     // Enable shadows
     this.light.castShadow = true;
@@ -95,6 +93,7 @@ class MyScene extends THREE.Scene {
   }
 
   setCamera(type) {
+    let game = Game.getGame();
 
     // Remove any existing, non rotating, camera ... and let GC deal with it (I hope).
     if (null != this.camera) {
@@ -106,23 +105,23 @@ class MyScene extends THREE.Scene {
     switch (type) {
       // Fotr these cases get existing cameras.
       case MyCamera.CHASE:
-        this.camera = this.game.getShip().getChaseCamera();
-        this.game.displays.hudEnable(false);
+        this.camera = game.getShip().getChaseCamera();
+        game.displays.hudEnable(false);
         break;
 
       case MyCamera.PILOT:
-        this.camera = this.game.getShip().getPilotCamera();
-        this.game.displays.hudEnable(true);
+        this.camera = game.getShip().getPilotCamera();
+        game.displays.hudEnable(true);
         break;
 
       case MyCamera.DUMMY:
-        this.camera = new MyCamera(this.sizes, type, this.game.getShip());
+        this.camera = new MyCamera(this.sizes, type, game.getShip());
         break;
 
       default:
         // Else get a new camera.
-        this.camera = new MyCamera(this.sizes, type, this.game.getShip());
-        this.game.displays.hudEnable(false);
+        this.camera = new MyCamera(this.sizes, type, game.getShip());
+        game.displays.hudEnable(false);
         break;
     }
 
@@ -136,12 +135,12 @@ class MyScene extends THREE.Scene {
 
     // Listener to handle viewport re-sizes
     window.addEventListener("resize", () => {
-      this.game.displays.resize();
+      game.displays.resize();
       this.resizeCamera();
     })
 
-    if (undefined != this.game.getListener()) {
-      this.getCamera().addListener(this.game.getListener());
+    if (undefined != game.getListener()) {
+      this.getCamera().addListener(game.getListener());
     }
 
     // this.renderer.render(this, this.camera);

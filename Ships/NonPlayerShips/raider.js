@@ -5,6 +5,9 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import NPShip from './nonPlayerShip.js';
 import SmallHull from '../Components/Hulls/smallHull.js';
+import MediumEngine from '../Components/Engines/mediumEngine.js';
+import BasicBay from '../Components/Bays/basicBay.js';
+import DumbMissileWeapon from '../Components/Weapons/dumbMissileWeapon.js';
 import { BasicAI } from './basicAI.js';
 
 class RaiderAI extends BasicAI {
@@ -42,14 +45,20 @@ class Raider extends NPShip {
     constructor(location, speed) {
         super(5, 10, 20, location, speed, undefined, HP);
         this.ai = new RaiderAI(this);
+        this.buildShip();
         this.setHostile(true);
-    }
+    }   
+    
+    buildShip() { 
+        this.hull = new SmallHull(this.compSets.hullSet); 
+        this.hull.setSlots(this.compSets);
+        
+        // Do custom stuff for this hull
+        new MediumEngine(this.compSets.engineSet);
+        new DumbMissileWeapon(this.compSets.weaponSet);
+        new BasicBay(this.compSets.baySet);
 
-    // Build/Rebuild ship components.
-    buildShip() {
-        // Create hull
-        // Will also create all other components, for that hull type, and add them to our components sets.
-        super.buildShip(SmallHull);
+        this.recalc();
     }
 }
 

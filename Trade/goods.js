@@ -14,8 +14,8 @@ class Goods {
     set;        // Set of goods that this is a member of.
     number;     // Number of goods.
 
-    constructor(type, set, number) {
-        this.type = type;
+    constructor(set, number) {
+        this.type = this.getType();
         this.set = set;
 
         if (undefined === number) {
@@ -26,6 +26,10 @@ class Goods {
         if (undefined != set) {
             set.add(this);
         }
+    }
+    
+    getType() {
+        return(this.constructor.type);
     }
 
     toJSON() {
@@ -75,14 +79,6 @@ class Goods {
 
     getShip() {
         return (this.set.getShip());
-    }
-
-    getGame() {
-        return (this.getUniverse().game);
-    }
-
-    getUniverse() {
-        return (this.getShip().location.system.universe);
     }
 
     // Get ordered collumn headings.
@@ -189,13 +185,13 @@ class Goods {
         }
 
         // Check that there is capacity.
-        if (this.getMass() > ship.hull.compSets.baySet.getAvailableCapacity()) {
+        if ((this.getMass() * number) > ship.compSets.baySet.getAvailableCapacity()) {
             throw (new GameError("Insufficient bay capacity."))
         }
 
         // Check that we can we afford it.
         if (!isFree) {
-            if (!ship.getPlayer().addCredits(-this.getValueInSystem(ship.system))) {
+            if (!ship.getPlayer().addCredits(-this.getValueInSystem(ship.system) * number)) {
                 return (false);
             }
         }

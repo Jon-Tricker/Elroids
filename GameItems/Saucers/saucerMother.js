@@ -5,7 +5,7 @@
 // Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
+import Game from '../../Game/game.js';
 import Saucer from './saucer.js';
 import SaucerShooter from "./saucerShooter.js";
 import SaucerRam from "./saucerRam.js";
@@ -66,8 +66,8 @@ class SaucerMother extends Saucer {
 
     // Do navigation logic
     navigate() {
-        if (!this.getGame().isSafe()) {
-            let delta = this.getGame().getShip().location.getRelative(this.location);
+        if (!Game.getGame().isSafe()) {
+            let delta = Game.getGame().getShip().location.getRelative(this.location);
 
             if (Math.abs(delta.length) > this.location.system.systemSize) {
                 // Safe to slow down
@@ -76,7 +76,7 @@ class SaucerMother extends Saucer {
             } else {
                 // Run
                 delta.normalize();
-                delta.multiplyScalar(MAX_ACC / this.getGame().getAnimateRate());
+                delta.multiplyScalar(MAX_ACC / Game.getGame().getAnimateRate());
 
                 // Add a bit of randomness. 
                 switch (Math.floor(Math.random() * 3)) {
@@ -109,7 +109,7 @@ class SaucerMother extends Saucer {
 
     // Do shooting (in our case ship creation) logic
     shoot() {
-        let game = this.getGame();
+        let game = Game.getGame();
 
         if (!game.isSafe()) {
             if (this.launchDue++ >= this.currentLaunchFrequency) {

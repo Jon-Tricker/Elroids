@@ -17,7 +17,7 @@ class NPShipFactory {
     // List of all ship types.
     // JSONSet is used for it's utilities. It is not stored as JSON.
     static shipTypes = new JSONSet([Freighter, Smuggler, Raider, Miner, PoliceShip]);
-    // static shipTypes = new JSONSet ([Miner]);
+    // static shipTypes = new JSONSet ([Freighter, Smuggler, PoliceShip]);
 
     // Create a random ship
     static createRandom(location, moving) {

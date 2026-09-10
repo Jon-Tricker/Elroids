@@ -1,5 +1,6 @@
 // Base list class for all cargo bays.
 import * as THREE from 'three';
+import Game from '../../../Game/game.js';
 import ComponentSet from '../componentSet.js'
 import GameError from "../../../Game/gameError.js"
 import Mineral from "../../../GameItems/mineral.js";
@@ -61,7 +62,7 @@ class BaySet extends ComponentSet {
         // Unpack components.
         this.components.clear();
         for (let jsonComp of json.comps) {
-            let comp = this.getGame().componentsList.getByClass(jsonComp.class);
+            let comp = Game.getGame().componentsList.getByClass(jsonComp.class);
             comp = new comp.constructor(this.components);
             comp.status = jsonComp.status;
         }
@@ -69,7 +70,7 @@ class BaySet extends ComponentSet {
         // Unpack goods  
         this.tradeGoods.clear();
         for (let jsonGood of json.goods) {
-            let good = this.getGame().goodsList.getByClass(jsonGood.class);
+            let good = Game.getGame().goodsList.getByClass(jsonGood.class);
             good = new good.constructor(this.tradeGoods, jsonGood.number);
         }
 
@@ -224,7 +225,7 @@ class BaySet extends ComponentSet {
         let spaceReqd = this.getContentMass() - this.capacity;
         if (0 < spaceReqd) {
             if (this.getShip() instanceof PlayerShip) {
-                this.getGame().displays.addMessage("Bay full. Dumping surplus " + spaceReqd + "(t)");
+                Game.getGame().displays.addMessage("Bay full. Dumping surplus " + spaceReqd + "(t)");
             }
         }
 
@@ -353,7 +354,7 @@ class BaySet extends ComponentSet {
 
                 case 1:
                     // Make goods.
-                    let good = new (this.getGame().goodsList.getRandomElement()).constructor();
+                    let good = new (Game.getGame().goodsList.getRandomElement()).constructor();
                     good.number = Math.ceil(cost / good.type.cost);
                     this.loadGoods(good);
                     break;

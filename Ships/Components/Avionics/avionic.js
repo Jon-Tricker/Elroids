@@ -8,8 +8,8 @@ const DESCRIPTION = "Avionics are the 'brains' of the ship.\n" +
  
 class Avionic extends ComponentAct {
 
-    constructor(type, set) {
-        super(type, set);
+    constructor(set) {
+        super(set);
         if (undefined != set) {
             set.recalc();
         }
@@ -20,7 +20,7 @@ class Avionic extends ComponentAct {
     }
 
     getTargetSet(ship) {
-        return(ship.hull.compSets.avionicsSet);
+        return(ship.compSets.avionicsSet);
     }
 }
 

@@ -25,6 +25,10 @@ class JSONSet extends Set{
     // Return a random element of the set.
     // This is a bit inefficient but is rarely used and, in general, we would rather have Sets and Sets ... not Arrays.
     getRandomElement() {
+        if (0 == this.size){
+            return(undefined);
+        }
+
         let index = Math.floor(Math.random() * this.size);
 
         let i = 0;

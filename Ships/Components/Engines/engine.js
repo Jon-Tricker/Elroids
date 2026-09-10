@@ -11,8 +11,8 @@ class Engine extends ComponentAct {
 
     thrust;         // kN
 
-    constructor(type, set, thrust) {
-        super(type, set);
+    constructor(set, thrust) {
+        super(set);
         this.thrust = thrust;
         if (undefined != set) {
             set.recalc();
@@ -44,7 +44,7 @@ class Engine extends ComponentAct {
     }
 
     getTargetSet(ship) {
-        return(ship.hull.compSets.engineSet);
+        return(ship.compSets.engineSet);
     }
 }
 

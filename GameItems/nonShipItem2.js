@@ -4,7 +4,7 @@
 // // Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
+import Game from "../Game/game.js";
 import NonShipItem from "./nonShipItem.js";
 
 class NonShipItem2 extends NonShipItem {

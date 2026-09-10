@@ -3,11 +3,10 @@
 // Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
+import Game from '../../../Game/game.js';
 import Panel from '../../Utils/panel.js';
 
 class HudDisplay extends Panel {
-    game;
     ship;
     comp;
 
@@ -18,10 +17,9 @@ class HudDisplay extends Panel {
     sz;         // Size of basic HUD.
     txtSz;
 
-    constructor(game, ctx, defaultColour, comp) {
+    constructor(ctx, defaultColour, comp) {
         super(ctx, defaultColour, true);
-        this.game = game;
-        this.ship = game.getShip();
+        this.ship = Game.getGame().getShip();
         this.comp = comp;
     }
 
@@ -42,7 +40,7 @@ class HudDisplay extends Panel {
     }
 
     printNum(num) {
-        return (this.game.displays.printNum(num));
+        return (Game.getGame().displays.printNum(num));
     }
 }
 

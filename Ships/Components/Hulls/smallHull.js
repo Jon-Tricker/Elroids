@@ -6,16 +6,8 @@
 
 import * as THREE from 'three';
 import { Hull, HullSection } from './hull.js';
-import BasicEngine from '../Engines/basicEngine.js';
-import BasicRadar from '../Avionics/basicRadar.js';
-import BasicCompass from '../Avionics/basicCompass.js';
-import DumbMissileWeapon from '../Weapons/dumbMissileWeapon.js';
-import LaserBeamWeapon from '../Weapons/LaserBeamWeapon.js';
-import BasicBay from '../Bays/basicBay.js';
-import BasicHud from '../Avionics/Huds/basicHud.js';
-import RangeHud from '../Avionics/Huds/rangeHud..js';
-import MiningHud from '../Avionics/Huds/miningHud..js';
 import { ComponentType } from '../component.js';
+import ComponentSets from '../componentSets.js';
 
 const DESCRIPTION = "A small hull used for scouts and light freighters.";
 
@@ -24,29 +16,16 @@ class SmallHull extends Hull {
     static type = new ComponentType("GP1", 5, 50, 1000, 3);
 
     constructor(set, hullColour) {
-        super(SmallHull.type, set, 200, hullColour);
-        super.buildSets(set, 1, 1, 1, 2, 3);
+        super(set, 200, hullColour);
+    } 
+    
+    // Customise components sets.
+    setSlots(sets) {
+        super.setSlots(sets, 1, 1, 1, 2, 3);
     }
 
     getDescription() {
         return (super.getDescription() + "\n\n'" + this.getName() + "' is " + DESCRIPTION.toLowerCase());
-    }
-
-    buildShip(ship) {
-        // Do stuff common for all hulls.
-        super.buildShip(ship);
-
-        // Do custom stuff for this hull
-        new BasicEngine(this.compSets.engineSet);
-        new DumbMissileWeapon(this.compSets.weaponSet);
-        new BasicBay(this.compSets.baySet);
-        new BasicRadar(this.compSets.avionicsSet);
-        new BasicCompass(this.compSets.avionicsSet);
-        new BasicHud(this.compSets.avionicsSet);
-        // new RangeHud(this.compSets.avionicsSet);
-        // new MiningHud(this.compSets.avionicsSet);
-
-        this.recalc();
     }
 
     getMesh() {

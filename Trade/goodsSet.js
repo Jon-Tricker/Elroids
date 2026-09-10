@@ -1,6 +1,7 @@
 // Base list class for Goods.
 import GameError from "../Game/gameError.js";
 import jsonSet from "../Game/Utils/jsonSet.js"
+import Game from "../Game/game.js";
 
 class GoodsSet extends jsonSet {
 
@@ -19,10 +20,18 @@ class GoodsSet extends jsonSet {
         this.plural = plural;
         this.singular = singular;
 
-        this.slots = slots;
+        this.setSlots(slots);
         this.sets = sets;
 
         // this.recalc();
+    }
+
+    // Generally ony called at construct time.
+    setSlots(slots) {
+        if ((undefined != slots) && (slots < this.size)) {
+            throw (new GameError("Too many Goods already in set."));
+        }
+        this.slots = slots;
     }
 
     toJSON(skip) {
@@ -90,14 +99,6 @@ class GoodsSet extends jsonSet {
 
     getShip() {
         return (this.sets.ship);
-    }
-
-    getUniverse() {
-        return (this.getShip().location.system.universe);
-    }
-
-    getGame() {
-        return (this.getUniverse().game);
     }
 
     getAverageStatus() {

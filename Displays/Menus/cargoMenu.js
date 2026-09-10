@@ -20,7 +20,7 @@ class CargoMenu {
         let doc = "";
 
         doc += "<P>"
-        doc += "<P>Total capacity " + ship.getCargoCapacity() + "(t), Current load " + ship.hull.compSets.baySet.getContentMass() + "(t)</P>"
+        doc += "<P>Total capacity " + ship.getCargoCapacity() + "(t), Current load " + ship.compSets.baySet.getContentMass() + "(t)</P>"
         doc += "<BR />"
 
         doc += CargoMenu.displayMinerals(ship);
@@ -53,13 +53,13 @@ class CargoMenu {
 
             let heads = new Array();
             heads.push("Type");
-            heads.push("Mass(t)");
+            heads.push("Mass\n(t)");
 
             if (null != ship.dockedWith) {
-                heads.push("Sell 1(t)");
+                heads.push("Sell 1\n(t)");
                 heads.push("Sell all");
             } else {
-                heads.push("Value(cr)");
+                heads.push("Value\n(cr)");
             }
 
             tab.addHeadings(heads);
@@ -112,8 +112,8 @@ class CargoMenu {
         if (0 != comps.size) {
             let heads = new Array();
             heads.push("Name");
-            heads.push("Mass(t)");
-            heads.push("Status(%)");
+            heads.push("Mass\n(t)");
+            heads.push("Status\n(%)");
             heads.push("Details");
             if (null != ship.dockedWith) {
                 heads.push("Mount");
@@ -156,7 +156,7 @@ class CargoMenu {
         if (0 != goods.size) {
             let heads = new Array();
             heads.push("Name");
-            heads.push("Mass(t)");
+            heads.push("Mass\n(t)");
             heads.push("Number");
             if (null == ship.dockedWith) {
                 heads.push("Value");
@@ -164,7 +164,7 @@ class CargoMenu {
             heads.push("Details");
             heads.push("Legal")
             if (null != ship.dockedWith) {
-                heads.push("Base cost")
+                heads.push("Base cost\n(each)")
                 heads.push("Sell 1");
                 heads.push("Sell all");
             }

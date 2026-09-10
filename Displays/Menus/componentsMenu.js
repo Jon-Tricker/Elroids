@@ -1,4 +1,5 @@
 // Component details menu.
+import Game from '../../Game/game.js';
 import MenuTable from './menuTable.js';
 import { ComponentDetailsMenu } from './compPurchaseMenu.js';
 import { ComponentAct } from '../../Ships/Components/component.js';
@@ -12,7 +13,7 @@ let componentsMenu = "\
 class ComponentsMenu {
 
     static printMenu(ship) {
-        let sets = ship.hull.compSets;
+        let sets = ship.compSets;
         let doc = "";
 
         doc += "<P>"
@@ -40,11 +41,11 @@ class ComponentsMenu {
                     if (printHeads) {
                         let heads = new Array();
                         heads.push("Name");
-                        heads.push("Mass(t)");
+                        heads.push("Mass\n(t)");
                         if (comp instanceof ComponentAct) {
                             heads.push("Active");
                         }
-                        heads.push("Status(%)");
+                        heads.push("Status\n(%)");
                         heads.push("Details");
                         heads.push("Display");
                         if (null != ship.dockedWith) {
@@ -53,7 +54,7 @@ class ComponentsMenu {
                                 heads.push("Sell");
                             }
                         }
-                        heads.push("Repair(Cr)");
+                        heads.push("Repair\n(Cr)");
                         tab.addHeadings(heads);
                         printHeads = false;
                     }
@@ -67,17 +68,27 @@ class ComponentsMenu {
                     vals.push(comp.status);
                     vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onDetailsClick(this, " + setIndex + ", " + compIndex + ")\">Show</button>");
                     vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onEnableClick(this, " + setIndex + ", " + compIndex + ")\">" + ComponentsMenu.onOff(comp.displayPanel) + "</button>");
+
                     if (null != ship.dockedWith) {
                         if (!(sets.hullSet == set)) {
                             vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onUnmountClick(this, " + setIndex + ", " + compIndex + ")\">Unmount</button>");
                             vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, " + setIndex + ", " + compIndex + ")\">" + comp.getValueInSystem(ship.system) + "</button>");
                         }
-                        vals.push("10%=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, " + setIndex + ", " + compIndex + ", 10)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 10) + "</button>" +
-                            " All=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, " + setIndex + ", " + compIndex + ", 100)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 100) + "</button>");
-                    } else {
-                        vals.push("10%=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, " + setIndex + ", " + compIndex + ", 10)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 10) + "</button>" +
-                            " Max=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, " + setIndex + ", " + compIndex + ", 100)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 100) + "</button>");
                     }
+
+                    let maxRep = comp.getMaxRepair(100, ship);
+                    let repText = "";
+                    if (10 < maxRep) {
+                        repText += "10%=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, " + setIndex + ", " + compIndex + ", 10)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 10) + " </button>";
+                    }
+                    if (0 < maxRep) {
+                        repText += maxRep + "%=<button type=\"button\" onclick=\"ComponentsMenu.onRepairClick(this, " + setIndex + ", " + compIndex + ", 100)\">" + ComponentsMenu.getRepairButtonText(ship, comp, 100) + "</button>";
+                    } else {
+                        repText = "N/A";
+                    }
+                    vals.push(repText);
+
+
                     tab.addRow(vals);
 
                     compIndex++;
@@ -135,7 +146,7 @@ class ComponentsMenu {
         comp.displayPanel = !comp.displayPanel;
 
         // Re-layout displays.
-        ship.getGame().displays.compDisplays.recalc(true);
+        Game.getGame().displays.compDisplays.recalc(true);
     }
 
     static onDetailsClick(menuSystem, setIndex, compIndex) {
@@ -151,7 +162,7 @@ class ComponentsMenu {
     }
 
     static getCompForIndex(ship, setIndex, compIndex) {
-        let set = ship.hull.compSets.get(setIndex);
+        let set = ship.compSets.get(setIndex);
         let comp = set.get(compIndex);
         return (comp);
     }

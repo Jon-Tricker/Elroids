@@ -6,10 +6,10 @@ const DESCRIPTION = "High power engine.";
 
 class LargeEngine extends Engine {
 
-    static type = new ComponentType("Starfire", 7, 15, 4000, 2);
+    static type = new ComponentType("Starfire", 7, 15, 8000, 2);
 
     constructor(set) {
-        super(LargeEngine.type, set, 8000);
+        super(set, 8000);
     }
 
     getDescription() {

@@ -16,11 +16,11 @@ var uniSize = parseInt(scriptName.getAttribute('uniSize'));
 var rockStyle = scriptName.getAttribute('rockStyle');
 var startDocked = scriptName.getAttribute('startDocked');
 var soundOn = scriptName.getAttribute('soundOn');
-var safe = true;
+var safeMode = scriptName.getAttribute('safeMode');
 
 // Create the game objects
 // For the moment universe and system are the same size.
-const game = new Game(uniSize, uniSize, rockCount, rockStyle, safe, soundOn, startDocked);
+const game = new Game(uniSize, uniSize, rockCount, rockStyle, safeMode, soundOn, startDocked);
 
 // Add event listener on clicks.
 // It takes a while for auto repeat to kick in. Also we don't know how fast it will be. So

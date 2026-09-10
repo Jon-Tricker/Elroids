@@ -5,6 +5,7 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
+import Game from '../../Game/game.js';
 import NonShipItem from '../nonShipItem.js';
 import PlayerShip from '../../Ships/playerShip.js';
 import Texture from '../../Game/Utils/texture.js';
@@ -77,7 +78,7 @@ class Station extends NonShipItem {
         this.setupMesh();
 
         if (undefined === json) {
-            if (!this.getGame().testMode) {
+            if (!Game.getGame().testMode) {
                 this.rotateX(Math.random() * Math.PI);
                 this.rotateZ(Math.random() * Math.PI);
             }
@@ -125,7 +126,7 @@ class Station extends NonShipItem {
 
         // While docked move mesh with station.
         // Switch to station coordinates.
-        // this.getGame().getScene().remove(that);
+        // Game.getGame().getScene().remove(that);
         this.add(that);
 
         // Rotate to face exit. Use station coordionates.
@@ -148,7 +149,7 @@ class Station extends NonShipItem {
 
         // It appears that, having been part of another group, 'this' needs to be added back to the scene. 
         // Otherwise camera cannot see it's mesh.
-        this.getGame().getScene().add(that);
+        Game.getGame().getScene().add(that);
 
         // Move to launch point.
         that.setLocation(this.getLaunchPoint());
@@ -426,15 +427,15 @@ class Station extends NonShipItem {
                 // Check speed.
                 if (Station.getMaxDockingSpeed() < Math.floor(ship.getSpeed())) {
                     if (ship instanceof PlayerShip) {
-                        this.getGame().displays.addMessage("Too fast! Max docking speed " + Station.getMaxDockingSpeed() + " m/s");
+                        Game.getGame().displays.addMessage("Too fast! Max docking speed " + Station.getMaxDockingSpeed() + " m/s");
                     }
                     return (false);
                 }
 
                 // Check legaility
                 if (ship instanceof PlayerShip) {  // Check legality
-                    if (!Reputation.getRepInSystem(this.getGame().player, this.getSystem()).getCanDock()) {
-                        this.getGame().displays.addMessage("Docking denided. Reputation too low.");
+                    if (!Reputation.getRepInSystem(Game.getGame().player, this.getSystem()).getCanDock()) {
+                        Game.getGame().displays.addMessage("Docking denided. Reputation too low.");
                         return (false);
                     }
                 }
@@ -457,7 +458,7 @@ class Station extends NonShipItem {
 
     animate() {
         // Spin
-        this.rotateX(ROTATE_RATE / this.getGame().getAnimateRate());
+        this.rotateX(ROTATE_RATE / Game.getGame().getAnimateRate());
 
         // Kill any momentum obtained.
         this.setSpeed(new THREE.Vector3());

@@ -6,6 +6,9 @@
 
 import NPShip from './nonPlayerShip.js';
 import MediumHull from '../Components/Hulls/mediumHull.js';
+import MediumEngine from '../Components/Engines/mediumEngine.js';
+import DumbMissileWeapon from '../Components/Weapons/dumbMissileWeapon.js';
+import MediumBay from '../Components/Bays/mediumBay.js';
 import { BasicAI } from './basicAI.js';
 
 class SmugglerAI extends BasicAI {
@@ -82,22 +85,30 @@ class SmugglerAI extends BasicAI {
 }
 
 const HP = 3;
+const INITIAL_CARGO_VALUE = 1000;
 
 class Smuggler extends NPShip {
     constructor(location, speed) {
         super(5, 10, 20, location, speed, undefined, HP);
-        this.ai = new SmugglerAI(this);
-    }
 
-    // Build/Rebuild ship components.
-    buildShip() {
-        // Create hull
-        // Will also create all other components, for that hull type, and add them to our components sets.
-        super.buildShip(MediumHull);
-    }  
+        this.buildShip();
+
+        this.ai = new SmugglerAI(this);
+
+        this.compSets.baySet.loadRandomCargo(Math.random() * INITIAL_CARGO_VALUE);
+    }   
     
-    getInitialCargoValue() {
-        return(200);
+    buildShip() { 
+        this.hull = new MediumHull(this.compSets.hullSet); 
+        this.hull.setSlots(this.compSets);
+        
+        // Do custom stuff for this hull
+        new MediumEngine(this.compSets.engineSet);
+        new DumbMissileWeapon(this.compSets.weaponSet);
+        new MediumBay(this.compSets.baySet);
+
+        this.recalc();
+
     }
 }
 

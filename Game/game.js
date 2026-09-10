@@ -20,7 +20,7 @@ import Utils from './Utils/utilities.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "11.3";
+const VERSION = "11.4";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -31,6 +31,8 @@ craterTexture.wrapT = THREE.RepeatWrapping;
 craterTexture.repeat.set(4, 4);
 
 class Game {
+    // Single game object for easy access.
+    static game;
 
     // The one and only Universe object
     universe;
@@ -81,10 +83,16 @@ class Game {
         ["police", null]
     ]);
 
-    constructor(uniSize, systemSize, maxRockCount, rockStyle, safe, soundOn, startDocked) {
+    constructor(uniSize, systemSize, maxRockCount, rockStyle, safeMode, soundOn, startDocked) {
 
-        this.setSafe(safe);
-        this.player = new Player(this);
+        // Set the static
+        Game.game = this;
+
+        this.player = new Player();
+
+        if ((safeMode != null) && (safeMode.toLowerCase() == "true")) {
+            this.safe = true;
+        }
 
         if ((soundOn != null) && (soundOn.toLowerCase() == "true")) {
             this.soundOn = true;
@@ -105,14 +113,14 @@ class Game {
         Rock.setRockStyle(rockStyle);
 
         // Create shopping list.
-        this.componentsList = new ComponentsList(this);
-        this.goodsList = new GoodsList(this);
+        this.componentsList = new ComponentsList();
+        this.goodsList = new GoodsList();
 
         // Create universe
-        this.universe = new Universe(this, uniSize, systemSize, maxRockCount);
+        this.universe = new Universe(uniSize, systemSize, maxRockCount);
 
         // Create the scene
-        this.scene = new MyScene(this, (0 == maxRockCount));
+        this.scene = new MyScene(0 == maxRockCount);
 
         // Now there is something to display it popuate the universe,
         this.universe.populate();
@@ -135,6 +143,10 @@ class Game {
 
         // First call of animation loop.
         this.loop();
+    }
+
+    static getGame() {
+        return(Game.game);
     }
 
     static getCraterTexture() {
@@ -351,6 +363,9 @@ class Game {
 
     setSafe(safe) {
         this.safe = safe;
+        if (!safe) {
+            this.universe.removeLabels();
+        }
     }
 
     animate(date) {

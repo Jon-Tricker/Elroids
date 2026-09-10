@@ -3,7 +3,7 @@
 // Copyright (C) Jon Tricker 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
+import Game from "../../Game/game.js";
 import ShipCompDisplay from "./shipCompDisplay.js";
 import Hud from "../../Ships/Components/Avionics/Huds/hud.js";
 import HudDisplay from "./Huds/hudDisplay.js";
@@ -51,8 +51,8 @@ class ComponentDisplays extends Set {
             this.clear();
 
             // Create new displays
-            this.add(new ShipCompDisplay(this.displays.game, this.ctx, this.defaultColour));
-            for (let set of this.displays.game.getShip().hull.compSets) {
+            this.add(new ShipCompDisplay(this.ctx, this.defaultColour));
+            for (let set of Game.game.getShip().compSets) {
                 for (let comp of set) {
                     if (comp.displayPanel) {
                         this.add(comp.getDisplay(this.ctx, this.defaultColour));

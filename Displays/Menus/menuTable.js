@@ -2,11 +2,10 @@
 //
 // For now columns widths are set by widest element.
 // For now right justified.
-import * as THREE from 'three';
 import MenuSystem from '../menuSystem.js';
 
 class MenuTable {
-    headers;
+    headers = new Array;    // Can be multipe rows of headers.
     rows;
     widths;
 
@@ -16,9 +15,58 @@ class MenuTable {
     }
 
     addHeadings(heads) {
-        this.headers = heads;
+
+        // Work out number of header rows and clo widths.
+        let maxRowCount = 0;
         for (let head of heads) {
-            this.widths.push(head.length + 1)
+            let rowCount = 0;
+            let maxWidth = 0;
+            let width = 0;
+            for (let i = 0; i <= head.length; i++) {
+                if ((i == head.length) || (head[i] == '\n')) {   
+                    // New line
+                    rowCount++;
+                    if (rowCount > maxRowCount) {
+                        maxRowCount = rowCount;
+                    }
+                    if (width > maxWidth) {
+                        maxWidth = width;
+                    }
+                    width = 0;
+                } else {
+                    width++;
+                }
+
+                if (width > maxWidth) {
+                    maxWidth = width;
+                }
+            }
+            this.widths.push(maxWidth + 1);
+        }
+
+        for (let i = 0; i < maxRowCount; i++) {
+            this.headers.push(new Array);
+        }
+
+        for (let head of heads) {
+            // Work out length of longest segment of header.
+            let segment = "";
+            let rowCount = 0;
+            for (let i = 0; i <= head.length; i++) {
+                if ((i == head.length) || (head[i] == '\n')) {
+                    // New line
+                    this.headers[rowCount].push(segment);
+                    segment = "";
+                    rowCount++; 
+                } else {
+                    segment += head[i];
+                }
+            }
+
+            // Blank remaining rows.
+            for (let row = rowCount; row < this.headers.length; row++) {
+                this.headers[row].push("");
+            }
         }
     }
 
@@ -38,13 +86,15 @@ class MenuTable {
 
         // Print headers
         if (undefined != this.headers) {
-            doc += "<tr>";
-            for (let i = 0; i < this.headers.length; i++) {
-                doc += "<th>";
-                doc += this.printElement(this.headers[i], this.widths[i]);
-                doc += "</th>"
+            for (let row of this.headers) {
+                doc += "<tr>";
+                for (let i = 0; i < row.length; i++) {
+                    doc += "<th>";
+                    doc += this.printElement(row[i], this.widths[i]);
+                    doc += "</th>"
+                }
+                doc += "</tr>";
             }
-            doc += "</tr>";
         }
 
         // Print rows
@@ -66,6 +116,7 @@ class MenuTable {
     printElement(ele, len) {
         let op = "";
         op += ele;
+
         if (undefined != len) {
             while (op.length < len) {
                 op += " ";

@@ -1,18 +1,18 @@
 // Goods purchase menu.
+import Game from '../../Game/game.js';
 import MenuTable from './menuTable.js';
-import BugError from '../../Game/bugError.js';
-import { ComponentsMenu } from './componentsMenu.js';
 
 let goodsPurchaseMenu = "\
 <BODY>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Goods Purchase Menu</P>\
-<script src=\"GoodsPurchaseMenu\" game=\"this.getGame()\"></script>\
+<script src=\"GoodsPurchaseMenu\" game=\"Game.getGame()\"></script>\
 </BODY>"
 
 class GoodsPurchaseMenu {
 
-    static printMenu(game) {
+    static printMenu() {
         let doc = "";
+        let game = Game.getGame();
 
         doc += "<P>"
 
@@ -57,21 +57,20 @@ class GoodsPurchaseMenu {
     }
 
     static onDetailsClick(menuSystem, index) {
-        let game = menuSystem.getGame();
-        let goods = GoodsPurchaseMenu.getGoodsForIndex(game, index);
+        let goods = GoodsPurchaseMenu.getGoodsForIndex(index);
         menuSystem.pushScript(GoodsDetailsMenu, goods);
     }
 
     static onBuyClick(menuSystem, index, number) {
-        let game = menuSystem.getGame();
-        let goods = GoodsPurchaseMenu.getGoodsForIndex(game, index);
+        let game = Game.getGame();
+        let goods = GoodsPurchaseMenu.getGoodsForIndex(index);
         let ship = game.getShip();
 
         goods.buy(ship, number);
     }
 
-    static getGoodsForIndex(game, index) {
-        let goods = game.goodsList.get(index);
+    static getGoodsForIndex(index) {
+        let goods = Game.getGame().goodsList.get(index);
         return(goods);
     }
 }

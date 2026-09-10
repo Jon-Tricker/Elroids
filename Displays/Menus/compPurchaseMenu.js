@@ -1,17 +1,17 @@
 // Component purchase menu.
+import Game from '../../Game/game.js';
 import MenuTable from './menuTable.js';
-import BugError from '../../Game/bugError.js';
-import { ComponentsMenu } from './componentsMenu.js';
 
 let compPurchaseMenu = "\
 <BODY>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Components Purchase Menu</P>\
-<script src=\"CompPurchaseMenu\" game=\"this.getGame()\"></script>\
+<script src=\"CompPurchaseMenu\" game=\"Game.getGame()\"></script>\
 </BODY>"
 
 class CompPurchaseMenu {
 
-    static printMenu(game) {
+    static printMenu() {
+        let game = Game.getGame();
         let sets = game.componentsList;
         let doc = "";
 
@@ -49,10 +49,13 @@ class CompPurchaseMenu {
                         if (set != sets.hullSet) {
                             vals.push("<button type=\"button\" onclick=\"CompPurchaseMenu.onBuyClick(this, " + setIndex + ", " + compIndex + ")\">" + comp.getValueInSystem(game.universe.system) + "</button>");
                             vals.push("<button type=\"button\" onclick=\"CompPurchaseMenu.onMountClick(this, " + setIndex + ", " + compIndex + ")\">" + comp.getValueInSystem(game.universe.system) + "</button>");
+                            tab.addRow(vals);
                         } else {
-                            vals.push("<button type=\"button\" onclick=\"CompPurchaseMenu.onUpgradeClick(this," + setIndex + ", " + compIndex + " )\">" + comp.getUpgradeCost(this.getShip()) + "</button>");
+                            if (comp.getName() != this.getShip().getCompSets().hullSet.get(0).getName()) {
+                                vals.push("<button type=\"button\" onclick=\"CompPurchaseMenu.onUpgradeClick(this," + setIndex + ", " + compIndex + " )\">" + comp.getUpgradeCost(this.getShip()) + "</button>");
+                                tab.addRow(vals);
+                            }
                         }
-                        tab.addRow(vals);
                     }
                     compIndex++;
                 }
@@ -69,39 +72,39 @@ class CompPurchaseMenu {
     }
 
     static onDetailsClick(menuSystem, setIndex, compIndex) {
-        let game = menuSystem.getGame();
-        let comp = CompPurchaseMenu.getCompForIndex(game, setIndex, compIndex);
+        let comp = CompPurchaseMenu.getCompForIndex(setIndex, compIndex);
         menuSystem.pushScript(ComponentDetailsMenu, comp);
     }
 
     static onBuyClick(menuSystem, setIndex, compIndex) {
-        let game = menuSystem.getGame();
-        let comp = CompPurchaseMenu.getCompForIndex(game, setIndex, compIndex);
+        let game = Game.getGame();
+        let comp = CompPurchaseMenu.getCompForIndex(setIndex, compIndex);
         let ship = game.getShip();
 
         comp.buy(ship);
     }
 
     static onMountClick(menuSystem, setIndex, compIndex) {
-        let game = menuSystem.getGame();
-        let comp = CompPurchaseMenu.getCompForIndex(game, setIndex, compIndex);
+        let game = Game.getGame();
+        let comp = CompPurchaseMenu.getCompForIndex(setIndex, compIndex);
         let ship = game.getShip();
 
         comp.mount(ship, true);
     }
 
     static onUpgradeClick(menuSystem, setIndex, compIndex) {
-        let game = menuSystem.getGame();
-        let comp = CompPurchaseMenu.getCompForIndex(game, setIndex, compIndex);
+        let game = Game.getGame();
+        let comp = CompPurchaseMenu.getCompForIndex(setIndex, compIndex);
         let ship = game.getShip();
 
-        comp.upgrade(ship);
+        ship.upgradeHull(comp);
     }
 
-    static getCompForIndex(game, setIndex, compIndex) {
+    static getCompForIndex(setIndex, compIndex) {
+        let game = Game.getGame();
         let set = game.componentsList.get(setIndex);
         let comp = set.get(compIndex);
-        return(comp);
+        return (comp);
     }
 }
 

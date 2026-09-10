@@ -5,6 +5,7 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
+import Game from '../Game/game.js';
 import NonShipItem2 from '../GameItems/nonShipItem2.js';
 import PlayerShip from '../Ships/playerShip.js';
 import Explosion from '../GameItems/explosion.js';
@@ -35,7 +36,7 @@ class GoodsCrate extends NonShipItem2 {
 
     this.contents = contents;
 
-    this.expiryTime = this.getUniverse().getTime() + TTL;
+    this.expiryTime = Game.getGame().getUniverse().getTime() + TTL;
 
     this.activateIfRequired();
   }

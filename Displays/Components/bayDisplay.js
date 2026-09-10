@@ -6,8 +6,8 @@ class BayDisplay extends ComponentDisplay {
 
     cargoPanel;
 
-    constructor(game, ctx, defaultColour, comp) {
-        super(game, ctx, defaultColour, comp);
+    constructor(ctx, defaultColour, comp) {
+        super(ctx, defaultColour, comp);
 
         this.cargoPanel = new BarPanel(ctx, defaultColour, false, "Capacity", "(t)", this.comp.capacity , true);
         this.add(this.cargoPanel);

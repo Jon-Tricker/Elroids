@@ -5,8 +5,11 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
+import Game from '../Game/game.js';
 import BugError from "../Game/bugError.js";
 import Utils from '../Game/Utils/utilities.js';
+import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
 
 const COLOUR = "#FFFFFF";
 
@@ -65,6 +68,10 @@ class Item extends THREE.Group {
     // Graphics mesh
     mesh = new THREE.Group();
 
+    // Textual label (if any).
+    label;
+    labelFixed;         // If true label can't be deleted/modified.
+
     // Construct with optional mass
     constructor(location, speed, size, mass, hitPoints, owner, immobile) {
         super();
@@ -104,8 +111,8 @@ class Item extends THREE.Group {
         location.system.addItem(this);
 
         // If this system is active add item to the graphics scene.
-        if (location.system == this.getGame().universe.system) {
-            this.getGame().getScene().add(this);
+        if (location.system == Game.getGame().universe.system) {
+            Game.getGame().getScene().add(this);
         }
 
         // Deal with situation where Item created inside another Item.
@@ -113,6 +120,10 @@ class Item extends THREE.Group {
             if (this.intersects(that)) {
                 this.separateFrom(that);
             }
+        }
+
+        if (Game.getGame().isSafe()) {
+            this.setLabel(this.getName());
         }
     }
 
@@ -147,7 +158,7 @@ class Item extends THREE.Group {
     // By default just add/remove from scene.
     // Override in Items that support (in)activate when not in use. 
     setActive(state) {
-        let scene = this.getGame().getScene();
+        let scene = Game.getGame().getScene();
         if (state) {
             scene.add(this);
         } else {
@@ -188,16 +199,8 @@ class Item extends THREE.Group {
         this.location.setSystem(newSystem);
     }
 
-    getUniverse() {
-        return (this.getSystem().universe);
-    }
-
-    getGame() {
-        return (this.getSystem().getGame());
-    }
-
     getShip() {
-        return (this.getUniverse().ship);
+        return (Game.getGame().getUniverse().ship);
     }
 
     getSystem() {
@@ -221,7 +224,7 @@ class Item extends THREE.Group {
                 throw (new BugError("Something too fast " + speed.length()));
             }
             this.speed = speed.clone();
-            this.speedFrame = speed.clone().divideScalar(this.getGame().getAnimateRate())
+            this.speedFrame = speed.clone().divideScalar(Game.getGame().getAnimateRate())
         }
     }
 
@@ -241,8 +244,8 @@ class Item extends THREE.Group {
         this.hitPoints = 0;
         this.location.system.removeItem(this);
         // If this system is active remove item from the graphics scene.
-        if (this.location.system == this.getGame().universe.system) {
-            this.getGame().getScene().remove(this);
+        if (this.location.system == Game.getGame().universe.system) {
+            Game.getGame().getScene().remove(this);
         }
     }
 
@@ -256,7 +259,7 @@ class Item extends THREE.Group {
         direction.normalize();
 
         let newSpeed = this.speed.clone();
-        newSpeed.addScaledVector(direction, accRate / this.getGame().getAnimateRate());
+        newSpeed.addScaledVector(direction, accRate / Game.getGame().getAnimateRate());
 
         if (newSpeed.length() > maxspeed) {
             newSpeed = newSpeed.normalize().multiplyScalar(maxspeed);
@@ -394,9 +397,9 @@ class Item extends THREE.Group {
         if (that.immobile) {
             thatMove = new THREE.Vector3();
         } else {
-            thisMove.divideScalar(2);  
+            thisMove.divideScalar(2);
         }
-        
+
         if (this.immobile) {
             thisMove = new THREE.Vector3();
         } else {
@@ -405,8 +408,8 @@ class Item extends THREE.Group {
 
         let newLoc = this.getLocation().clone();
         newLoc.add(thisMove);
-        this.setLocation(newLoc); 
-        
+        this.setLocation(newLoc);
+
         newLoc = that.getLocation().clone();
         newLoc.add(thatMove);
         that.setLocation(newLoc);
@@ -508,7 +511,7 @@ class Item extends THREE.Group {
     // Move mesh in graphics space. Will be relative to ship position.
     moveMesh() {
 
-        let camera = this.getGame().getScene().getCamera();
+        let camera = Game.getGame().getScene().getCamera();
         if (camera.getIsFixedLocation()) {
             // Just plot it at it's location
             let loc = this.getLocation();
@@ -634,11 +637,11 @@ class Item extends THREE.Group {
     // 3D location should be from the Item. However I could not get positional listeners to work.
     // So for now simple 'mono' with volume reduced by distance.
     playSound(name, volume, loop) {
-        if (!this.getGame().soundOn) {
+        if (!Game.getGame().soundOn) {
             return (false);
         }
 
-        let list = this.getGame().getListener();
+        let list = Game.getGame().getListener();
         if ((undefined == list)) {
             // Dont have a listener yet ... give up. without loading
             return (false);
@@ -649,7 +652,7 @@ class Item extends THREE.Group {
         let sound = this.sounds.get(name);
         if (undefined == sound) {
             // Need to create/attach PositionalAudio for this Item.
-            let buffer = this.getGame().getSounds().get(name);
+            let buffer = Game.getGame().getSounds().get(name);
             if (null == buffer) {
                 // Buffer not yet loaded into Univese
                 return (false);
@@ -746,6 +749,43 @@ class Item extends THREE.Group {
         let angle = Math.atan2(v.y, v.z);
 
         return (angle);
+    }
+
+    setLabel(label, fixed) {
+
+        if ((undefined != this.label) && this.labelFIxed) {
+            new BugError("Fixed labels can't be set.")
+        }
+
+        this.labelFixed = fixed;
+
+        // Can only have one label.
+        this.removeLabel();
+
+        let labelDiv = document.createElement('div');
+        labelDiv.className = 'label';
+        labelDiv.textContent = label;
+        // labelDiv.style.backgroundColor = '#FFFFFF';
+        labelDiv.style.color = 'red';
+        // labelDiv.font-family = 'sans-serif';
+        // labelDiv.padding = '2px';
+
+        this.label = new CSS2DObject(labelDiv);
+        this.label.position.set(0, 0, 0);
+        this.add(this.label);
+        this.label.layers.set(0);
+    }
+
+    removeLabel() {
+        if (this.labelFIxed) {
+            // Fixed labels can't be removed.
+            return;
+        }
+
+        if (undefined != this.label) {
+            this.remove(this.label)
+            this.label = undefined;
+        }
     }
 }
 

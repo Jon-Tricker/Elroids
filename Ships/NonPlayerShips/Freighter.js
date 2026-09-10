@@ -6,28 +6,44 @@
 
 import NPShip from './nonPlayerShip.js';
 import LargeHull from '../Components/Hulls/largeHull.js';
-import {BasicAI} from './basicAI.js';
+import BasicEngine from '../Components/Engines/basicEngine.js';
+import DumbMissileWeapon from '../Components/Weapons/dumbMissileWeapon.js';
+import MediumBay from '../Components/Bays/mediumBay.js';
+import { BasicAI } from './basicAI.js';
 
 class FreighterAI extends BasicAI {
 }
 
 const HP = 3;
+const INITIAL_CARGO_VALUE = 2000;
 
 class Freighter extends NPShip {
     constructor(location, speed) {
         super(5, 10, 20, location, speed, undefined, HP);
+
+        this.buildShip();
+
         this.ai = new FreighterAI(this);
+
+        this.compSets.baySet.loadRandomCargo(Math.random() * INITIAL_CARGO_VALUE);
     }
-    
-    // Build/Rebuild ship components.
+
     buildShip() {
-        // Create hull
-        // Will also create all other components, for that hull type, and add them to our components sets.
-        super.buildShip(LargeHull);
-    }  
-    
-    getInitialCargoValue() {
-        return(500);
+        this.hull = new LargeHull(this.compSets.hullSet);
+        this.hull.setSlots(this.compSets);
+
+        // Do custom stuff for this hull
+        new BasicEngine(this.compSets.engineSet);
+        new BasicEngine(this.compSets.engineSet);
+        new DumbMissileWeapon(this.compSets.weaponSet);
+        new MediumBay(this.compSets.baySet);
+        //new BasicRadar(this.compSets.avionicsSet);
+        //new BasicCompass(this.compSets.avionicsSet);
+        //new BasicHud(this.compSets.avionicsSet);
+        // new RangeHud(this.compSets.avionicsSet);
+        // new MiningHud(this.compSets.avionicsSet);
+
+        this.recalc();
     }
 }
 

@@ -15,7 +15,7 @@ class RangeHud extends Hud {
     static type = new ComponentType("RangeHud", 5, 1, 2000, 1);
 
     constructor(ship) {
-        super(RangeHud.type, ship);
+        super(ship);
     }
 
     getDescription() {
@@ -25,7 +25,7 @@ class RangeHud extends Hud {
     // Return the HUD display panel for this component.
     // This is in addition to the Component display panel that all components have.
     getHudDisplay(ctx, defaultColour) {
-        return (new RangeHudDisplay(this.getShip().game, ctx, defaultColour, this));
+        return (new RangeHudDisplay(ctx, defaultColour, this));
     }
 }
 

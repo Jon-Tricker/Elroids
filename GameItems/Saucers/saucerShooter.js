@@ -1,9 +1,9 @@
 // Random shooting saucer.
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023 - 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
+import Game from '../../Game/game.js';
 import DumbMissile from '../Projectiles/dumbMissile.js';
 import Saucer from './saucer.js';
 import Utils from '../../Game/Utils/utilities.js';
@@ -60,7 +60,7 @@ class SaucerShooter extends Saucer {
         let delta = targetSpeed.clone();
         delta.sub(this.speed);
 
-        let ar = this.getGame().getAnimateRate();
+        let ar = Game.getGame().getAnimateRate();
         if (delta.length() > MAX_ACC/ar) {
             delta.normalize;
             delta.multiplyScalar(MAX_ACC/ar);
@@ -79,12 +79,12 @@ class SaucerShooter extends Saucer {
 
     // Do shooting logic
     shoot() {
-        if (!this.getGame().isSafe()) {
+        if (!Game.getGame().isSafe()) {
             if (this.shootDue++ >= SHOOT_FREQUENCY) {
                 this.shootDue = 0;
 
                 // Only fire if vaguley close enough.
-                let game = this.getGame();
+                let game = Game.getGame();
                 let range = game.getShip().location.getRelative(this.location);
                 if ((STANDOFF_DISTANCE * 2) > range.length()) {
                     let direction = Utils.createRandomVector(2);

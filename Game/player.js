@@ -3,11 +3,11 @@
 // Copyright (C) Jon Tricker 2023, 24, 25, 26.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
+import Game from "./game.js";
 import GameError from "./gameError.js";
 import Reputation from "./reputation.js";
 
 class Player {
-    game;
     credits;
 
     // Reputation (0 - 1 but displayed as 0.xx - 10).
@@ -15,8 +15,7 @@ class Player {
 
     lastAnimate = 0;
 
-    constructor(game, credits, reputation) {
-        this.game = game;
+    constructor(credits, reputation) {
         if (undefined === credits) {
             this.credits = 0;
             this.reputation = 0.40;
@@ -33,12 +32,12 @@ class Player {
         }
     }
 
-    static fromJSON(json, game) {
-        return (new Player(game, json.credits, json.reputation));
+    static fromJSON(json) {
+        return (new Player(json.credits, json.reputation));
     }
 
     animate() {
-        let time = this.game.universe.getTime();
+        let time = Game.getGame().universe.getTime();
 
         // Gradually increase rep.
         this.incReputation(false, 0.0001 * (time - this.lastAnimate) / 1000);
@@ -70,10 +69,8 @@ class Player {
         }
 
         this.reputation += inc;
-        this.game.universe.system.recalcPoliceHostility();
+        Game.getGame().universe.system.recalcPoliceHostility();
         return (true);
-
-        return (false);
     }
 
     decReputation(inc) {
@@ -85,7 +82,7 @@ class Player {
 
         if (this.reputation > 0) {
             this.reputation -= inc;
-            this.game.universe.system.recalcPoliceHostility();
+            Game.getGame().universe.system.recalcPoliceHostility();
             return (true);
         }
         return (false);
@@ -102,13 +99,12 @@ class Player {
         // Check there is enough
         if (-credits > this.credits) {
             throw (new GameError("Not enough credits."));
-            return (false);
         }
 
         this.credits += credits;
 
         // If we can make a noise.
-        let display = this.game.displays;
+        let display = Game.getGame().displays;
         if (undefined != display) {
             if (0 < credits) {
                 display.terminal.playSound('coin');

@@ -1,11 +1,10 @@
 // Display for an individual ship component
-import * as THREE from 'three';
+import Game from '../../Game/game.js';
 import DarkPanel from '../Utils/darkPanel.js';
 import TextPanel from '../Utils/textPanel.js';
 import BarPanel from '../Utils/barPanel.js';
 
 class ComponentDisplay extends DarkPanel {
-    game;
 
     // Our component.
     comp;
@@ -13,10 +12,9 @@ class ComponentDisplay extends DarkPanel {
 
     statusPanel;
 
-    constructor(game, ctx, defaultColour, comp) {
+    constructor(ctx, defaultColour, comp) {
         super(ctx, defaultColour, true);
-        this.game = game;
-        this.ship = game.ship;
+        this.ship = Game.getGame().getShip();
         this.comp = comp;
 
         let title = new TextPanel(ctx, defaultColour, false);

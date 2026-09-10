@@ -21,28 +21,16 @@ class MediumHull extends Hull {
     static type =  new ComponentType("GP2", 6, 50, 5000, 4);
 
     constructor(set, hullColour) {
-        super(MediumHull.type, set, 250, hullColour);
-        super.buildSets(set, 1, 2, 1, 2, 4);  
+        super(set, 250, hullColour);
+    }    
+    
+    // Customise components sets.
+    setSlots(sets) {
+        super.setSlots(sets, 1, 2, 1, 2, 4);
     }
 
     getDescription() {
         return (super.getDescription() + "\n\n'" + this.getName() + "' is " + DESCRIPTION.toLowerCase());
-    }
-
-    buildShip(ship) {
-        // Do stuff common for all hulls.
-        super.buildShip(ship);
-
-        // Do custom stuff for this hull
-        new BasicEngine(this.compSets.engineSet);
-        new BasicEngine(this.compSets.engineSet);
-        new DumbMissileWeapon(this.compSets.weaponSet);
-        new BasicBay(this.compSets.baySet);
-        new BasicRadar(this.compSets.avionicsSet);
-        new BasicCompass(this.compSets.avionicsSet);
-        new BasicHud(this.compSets.avionicsSet);
-
-        this.recalc();
     }
 
     getMesh() {

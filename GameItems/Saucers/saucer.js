@@ -5,6 +5,7 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
+import Game from '../../Game/game.js';
 import NonShipItem from '../nonShipItem.js';
 import Mineral from '../mineral.js';
 import { MineralTypes } from '../minerals.js';
@@ -48,8 +49,8 @@ class Saucer extends NonShipItem {
         this.setupMesh();
 
         let ttl = this.getTtl();
-        if ((0 != ttl) && (!this.getGame().isSafe())) {
-            this.destructTime = this.getUniverse().getTime() + Math.floor(ttl / 2 + Math.random() * ttl / 2);
+        if ((0 != ttl) && (!Game.getGame().isSafe())) {
+            this.destructTime = Game.getGame().getUniverse().getTime() + Math.floor(ttl / 2 + Math.random() * ttl / 2);
         }
 
         this.location.system.saucerCount++;
@@ -141,11 +142,11 @@ class Saucer extends NonShipItem {
             if (destroyed) {
                 // For now only make loot if destroyed by ship.
                 this.makeLoot();
-                this.getGame().getPlayer().incReputation(false, 0.01);
+                Game.getGame().getPlayer().incReputation(false, 0.01);
             }
 
             // Now it's war!
-            this.getGame().setSafe(false);
+            Game.getGame().setSafe(false);
         }
     }
 
@@ -162,7 +163,7 @@ class Saucer extends NonShipItem {
 
             case 1:
                 // Make goods.
-                let good = new (this.getGame().goodsList.getRandomElement()).constructor();
+                let good = new (Game.getGame().goodsList.getRandomElement()).constructor();
                 good.number = Math.ceil(value / good.type.cost);
                 let crate = good.makeCrate(thisLoc, this.speed);
                 break;

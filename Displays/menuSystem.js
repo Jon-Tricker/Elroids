@@ -6,6 +6,7 @@
 
 // Since they are dynamically loaded most of the imports, below, are needed (even though greyed out).
 import * as THREE from 'three';
+import Game from '../Game/game.js';
 import Terminal from './terminal.js';
 import helpMenu from './Menus/helpMenu.js';
 import topMenu from './Menus/topMenu.js';
@@ -100,10 +101,6 @@ class MenuSystem {
 
     getShip() {
         return (this.display.getShip());
-    }
-
-    getGame() {
-        return (this.display.getGame());
     }
 
     pushMenu(menu) {
@@ -290,7 +287,7 @@ class MenuSystem {
     }
 
     defaultExitClick() {
-        this.display.game.togglePaused();
+        Game.getGame().togglePaused();
     }
 
     defaultBackClick() {
@@ -405,7 +402,13 @@ class MenuSystem {
             case "th":
             case "TH":
                 // Headings define col widths.
-                tableData.colWidths.push(op.width);
+                if (tableData.colWidths.length <= tableData.colNumber) {
+                    tableData.colWidths.push(op.width);
+                } else {
+                    if (op.width > tableData.colWidths[tableData.colNumber]) {
+                        tableData.colWidths[tableData.colNumber] = op.width;
+                    }
+                }
                 tableData.colNumber++;
                 break;
 

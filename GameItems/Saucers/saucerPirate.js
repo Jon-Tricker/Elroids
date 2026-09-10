@@ -6,6 +6,7 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
+import Game from '../../Game/game.js';
 import Saucer from './saucer.js';
 import Mineral from '../mineral.js';
 import DumbMissile from '../Projectiles/dumbMissile.js'
@@ -48,7 +49,7 @@ class SaucerPirate extends Saucer {
     animate(date) {
         // Decay cargo
         if (0 < this.cargoMass) {
-            this.cargoMass -= DECAY_RATE / this.getGame().getAnimateRate();
+            this.cargoMass -= DECAY_RATE / Game.getGame().getAnimateRate();
         }
 
         super.animate(date);
@@ -60,7 +61,7 @@ class SaucerPirate extends Saucer {
         if (0 < this.cargoMass) {
             // Run away
             if (null == this.farAway) {
-                let game = this.getGame();
+                let game = Game.getGame();
                 this.farAway = game.getShip().location.getFarAway();
             }
             targetLoc = this.farAway;
@@ -89,7 +90,7 @@ class SaucerPirate extends Saucer {
     }
 
     createLoiterLocation() {
-        this.targetLocation = this.getGame().getShip().getLocation().clone();
+        this.targetLocation = Game.getGame().getShip().getLocation().clone();
 
         let offset = Utils.createRandomVector(STANDOFF_DISTANCE)
         this.targetLocation.add(offset);
@@ -101,11 +102,11 @@ class SaucerPirate extends Saucer {
     shoot() {
         // Only shoot if running
         if (0 != this.cargoMass) {
-            if (!this.getGame().isSafe()) {
+            if (!Game.getGame().isSafe()) {
                 if (this.shootDue++ >= SHOOT_FREQUENCY) {
 
                     // Only fire if vaguley close enough.
-                    let range = this.location.getRelative(this.getGame().getShip().location);
+                    let range = this.location.getRelative(Game.getGame().getShip().location);
 
                     if (MAX_RANGE > range.length()) {
                         // range.normalize();

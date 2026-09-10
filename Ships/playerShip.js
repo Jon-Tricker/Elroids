@@ -6,14 +6,20 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
+import Game from '../Game/game.js';
 import Ship from './ship.js';
 import MyCamera from '../Game/Scenery/myCamera.js';
 import SmallHull from './Components/Hulls/smallHull.js';
 import Location from '../Game/Utils/location.js';
+import BasicEngine from './Components/Engines/basicEngine.js';
+import DumbMissileWeapon from './Components/Weapons/dumbMissileWeapon.js';
+import BasicBay from './Components/Bays/basicBay.js';
+import BasicRadar from './Components/Avionics/basicRadar.js';
+import BasicCompass from './Components/Avionics/basicCompass.js';
+import BasicHud from './Components/Avionics/Huds/basicHud.js';
+import ComponentSets from './Components/componentSets.js';
 
 class PlayerShip extends Ship {
-    game;
-
     // Ship cameras are creted once and permanently attached to ship. 
     // Will be added to renderer when needed.
     pilotCamera;
@@ -21,37 +27,40 @@ class PlayerShip extends Ship {
 
     originalPosition;
 
-    constructor(game, height, width, length, location) {
+    constructor(height, width, length, location) {
         super(height, width, length, location, undefined);
 
-        this.game = game;
-
         this.originalPosition = location.clone();
+
+        this.buildShip();
 
         this.createCameras();
     }
 
-    toJSON() {
-        let json = super.toJSON();
+    buildShip() {
+        this.hull = new SmallHull(this.compSets.hullSet); 
+        this.hull.setSlots(this.compSets);
+        
+        new BasicEngine(this.compSets.engineSet);
+        new DumbMissileWeapon(this.compSets.weaponSet);
+        new BasicBay(this.compSets.baySet);
+        new BasicRadar(this.compSets.avionicsSet);
+        new BasicCompass(this.compSets.avionicsSet);
+        new BasicHud(this.compSets.avionicsSet);
+        // new RangeHud(this.compSets.avionicsSet);
+        // new MiningHud(this.compSets.avionicsSet);
 
-        return (json);
-    }
+        this.recalc();
+    }    
 
-    static fromJSON(game, json, system) {
+    static fromJSON(json, system) {
         // Make a default ship.
         // Default components will be made. We will replace them latter. 
-        let newShip = new PlayerShip(game, json.height, json.width, json.length, Location.fromJSON(json.location, system));
+        let newShip = new PlayerShip(json.height, json.width, json.length, Location.fromJSON(json.location, system));
 
         super.fromJSON(json, system, newShip);
 
         return (newShip);
-    }
-
-    // Build/Rebuild ship components.
-    buildShip() {
-        // Create hull
-        // Will also create all other components, for that hull type, and add them to our components sets.
-        super.buildShip(SmallHull);
     }
 
     // Work round for circular dependency with Item class.
@@ -154,23 +163,24 @@ class PlayerShip extends Ship {
     // Ships get re-spawned so do not destruct.
     takeDamage(hits, that) {
         let msg = "Ship damaged ";
+        let game = Game.getGame();
 
         let name = that.getName();
         if (0 < name.length) {
             msg += "by " + name.toLowerCase();
         }
         msg += "!"
-        this.game.displays.addMessage(msg);
+        game.displays.addMessage(msg);
 
         // Dont call 'super'. We want to re-use the same ship. So don't want it to destruct.
-        this.hull.compSets.takeDamage(hits);
+        this.compSets.takeDamage(hits);
 
-        if (this.hull.compSets.hullSet.getAverageStatus() <= 0) {
+        if (this.compSets.hullSet.getAverageStatus() <= 0) {
             this.playSound('scream');
             this.setEngineSound(false);
 
             // new Explosion(this.size, this);
-            this.game.shipDestroyed(that);
+            game.shipDestroyed(that);
         } else {
             this.playSound('clang');
         }
@@ -188,8 +198,9 @@ class PlayerShip extends Ship {
     }
 
     // Return to original state
+    // NOT TESTED.
     respawn() {
-        // Repair damaged components.
+        this.compSets = new ComponentSets(this);
         this.buildShip();
 
         // Return to start location.
@@ -200,7 +211,7 @@ class PlayerShip extends Ship {
 
     // Get termnal (if active)
     getTerminal() {
-        return (this.game.displays.terminal);
+        return (Game.getGame().displays.terminal);
     }
 
     // Pick up a mineral.
@@ -209,7 +220,7 @@ class PlayerShip extends Ship {
         let res = super.mineralPickup(mineral)
         if (res) {
             let mass = Math.ceil(mineral.mass);
-            this.game.displays.addMessage("Loaded " + mineral.type.name.toLowerCase() + " " + mass + "(t)");
+            Game.getGame().displays.addMessage("Loaded " + mineral.type.name.toLowerCase() + " " + mass + "(t)");
             this.playSound('thud');
         }
         return (res);
@@ -220,18 +231,18 @@ class PlayerShip extends Ship {
     cratePickup(crate) {
         let res = super.cratePickup(crate);
         if (res) {
-            this.game.displays.addMessage("Loaded " + crate.contents.number + " X " + crate.contents.getName().toLowerCase());
+            Game.getGame().displays.addMessage("Loaded " + crate.contents.number + " X " + crate.contents.getName().toLowerCase());
             this.playSound('thud');
         }
         return (res);
     }
 
     getPlayer() {
-        return (this.game.player);
+        return (Game.getGame().player);
     }
 
     getCredits() {
-        return (this.game.player.getCredits());
+        return (Game.getGame().player.getCredits());
     }
 
     dock(station) {
@@ -240,18 +251,20 @@ class PlayerShip extends Ship {
         }
 
         this.getTerminal().playSound("poweroff", 0.5);
-        this.game.displays.terminalEnable(true);
+        Game.getGame().displays.terminalEnable(true);
 
         return (true);
     }
 
     undock() {
+        let game = Game.getGame();
+
         this.getTerminal().playSound("poweron", 0.5);
-        if (this.game.paused) {
-            this.game.togglePaused();
+        if (game.paused) {
+            game.togglePaused();
         }
 
-        this.game.displays.terminalEnable(false);
+        game.displays.terminalEnable(false);
 
         super.undock();
     }

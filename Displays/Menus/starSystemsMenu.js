@@ -1,4 +1,5 @@
 // Star systems menu.
+import Game from '../../Game/game.js';
 import MenuTable from './menuTable.js';
 import { MineralType, MineralTypes } from "../../GameItems/minerals.js";
 import Reputation from '../../Game/reputation.js';
@@ -7,12 +8,13 @@ let starSystemsMenu = "\
 <BODY>\
 <P ALIGN=\"CENTER\" HIGHLIGHT=\"true\">Guide to the Galaxy</P>\
 <P>Select system to show details:</P>\
-<script src=\"StarSystemsMenu\" game=\"this.getGame()\"></script>\
+<script src=\"StarSystemsMenu\" game=\"Game.getGame()\"></script>\
 </BODY>"
 
 class StarSystemsMenu {
 
-    static printMenu(game) {
+    static printMenu() {
+        let game = Game.getGame();
         let systems = game.universe.systems;
         let doc = "";
 
@@ -50,7 +52,7 @@ class StarSystemsMenu {
     }
 
     static onDetailsClick(menuSystem, index) {
-        let game = menuSystem.getGame();
+        let game = Game.getGame();
         let system = game.universe.systems.get(index);
 
         StarSystemsMenu.displayDetails(menuSystem, system);

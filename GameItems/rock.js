@@ -3,7 +3,6 @@
 // Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
 import * as THREE from 'three';
 import NonShipItem2 from './nonShipItem2.js';
 import Game from '../Game/game.js';
@@ -35,7 +34,6 @@ class Rock extends NonShipItem2 {
   rockSize;
   originalHP;
   composition;
-  game;
 
   static rockStyle = Rock.ROCK_STYLE_SPHERE;
 
@@ -60,6 +58,10 @@ class Rock extends NonShipItem2 {
     this.activateIfRequired();
 
     this.location.system.rockCount++;
+  }
+
+  setLabel(label) {
+    // Don't lable rocks. Too many of them.
   }
 
   destruct() {

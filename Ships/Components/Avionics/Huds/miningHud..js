@@ -15,7 +15,7 @@ class MiningHud extends Hud {
     static type = new ComponentType("MiningHud", 6, 1, 4000, 1);
 
     constructor(ship) {
-        super(MiningHud.type, ship);
+        super(ship);
     }
 
     getDescription() {
@@ -25,7 +25,7 @@ class MiningHud extends Hud {
     // Return the HUD display panel for this component.
     // This is in addition to the Component display panel that all components have.
     getHudDisplay(ctx, defaultColour) {
-        return (new MiningHudDisplay(this.getShip().game, ctx, defaultColour, this));
+        return (new MiningHudDisplay(ctx, defaultColour, this));
     }
 }
 

@@ -12,7 +12,7 @@ class LaserBeamWeapon extends BeamWeapon {
     static type = new ComponentType("Laser", 4, 3, 5000, 2,);
 
     constructor(set) {
-        super(LaserBeamWeapon.type, set, FIRE_RATE);
+        super(set, FIRE_RATE);
     }
 
     getDescription() {

@@ -3,7 +3,7 @@
 // Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
+import Game from '../../../Game/game.js';
 import HudDisplay from './hudDisplay.js';
 import Projectile from '../../../GameItems/Projectiles/projectile.js';
 import TextPanel from '../../Utils/textPanel.js';
@@ -12,8 +12,8 @@ class RangeHudDisplay extends HudDisplay {
 
     txt;
 
-    constructor(game, ctx, defaultColour, comp) {
-        super(game, ctx, defaultColour, comp);
+    constructor(ctx, defaultColour, comp) {
+        super(ctx, defaultColour, comp);
 
         this.txt = new TextPanel(ctx, defaultColour, false);
         this.add(this.txt);
@@ -25,7 +25,7 @@ class RangeHudDisplay extends HudDisplay {
         }
 
         // Scaling is relative to parent display.
-        let parent = this.game.displays;
+        let parent = Game.getGame().displays;
         if (parent.hudIsOn) {
             let list = this.ship.getAheadList();
 

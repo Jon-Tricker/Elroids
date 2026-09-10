@@ -12,8 +12,8 @@ const DESCRIPTION = "Head Up Displays (HUds) are on screen 'sights' for weapons 
 
 class Hud extends ComponentAct {
 
-    constructor(type, set) {
-        super(type, set);
+    constructor(set) {
+        super(set);
         if (undefined != set) {
             set.recalc();
         }
@@ -35,7 +35,7 @@ class Hud extends ComponentAct {
     }
 
     getTargetSet(ship) {
-        return (ship.hull.compSets.avionicsSet);
+        return (ship.compSets.avionicsSet);
     }
 }
 

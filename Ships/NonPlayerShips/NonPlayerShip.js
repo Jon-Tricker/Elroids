@@ -4,7 +4,7 @@
 // Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
+import Game from '../../Game/game.js';
 import Ship from '../ship.js';
 
 class NPShip extends Ship {
@@ -14,16 +14,10 @@ class NPShip extends Ship {
 
     constructor(height, width, length, location, speed, mass, hitPoints) {
         super(height, width, length, location, speed, mass, hitPoints);
-
-        this.hull.compSets.baySet.loadRandomCargo(this.getInitialCargoValue());
     }
 
     destruct() {
         super.destruct();
-    }
-
-    getInitialCargoValue() {
-        return(0);
     }
 
     animate(date, keyboard) {
@@ -38,18 +32,18 @@ class NPShip extends Ship {
 
         if (that.owner == this.getShip()) {
             if (!this.isHostile() && (this.getSystem().getLawLevel() > 1) ) {
-                this.getGame().displays.addMessage("Piracy is illegal. Reputation reduced.");
+                Game.getGame().displays.addMessage("Piracy is illegal. Reputation reduced.");
                 this.getShip().getPlayer().decReputation();
             }
 
             // Now it's war!
-            this.getGame().setSafe(false);
+            Game.getGame().setSafe(false);
             this.setHostile(true);
         }
 
         if (destroyed) {
             // Dump all cargo.
-            this.hull.compSets.baySet.dumpAll();
+            this.compSets.baySet.dumpAll();
             this.recalc();
         }
 

@@ -3,6 +3,7 @@
 // Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
+import Game from "../../Game/game.js";
 import SkyBox from "../../Game/Scenery/skyBox.js";
 import { MineralTypes } from "../minerals.js";
 import JSONSet from "../../Game/Utils/jsonSet.js";
@@ -176,10 +177,6 @@ class System {
         return (this.spec.description);
     }
 
-    getGame() {
-        return (this.universe.game);
-    }
-
     getSize() {
         return(this.systemSize);
     }
@@ -226,7 +223,7 @@ class System {
     }
 
     animate(date, keyBoard) {
-        let game = this.getGame();
+        let game = Game.getGame();
         let scene = game.getScene();
 
         // Move sky box so we never get closer to it.
@@ -300,6 +297,13 @@ class System {
         }
 
         return (closest);
+    }    
+    
+    // Remove non fixed labels.
+    removeLabels() {
+        for (let item of this.items) {
+            item.removeLabel();
+        }
     }
 }
 

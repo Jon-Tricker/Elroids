@@ -47,9 +47,8 @@ class Terminal extends DarkPanel {
     // Scroll to cursor mode
     scrollToCursorMode = true;
 
-    constructor(game, ctx, doc, defaultColour, rows, cols) {
+    constructor(ctx, doc, defaultColour, rows, cols) {
         super(ctx, defaultColour, true);
-        this.game = game;
         this.doc = doc;
         this.firstLine = 0;
 
@@ -211,13 +210,6 @@ class Terminal extends DarkPanel {
         //if (this.cols < this.cursor.x++) {
         if (this.cols <= row.length) {
             this.linefeed();
-            /*
-            this.cursor.y++;
-            this.cursor.x = 0;
-
-            // New row.
-            this.lineBuffer.push(new Array());
-            */
         }
     }
 
@@ -323,11 +315,13 @@ class Terminal extends DarkPanel {
     // Simple non-directional sound.
     // Unlike sounds emited by Items which may be 3D.
     playSound(name, volume, loop) {
-        if (!this.game.soundOn) {
+        let game = Game.getGame();
+
+        if (!game.soundOn) {
             return (false);
         }
 
-        let list = this.game.getListener();
+        let list = game.getListener();
         if ((undefined == list)) {
             // Dont have a listener yet ... give up. without loading
             return (false);

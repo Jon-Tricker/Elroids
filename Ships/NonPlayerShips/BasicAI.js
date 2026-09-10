@@ -3,8 +3,8 @@
 // Copyright (C) Jon Tricker 2023 - 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
 import * as THREE from 'three';
+import Game from '../../Game/game.js';
 import Item from '../../GameItems/item.js';
 import Station from '../../GameItems/System/station.js';
 import PlayerShip from '../playerShip.js';
@@ -219,7 +219,7 @@ class BasicAI {
             // Nay worries mate!
             return (true);
         }
-        return (this.attack(this.myShip.getGame().getShip(), date));
+        return (this.attack(Game.getGame().getShip(), date));
     }
 
     dock(date) {
@@ -230,7 +230,7 @@ class BasicAI {
         }
 
         // If docking blocked give up.
-        if (ship.getLocation().distanceTo(this.dest.getLocation()) > ship.getGame().getShip().getLocation().distanceTo(this.dest.getLocation())) {
+        if (ship.getLocation().distanceTo(this.dest.getLocation()) > Game.getGame().getShip().getLocation().distanceTo(this.dest.getLocation())) {
             return (true);
         }
 
@@ -308,7 +308,7 @@ class BasicAI {
         // If close enough fire.
         if (angle < MAX_FIRE_ANGLE) {
             if ((undefined == this.expire) || (this.expire < date)) {
-                if ((dest instanceof PlayerShip) && ship.getGame().isSafe()) {
+                if ((dest instanceof PlayerShip) && Game.getGame().isSafe()) {
                     // Play nicely.
                     return (true);
                 }
@@ -535,7 +535,7 @@ class BasicAI {
         if (!damp || (Math.abs(yawDelta) > threshold)) {
             rotated = true;
             let yr = ship.yawRate.getRate();
-            let yawEst = this.myShip.getGame().getAnimateRate() * (yr * yr) / (ship.yawRate.getDelta() * 2);
+            let yawEst = Game.getGame().getAnimateRate() * (yr * yr) / (ship.yawRate.getDelta() * 2);
             if (0 > yr) {
                 yawEst = -yawEst;
             }
@@ -549,7 +549,7 @@ class BasicAI {
         if (!damp || (Math.abs(pitchDelta) > threshold)) {
             rotated = true;
             let pr = ship.pitchRate.getRate();
-            let pitchEst = this.myShip.getGame().getAnimateRate() * (pr * pr) / (ship.pitchRate.getDelta() * 2);
+            let pitchEst = Game.getGame().getAnimateRate() * (pr * pr) / (ship.pitchRate.getDelta() * 2);
             if (0 > pr) {
                 pitchEst = -pitchEst;
             }

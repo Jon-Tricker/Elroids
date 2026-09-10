@@ -1,9 +1,10 @@
 // kamikaze saucer
 // Tries to ram ship.
 
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023 - 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
+import Game from '../../Game/game.js'; 
 import Saucer from './saucer.js';
 
 const COLOUR = "#C03030";
@@ -29,7 +30,7 @@ class SaucerRam extends Saucer {
         let targetSpeed = this.getShip().location.getRelative(this.location);
 
         // In safe mode always miss.
-        if (this.getGame().isSafe()) {
+        if (Game.getGame().isSafe()) {
             targetSpeed.x += 100;
             targetSpeed.y += 100;
             targetSpeed.z += 100;
@@ -41,7 +42,7 @@ class SaucerRam extends Saucer {
         let delta = targetSpeed.clone();
         delta.sub(this.speed);
 
-        let ar = this.getGame().getAnimateRate();
+        let ar = Game.getGame().getAnimateRate();
         if (delta.length() > MAX_ACC/ar) {
             delta.normalize;
             delta.multiplyScalar(MAX_ACC/ar);

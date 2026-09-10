@@ -12,7 +12,7 @@ class DumbMissileWeapon extends MissileWeapon {
     static type = new ComponentType("DML1", 3, 3, 3000, 2,);
 
     constructor(set) {
-        super(DumbMissileWeapon.type, set, FIRE_RATE);
+        super(set, FIRE_RATE);
     }
 
     getDescription() {

@@ -236,7 +236,7 @@ class MineralType {
 // 1st item is valueless.
 // TOTAL OF ALL ABUNDANCES SHOULD ADD UP TO 1 (ish)
 const MineralTypes = new Array(
-  new MineralType("Silica", "Si",  new THREE.Color(0x808080), 0.6, 10, 0.5, 0, false),   // OK. I know its not an element!
+  new MineralType("Silicon", "Si",  new THREE.Color(0x808080), 0.6, 10, 0.5, 0, false),
   new MineralType("Iron", "Fe", new THREE.Color(0xB06000), 0.3, 15, 0.25, 20, false),
   new MineralType("Copper", "Cu", new THREE.Color(0x00D080), 0.2, 15, 0.16, 40, false),
   new MineralType("Gold", "Au", new THREE.Color(0xFFF000), 0.3, 15, 0.04, 80, false),

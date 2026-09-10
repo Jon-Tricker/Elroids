@@ -41,14 +41,8 @@
 
 	<H2>ToDos (In some sort of priority order)</H2>
 
-	<H3>V11.x General improvements.</H3>
-	<P>Fix text wrap issue on ship componets menu ... multi line table headers.</P>
-	<P>Rework buildShip() to be based on individual ship classes.</P>
-	<P>Add launch option to start in safe mode/or not.</P>
-	<P>Add lables for everything. Always on in safe mode. Add switch to swith on/off (apart from destination HS lables).</P>
-	<P>Revisit comodities pricing.</P>
-
 	<H3>V12.x Code improvements.</H3>
+	<P>Add hit counter to elroids launch page.</P>
 	<P>Split Items into</P>
 	<UL>
 		<LI>Regular items. Only persisted for active system. Cannot be JSON saved.</LI>
@@ -65,6 +59,7 @@
 	<P>Modify saucer launch frequency to be based on time ... rather than number of animate cycles.</P>
 
 	<H3>V14.x Improve NPShips</H3>
+	<P>Remove HP ... use regular damage to systems instead ... if NPShips become too tough multiply the damage by some amount.</P>
 	<P>Less 'wild' navigation. Modify navigateThroughDest() to add lead. Possibly common code with attack().</P>
 	<P>Make miners less stupid. Dont charge in before all sub-rocks destroyed.</P>
 	<P>Don't 'stop' when attacking. Makes attacker an easy target.</P>
@@ -77,10 +72,11 @@
 	<P>Convert GoodsList and ComponentsList to use classes ... like shipTypes in NPShipFactory.</P>
 	<P>Do a sweep of use of null. In most cases change to undefned.</P>
 	<P>Modify flame cones to grow/shrink when pulsed. Not flicker.</P>
-	<P>Possibly don't need extra 2D layer for lables ... make them part of instumentation layer.</P>
+	<P>Possibly don't need extra 2D layer for lables ... make them part of HUD layer.</P>
 
 	<H3>V16.x Fix game launch problems.</H3>
 	<P>Add 'loading' screen.</P>
+	<P>Add a hit counter to lauch screen.</P>
 
 	<H3>V17.x Add extra ship components.</H3>
 	<UL>
@@ -102,7 +98,7 @@
 	<P>Add many more:
 	<UL>
 		<LI>Goods Types.</LI>
-		<LI>Systems.</LI>
+		<LI>Systems. Maybe proceduraly generated.</LI>
 		<LI>Hull types.</LI>
 	</UL>
 	</P>
@@ -118,8 +114,6 @@
 			<UL>
 				<LI>Improve 'vision through' wrap to take account of camera direction (i.e. dont just use
 					Universe.handleWrap()). i.e. allow rocks to be seen at full universe width not half.</LI>
-				<LI>Improve 'collision detection' mechanism (Item.detectCollision()). Although, for now, the 'cylinder
-					Vs sphere' bounding check seems to be doing good service.</LI>
 				<UL>
 					<LI>For ship/station interaction, once an rough aproximation to a collision is detected, it is
 						confirmed using ray tracing (Item.isPointInside()). Maybe extend to ray trace all the corners of
@@ -128,7 +122,6 @@
 						between everything and 'everthing else'. Just check the surrounding 9 cubes.</LI>
 				</UL>
 		</LI>
-		<LI>Limited number of missiles in flight (like Asteroids).</LI>
 		<LI>In flight ship repairs based on expenditure of, purchable, 'univeral shunt' modules (goods) rather than
 			credits. </LI>
 	</UL>

@@ -1,5 +1,6 @@
 // A normal star system.
 import * as THREE from 'three';
+import Game from '../../Game/game.js';
 import { System } from './system.js'
 import PlayerShip from '../../Ships/playerShip.js';
 import Rock from '../rock.js';
@@ -107,10 +108,10 @@ class StarSystem extends System {
     animate(date, keyBoard) {
         // If necesarry top up rocks.
         if (this.rockCount < this.maxRockCount) {
-            this.createRandomRock(this.getGame().getShip().location.getFarAway());
+            this.createRandomRock(Game.getGame().getShip().location.getFarAway());
         }
 
-        if (!this.getGame().testMode) {
+        if (!Game.getGame().testMode) {
             // If mother saucer detroyed periodicaly re-create
             if (0 == this.motherSaucers.size) {
                 if ((Math.random() * 1000) < 1) {
@@ -119,7 +120,7 @@ class StarSystem extends System {
             }
         }
 
-        if ((date > this.nPShipTimer) && (!this.getGame().testMode)) {
+        if ((date > this.nPShipTimer) && (!Game.getGame().testMode)) {
             // Genrate new NPShip from one of the wormhole ends.
             let wormholeEnd = this.wormholeEnds.getRandomElement();
             let npShip = NPShipFactory.createRandom(wormholeEnd.location, true);
@@ -128,7 +129,7 @@ class StarSystem extends System {
 
             // Top up police ships.
             if (this.policeShips.size < Math.floor(this.getLawLevel() / 2)) {
-                let police = new PoliceShip(this.getGame().getShip().location.getFarAway());
+                let police = new PoliceShip(Game.getGame().getShip().location.getFarAway());
                 police.setActive(true);
                 this.addPolice(police);
             }
@@ -181,7 +182,7 @@ class StarSystem extends System {
     }
 
     createRocks(rockCount) {
-        if (this.getGame().testMode) {
+        if (Game.getGame().testMode) {
             // Create a few test rocks at set locations
 
             // Horizontal colliders
@@ -199,7 +200,7 @@ class StarSystem extends System {
 
             // Row of rocks
             for (let i = -this.systemSize; i < this.systemSize; i += 211) {
-                let sz = Math.abs(i % this.universe.game.getMaxRockSize());
+                let sz = Math.abs(i % Game.getGame().getMaxRockSize());
                 if (sz != 0) {
                     new Rock(sz, new Location(i, -100, 0, this), new THREE.Vector3());
                 }
@@ -227,11 +228,11 @@ class StarSystem extends System {
             new Mineral(100, new Location(500, 50, 50, this), new THREE.Vector3(), MineralTypes[3]);
 
             // Add sample goods crates.
-            let good = new (this.universe.game.goodsList.getByClass("Gun")).constructor();
+            let good = new (Game.getGame().goodsList.getByClass("Gun")).constructor();
             good.number = 50;
             good.makeCrate(new Location(250, 10, 50, this), new THREE.Vector3());
 
-            let comp = new (this.universe.game.componentsList.getByClass("BasicEngine")).constructor();
+            let comp = new (Game.getGame().componentsList.getByClass("BasicEngine")).constructor();
             comp.number = 1;
             comp.makeCrate(new Location(270, 10, 70, this), new THREE.Vector3());
 
@@ -247,18 +248,18 @@ class StarSystem extends System {
     }
 
     createRandomRock(loc) {
-        let game = this.universe.game;
+        let game = Game.getGame();
         let maxVel = Utils.createRandomVector(game.getMaxRockVelocity());
         let sz = Math.floor((Math.random() * game.getMaxRockSize()) + 10);
 
-        let rock = new Rock(sz, loc, maxVel);
+        new Rock(sz, loc, maxVel);
     };
 
     createStations(json) {
         if (undefined === json) {
             // Create new stations.
             let station;
-            if (this.getGame().testMode) {
+            if (Game.getGame().testMode) {
                 // station = new Station(new Location(-4900, 0, 0, this), null);
                 station = new Station(new Location(1100, 0, 0, this), null);
             } else {
@@ -288,11 +289,11 @@ class StarSystem extends System {
 
     createMotherSaucer() {
         let loc;
-        let game = this.getGame();
+        let game = Game.getGame();
 
         // Create it close so we can find it. 
         let hole = this.wormholeEnds.getRandomElement();
-        if (this.getGame().testMode) {
+        if (Game.getGame().testMode) {
             loc = new Location(1000, 100, -50, this);
         } else {
             // Spawn from a wormhole.

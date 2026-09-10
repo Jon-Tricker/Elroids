@@ -1,7 +1,7 @@
 // Missiles
 
 // For now simple spheres.
-import * as THREE from 'three';
+import Game from '../../Game/game.js';
 import Explosion from '../explosion.js'
 import Projectile from './projectile.js';
 
@@ -14,7 +14,7 @@ class Missile extends Projectile {
   }
 
   getRadarColour() {
-    if (this.getGame().displays.radar.showMissiles) {
+    if (Game.getGame().displays.radar.showMissiles) {
       return (this.colour);
     } else {
       // Don't plot

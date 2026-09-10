@@ -6,10 +6,13 @@
 
 import * as THREE from 'three';
 import NPShip from './nonPlayerShip.js';
-import PoliceHull from '../Components/Hulls/policeHull..js';
 import Reputation from '../../Game/reputation.js';
 import Saucer from '../../GameItems/Saucers/saucer.js';
+import SmallHull from '../Components/Hulls/smallHull.js';
+import MediumEngine from '../Components/Engines/mediumEngine.js';
+import LaserBeamWeapon from '../Components/Weapons/laserBeamWeapon.js';
 import { BasicAI } from './basicAI.js';
+import Game from '../../Game/game.js';
 
 class PoliceAI extends BasicAI {
 
@@ -21,7 +24,7 @@ class PoliceAI extends BasicAI {
             case 0:
                 // Work out what to do
                 if (Math.random() < 0.5) {
-                    this.dest = this.myShip.location.system.getClosest(Saucer,  this.myShip.location);
+                    this.dest = this.myShip.location.system.getClosest(Saucer, this.myShip.location);
                     if (undefined != this.dest) {
                         this.pc = 2;
                         break;
@@ -66,7 +69,7 @@ class PoliceAI extends BasicAI {
         switch (this.pc) {
             case 0:
                 done = this.attackShip(date);
-                break; 
+                break;
 
             case 1:
                 this.setHostile(false);
@@ -79,7 +82,7 @@ class PoliceAI extends BasicAI {
                 break;
         }
 
-        return(done);
+        return (done);
     }
 
 }
@@ -89,21 +92,28 @@ const HP = 3;
 class PoliceShip extends NPShip {
     constructor(location, speed) {
         super(5, 10, 20, location, speed, undefined, HP);
+
+        this.buildShip();
+
         this.ai = new PoliceAI(this);
+
         this.recalcHostility();
         this.location.system.addPolice(this);
+    }
+
+    buildShip() {
+        this.hull = new SmallHull(this.compSets.hullSet, new THREE.Color(0x4040FF) );
+        this.hull.setSlots(this.compSets);
+
+        new MediumEngine(this.compSets.engineSet);
+        new LaserBeamWeapon(this.compSets.weaponSet);
+
+        this.recalc();
     }
 
     destruct() {
         this.location.system.deletePolice(this);
         super.destruct();
-    }
-
-    // Build/Rebuild ship components.
-    buildShip() {
-        // Create hull
-        // Will also create all other components, for that hull type, and add them to our components sets.
-        super.buildShip(PoliceHull,  new THREE.Color(0x4040FF));
     }
 
     getName() {
@@ -112,7 +122,7 @@ class PoliceShip extends NPShip {
 
     recalcHostility() {
         let system = this.getLocation().system;
-        let player = system.getGame().getPlayer();
+        let player = Game.getGame().getPlayer();
         let rep = Reputation.getRepInSystem(player, system);
         super.setHostile(rep.getAttack());
     }

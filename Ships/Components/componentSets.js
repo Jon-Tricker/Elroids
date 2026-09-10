@@ -10,11 +10,9 @@ import HullSet from "./Hulls/hullSet.js";
 import WeaponSet from "./Weapons/weaponSet.js";
 import BaySet from "./Bays/baySet.js";
 import JSONSet from "../../Game/Utils/jsonSet.js";
+import BugError from "../../Game/bugError.js";
 
 class ComponentSets extends JSONSet {
-
-    // Ship ... or may be purchace list.
-    ship;
 
     // Sub sets
     engineSet;
@@ -26,13 +24,19 @@ class ComponentSets extends JSONSet {
     mass;
     hp;
 
+    ship;
+
     constructor(ship, hullSlots, engineSlots, weaponSlots, baySlots, avionicsSlots) {
         super();
+
         this.ship = ship;
 
         // Create sets. Order will effect order in which status panels are displayed.
+
+        // Hull set is special. MUST BE FIRST!
         this.hullSet = new HullSet(this, hullSlots);
         super.add(this.hullSet);
+
         this.engineSet = new EngineSet(this, engineSlots);
         super.add(this.engineSet);
         this.weaponSet = new WeaponSet(this, weaponSlots);
@@ -43,6 +47,17 @@ class ComponentSets extends JSONSet {
         super.add(this.avionicsSet);
 
         this.recalc();
+    }
+
+    setSlots(hullSlots, engineSlots, weaponSlots, baySlots, avionicsSlots) { 
+        this.hullSet.setSlots(hullSlots);
+        this.engineSet.setSlots(engineSlots);
+        this.weaponSet.setSlots(weaponSlots);
+        this.baySet.setSlots(baySlots);
+        this.avionicsSet.setSlots(avionicsSlots);
+
+        this.recalc();
+
     }
 
     toJSON(skip) {
@@ -80,10 +95,6 @@ class ComponentSets extends JSONSet {
         return(this.engineSet.getTotalThrust());
     }
 
-    getGame() {
-        return (this.ship.getGame());
-    }
-
     takeDamage(hits) {
         while ((hits > 0) && (this.getCurrentHp() > 0)) {
             // Damage a random set.
@@ -107,6 +118,10 @@ class ComponentSets extends JSONSet {
     // Return a random element of the set.
     // This is a bit inefficient but is rarely used and, in general, we would rather have Sets and Sets ... not Arrays.
     getRandomElement() {
+        if (0 == this.size) {
+            return(undefined);
+        }
+        
         let index = Math.floor(Math.random() * this.size);
 
         let i = 0;

@@ -24,7 +24,7 @@ const DESCRIPTION = "Each ship had one 'hull'.\n" +
 // undefined = centre
 class HullSection {
     name;
-    
+
     // Stem to stern
     static FORWARD = new HullSection("forward");
     static MIDSHIP = new HullSection("midship");
@@ -78,7 +78,7 @@ class EngineMesh extends THREE.Mesh {
 
         this.castShadow = true;
         this.receiveShadow = true;
-        
+
         this.rotateZ(-Math.PI / 2);
     }
 
@@ -115,19 +115,14 @@ class EngineMesh extends THREE.Mesh {
 
 class Hull extends Component {
 
-    // Components in hull.
-    compSets;
-
     // Sizes of this hull
     // Enbables graphics scaling. Does not effect game mechanics which is the same for all hulls.
     height;
     width;
     length;
-
-    // Cached values. Only recalculate when hull changes.
-    totalMass;
-
     maxSpeed;
+
+    shipMaterial;
 
     // Create base ship material.
     static baseShipMaterial = new THREE.MeshStandardMaterial(
@@ -160,8 +155,8 @@ class Hull extends Component {
 
     engineMeshes = new Set();
 
-    constructor(type, set, maxSpeed, hullColour) {
-        super(type, set);
+    constructor(set, maxSpeed, hullColour) {
+        super(set);    // Set undefined ... will be filled in during buildSets() below.
         this.maxSpeed = maxSpeed;
         this.displayPanel = true;
 
@@ -171,66 +166,28 @@ class Hull extends Component {
         } else {
             // Cook our own material.
             this.shipMaterial = Hull.baseShipMaterial.clone();
-            this.shipMaterial.color=hullColour;
+            this.shipMaterial.color = hullColour;
         }
+    }
 
-        if (undefined != set) {
-            set.recalc();
-        }
-
+    setSlots(sets, hullSlots, engineSlots, weaponSlots, baySlots, avionicsSlots) {
+        sets.setSlots(hullSlots, engineSlots, weaponSlots, baySlots, avionicsSlots);
+        // this.set = sets.hullSet;
+        // sets.hullSet.add(this);
     }
 
     getShipMaterial() {
-        return(this.shipMaterial);
-    }
-
-    toJSON() {
-        let json = super.toJSON();
-
-        json.comps = this.compSets.toJSON(this);
-
-        // Pack cargo.
-        json.cargo = this.compSets.baySet.cargoToJSON();
-
-        return (json);
-    }
-
-
-    static fromJSON(json, ship) {
-
-        let hull = ship.getSystem().getGame().componentsList.getByClass(json.class);
-        ship.hull.compSets.hullSet.clear();
-        // hull = new hull.constructor(hull.getTargetSet(ship));
-        hull = new hull.constructor();
-        hull.status = json.status;
-        hull.compSets.ship = ship;
-        ship.setHull(hull);
-
-        // Unpack other components
-        for (let jsonComp of json.comps) {
-            let comp = ship.getSystem().getGame().componentsList.getByClass(jsonComp.class);
-            comp = new comp.constructor(comp.getTargetSet(ship));
-            comp.status = jsonComp.status;
-            comp.displayPanel = jsonComp.displayPanel;
-            if (comp instanceof ComponentAct) {
-                comp.setOn(jsonComp.on);
-            }
-        }
-
-        // Unpack cargo
-        hull.compSets.baySet.loadFromJSON(json.cargo);
-
-        return (hull);
-    }
-
-    recalc() {
-        this.compSets.recalc();
+        return (this.shipMaterial);
+    }  
+    
+    getColour() {
+        return (this.getShipMaterial().color);
     }
 
     getDescription() {
         return (DESCRIPTION);
-    }  
-    
+    }
+
     // Get position of gun (maybe eventually one of several hardpoints.)
     getGunPoint() {
         let point = this.mesh.position.clone();
@@ -240,14 +197,14 @@ class Hull extends Component {
         point.x += ship.length + 1;
 
         // Slightly below camera.
-        point.z -= ship.height/2;
-        
+        point.z -= ship.height / 2;
+
         ship.localToWorld(point);
 
         let loc = new Location(point.x, point.y, point.z, ship.location.system);
         return (loc);
-    }  
-    
+    }
+
     // Get position at which to dump stuff.
     getDumpPoint() {
         let point = this.mesh.position.clone();
@@ -255,7 +212,7 @@ class Hull extends Component {
 
         // Slightly outside mesh.
         point.x -= ship.length + 1;
-        
+
         ship.localToWorld(point);
 
         let loc = new Location(point.x, point.y, point.z, ship.location.system);
@@ -264,28 +221,6 @@ class Hull extends Component {
 
     setOn(active) {
         throw new GameError("Hulls can't be de-activated.")
-    }
-
-    // Build a ship for this hull type.
-    buildSets(existingSet, hullSlots, engineSlots, weaponSlots, baySlots, avionicsSlots) {
-        // If we are not part of an existing set. Build set of componets sets.
-        if (undefined === existingSet) {
-            // Order effects order in which component display panels are displayed.
-            // All hulls have a single HullSet slot for themself.
-            if (1 != hullSlots) {
-                throw (new BugError("Can only build a ship with a single hull."));
-            }
-            // Initially dont know ship.
-            this.compSets = new ComponentSets(null, hullSlots, engineSlots, weaponSlots, baySlots, avionicsSlots);
-            this.set = this.compSets.hullSet;
-            this.compSets.hullSet.add(this);
-        } else {
-            this.compSets = existingSet;
-        }
-    }
-
-    buildShip(ship) {
-        this.compSets.ship = ship;
     }
 
     setFlameState(state) {
@@ -314,76 +249,9 @@ class Hull extends Component {
         throw (new GameError("Can't sell hulls."))
     }
 
-    // Upgrade existing hull to this.
-    upgrade(ship) {
-        // Check we can afford it.
-        let cost = this.getUpgradeCost(ship);
-        if (ship.getGame().player.getCredits() < cost) {
-            throw (new GameError("Not enough credits"));
-        }
-
-        // Check existing components will fit in this.
-        // Need to iterate both set of sets.
-        let thisIter = this.compSets.keys();
-        let thisCurs = thisIter.next()
-        let shipIter = ship.hull.compSets.keys();
-        let shipCurs = shipIter.next()
-        while ((!thisCurs.done) && (!shipCurs.done)) {
-            if (thisCurs.value.slots < shipCurs.value.size) {
-                throw (new GameError("Not enough slots in " + shipCurs.value.plural + ". Unmount/Sell something first."));
-            }
-            thisCurs = thisIter.next()
-            shipCurs = shipIter.next()
-        }
-
-        // Make copy of purchace menu item. Unitil constructed set not know.
-        let newHull = new this.constructor(undefined);
-        // Set now know.
-        newHull.set = newHull.compSets.hullSet;
-
-        // Move compomemt sets into this.
-        let newIter = newHull.compSets.keys();
-        let newCurs = newIter.next()
-        shipIter = ship.hull.compSets.keys();
-        shipCurs = shipIter.next()
-        while ((!newCurs.done) && (!shipCurs.done)) {
-            let newSet = newCurs.value;
-            newSet.clear();
-            for (let comp of shipCurs.value) {
-                newSet.add(comp);
-            }
-            newCurs = newIter.next()
-            shipCurs = shipIter.next()
-        }
-
-        // Move cargo to new hull.
-        newHull.compSets.baySet.minerals = ship.hull.compSets.baySet.minerals;
-        newHull.compSets.baySet.components = ship.hull.compSets.baySet.components;
-        newHull.compSets.baySet.tradeGoods = ship.hull.compSets.baySet.tradeGoods;
-
-        // Fiddle hull sets set.
-        newHull.compSets.hullSet.clear();
-        newHull.compSets.hullSet.add(newHull);
-
-        // Set ship to use this hull. Old one will go out of scope and GC.
-        newHull.compSets.ship = ship;
-        ship.setHull(newHull);
-
-        // Recalculate
-        newHull.set.recalc();
-
-        // Charge acount.
-        if (ship.getPlayer().addCredits(-cost));
-    }
-
     getUpgradeCost(ship) {
         let oldHull = ship.hull;
-        let cost = Math.floor(this.getValueInSystem(ship.system) - oldHull.getValueInSystem(ship.system));
-
-        // Half price on trade ins.
-        if (0 > cost) {
-            cost /= 2;
-        }
+        let cost = Math.floor(this.getValueInSystem(ship.system) - oldHull.getValueInSystem(ship.system)/2);
 
         return (cost);
     }
@@ -393,7 +261,7 @@ class Hull extends Component {
     }
 
     getTargetSet(ship) {
-        return (ship.hull.compSets.hullSet);
+        return (ship.compSets.hullSet);
     }
 
     getMesh() {

@@ -10,7 +10,7 @@ class BasicRadar extends Radar {
     static type = new ComponentType("Rpad1", 1,  1, 5000, 1,)
 
     constructor(set) {
-        super(BasicRadar.type, set);
+        super(set);
     }
 
     getDescription() {

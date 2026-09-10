@@ -1,10 +1,11 @@
 // Minearal container
 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
+import Game from '../Game/game.js';
 import NonShipItem2 from './nonShipItem2.js';
 import PlayertShip from '../Ships/playerShip.js';
 import Explosion from './explosion.js';
@@ -30,9 +31,14 @@ class Mineral extends NonShipItem2 {
 
     super(location, speed, size, mass, 1);
 
+    // Improve label. 
+    if (undefined != this.label) {
+      super.setLabel(this.getName() + " (" + type.getSymbol() + ")")
+    }
+
     this.type = type;
 
-    this.expiryTime = this.getUniverse().getTime() + TTL;
+    this.expiryTime = Game.getGame().getUniverse().getTime() + TTL;
 
     this.activateIfRequired();
   }
@@ -43,7 +49,7 @@ class Mineral extends NonShipItem2 {
   }
 
   setupMesh() {
-    let geometry = new THREE.CylinderGeometry(this.size/2, this.size/2, this.size);
+    let geometry = new THREE.CylinderGeometry(this.size / 2, this.size / 2, this.size);
 
     // compute vertex normals
     geometry.computeVertexNormals();
@@ -57,7 +63,7 @@ class Mineral extends NonShipItem2 {
   }
 
   getValue() {
-    return(Math.ceil(this.type.value * this.mass));
+    return (Math.ceil(this.type.value * this.mass));
   }
 
   animate(date) {
@@ -70,13 +76,13 @@ class Mineral extends NonShipItem2 {
   }
 
   handleCollision(that) {
-      if (that instanceof PlayertShip) {
-          return(that.mineralPickup(this));
-      }
+    if (that instanceof PlayertShip) {
+      return (that.mineralPickup(this));
+    }
 
-      return(super.handleCollision(that));
+    return (super.handleCollision(that));
   }
-  
+
 }
 
 export default Mineral;

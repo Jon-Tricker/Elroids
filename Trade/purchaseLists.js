@@ -6,7 +6,7 @@ import BasicEngine from "../Ships/Components/Engines/basicEngine.js";
 import BasicRadar from "../Ships/Components/Avionics/basicRadar.js";
 import BasicCompass from "../Ships/Components/Avionics/basicCompass.js";
 import DumbMissileWeapon from "../Ships/Components/Weapons/dumbMissileWeapon.js";
-import LaserBeamWeapon from "../Ships/Components/Weapons/LaserBeamWeapon.js";
+import LaserBeamWeapon from "../Ships/Components/Weapons/laserBeamWeapon.js";
 import LargeEngine from "../Ships/Components/Engines/largeEngine.js";
 import MediumEngine from "../Ships/Components/Engines/mediumEngine.js";
 import SmallHull from "../Ships/Components/Hulls/smallHull.js";
@@ -17,12 +17,9 @@ import RangeHud from "../Ships/Components/Avionics/Huds/rangeHud..js";
 import MiningHud from "../Ships/Components/Avionics/Huds/miningHud..js";
 
 class ComponentsList extends ComponentSets {
-    game;
 
-    constructor(game) {
+    constructor() {
         super();
-
-        this.game = game;
 
         new SmallHull(this.hullSet);
         new MediumHull(this.hullSet);
@@ -39,10 +36,6 @@ class ComponentsList extends ComponentSets {
         new BasicHud(this.avionicsSet);
         new RangeHud(this.avionicsSet);
         new MiningHud(this.avionicsSet);
-    }
-
-    getGame() {
-        return (this.game);
     }
 }
 

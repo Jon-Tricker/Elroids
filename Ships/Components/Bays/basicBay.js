@@ -10,7 +10,7 @@ class BasicBay extends Bay {
     static type = new ComponentType("Miniskip", 1, 10, 200, 3);
 
     constructor(ship) {
-        super(BasicBay.type, ship,  25);
+        super(ship,  25);
     }
 
     getDescription() {

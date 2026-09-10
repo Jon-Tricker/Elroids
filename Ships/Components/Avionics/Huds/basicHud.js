@@ -15,7 +15,7 @@ class BasicHud extends Hud {
     static type = new ComponentType("BasicHud", 4, 1, 500, 1);
 
     constructor(ship) {
-        super(BasicHud.type, ship);
+        super(ship);
     }
 
     getDescription() {
@@ -25,7 +25,7 @@ class BasicHud extends Hud {
     // Return the HUD display panel for this component.
     // This is in addition to the Component display panel that all components have.
     getHudDisplay(ctx, defaultColour) {
-        return (new BasicHudDisplay(this.getShip().game, ctx, defaultColour, this));
+        return (new BasicHudDisplay(ctx, defaultColour, this));
     }
 }
 

@@ -9,7 +9,7 @@ class BasicCompass extends Compass {
     static type = new ComponentType("Wayfinder1", 1,  1, 5000, 1,)
 
     constructor(set) {
-        super(BasicCompass.type, set);
+        super(set);
     }
 
     getDescription() {

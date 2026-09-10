@@ -1,17 +1,15 @@
 // Radar screen just one for the ship.
-import * as THREE from 'three';
+import Game from '../Game/game.js';
 import DarkPanel from './Utils/darkPanel.js';
 
 const RANGE = 1500;     // m
 const FLAG_SIZE = 5;
 
 class RadarDisplay extends DarkPanel {
-    game;
     showMissiles = false;
 
-    constructor(game, ctx, defaultColour) {
+    constructor(ctx, defaultColour) {
         super(ctx, defaultColour, true);
-        this.game = game;
     }
 
     animate() {
@@ -50,15 +48,15 @@ class RadarDisplay extends DarkPanel {
         // No longer dashed
         this.ctx.setLineDash([]);
 
-        let ship = this.game.getShip();
+        let ship = Game.getGame().getShip();
 
         // Check we have a working radar component.
-        let radar = ship.hull.compSets.avionicsSet.getRadar();
+        let radar = ship.compSets.avionicsSet.getRadar();
         if ((undefined == radar) || (!radar.isWorking())) {
             return;
         }
 
-        for (let item of this.game.universe.system.items) {
+        for (let item of Game.getGame().universe.system.items) {
 
             let relPos = ship.location.getRelative(item.getLocation());
 

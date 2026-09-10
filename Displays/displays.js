@@ -3,7 +3,7 @@
 // Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
-
+import Game from "../Game/game.js";
 import RadarDisplay from "./radarDisplay.js";
 import CompassDisplay from "./compassDisplay.js";
 import ComponentDisplays from "./Components/componentDisplays.js";
@@ -41,8 +41,6 @@ class Displays {
     textHeight;
     pt;
 
-    game;
-
     status;
     hudIsOn = false;
     terminalIsOn = false;
@@ -62,8 +60,7 @@ class Displays {
 
     // Game control variables.
 
-    constructor(game) {
-        this.game = game;
+    constructor() {
         this.msgs = new Array();
 
         // Get and scale page elements.
@@ -81,21 +78,17 @@ class Displays {
 
         let terminalDoc = document.querySelector('.terminalclass');
         let terminalCtx = terminalDoc.getContext("2d");
-        this.terminal = new Terminal(this.game, terminalCtx, terminalDoc, DEFAULT_TERM_COLOUR);
+        this.terminal = new Terminal(terminalCtx, terminalDoc, DEFAULT_TERM_COLOUR);
 
-        this.radar = new RadarDisplay(this.game, this.statusCtx, DEFAULT_COLOUR);
-        this.compass = new CompassDisplay(this.game, this.statusCtx, DEFAULT_COLOUR);
+        this.radar = new RadarDisplay(this.statusCtx, DEFAULT_COLOUR);
+        this.compass = new CompassDisplay(this.statusCtx, DEFAULT_COLOUR);
         this.compDisplays = new ComponentDisplays(this.statusCtx, this.hudCtx, DEFAULT_COLOUR, this);
 
         // this.resize();
     }
 
-    getGame() {
-        return (this.game);
-    }
-
     getShip() {
-        return (this.getGame().getShip());
+        return (Game.getGame().getShip());
     }
 
     resize() {
@@ -176,10 +169,12 @@ class Displays {
         this.controlsCtx.fillRect(0, 0, this.controls.width, this.controls.height);
         this.controlsCtx.globalAlpha = 1;
         this.controlsCtx.fillStyle = this.defaultColour;
-        let text = "V" + this.game.getVersion() + "    Credits:" + this.printNum(this.game.player.getCredits()) +
-            "    Reputation: " + Reputation.getRepInSystem(this.game.player, this.game.getSystem()).getText() + " (" + Number(this.game.player.getReputation()).toFixed(2).padStart(0) + ")"
-        "    Frame rate:" + this.printNum(this.game.universe.getActualAnimateRate()) + "/s";
-        if (this.game.isSafe()) {
+        
+        let game = Game.getGame();
+        let text = "V" + game.getVersion() + "    Credits:" + this.printNum(game.player.getCredits()) +
+            "    Reputation: " + Reputation.getRepInSystem(game.player, game.getSystem()).getText() + " (" + Number(game.player.getReputation()).toFixed(2).padStart(0) + ")"
+        "    Frame rate:" + this.printNum(game.universe.getActualAnimateRate()) + "/s";
+        if (game.isSafe()) {
             text += "     Safe Mode: On";
         }
 
@@ -203,7 +198,7 @@ class Displays {
 
         let expiry;
         if (0 != duration) {
-            expiry = this.game.universe.getTime() + duration;
+            expiry = Game.getGame().universe.getTime() + duration;
         } else {
             expiry = 0;
         }
@@ -215,8 +210,6 @@ class Displays {
 
     animateStatus() {
         this.statusCtx.clearRect(0, 0, this.status.width, this.status.height);
-
-        let ship = this.game.ship;
 
         if (this.hudIsOn) {
             this.radar.animate();

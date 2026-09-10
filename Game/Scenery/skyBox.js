@@ -189,7 +189,7 @@ class SkyBox extends THREE.Group {
         let moonCount = 2 + Math.floor(Math.random() * 3);
         for (let i = 0; i <= moonCount; i++) {
 
-          let sz = this.getUniverse().systemSize;
+          let sz = Game.getGame().getUniverse().systemSize;
 
           let position = Utils.createRandomVector(sz, true);
 
@@ -222,7 +222,7 @@ class SkyBox extends THREE.Group {
 
         // One sun for now.
         // Same position as light.
-        let sz = this.getUniverse().systemSize;
+        let sz = Game.getGame().getUniverse().systemSize;
         let position = new THREE.Vector3(0, 0, sz * 2);
         this.suns.add(new Sun(this, SUN_SIZE * this.size / 100, position));
       } else {
@@ -241,7 +241,7 @@ class SkyBox extends THREE.Group {
   setActive(state) {
     if (true == state) {
       this.setupMesh();
-      this.getGame().getScene().add(this);
+      Game.getGame().getScene().add(this);
     }
 
     for (let sun of this.suns) {
@@ -253,21 +253,13 @@ class SkyBox extends THREE.Group {
     }
 
     if (false == state) {
-      this.getGame().getScene().remove(this);
+      Game.getGame().getScene().remove(this);
       for (let mesh of this.children) {
         this.remove(mesh);
         // ... and GC.
         mesh = undefined;
       }
     }
-  }
-
-  getUniverse() {
-    return (this.system.universe);
-  }
-
-  getGame() {
-    return (this.getUniverse().game);
   }
 
   setupMesh() {
