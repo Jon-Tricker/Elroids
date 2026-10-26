@@ -247,7 +247,7 @@ class BaySet extends ComponentSet {
                 this.dumpMineral(cheapest, this.minerals.get(cheapest));
             } else {
                 // Enough. Dump and give up
-                this.dumpMineral(cheapest, spaceReqd)
+                this.dumpMineral(cheapest, Math.ceil(spaceReqd));
                 this.recalc();
                 return;
             }

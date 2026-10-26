@@ -23,6 +23,10 @@ class DumbMissile extends Missile {
   constructor(direction, owner) {
     super(direction, owner, DAMAGE, COLOUR, SPEED, RANGE, material,'pew');
   }
+
+  takeDamage(hits, that) {
+    super.takeDamage(hits, that);
+  }
 }
 
 export default DumbMissile;

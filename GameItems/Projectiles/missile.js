@@ -24,10 +24,6 @@ class Missile extends Projectile {
 
   animate(date) {
     super.animate();
-
-    if (this.isDestructed()) {
-      new Explosion(1, this);
-    }
   }
 }
 

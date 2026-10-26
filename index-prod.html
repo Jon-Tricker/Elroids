@@ -18,7 +18,31 @@
 <BODY>
 	<P LANG="en-GB" ALIGN=CENTER><IMG SRC="Logo.jpg" NAME="Logo" WIDTH=250 HEIGHT=200 BORDER=0>
 </P>
+
+	<!--
+		Ping my personal page hit counter.
+		Will 404 if not present (but rest of page should work). If so just comment out following <div>.
+	-->
+	<div ALIGN=CENTER>
+	    <script>
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", "/HitCounter", false);
+		xhr.send(null);
+		document.write(xhr.response);
+	    </script>
+	</div>
+
 	<H2 LANG="en-GB" CLASS="western">What is 'Elroids'?</H2>
+
+
+	<div ALIGN=CENTER>
+        <!-- iframes are a bit crap ... takes tunin to get the height right -->
+        <!--
+        <iframe marginwidth="0" marginheight="0" frameBorder="0" height="50px" scrolling="no" src="HitCounter" ></iframe>
+                -->
+        <!-- Invoke it from a script -->
+	</div>
+
 	<P>An experiment with a javascript/threeJS based cross between 'Asteroids' and 'Elite'.</P>
 	<P>Any comments gratefully recieved. There is a facebook discussion group <A HREF="https://www.facebook.com/groups/1194329962511239">here</A>.</P>
 	<P>Code is open source and available on GitHiub. See manual for more details.</P>

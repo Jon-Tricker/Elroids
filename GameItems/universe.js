@@ -11,17 +11,17 @@ import { MineralTypes } from './minerals.js';
 import PlayerShip from '../Ships/playerShip.js';
 import Wormhole from './System/wormhole.js';
 import JSONSet from '../Game/Utils/jsonSet.js';
-import NonShipItem from './nonShipItem.js';
 import BugError from '../Game/bugError.js';
 import Location from '../Game/Utils/location.js';
+import ItemPers from './itemPers.js';
 
 const SYSTEM_SPECS = [
-    new SystemSpec("Sol", 6, 2, 5, "Mostly harmless."),
-    new SystemSpec("Asteel", 6, 1, 4, "Industrial, capitalist society."),
-    new SystemSpec("Kessel", 7, 1, 6, "High tech society."),
-    new SystemSpec("Endor", 2, 4, 2, "Low tech, magical society."),
-    new SystemSpec("Coruscant",7, 2, 7, "High tech, authoritarian society."),
-    new SystemSpec("Oz", 3, 4, 7, "Magical, authoritarian society.")
+    new SystemSpec(undefined, "Sol", 6, 2, 5, "Mostly harmless."),
+    new SystemSpec(undefined, "Asteel", 6, 1, 4, "Industrial, capitalist society."),
+    new SystemSpec(undefined, "Kessel", 7, 1, 6, "High tech society."),
+    new SystemSpec(undefined, "Endor", 2, 4, 2, "Low tech, magical society."),
+    new SystemSpec(undefined, "Coruscant", 7, 2, 7, "High tech, authoritarian society."),
+    new SystemSpec(undefined, "Oz", 3, 4, 7, "Magical, authoritarian society.")
 ];
 
 class Universe {
@@ -58,11 +58,30 @@ class Universe {
 
     static CBRT_THREE = Math.cbrt(3);
 
-    constructor(uniSize, systemSize, maxRockCount) {
+    constructor(json, uniSize, systemSize, maxRockCount) {
+        if (undefined != json) {
+            // Restore Item count so any new item IDs don't clash with the saved ones.
+            ItemPers.idCount = json.nextItemId;
+
+            uniSize = json.uniSize;
+            systemSize = json.systemSize;
+            maxRockCount = json.maxRockCount;
+        }
+
         this.uniSize = uniSize;
         this.systemSize = systemSize;
         this.maxRockCount = maxRockCount;
         this.actualAnimateRate = Game.getGame().ANIMATE_RATE;
+    }
+
+    // Destruct as much as possible. Hopefully garbage clearance will kick in.
+    destruct() {
+        for (let system of this.systems) {
+            system.destruct();
+        }
+
+        this.wormholes = undefined;
+        this.hyperspace = undefined;
     }
 
     toJSON() {
@@ -74,32 +93,14 @@ class Universe {
             systems: this.systems.toJSON(),
             wormholes: this.wormholes.toJSON(),
             ship: this.ship.toJSON(),
-            nextItemId: NonShipItem.idCount
+            nextItemId: ItemPers.idCount
         }
-    }
-
-    static fromJSON(json) {
-        // Restore Item count so any new item IDs don't clash with the saved ones.
-        NonShipItem.idCount = json.nextItemId;
-
-        let uni = new Universe(json.uniSize, json.systemSize, json.maxRockCount);
-
-        uni.populate(json);
-
-        if (undefined != json.ship.dockedWith) {
-            let station = uni.getSystemByName(json.currentSystem).getItemById(json.ship.dockedWith);
-            if (null != station) {
-                uni.ship.dock(station);
-            }
-        }
-
-        return (uni);
     }
 
     populate(json) {
 
         // Create hyperspacc
-        this.hyperspace = new Hyperspace(this, this.systemSize);
+        this.hyperspace = new Hyperspace(this.systemSize);
 
         // Create initial systems
         this.createSystems(json);
@@ -109,12 +110,6 @@ class Universe {
 
         // Put ship into current system.
         this.createShip(json);
-
-        // Now we have a ship to target can create saucers.
-        this.createSaucers(json);
-
-        // Make current system graphics active.
-        this.system.setActive(true);
     }
 
     createSystems(json) {
@@ -125,7 +120,7 @@ class Universe {
                 count++;
 
                 if (Game.getGame().testMode) {
-                    uniLoc = new Location(500 * count, 0, 0, this.hyperspace);
+                    uniLoc = new Location(undefined, 500 * count, 0, 0, this.hyperspace);
                 } else {
                     // Locate system randomly in the universe
                     let minDist;
@@ -141,14 +136,17 @@ class Universe {
                         }
                     } while (minDist < (this.systemSize / 10));
                 }
-                let system = new StarSystem(this, spec, this.systemSize, this.maxRockCount, uniLoc);
+                let system = new StarSystem(json, spec, this.systemSize, this.maxRockCount, uniLoc);
                 this.systems.add(system);
+
+                // Now it is added can populate.
+                system.populate(json);
             }
         } else {
             this.systems = new JSONSet();
             let systemIndex = 0;
             for (let jsonSystem of json.systems) {
-                let system = StarSystem.fromJSON(jsonSystem, this);
+                let system = new StarSystem(jsonSystem);
 
                 if (systemIndex == json.systemIndex) {
                     this.system = system;
@@ -156,6 +154,9 @@ class Universe {
                 systemIndex++;
 
                 this.systems.add(system);
+
+                // Now it is added can populate.
+                system.populate(jsonSystem);
             }
         }
 
@@ -174,18 +175,6 @@ class Universe {
         }
     }
 
-    createSaucers(json) {
-        if (undefined === json) {
-            for (let system of this.systems) {
-                system.createSaucers();
-            }
-        } else {
-            for (let jsonSystem of json.systems) {
-                this.getSystemByName(jsonSystem.spec.name).createSaucers(jsonSystem);
-            }
-        }
-    }
-
     createWormholes(json) {
         if (undefined === json) {  // Scan through systems and setup other variables.
             let count = 1;
@@ -194,20 +183,20 @@ class Universe {
                 // Locate system end away from origin in system.
                 let sysLoc;
                 if (Game.getGame().testMode) {
-                    sysLoc = new Location(0, 500 * count, 0, system);
+                    sysLoc = new Location(undefined, 0, 500 * count, 0, system);
                 } else {
                     // Locate wormhole randomly in the system
                     do {
                         sysLoc = Location.createRandomInSystem(system, true);
                     } while (sysLoc.length < (this.systemSize / 2));
                 }
-                this.wormholes.add(new Wormhole(sysLoc, system.uniLocation));
+                this.wormholes.add(new Wormhole(json, sysLoc, system.uniLocation));
                 count++;
             }
         } else {
             this.wormholes = new JSONSet();
             for (let jsonWormhole of json.wormholes) {
-                let wormhole = Wormhole.fromJSON(jsonWormhole, this);
+                let wormhole = new Wormhole(jsonWormhole);
                 this.wormholes.add(wormhole);
             }
         }
@@ -237,6 +226,10 @@ class Universe {
         return (this.universeTime);
     }
 
+    getMaxRockCount() {
+        return (this.maxRockCount);
+    }
+
     // Create a ship.
     createShip(json) {
         let system = this.system;
@@ -244,7 +237,7 @@ class Universe {
 
         if (undefined === json) {
             if (Game.getGame().testMode) {
-                this.ship = new PlayerShip(5, 10, 20, new Location(0, 0, 0, system));
+                this.ship = new PlayerShip(undefined, 5, 10, 20, new Location(undefined, 0, 0, 0, system));
 
                 // Do some damage
                 this.ship.compSets.takeDamage(1);
@@ -299,15 +292,14 @@ class Universe {
                     count++;
                 }
             } else {
-                this.ship = new PlayerShip(5, 10, 20, new Location(-200, 100, 0, system));
+                this.ship = new PlayerShip(undefined, 5, 10, 20, new Location(undefined, -200, 100, 0, system));
             }
         } else {
-            this.ship = PlayerShip.fromJSON(json.ship, system);
+            this.ship = new PlayerShip(json.ship);
         }
     }
 
     // Get System by name.
-    // null if not found.
     getSystemByName(name) {
         if (this.hyperspace.getName() == name) {
             return (this.hyperspace);
@@ -322,7 +314,7 @@ class Universe {
         }
         throw (new BugError("Cannot find system named " + name + "."))
     }
-    
+
     // Remove non fixed labels.
     removeLabels() {
         for (let system of this.systems) {

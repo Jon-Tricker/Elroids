@@ -126,8 +126,6 @@ class Miner extends NPShip {
     constructor(location, speed) {
         super(5, 10, 20, location, speed, undefined, HP);
 
-        this.buildShip();
-
         this.ai = new MinerAI(this);
     }  
     

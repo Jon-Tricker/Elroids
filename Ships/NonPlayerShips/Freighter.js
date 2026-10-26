@@ -21,8 +21,6 @@ class Freighter extends NPShip {
     constructor(location, speed) {
         super(5, 10, 20, location, speed, undefined, HP);
 
-        this.buildShip();
-
         this.ai = new FreighterAI(this);
 
         this.compSets.baySet.loadRandomCargo(Math.random() * INITIAL_CARGO_VALUE);

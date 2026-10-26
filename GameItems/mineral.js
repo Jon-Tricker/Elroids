@@ -6,20 +6,25 @@
 
 import * as THREE from 'three';
 import Game from '../Game/game.js';
-import NonShipItem2 from './nonShipItem2.js';
 import PlayertShip from '../Ships/playerShip.js';
 import Explosion from './explosion.js';
+import Item from './item.js';
 
 const MAX_SIZE = 10;
 
 // Tine to live ms.
 const TTL = 100000;   // ms
 
-class Mineral extends NonShipItem2 {
+class Mineral extends Item {
   type;
   expiryTime;
 
   constructor(mass, location, speed, type) {
+
+    // TODO remove.
+    if (mass != Math.floor(mass)) {
+      console.log("XXX");
+    }
 
     let size = Math.floor(Math.cbrt(mass));
     if (size < 1) {
@@ -70,8 +75,7 @@ class Mineral extends NonShipItem2 {
     super.animate();
 
     if (date > this.expiryTime) {
-      new Explosion(1, this);
-      this.destruct();
+      this.destruct(false);
     }
   }
 

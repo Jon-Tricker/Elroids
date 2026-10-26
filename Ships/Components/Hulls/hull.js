@@ -201,7 +201,7 @@ class Hull extends Component {
 
         ship.localToWorld(point);
 
-        let loc = new Location(point.x, point.y, point.z, ship.location.system);
+        let loc = new Location(undefined, point.x, point.y, point.z, ship.location.system);
         return (loc);
     }
 
@@ -215,7 +215,7 @@ class Hull extends Component {
 
         ship.localToWorld(point);
 
-        let loc = new Location(point.x, point.y, point.z, ship.location.system);
+        let loc = new Location(undefined, point.x, point.y, point.z, ship.location.system);
         return (loc);
     }
 

@@ -5,13 +5,13 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
-import NonShipItem2 from '../nonShipItem2.js';
+import Item from '../item.js';
 import Universe from '../universe.js';
 
 const MISSILE_SIZE = 1;     // m
 const MISSILE_MASS = 0.1;
 
-class Projectile extends NonShipItem2 {
+class Projectile extends Item {
 
   colour;
   damage;
@@ -53,7 +53,7 @@ class Projectile extends NonShipItem2 {
 
     this.range -= this.speedFrame.length();
     if (0 > this.range) {
-      this.destruct();
+      this.destruct(false);
     }
   }
 

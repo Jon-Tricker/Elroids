@@ -1,6 +1,6 @@
 // Stuff that's common to the entire game.
 
-// Copyright (C) Jon Tricker 2023, 2025, 2026.
+// Copyright (C) Jon Tricker 2023 - 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -20,7 +20,7 @@ import Utils from './Utils/utilities.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "11.4";
+const VERSION = "12.0";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -96,8 +96,8 @@ class Game {
 
         if ((soundOn != null) && (soundOn.toLowerCase() == "true")) {
             this.soundOn = true;
-        }     
-        
+        }
+
         if ((startDocked != null) && (startDocked.toLowerCase() == "true")) {
             this.startDocked = true;
         }
@@ -116,14 +116,32 @@ class Game {
         this.componentsList = new ComponentsList();
         this.goodsList = new GoodsList();
 
+        this.setup(undefined, uniSize, systemSize, maxRockCount);
+
+        // First call of animation loop.
+        this.loop();
+    }
+
+    setup(json, uniSize, systemSize, maxRockCount) {
+
         // Create universe
-        this.universe = new Universe(uniSize, systemSize, maxRockCount);
+        if (undefined == json) {
+            this.universe = new Universe(undefined, uniSize, systemSize, maxRockCount);
+        } else {
+            this.universe = new Universe(json.universe);
+        }
 
         // Create the scene
-        this.scene = new MyScene(0 == maxRockCount);
+        if (undefined == json) {
+            this.scene = new MyScene(0 == this.universe.getMaxRockCount());
+        }
 
         // Now there is something to display it popuate the universe,
-        this.universe.populate();
+        if (undefined == json) {
+            this.universe.populate(undefined);
+        } else {
+            this.universe.populate(json.universe);
+        }
 
         // Create displays
         this.displays = new Displays(this);
@@ -132,21 +150,12 @@ class Game {
         // Now we have a ship. Switch to it's camera
         this.scene.setCamera(MyCamera.PILOT);
 
-        if (this.startDocked) {
-            // Doc ship to first station.
-            for (let station of this.universe.system.stations) {
-                this.getShip().dock(station);
-                break;
-            }
-        }
-        
-
-        // First call of animation loop.
-        this.loop();
+        // Make current system graphics active.
+        this.universe.system.setActive(true);
     }
 
     static getGame() {
-        return(Game.game);
+        return (Game.game);
     }
 
     static getCraterTexture() {
@@ -223,30 +232,20 @@ class Game {
         // Deactivate old sustem.
         this.universe.system.setActive(false);
 
+        // Destroy old universe.
+        this.universe.destruct();
+        this.universe = undefined;
+
+        // this.scene = undefined;
+
         this.testMode = json.testMode;
         this.soundOn = json.soundOn;
         this.maxSaucerCount = json.maxSaucerCount;
         this.safe = json.safe;
 
         this.player = Player.fromJSON(json.player, this);
-        this.universe = Universe.fromJSON(json.universe, this);
 
-        // Activate new system.
-        this.universe.system.setActive(true);
-
-        if (this.paused != json.paused) {
-            this.togglePaused();
-        }
-
-        // Refresh displays.
-        this.displays = new Displays(this);
-        this.displays.resize();
-
-        // We saved from a menu. So koad with terminal open/
-        this.displays.terminalEnable(true);
-
-        this.scene.setCamera(json.cameraType);
-
+        this.setup(json);
     }
 
     getSounds() {
@@ -259,7 +258,7 @@ class Game {
     }
 
     setListener(listener) {
-        Universe.listener = listener;
+        Game.listener = listener;
     }
 
     loadSoundBuffers() {
@@ -273,7 +272,7 @@ class Game {
     }
 
     getListener() {
-        return (Universe.listener);
+        return (Game.listener);
     }
 
     getUniverse() {
@@ -296,7 +295,7 @@ class Game {
 
             this.getShip().respawn();
         } else {
-            this.getShip().destruct();
+            this.getShip().destruct(false);
             this.displays.addMessage("Game Over! ... Refresh page to play again.", 0);
         }
     }
@@ -348,7 +347,7 @@ class Game {
 
     togglePaused() {
         this.paused = !this.paused;
-        if (null == this.getShip().dockedWith) {
+        if (undefined == this.getShip().dockedWith) {
             this.displays.terminalEnable(this.paused);
         }
     }
@@ -358,7 +357,7 @@ class Game {
     }
 
     isSafe() {
-        return(this.safe);
+        return (this.safe);
     }
 
     setSafe(safe) {

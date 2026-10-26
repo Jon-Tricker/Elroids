@@ -2,11 +2,12 @@
 // 
 // Extends Vector3 to include the system coordinate and optionally handle wrap round.
 // 
-// Copyright (C) Jon Tricker 2023, 2025.
+// Copyright (C) Jon Tricker 2023, 2025, 2026.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import * as THREE from 'three';
+import Game from '../game.js';
 import BugError from '../bugError.js';
 
 class Location extends THREE.Vector3 {
@@ -14,26 +15,31 @@ class Location extends THREE.Vector3 {
     // System pointer.
     system;
 
-    constructor(x, y, z, system) {
+    constructor(json, x, y, z, system) {
+        if (undefined != json) {
+            x = json.x;
+            y = json.y;
+            z = json.z;
+            system =  Game.getGame().getUniverse().getSystemByName(json.system);
+        }
         super(x, y, z);
         this.setSystem(system);
     }
 
     toJSON() {
-        // Just save the vector. System is inplicit in our location in the JSON heirachy. 
+        // Just save the vector. System is implicit in our location in the JSON heirachy. 
         return {
             x: this.x,
             y: this.y,
-            z: this.z
+            z: this.z,
+
+            // Systems don't have an ID ... so save name.
+            system: this.system.getName()
         }
     }
 
-    static fromJSON(json, system) {
-        return (new Location(json.x, json.y, json.z, system));
-    }
-
     clone() {
-        return new Location(this.x, this.y, this.z, this.system);
+        return new Location(undefined, this.x, this.y, this.z, this.system);
     }
 
     equals(that) {
@@ -149,7 +155,7 @@ class Location extends THREE.Vector3 {
             z = Math.floor(z);
         }
 
-        return (new Location(x, y, z, system));
+        return (new Location(undefined, x, y, z, system));
     }
 
     // Get a random location far away from this loction. 

@@ -13,25 +13,22 @@ class NPShip extends Ship {
     ai;
 
     constructor(height, width, length, location, speed, mass, hitPoints) {
-        super(height, width, length, location, speed, mass, hitPoints);
-    }
-
-    destruct() {
-        super.destruct();
+        super(undefined, height, width, length, location, speed, mass, hitPoints);
+        this.activateIfRequired();
     }
 
     animate(date, keyboard) {
         // Move, at existing speed, first so we don't run over anything created.
         super.animate(date);
-        
-        this.ai.animate(date);
+
+        if (!this.isDestructed()) {
+            this.ai.animate(date);
+        }
     }
 
     takeDamage(hits, that) {
-        let destroyed = super.takeDamage(hits, that);
-
         if (that.owner == this.getShip()) {
-            if (!this.isHostile() && (this.getSystem().getLawLevel() > 1) ) {
+            if (!this.isHostile() && (this.getSystem().getLawLevel() > 1)) {
                 Game.getGame().displays.addMessage("Piracy is illegal. Reputation reduced.");
                 this.getShip().getPlayer().decReputation();
             }
@@ -41,17 +38,23 @@ class NPShip extends Ship {
             this.setHostile(true);
         }
 
-        if (destroyed) {
+        let destroyed = super.takeDamage(hits, that);
+
+        return (destroyed);
+    }
+
+    destruct(violent) {
+        if (violent) {
             // Dump all cargo.
             this.compSets.baySet.dumpAll();
             this.recalc();
         }
 
-        return (destroyed);
+        super.destruct(violent);
     }
 
     isHostile() {
-        return(this.ai.isHostile())
+        return (this.ai.isHostile())
     }
 
     setHostile(hostile) {
@@ -60,9 +63,9 @@ class NPShip extends Ship {
 
     getRadarColour() {
         if (this.isHostile()) {
-            return("#FF0000")
+            return ("#FF0000")
         } else {
-            return(super.getRadarColour());
+            return (super.getRadarColour());
         }
     }
 }

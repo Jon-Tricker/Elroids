@@ -84,7 +84,7 @@ class MenuSystem {
     constructor(display) {
         this.display = display;
         try {
-            if (null != this.getShip().getDockedWith()) {
+            if (undefined != this.getShip().getDockedWith()) {
                 this.pushMenu(dockedMenu);
             } else {
                 this.pushMenu(topMenu);
@@ -272,7 +272,7 @@ class MenuSystem {
             text += "\t<button type=\"button\" onclick=\"this.defaultBackClick()\">Back</button>"
         }
 
-        if (null == this.getShip().getDockedWith()) {
+        if (undefined == this.getShip().getDockedWith()) {
             text += "\t<button type=\"button\" onclick=\"this.defaultExitClick()\">Exit</button>"
         } else {
             text += "\t<button type=\"button\" onclick=\"this.defaultUndockClick()\">Undock</button>"
@@ -500,7 +500,7 @@ class MenuSystem {
 
     // Folow a link
     followLink(link) {
-        let linkName = null;
+        let linkName;
 
         for (let i = 0; i < link.attributes.length; i++) {
             let attrib = link.attributes[i];
@@ -511,7 +511,7 @@ class MenuSystem {
             }
         }
 
-        if (null == linkName) {
+        if (undefined == linkName) {
             throw new BugError("No HREF in link.");
         } else {
             if (undefined == MenuSystem[linkName]) {

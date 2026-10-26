@@ -57,11 +57,8 @@ class SaucerMother extends Saucer {
         return(COLOUR);
     }
 
-    destruct() {
-        // Remove self from game.
-        this.location.system.removeMotherSaucer(this);
-
-        super.destruct();
+    destruct(violent) {
+        super.destruct(violent);
     }
 
     // Do navigation logic

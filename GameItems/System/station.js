@@ -6,7 +6,6 @@
 
 import * as THREE from 'three';
 import Game from '../../Game/game.js';
-import NonShipItem from '../nonShipItem.js';
 import PlayerShip from '../../Ships/playerShip.js';
 import Texture from '../../Game/Utils/texture.js';
 import BoxSides from '../../Game/Utils/boxSides.js'
@@ -14,6 +13,7 @@ import PlateTexture from '../../Game/Utils/plateTexture.js';
 import JSONSet from '../../Game/Utils/jsonSet.js';
 import Location from '../../Game/Utils/location.js';
 import Reputation from '../../Game/reputation.js';
+import ItemPers from '../itemPers.js';
 
 
 const ROTATE_RATE = 0.1;    // r/s
@@ -61,31 +61,23 @@ const BAY_MATERIAL = new THREE.MeshStandardMaterial(
     }
 )
 
-class Station extends NonShipItem {
+class Station extends ItemPers {
 
     bayMesh;
 
     // Set of things docked with us. We don't dock with anything.
     dockedItems = new JSONSet();
 
-    constructor(location, owner, json) {
+    constructor(json, location, owner) {
+        // Random rotation
         if (undefined === json) {
-            super(location, new THREE.Vector3(), STATION_SIZE, STATION_MASS, STATION_HP, owner, true);
-        } else {
-            super(location, new THREE.Vector3(), STATION_SIZE, STATION_MASS, STATION_HP, owner, true, json.id);
-        }
-
-        this.setupMesh();
-
-        if (undefined === json) {
+            super(undefined , location, new THREE.Vector3(), STATION_SIZE, STATION_MASS, STATION_HP, owner, true, undefined, new THREE.Vector3(ROTATE_RATE, 0, 0), true);
             if (!Game.getGame().testMode) {
                 this.rotateX(Math.random() * Math.PI);
                 this.rotateZ(Math.random() * Math.PI);
             }
         } else {
-            this.rotateX(json.rotationx);
-            this.rotateY(json.rotationy);
-            this.rotateZ(json.rotationz);
+            super(json.item);
         }
 
         let text = new PlateTexture().getTexture();
@@ -93,19 +85,18 @@ class Station extends NonShipItem {
         STATION_MATERIAL.bumpMap = text;
         STATION_MATERIAL.needsUpdate = true;
 
+        this.activateIfRequired();
+
         // Set the 'position' so other items can get positions relative to this.
         this.moveMesh();
     }
 
     toJSON() {
-        let json = super.toJSON();
+        let json = new Object();
+        json.item = super.toJSON();
+
         // json.stationSpecific = ....
         return (json);
-    }
-
-    static fromJSON(json, system) {
-        let newStation = new Station(Location.fromJSON(json.location, system), system.owner, json);
-        return (newStation);
     }
 
     // Dock something to us.
@@ -120,14 +111,17 @@ class Station extends NonShipItem {
 
         // Place this in our bay. Use universal coordinates.
         let newLoc = this.location.clone();
+        //let newLoc = new Location(undefined, this.bayMesh.position.x, this.bayMesh.position.y, this.bayMesh.position.z, this.location.system)
         newLoc.add(this.bayMesh.position);
         that.setLocation(newLoc);
+        // that.moveItem();
         // that.setLocation(this.bayMesh.position);
 
         // While docked move mesh with station.
         // Switch to station coordinates.
-        // Game.getGame().getScene().remove(that);
+        Game.getGame().getScene().remove(that);
         this.add(that);
+        // that.setLocation(newLoc);
 
         // Rotate to face exit. Use station coordionates.
         that.rotation.set(0, 0, Math.PI);
@@ -156,10 +150,6 @@ class Station extends NonShipItem {
 
         // Rotate to face away from exit.
         that.rotation.set(this.rotation.x, this.rotation.y, this.rotation.z + Math.PI);
-    }
-
-    destruct() {
-        super.destruct();
     }
 
     getRadarColour() {
@@ -285,7 +275,7 @@ class Station extends NonShipItem {
         point.x -= STATION_SIZE;
         this.localToWorld(point);
 
-        let loc = new Location(point.x, point.y, point.z, this.location.system);
+        let loc = new Location(undefined, point.x, point.y, point.z, this.location.system);
         return (loc);
     }
 
@@ -295,7 +285,7 @@ class Station extends NonShipItem {
         point.x -= STATION_SIZE * 2;
         this.localToWorld(point);
 
-        let loc = new Location(point.x, point.y, point.z, this.location.system);
+        let loc = new Location(undefined, point.x, point.y, point.z, this.location.system);
         return (loc);
     }
 
@@ -454,18 +444,6 @@ class Station extends NonShipItem {
 
     static getMaxDockingSpeed() {
         return (MAX_DOCKING_SPEED);
-    }
-
-    animate() {
-        // Spin
-        this.rotateX(ROTATE_RATE / Game.getGame().getAnimateRate());
-
-        // Kill any momentum obtained.
-        this.setSpeed(new THREE.Vector3());
-
-        this.moveMesh();
-
-        this.moveItem(true);
     }
 }
 export default Station;

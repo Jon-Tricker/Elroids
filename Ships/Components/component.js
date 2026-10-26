@@ -250,7 +250,7 @@ class Component extends Goods {
     getCompleteRepairCost(ship) {
         let cost = 0;
 
-        if (null == ship.dockedWith) {
+        if (undefined == ship.dockedWith) {
             // Doubled if not docked.
             cost = this.type.cost * 2;
         } else {
@@ -280,7 +280,7 @@ class Component extends Goods {
 
         // Only upto half when undocked.
         let maxRepairable = 100;
-        if (null == ship.dockedWith) {
+        if (undefined == ship.dockedWith) {
             maxRepairable = 50;
         } else {
             // Only upto half in low tech systems.

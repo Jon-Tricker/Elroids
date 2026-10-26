@@ -234,7 +234,7 @@ class BasicAI {
             return (true);
         }
 
-        if (null != ship.dockedWith) {
+        if (undefined != ship.dockedWith) {
             return (true);
         }
 
@@ -268,12 +268,18 @@ class BasicAI {
     }
 
     destruct(date) {
-        this.myShip.destruct();
+        this.myShip.destruct(false);
         return (true);
     }
 
     // Attack an Item
     attack(dest, date) {
+        // If target destroyed we are done.
+        if (dest.isDestructed()) {
+            this.expire = undefined;
+            return (true);
+        }
+
         let ship = this.myShip;
 
         let range = ship.getLocation().distanceTo(dest.getLocation());
@@ -320,12 +326,6 @@ class BasicAI {
                     this.expire += (FIRE_FREQ * (1 + Math.random() * 2));
                 }
             }
-        }
-
-        // If target destroyed we are done.
-        if (dest.isDestructed()) {
-            this.expire = undefined;
-            return (true);
         }
 
         return (false);

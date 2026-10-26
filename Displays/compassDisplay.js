@@ -32,7 +32,7 @@ class CompassDisplay extends DarkPanel {
 
         let thisship = this.getShip();
 
-        if (null != thisship.dockedWith) {
+        if (undefined != thisship.dockedWith) {
             return;
         }   
         
@@ -71,19 +71,19 @@ class CompassDisplay extends DarkPanel {
         let thisship = this.getShip();
 
         // Find closest object in set.
-        let closest = null;
-        let closestRp = null;
+        let closest;
+        let closestRp;
 
         for (let item of items) {
             let relPos = thisship.location.getRelative(item.getLocation());
             
-            if ((null == closest) || (relPos.length() < closestRp.length())) {
+            if ((undefined == closest) || (relPos.length() < closestRp.length())) {
                 closest = item;
                 closestRp = relPos;
             }
         }
 
-        if (null == closest) {
+        if (undefined == closest) {
             return;
         }
 

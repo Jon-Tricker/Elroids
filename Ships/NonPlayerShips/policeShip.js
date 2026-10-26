@@ -93,12 +93,9 @@ class PoliceShip extends NPShip {
     constructor(location, speed) {
         super(5, 10, 20, location, speed, undefined, HP);
 
-        this.buildShip();
-
         this.ai = new PoliceAI(this);
 
         this.recalcHostility();
-        this.location.system.addPolice(this);
     }
 
     buildShip() {
@@ -111,9 +108,8 @@ class PoliceShip extends NPShip {
         this.recalc();
     }
 
-    destruct() {
-        this.location.system.deletePolice(this);
-        super.destruct();
+    destruct(violent) {
+        super.destruct(violent);
     }
 
     getName() {

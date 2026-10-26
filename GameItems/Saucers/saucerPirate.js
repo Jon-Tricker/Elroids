@@ -36,10 +36,10 @@ class SaucerPirate extends Saucer {
 
     constructor(location, owner) {
         super(SIZE, location, MASS, COLOUR, owner);
-    } 
-    
+    }
+
     getName() {
-        return("Pirate");
+        return ("Pirate");
     }
 
     getMaxSpeed() {
@@ -86,7 +86,7 @@ class SaucerPirate extends Saucer {
     }
 
     getTotalMass() {
-        return(this.mass + this.cargoMass);
+        return (this.mass + this.cargoMass);
     }
 
     createLoiterLocation() {
@@ -95,7 +95,7 @@ class SaucerPirate extends Saucer {
         let offset = Utils.createRandomVector(STANDOFF_DISTANCE)
         this.targetLocation.add(offset);
 
-        return(this.targetLocation);
+        return (this.targetLocation);
     }
 
     // Do shooting logic
@@ -126,19 +126,21 @@ class SaucerPirate extends Saucer {
         super.handleCollision(that);
     }
 
-    destruct() {
-        // If cargo on board make new mineral.
-        this.cargoMass = Math.floor(this.cargoMass);
-        if (0 < this.cargoMass) {
-            let min = new Mineral(this.cargoMass, this.location, this.speed, this.cargoType);
+    destruct(violent) {
+        if (violent) {
+            // If cargo on board make new mineral.
+            this.cargoMass = Math.floor(this.cargoMass);
+            if (0 < this.cargoMass) {
+                let min = new Mineral(this.cargoMass, this.location, this.speed, this.cargoType);
+            }
         }
-        super.destruct();
+        super.destruct(violent);
     }
 
     mineralPickup(that) {
         this.cargoType = that.type;
         this.cargoMass = that.mass;
-        that.destruct();
+        that.destruct(false);
 
         // Find new hiding place
         this.farAway = null;

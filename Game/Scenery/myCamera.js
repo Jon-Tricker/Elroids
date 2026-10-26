@@ -1,4 +1,4 @@
-// Camera and listener mechanics
+// Camera mechanics
 import * as THREE from 'three';
 import Universe from '../../GameItems/universe.js';
 
@@ -24,7 +24,6 @@ class MyCamera extends THREE.PerspectiveCamera {
     ship;
     isFixedLocation;
     isFixedRotation;
-    listener;
 
     constructor(sizes, type, ship) {
 
@@ -142,7 +141,7 @@ class MyCamera extends THREE.PerspectiveCamera {
                 // Adjust loation
                 let loc = this.ship.getLocation().clone();
 
-                if (null != this.ship.dockedWith) {
+                if (undefined != this.ship.dockedWith) {
                     // If docked ship locarion will be relative to dock.
                     this.ship.dockedWith.localToWorld(loc);
                 }

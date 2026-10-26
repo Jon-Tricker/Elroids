@@ -7,7 +7,6 @@
 
 import * as THREE from 'three';
 import Game from '../Game/game.js';
-import Item from '../GameItems/item.js';
 import Explosion from '../GameItems/explosion.js';
 import Mineral from '../GameItems/mineral.js';
 import GoodsCrate from '../Trade/goodsCrate.js';
@@ -16,6 +15,7 @@ import WormholeEnd from '../GameItems/System/wormholeEnd.js';
 import BugError from '../Game/bugError.js';
 import ComponentSets from './Components/componentSets.js';
 import { ComponentAct } from './Components/component.js';
+import ItemPers from '../GameItems/itemPers.js';
 
 // Slightly damped attitude contols to allow fine adjustment.
 const ROTATE_RATE_DELTA = 0.125;        // r/s
@@ -72,7 +72,7 @@ class TurnRate {
     }
 }
 
-class Ship extends Item {
+class Ship extends ItemPers {
 
     // ToDo : These really should be part of the 'Hull' sub classes.
     // However for now have all ships are actually the same size (so game mechanics are identcal) and just vary the size of the hull meshes.
@@ -94,8 +94,15 @@ class Ship extends Item {
     // Array of Items that we would collide with if went straight forward.
     aheadList = undefined;
 
-    constructor(height, width, length, location, speed, mass, hitPoints, owner) {
-        super(location, speed, length, mass, hitPoints, owner);
+    constructor(json, height, width, length, location, speed, mass, hitPoints, owner, persist) {
+        if (undefined == json) {
+            super(undefined, location, speed, length, mass, hitPoints, owner, false, undefined, new THREE.Vector3(), persist);
+        } else {
+            height = json.height;
+            width = json.width;
+            length = json.length;
+            super(json.item);
+        }
 
         // Now that we called 'super' can use 'this
         this.height = height;
@@ -108,6 +115,31 @@ class Ship extends Item {
         this.rollRate = new TurnRate();
 
         this.compSets = new ComponentSets(this);
+        if (undefined == json) {
+            // Build new ship
+            this.buildShip();
+        } else {
+            // Unpack old ship
+            this.unpackShip(json);
+        }
+
+        // Dock ship if reqd.
+        if (undefined == json) {
+            if (Game.getGame().startDocked) {
+                // Doc ship to first station.
+                for (let station of this.location.system.stations) {
+                    this.dockedWith = station;
+                    break;
+                }
+            }
+        } else {
+            if (undefined != json.dockedWith) {
+                let station = this.location.system.getItemById(json.dockedWith);
+                this.dockedWith = station;
+            }
+        }
+
+        this.activateIfRequired();
     }
 
     buildShip() {
@@ -115,12 +147,15 @@ class Ship extends Item {
     }
 
     toJSON() {
-        let json = super.toJSON();
+        let json = new Object();
+        json.item = super.toJSON();
+
+        // Ship specific stuff.
         json.height = this.height;
         json.width = this.width;
         json.length = this.length;
 
-        if (null != this.dockedWith) {
+        if (undefined != this.dockedWith) {
             json.dockedWith = this.dockedWith.getId();
         }
 
@@ -132,28 +167,19 @@ class Ship extends Item {
         return (json);
     }
 
-    static fromJSON(json, system, ship) {
-        if (undefined == json.dockedWith) {
-            ship.rotateX(json.rotationx);
-            ship.rotateY(json.rotationy);
-            ship.rotateZ(json.rotationz);
-        } else {
-            ship.dock(system.getItemById(json.dockedWith));
-        }
-
-        // Build component sets.
-        ship.compSets = new ComponentSets(ship);
+    // Unpack ship from JSON image.
+    unpackShip(json) {
 
         // Unpack components
         for (let jsonComp of json.comps) {
             let comp = Game.getGame().componentsList.getByClass(jsonComp.class);
-            comp = new comp.constructor(comp.getTargetSet(ship));
+            comp = new comp.constructor(comp.getTargetSet(this));
             comp.status = jsonComp.status;
 
-            if (comp.getTargetSet(ship) == ship.compSets.hullSet) {
+            if (comp.getTargetSet(this) == this.compSets.hullSet) {
                 // Do extra stuff for hull. 
-                ship.hull = comp;
-                ship.hull.setSlots(ship.compSets);
+                this.hull = comp;
+                this.hull.setSlots(this.compSets);
             }
 
             comp.displayPanel = jsonComp.displayPanel;
@@ -163,9 +189,13 @@ class Ship extends Item {
         }
 
         // Unpack cargo
-        ship.compSets.baySet.loadFromJSON(json.cargo);
+        this.compSets.baySet.loadFromJSON(json.cargo);
+        
+        if (undefined != json.dockedWith) {
+            this.dockedWith = this.location.system.getItemById(json.dockedWith);
+        }
 
-        ship.recalc();
+        this.recalc();
     }
 
     recalc() {
@@ -173,7 +203,7 @@ class Ship extends Item {
     }
 
     getCompSets() {
-        return(this.compSets);
+        return (this.compSets);
     }
 
     // Upgrade to a new hull
@@ -183,7 +213,7 @@ class Ship extends Item {
         let cost = upHullType.getUpgradeCost(this);
         if (Game.getGame().player.getCredits() < cost) {
             throw (new GameError("Not enough credits"));
-        }  
+        }
 
         // Check existing components will fit in new hull.
 
@@ -229,10 +259,8 @@ class Ship extends Item {
                 this.mesh = null;
             }
         } else {
-            this.setupMesh();
-
             // Only move to scene if not part of something else.
-            if (null == this.getDockedWith()) {
+            if (undefined == this.getDockedWith()) {
                 super.setActive(state);
             }
         }
@@ -365,9 +393,6 @@ class Ship extends Item {
     // Return 'true' if destroyed.
     takeDamage(hits, that) {
         let destroyed = super.takeDamage(hits, that);
-        if (destroyed) {
-            new Explosion(this.size, this);
-        }
 
         this.recalc();
 
@@ -375,7 +400,7 @@ class Ship extends Item {
     }
 
     animate(date) {
-        if (null == this.dockedWith) {
+        if (undefined == this.dockedWith) {
             this.genAheadList();
             super.animate();
         }
@@ -399,7 +424,7 @@ class Ship extends Item {
 
     handleCollision(that) {
         // Can't get hit while docked.
-        if (null != this.dockedWith) {
+        if (undefined != this.dockedWith) {
             return (false)
         }
 
@@ -442,12 +467,12 @@ class Ship extends Item {
 
     undock() {
         // Skip if not really docked
-        if (null == this.dockedWith) {
+        if (undefined == this.dockedWith) {
             return;
         }
 
         this.dockedWith.undock(this);
-        this.dockedWith = null;
+        this.dockedWith = undefined;
 
 
         this.moveMesh();
@@ -463,7 +488,7 @@ class Ship extends Item {
     cratePickup(crate) {
         // Store goods
         this.loadGoods(crate.contents);
-        crate.destruct();
+        crate.destruct(false);
         return (true);
     }
 
@@ -472,7 +497,7 @@ class Ship extends Item {
     mineralPickup(mineral) {
         let mass = Math.ceil(mineral.mass);
         this.loadMineral(mineral.type, mass);
-        mineral.destruct();
+        mineral.destruct(false);
         return (true);
     }
 

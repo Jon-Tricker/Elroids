@@ -6,9 +6,9 @@
 
 import * as THREE from 'three';
 import Game from '../Game/game.js';
-import NonShipItem2 from '../GameItems/nonShipItem2.js';
 import PlayerShip from '../Ships/playerShip.js';
 import Explosion from '../GameItems/explosion.js';
+import Item from '../GameItems/item.js';
 
 const SIZE = 5;
 
@@ -24,7 +24,7 @@ const MATERIAL = new THREE.MeshStandardMaterial(
     metalness: 0.8,
   })
 
-class GoodsCrate extends NonShipItem2 {
+class GoodsCrate extends Item {
   contents;
   expiryTime;
 
@@ -67,8 +67,7 @@ class GoodsCrate extends NonShipItem2 {
     super.animate();
 
     if (date > this.expiryTime) {
-      new Explosion(1, this);
-      this.destruct();
+      this.destruct(false);
     }
   }
 

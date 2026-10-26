@@ -10,6 +10,8 @@ import JSONSet from "../../Game/Utils/jsonSet.js";
 import BugError from "../../Game/bugError.js";
 import GoodsCrate from "../../Trade/goodsCrate.js";
 import Mineral from "../mineral.js";
+import WormholeEnd from "./wormholeEnd.js";
+import Station from "./station.js";
 
 // Specification of a star system.
 class SystemSpec {
@@ -19,7 +21,16 @@ class SystemSpec {
     lawLevel;
     mineralAbundance = new Map();   // %
 
-    constructor(name, techLevel, magicLevel, lawLevel, description, abundancies) {
+    constructor(json, name, techLevel, magicLevel, lawLevel, description, abundancies) {
+        if (undefined != json) {
+            name = json.name;
+            techLevel = json.techLevel;
+            magicLevel = json.magicLevel;
+            lawLevel = json.lawLevel;
+            description = json.description;
+            abundancies = json.abundancies;
+        }
+
         this.name = name;
         this.techLevel = techLevel;
         this.magicLevel = magicLevel;
@@ -64,10 +75,6 @@ class SystemSpec {
         }
     }
 
-    static fromJSON(json) {
-        return (new SystemSpec(json.name, json.techLevel, json.magicLevel, json.lawLevel, json.description, json.abundancies));
-    }
-
     normalizeAbundancies() {
         let total = 0;
         for (let [key, value] of this.mineralAbundance) {
@@ -99,9 +106,6 @@ class SystemSpec {
 }
 
 class System {
-    // Back reference to out parent.
-    universe;
-
     // Size of this system
     systemSize;
 
@@ -122,19 +126,34 @@ class System {
     // Static elements
     skyBox;
 
-    constructor(universe, spec, systemSize, uniLocation, background, json) {
+    constructor(json, spec, systemSize, uniLocation, background) {
+        if (undefined != json) {
+            spec = new SystemSpec(json.spec);
+            systemSize = json.systemSize;
+            uniLocation = json.uniLocation;
+            background = json.background;
+        }
+
         this.spec = spec;
         this.systemSize = systemSize;
-        this.universe = universe;
         this.uniLocation = uniLocation;
 
         this.createSkyBox(background, json)
     }
 
+    destruct() {
+        for (let item of this.items) {
+            item.destruct(false);
+        }
+
+        this.wormholeEnds = undefined;
+        this.SkyBox = undefined;
+    }
+
     createSkyBox(background, json) {
         if (undefined === json) {
             // Create static elements.
-            let skyBoxSize = this.universe.systemSize * 4;
+            let skyBoxSize = this.systemSize * 4;
             this.skyBox = new SkyBox(skyBoxSize, this, true, background);
         } else {
             this.skyBox = SkyBox.fromJSON(json.skyBox, this);
@@ -151,10 +170,6 @@ class System {
         }
 
         return (json);
-    }
-
-    static fromJSON(json, universe) {
-        return (new System(universe, new SystemSpec(json.SystemSpec), json.systemSize, json.uniLocation, json.background, json.skyBox));
     }
 
     getName() {
@@ -178,7 +193,7 @@ class System {
     }
 
     getSize() {
-        return(this.systemSize);
+        return (this.systemSize);
     }
 
     // Switch this system on/off
@@ -187,18 +202,34 @@ class System {
         for (let item of this.items) {
             item.setActive(state);
         }
+
+        // Now everything is active do any necessary docking. 
+        if (state) {
+            for (let item of this.items) {
+                if (undefined != item.getDockedWith()) {
+                    item.dock(item.getDockedWith());
+                }
+            }
+        }
     }
 
     addItem(item) {
         this.items.add(item);
+
+        if (item instanceof WormholeEnd) {
+            this.wormholeEnds.add(item);
+        }  
     }
 
     removeItem(item) {
-        this.items.delete(item);
+        this.items.delete(item);    
+        
+        if (item instanceof WormholeEnd) {
+            this.wormholeEnds.delete(item);
+        }  
     }
 
     // Get item by id.
-    // null if not found.
     getItemById(id) {
         for (let item of this.items) {
             if (undefined != item.getId()) {
@@ -239,7 +270,7 @@ class System {
             item.animate(date, keyBoard);
 
             // IF not still the current system give up.
-            if (this.universe.system != this) {
+            if (Game.getGame().getUniverse().system != this) {
                 return;
             }
         }
@@ -297,8 +328,8 @@ class System {
         }
 
         return (closest);
-    }    
-    
+    }
+
     // Remove non fixed labels.
     removeLabels() {
         for (let item of this.items) {

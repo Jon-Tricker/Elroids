@@ -39,16 +39,19 @@ class StarSystem extends System {
     stations = new Set();
     policeShips = new Set();
 
-    constructor(universe, spec, systemSize, maxRockCount, uniLocation, background, json) {
-        super(universe, spec, systemSize, uniLocation, background, json);
+    constructor(json, spec, systemSize, maxRockCount, uniLocation, background) {
+        if (undefined != json) {
+            maxRockCount = json.maxRockCount;
+        }
+
+        super(json, spec, systemSize, uniLocation, background);
+
         this.maxRockCount = maxRockCount;
+    }
+
+    populate(json) {
+        // Create persistent stuff.
         this.createStations(json);
-
-        // When we create the system don't yet have a ship. So saucers cannot target it.
-        // Hold off saucer creation till latter.
-        // this.createSaucers(json);
-
-        this.createRocks(this.maxRockCount);
     }
 
     toJSON() {
@@ -65,34 +68,58 @@ class StarSystem extends System {
 
         json.skyBox = this.skyBox.toJSON();
 
+        /*
         let saucers = [];
         for (let saucer of this.motherSaucers) {
-            saucers.push(saucer);
+            saucers.push(saucer.toJSON());
         }
         json.saucers = saucers;
+        */
 
         return (json);
     }
 
-    static fromJSON(json, universe) {
-        let system = new StarSystem(universe, SystemSpec.fromJSON(json.spec), json.systemSize, json.maxRockCount, json.uniLocation, json.background, json);
-        return (system);
+    setActive(state) {
+        if (state) {
+            this.createDynamic(this.maxRockCount);
+        }
+        super.setActive(state)
     }
 
-    addStation(station) {
-        this.stations.add(station);
+    addItem(item) {
+        super.addItem(item);
+
+        if (item instanceof Station) {
+            this.stations.add(item);
+        }
+
+        if (item instanceof PoliceShip) {
+            this.policeShips.add(item);
+        }
+
+        if (item instanceof SaucerMother) {
+            this.motherSaucers.add(item);
+        }
+    }
+
+    removeItem(item) {
+        super.removeItem(item);
+
+        if (item instanceof Station) {
+            this.stations.delete(item);
+        } 
+        
+        if (item instanceof PoliceShip) {
+            this.policeShips.delete(item);
+        }   
+
+        if (item instanceof SaucerMother) {
+            this.motherSaucers.delete(item);
+        }
     }
 
     getStations() {
         return (this.stations);
-    }
-
-    addPolice(ship) {
-        this.policeShips.add(ship);
-    }
-
-    deletePolice(ship) {
-        this.policeShips.delete(ship);
     }
 
     getPolice() {
@@ -100,7 +127,7 @@ class StarSystem extends System {
     }
 
     recalcPoliceHostility() {
-        for(let police of this.policeShips) {
+        for (let police of this.policeShips) {
             police.recalcHostility();
         }
     }
@@ -131,7 +158,6 @@ class StarSystem extends System {
             if (this.policeShips.size < Math.floor(this.getLawLevel() / 2)) {
                 let police = new PoliceShip(Game.getGame().getShip().location.getFarAway());
                 police.setActive(true);
-                this.addPolice(police);
             }
 
             this.nPShipTimer = date + NP_SHIP_FREQUENCY * (1 + Math.random()) * 0.5;
@@ -181,28 +207,31 @@ class StarSystem extends System {
         }
     }
 
-    createRocks(rockCount) {
+    // Create the dynamic content that is not persisted when system inactive.
+    createDynamic(rockCount) {
+        this.createSaucers();
+
         if (Game.getGame().testMode) {
             // Create a few test rocks at set locations
 
             // Horizontal colliders
-            new Rock(20, new Location(200, 100, 50, this), new THREE.Vector3());
-            new Rock(10, new Location(200, -50, 50, this), new THREE.Vector3(0, 25, 0));
+            new Rock(20, new Location(undefined, 200, 100, 50, this), new THREE.Vector3());
+            new Rock(10, new Location(undefined, 200, -50, 50, this), new THREE.Vector3(0, 25, 0));
 
             // Point blank shot
-            // new Rock(5, new Location(20, 0, 0, this), new THREE.Vector3(0, 0, 0));
+            // new Rock(5, new Location(undefined, 20, 0, 0, this), new THREE.Vector3(0, 0, 0));
 
             // Big target
-            // new Rock(20, new Location(100, 0, 0, this),new THREE.Vector3() );
+            // new Rock(20, new Location(undefined, 100, 0, 0, this),new THREE.Vector3() );
 
             // Small target
-            // new Rock(80, new Location(100, 0, 0, this), new THREE.Vector3());
+            // new Rock(80, new Location(undefined, 100, 0, 0, this), new THREE.Vector3());
 
             // Row of rocks
             for (let i = -this.systemSize; i < this.systemSize; i += 211) {
                 let sz = Math.abs(i % Game.getGame().getMaxRockSize());
                 if (sz != 0) {
-                    new Rock(sz, new Location(i, -100, 0, this), new THREE.Vector3());
+                    new Rock(sz, new Location(undefined, i, -100, 0, this), new THREE.Vector3());
                 }
             }
 
@@ -210,7 +239,7 @@ class StarSystem extends System {
             /*
             for (let i = 0; i < this.systemSize ; i += 211) {
                 let sz = i % MAX_ROCK_SIZE;
-                new Rock(sz, new Location(i, i, i), new THREE.Vector3());
+                new Rock(sz, new Location(undefined, i, i, i), new THREE.Vector3());
             }
             */
 
@@ -218,23 +247,23 @@ class StarSystem extends System {
             let count = 0;
             for (let type of NPShipFactory.shipTypes) {
                 let yLoc = (NPShipFactory.shipTypes.size / 2 - count) * 100;
-                let location = new Location(2000, yLoc, 200, this);
+                let location = new Location(undefined, 2000, yLoc, 200, this);
                 NPShipFactory.createShip(type, location, undefined);
                 count++;
             }
 
             // And a sample mineral
-            new Mineral(100, new Location(250, -10, 50, this), new THREE.Vector3(), MineralTypes[2]);
-            new Mineral(100, new Location(500, 50, 50, this), new THREE.Vector3(), MineralTypes[3]);
+            new Mineral(100, new Location(undefined, 250, -10, 50, this), new THREE.Vector3(), MineralTypes[2]);
+            new Mineral(100, new Location(undefined, 500, 50, 50, this), new THREE.Vector3(), MineralTypes[3]);
 
             // Add sample goods crates.
             let good = new (Game.getGame().goodsList.getByClass("Gun")).constructor();
             good.number = 50;
-            good.makeCrate(new Location(250, 10, 50, this), new THREE.Vector3());
+            good.makeCrate(new Location(undefined, 250, 10, 50, this), new THREE.Vector3());
 
             let comp = new (Game.getGame().componentsList.getByClass("BasicEngine")).constructor();
             comp.number = 1;
-            comp.makeCrate(new Location(270, 10, 70, this), new THREE.Vector3());
+            comp.makeCrate(new Location(undefined, 270, 10, 70, this), new THREE.Vector3());
 
         } else {
             // Create a bunch of random rocks
@@ -258,19 +287,16 @@ class StarSystem extends System {
     createStations(json) {
         if (undefined === json) {
             // Create new stations.
-            let station;
             if (Game.getGame().testMode) {
-                // station = new Station(new Location(-4900, 0, 0, this), null);
-                station = new Station(new Location(1100, 0, 0, this), null);
+                // new Station(new Location(-4900, 0, 0, this), null);
+                new Station(undefined, new Location(undefined, 1100, 0, 0, this), null);
             } else {
-                station = new Station(new Location(0, 0, 0, this), null);
+                new Station(undefined, new Location(undefined, 0, 0, 0, this), null);
             }
-            this.stations.add(station);
         } else {
             // Restore old stations.
             for (let station of json.stations) {
-                let newStation = Station.fromJSON(station, this);
-                this.stations.add(newStation);
+                new Station(station);
             }
         }
     }
@@ -281,8 +307,7 @@ class StarSystem extends System {
         } else {
             // Restore old saucers.
             for (let saucer of json.saucers) {
-                let newSaucer = SaucerMother.fromJSON(saucer, this);
-                this.motherSaucers.add(newSaucer);
+                SaucerMother.fromJSON(saucer, this);
             }
         }
     }
@@ -294,22 +319,16 @@ class StarSystem extends System {
         // Create it close so we can find it. 
         let hole = this.wormholeEnds.getRandomElement();
         if (Game.getGame().testMode) {
-            loc = new Location(1000, 100, -50, this);
+            loc = new Location(undefined, 1000, 100, -50, this);
         } else {
             // Spawn from a wormhole.
             loc = hole.location;
         }
 
-        let saucer = new SaucerMother(loc, null);
-        this.motherSaucers.add(saucer);
+        new SaucerMother(loc, null);
 
         // Game gradually gets harder.
         game.maxSaucerCount++;
-    }
-
-    removeMotherSaucer(saucer) {
-        // console.log("MS destoryed");
-        this.motherSaucers.delete(saucer);
     }
 }
 

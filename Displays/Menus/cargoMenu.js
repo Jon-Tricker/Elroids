@@ -55,7 +55,7 @@ class CargoMenu {
             heads.push("Type");
             heads.push("Mass\n(t)");
 
-            if (null != ship.dockedWith) {
+            if (undefined != ship.dockedWith) {
                 heads.push("Sell 1\n(t)");
                 heads.push("Sell all");
             } else {
@@ -71,7 +71,7 @@ class CargoMenu {
                 row.push(mineral.name);
                 row.push(mass);
 
-                if (null != ship.dockedWith) {
+                if (undefined != ship.dockedWith) {
                     row.push(CargoMenu.getButtonText(ship.location.system, index, mineral, 1));
                     row.push(CargoMenu.getButtonText(ship.location.system, index, mineral, mass));
 
@@ -87,7 +87,7 @@ class CargoMenu {
             }
             doc += tab.toString();
 
-            if (null != ship.dockedWith) {
+            if (undefined != ship.dockedWith) {
                 doc += "<BR />";
                 doc += "<P>Sell all minerals <button type=\"button\" onclick=\"CargoMenu.onSellMineralClick(this)\">" + totalValue + "</button></P>";
             }
@@ -115,7 +115,7 @@ class CargoMenu {
             heads.push("Mass\n(t)");
             heads.push("Status\n(%)");
             heads.push("Details");
-            if (null != ship.dockedWith) {
+            if (undefined != ship.dockedWith) {
                 heads.push("Mount");
                 heads.push("Sell");
             }
@@ -128,7 +128,7 @@ class CargoMenu {
                 vals.push(comp.getMass());
                 vals.push(comp.status);
                 vals.push("<button type=\"button\" onclick=\"CargoMenu.onDetailsCompClick(this, " + index + ")\">Show</button>");
-                if (null != ship.dockedWith) {
+                if (undefined != ship.dockedWith) {
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onMountCompClick(this, " + index + ")\">Mount</button>");
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellCompClick(this, " + index + ")\">" + comp.getValueInSystem(ship.location.system) + "</button>");
                 } else {
@@ -158,12 +158,12 @@ class CargoMenu {
             heads.push("Name");
             heads.push("Mass\n(t)");
             heads.push("Number");
-            if (null == ship.dockedWith) {
+            if (undefined == ship.dockedWith) {
                 heads.push("Value");
             }
             heads.push("Details");
             heads.push("Legal")
-            if (null != ship.dockedWith) {
+            if (undefined != ship.dockedWith) {
                 heads.push("Base cost\n(each)")
                 heads.push("Sell 1");
                 heads.push("Sell all");
@@ -176,12 +176,12 @@ class CargoMenu {
                 vals.push(good.getName());
                 vals.push(good.getMass());
                 vals.push(good.number);
-                if (null == ship.dockedWith) {
+                if (undefined == ship.dockedWith) {
                     vals.push(good.getValueInSystem(ship.location.system));
                 }
                 vals.push("<button type=\"button\" onclick=\"CargoMenu.onDetailsGoodsClick(this, " + index + ")\">Show</button>");
                 vals.push(good.isLegal(ship.location.system));
-                if (null != ship.dockedWith) {
+                if (undefined != ship.dockedWith) {
                     vals.push(good.getCost());
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, " + index + ", 1)\">" + good.getUnitCostInSystem(ship.location.system) + "</button>");
                     vals.push("<button type=\"button\" onclick=\"CargoMenu.onSellGoodsClick(this, " + index + ", " + good.number + ")\">" + good.getValueInSystem(ship.location.system) + "</button>");

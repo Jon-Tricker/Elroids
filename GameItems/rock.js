@@ -4,11 +4,11 @@
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import * as THREE from 'three';
-import NonShipItem2 from './nonShipItem2.js';
 import Game from '../Game/game.js';
 import FacitRockGeometry from '../Game/Scenery/facitRockGeometry.js';
 import { Composition } from './minerals.js';
 import PlayerShip from '../Ships/playerShip.js'
+import Item from './item.js';
 
 // Type of rock graphics
 const ROCK_STYLE_SPHERE = 0;
@@ -29,7 +29,7 @@ const BASE_ROCK_MATERIAL = new THREE.MeshStandardMaterial(
   }
 )
 
-class Rock extends NonShipItem2 {
+class Rock extends Item {
 
   rockSize;
   originalHP;
@@ -64,9 +64,9 @@ class Rock extends NonShipItem2 {
     // Don't lable rocks. Too many of them.
   }
 
-  destruct() {
+  destruct(violent) {
     this.location.system.rockCount--;
-    super.destruct();
+    super.destruct(violent);
   }
 
   static setRockStyle(style) {
@@ -140,7 +140,7 @@ class Rock extends NonShipItem2 {
     let loc = this.getLocation().clone();
     let spd = this.speed.clone();
 
-    this.destruct();
+    this.destruct(true);
 
 
     if (2 < newSize) {

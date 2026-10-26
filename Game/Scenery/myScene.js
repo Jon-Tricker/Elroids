@@ -12,7 +12,7 @@ import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 
 class MyScene extends THREE.Scene {
 
-  camera = null;
+  camera;
   light;
   ambientLight;
 
@@ -96,7 +96,7 @@ class MyScene extends THREE.Scene {
     let game = Game.getGame();
 
     // Remove any existing, non rotating, camera ... and let GC deal with it (I hope).
-    if (null != this.camera) {
+    if (undefined != this.camera) {
       if (this.camera.getIsFixedRotation()) {
         super.remove(this.camera);
       }
@@ -143,8 +143,8 @@ class MyScene extends THREE.Scene {
       this.getCamera().addListener(game.getListener());
     }
 
-    // this.renderer.render(this, this.camera);
-    // this.labelRenderer.render(this, this.camera);
+    this.renderer.render(this, this.camera);
+    this.labelRenderer.render(this, this.camera);
   }
 
   addListener(list) {

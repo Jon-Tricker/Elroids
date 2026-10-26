@@ -1,12 +1,13 @@
 // Explosion
-// For now simple spheres.
+//
+// Inherit from ItemGraphics. So there is not a circular dependancy betweeen Explosion and Item.
  
 // Copyright (C) Jon Tricker 2023.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import * as THREE from 'three';
 import Game from '../Game/game.js';
-import Item from './item.js';
+import ItemGraphics from './itemGraphics.js';
 
 // Create material.
 const explosionMaterial = new THREE.MeshStandardMaterial(
@@ -21,7 +22,7 @@ const explosionMaterial = new THREE.MeshStandardMaterial(
 
 const MAX_SIZE = 10;
 
-class Explosion extends Item {
+class Explosion extends ItemGraphics {
 
   maxSize;
   currentSize;
@@ -39,7 +40,9 @@ class Explosion extends Item {
     this.currentSize = 1;
 
     this.setupMesh();
-  }
+    
+    this.activateIfRequired();
+  }   
 
   setupMesh() {
     // Create a sphere.
@@ -62,7 +65,7 @@ class Explosion extends Item {
 
   animate() {
     if (this.currentSize > this.maxSize) {
-      this.destruct();
+      this.destruct(false);
     } else {
       this.scale.set(this.currentSize, this.currentSize, this.currentSize);
 

@@ -48,7 +48,7 @@ class ComponentsMenu {
                         heads.push("Status\n(%)");
                         heads.push("Details");
                         heads.push("Display");
-                        if (null != ship.dockedWith) {
+                        if (undefined != ship.dockedWith) {
                             if (!(sets.hullSet == set)) {
                                 heads.push("Unmount");
                                 heads.push("Sell");
@@ -69,7 +69,7 @@ class ComponentsMenu {
                     vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onDetailsClick(this, " + setIndex + ", " + compIndex + ")\">Show</button>");
                     vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onEnableClick(this, " + setIndex + ", " + compIndex + ")\">" + ComponentsMenu.onOff(comp.displayPanel) + "</button>");
 
-                    if (null != ship.dockedWith) {
+                    if (undefined != ship.dockedWith) {
                         if (!(sets.hullSet == set)) {
                             vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onUnmountClick(this, " + setIndex + ", " + compIndex + ")\">Unmount</button>");
                             vals.push("<button type=\"button\" onclick=\"ComponentsMenu.onSellClick(this, " + setIndex + ", " + compIndex + ")\">" + comp.getValueInSystem(ship.system) + "</button>");

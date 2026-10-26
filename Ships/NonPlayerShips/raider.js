@@ -45,7 +45,6 @@ class Raider extends NPShip {
     constructor(location, speed) {
         super(5, 10, 20, location, speed, undefined, HP);
         this.ai = new RaiderAI(this);
-        this.buildShip();
         this.setHostile(true);
     }   
     

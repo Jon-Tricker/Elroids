@@ -5,9 +5,9 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import * as THREE from 'three';
 import Game from '../../Game/game.js';
-import NonShipItem from '../nonShipItem.js';
 import PlayerShip from '../../Ships/playerShip.js';
 import StarFieldTexture from '../../Game/Utils/starFieldText.js';
+import ItemPers from '../itemPers.js';
 
 const RADIUS = 50;
 const HALO_RADIUS = 52;
@@ -35,7 +35,7 @@ const HALO_MATERIAL = new THREE.MeshStandardMaterial(
 
 // One end of a wormhole. Including the graphics.
 // Since it exists in one System this can be an Item.
-class WormholeEnd extends NonShipItem {
+class WormholeEnd extends ItemPers {
 
     // Parent
     wormhole;
@@ -45,27 +45,31 @@ class WormholeEnd extends NonShipItem {
 
     backgroundColour;
 
-    constructor(location, name, wormhole, backgroundColour) {
-        super(location, new THREE.Vector3(), RADIUS, MASS, HP, null, true);
+    constructor(json, location, label, wormhole, backgroundColour) {
+        if (undefined == json) {
+            super(undefined, location, new THREE.Vector3(), RADIUS, MASS, HP, null, true, undefined, new THREE.Vector3, true);
+
+
+        } else {
+            super(json.item);
+            label = json.label;
+            backgroundColour = json.backgroundColour;
+
+        }
+
         this.wormhole = wormhole;
+
+        if (undefined != label) {
+            this.setLabel(label, true);
+        }
 
         if (undefined == backgroundColour) {
             backgroundColour = new THREE.Color("black");
         }
         this.backgroundColour = backgroundColour;
 
-        this.setupMesh();
-
-        if (Game.getGame().getUniverse().hyperspace == location.system) {
-            this.setLabel(name, true);
-        }
-        
         // So other items can get relative positions.
         this.moveMesh();
-    }
-
-    destruct() {
-        super.destruct();
     }
 
     getWormhole() {
@@ -73,7 +77,18 @@ class WormholeEnd extends NonShipItem {
     }
 
     getName() {
-        return("Worm hole")
+        return ("Worm hole")
+    }
+
+    toJSON() {
+        let json = new Object();
+        json.item = super.toJSON();
+
+        // Worm hole specific stuff.
+        json.label = this.getLabel();
+        json.backgroundColour = this.backgroundColour;
+
+        return (json);
     }
 
     // Traverse the wormhole.
@@ -84,7 +99,7 @@ class WormholeEnd extends NonShipItem {
         this.location.system.removeItem(that);
 
         if (!(that instanceof PlayerShip)) {
-            that.destruct();
+            that.destruct(false);
             return (true);
         }
 
@@ -98,7 +113,7 @@ class WormholeEnd extends NonShipItem {
         this.location.system.setActive(false);
 
         // Place in limbo.
-        this.location.system.universe.system = undefined;
+        Game.getGame().getUniverse().system = undefined;
         that.location.system = this.undefined;
 
         farEnd.exit(that);
@@ -110,10 +125,8 @@ class WormholeEnd extends NonShipItem {
         if (that instanceof PlayerShip) {
 
             // Switch universe to far system
-            this.location.system.universe.system = this.location.system;
+            Game.getGame().getUniverse().system = this.location.system;
 
-            // Swich ship to far end.
-            that.location.setSystem(this.location.system);
 
             // Activate far system.
             this.location.system.setActive(true);
@@ -121,6 +134,10 @@ class WormholeEnd extends NonShipItem {
 
         // Add that to far system.
         this.location.system.addItem(that);
+
+        // Switch to far end.
+        that.setLocation(this.location);
+        that.separateFrom(this);
     }
 
     getRadarColour() {
@@ -193,9 +210,6 @@ class WormholeEnd extends NonShipItem {
         let ar = Game.getGame().getAnimateRate();
         this.holeMesh.rotateX(ROTATE_RATE / ar);
         this.haloMesh.rotateX(-ROTATE_RATE / ar);
-
-        // Kill any momentum obtained.
-        this.setSpeed(new THREE.Vector3());
 
         super.animate();
     }

@@ -27,20 +27,39 @@ class PlayerShip extends Ship {
 
     originalPosition;
 
-    constructor(height, width, length, location) {
-        super(height, width, length, location, undefined);
-
-        this.originalPosition = location.clone();
-
-        this.buildShip();
+    constructor(json, height, width, length, location) {
+        if (undefined == json) {
+            super(undefined, height, width, length, location, undefined, undefined, undefined, undefined, true);
+            this.originalPosition = location.clone();
+        } else {
+            super(json.ship);
+            this.originalPosition = new Location(json.originalPosition);
+        }
 
         this.createCameras();
     }
 
+    toJSON() {
+        let json = new Object();
+        json.ship = super.toJSON();
+
+        //PlayerShip specific stuff.
+        json.originalPosition = this.originalPosition.toJSON();
+
+        return (json);
+    }
+
+    destruct() {
+        this.remove(this.pilotCamera);
+        this.pilotCamera = undefined;
+        this.remove(this.chaseCamera);
+        this.chaseCamera = undefined;
+    }
+
     buildShip() {
-        this.hull = new SmallHull(this.compSets.hullSet); 
+        this.hull = new SmallHull(this.compSets.hullSet);
         this.hull.setSlots(this.compSets);
-        
+
         new BasicEngine(this.compSets.engineSet);
         new DumbMissileWeapon(this.compSets.weaponSet);
         new BasicBay(this.compSets.baySet);
@@ -51,16 +70,6 @@ class PlayerShip extends Ship {
         // new MiningHud(this.compSets.avionicsSet);
 
         this.recalc();
-    }    
-
-    static fromJSON(json, system) {
-        // Make a default ship.
-        // Default components will be made. We will replace them latter. 
-        let newShip = new PlayerShip(json.height, json.width, json.length, Location.fromJSON(json.location, system));
-
-        super.fromJSON(json, system, newShip);
-
-        return (newShip);
     }
 
     // Work round for circular dependency with Item class.
@@ -100,7 +109,7 @@ class PlayerShip extends Ship {
     }
 
     animate(date, keyboard) {
-        if (null == this.dockedWith) {
+        if (undefined == this.dockedWith) {
             // Handle movement keys
             if (keyboard.getState(" ")) {
                 this.accelerate();
@@ -149,9 +158,9 @@ class PlayerShip extends Ship {
         }
 
         super.animate(date);
-        
+
         // Shoot after moving. So we don't run over new projectile.
-        if (null == this.dockedWith) {
+        if (undefined == this.dockedWith) {
             // if (keyboard.getClearState("M") || keyboard.getClearState("m")) { 
             if (keyboard.getState("M") || keyboard.getState("m")) {
                 this.shoot(date);
@@ -178,8 +187,6 @@ class PlayerShip extends Ship {
         if (this.compSets.hullSet.getAverageStatus() <= 0) {
             this.playSound('scream');
             this.setEngineSound(false);
-
-            // new Explosion(this.size, this);
             game.shipDestroyed(that);
         } else {
             this.playSound('clang');
@@ -248,10 +255,16 @@ class PlayerShip extends Ship {
     dock(station) {
         if (!super.dock(station)) {
             return (false);
+        } 
+        
+        let game = Game.getGame();
+
+        if (game.paused) {
+            game.togglePaused();
         }
 
         this.getTerminal().playSound("poweroff", 0.5);
-        Game.getGame().displays.terminalEnable(true);
+        game.displays.terminalEnable(true);
 
         return (true);
     }

@@ -6,13 +6,13 @@
 
 import * as THREE from 'three';
 import Game from '../../Game/game.js';
-import NonShipItem from '../nonShipItem.js';
 import Mineral from '../mineral.js';
 import { MineralTypes } from '../minerals.js';
 import Explosion from '../explosion.js';
 import DumbMissile from '../Projectiles/dumbMissile.js';
 import Utils from '../../Game/Utils/utilities.js';
 import Location from '../../Game/Utils/location.js';
+import Item from '../item.js';
 
 const MAX_ROTATE_RATE = 2.5;    // r/s
 const SAUCER_HP = 1;
@@ -32,7 +32,7 @@ const DEFAULT_SAUCER_MATERIAL = new THREE.MeshStandardMaterial(
     }
 )
 
-class Saucer extends NonShipItem {
+class Saucer extends Item {
     colour;
 
     // Time to self destruct.
@@ -40,18 +40,15 @@ class Saucer extends NonShipItem {
     destructTime = 0;
 
     constructor(size, location, mass, colour, owner) {
-        super(location, new THREE.Vector3(), size, mass, SAUCER_HP, owner, false, undefined, false);
+        super(location, new THREE.Vector3(), size, mass, SAUCER_HP, owner, false, new THREE.Vector3(0, Math.random() * MAX_ROTATE_RATE * 2 - MAX_ROTATE_RATE, 0), false);
         this.colour = colour;
-
-        // Spin on axis.
-        this.rotationRate = new THREE.Vector3(0, Math.random() * MAX_ROTATE_RATE * 2 - MAX_ROTATE_RATE, 0);
-
-        this.setupMesh();
 
         let ttl = this.getTtl();
         if ((0 != ttl) && (!Game.getGame().isSafe())) {
             this.destructTime = Game.getGame().getUniverse().getTime() + Math.floor(ttl / 2 + Math.random() * ttl / 2);
         }
+        
+        this.activateIfRequired();
 
         this.location.system.saucerCount++;
     }
@@ -62,7 +59,7 @@ class Saucer extends NonShipItem {
         
         this.localToWorld(point);
 
-        let loc = new Location(point.x, point.y, point.z, this.location.system);
+        let loc = new Location(undefined, point.x, point.y, point.z, this.location.system);
 
         return (loc);
     }  
@@ -71,11 +68,6 @@ class Saucer extends NonShipItem {
     // 0 if forever.
     getTtl() {
         return (0);
-    }
-
-    destruct() {
-        this.location.system.saucerCount--;
-        super.destruct();
     }
 
     getDefaultMaterial() {
@@ -140,14 +132,20 @@ class Saucer extends NonShipItem {
 
         if ((that.owner == this.getShip()) || (that == this.getShip())) {
             if (destroyed) {
-                // For now only make loot if destroyed by ship.
-                this.makeLoot();
                 Game.getGame().getPlayer().incReputation(false, 0.01);
             }
 
             // Now it's war!
             Game.getGame().setSafe(false);
         }
+    }
+
+    destruct(violent) {
+        if (violent) {
+            this.makeLoot();
+        }
+        this.location.system.saucerCount--;
+        super.destruct(violent);
     }
 
     makeLoot() {
@@ -158,14 +156,14 @@ class Saucer extends NonShipItem {
                 // Make mineral
                 let type = MineralTypes[1 + Math.floor(Math.random() * (MineralTypes.length - 1))];
                 let mass = Math.ceil(value / type.value);
-                let mineral = new Mineral(mass, thisLoc, this.speed, type);
+                new Mineral(mass, thisLoc, this.speed, type);
                 break;
 
             case 1:
                 // Make goods.
                 let good = new (Game.getGame().goodsList.getRandomElement()).constructor();
                 good.number = Math.ceil(value / good.type.cost);
-                let crate = good.makeCrate(thisLoc, this.speed);
+                good.makeCrate(thisLoc, this.speed);
                 break;
 
             case 2:
@@ -185,7 +183,7 @@ class Saucer extends NonShipItem {
     // Override in sub classes.
     getScore() {
         0;
-    }
+    }  
 
     animate(date) {
         // Lean towards direction of travel. Dont wobble.
@@ -217,8 +215,7 @@ class Saucer extends NonShipItem {
         }
 
         // Blow up.
-        new Explosion(this.size, this);
-        this.destruct();
+        this.destruct(false);
     }
 
     // Do navigation logic
