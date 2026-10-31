@@ -22,10 +22,10 @@ class JSONQuaternion extends THREE.Quaternion {
 
     toJSON() {
         return {
-            x: this.x.toFixed(4),
-            y: this.y.toFixed(4),
-            z: this.z.toFixed(4),
-            w: this.w.toFixed(4)
+            x: Number(this.x.toFixed(4)),
+            y: Number(this.y.toFixed(4)),
+            z: Number(this.z.toFixed(4)),
+            w: Number(this.w.toFixed(4))
         }
     }
 }

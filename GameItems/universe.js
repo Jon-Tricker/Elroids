@@ -100,7 +100,7 @@ class Universe {
     populate(json) {
 
         // Create hyperspacc
-        this.hyperspace = new Hyperspace(this.systemSize);
+        this.hyperspace = new Hyperspace(this.uniSize);
 
         // Create initial systems
         this.createSystems(json);
@@ -125,8 +125,8 @@ class Universe {
                     // Locate system randomly in the universe
                     let minDist;
                     do {
-                        uniLoc = Location.createRandomInSystem(this.hyperspace, this.systemSize / 5, true);
-                        minDist = this.systemSize;
+                        uniLoc = Location.createRandomInSystem(this.hyperspace, this.uniSize / 5, true);
+                        minDist = this.uniSize;
                         for (let sys of this.systems) {
                             let relLoc = sys.uniLoc;
                             relLoc -= uniLoc;
@@ -134,7 +134,7 @@ class Universe {
                                 minDist = relLoc.length;
                             }
                         }
-                    } while (minDist < (this.systemSize / 10));
+                    } while (minDist < (this.uniSize / 10));
                 }
                 let system = new StarSystem(json, spec, this.systemSize, this.maxRockCount, uniLoc);
                 this.systems.add(system);

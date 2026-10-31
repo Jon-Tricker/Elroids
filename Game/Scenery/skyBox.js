@@ -2,6 +2,10 @@
 
 // Actually quite close to the ship (only just beyond the universe size). But moves with the ship. So perspective remains constant.
 
+// Copyright (C) Jon Tricker 2026.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import * as THREE from 'three';
 import Game from '../game.js';
 import StarFieldTexture from '../Utils/starFieldText.js';
@@ -45,7 +49,12 @@ class SkyBoxItem {
   position;
   mesh;
 
-  constructor(skyBox, size, position) {
+  constructor(json, skyBox, size, position) {
+    if (undefined != json) {
+      size = json.size;
+      position = json.position;
+    }
+
     this.skyBox = skyBox;
     this.size = size;
     this.position = position;
@@ -56,10 +65,6 @@ class SkyBoxItem {
       size: this.size,
       position: this.position
     }
-  }
-
-  static fromJSON(json, skyBox) {
-    return (new SkyBoxItem(skyBox, json.size, json.position));
   }
 
   setActive(state) {
@@ -78,12 +83,12 @@ class SkyBoxItem {
 
 class Sun extends SkyBoxItem {
 
-  constructor(skyBox, size, position) {
-    super(skyBox, size, position);
-  }
-
-  static fromJSON(json, skyBox) {
-    return (new Sun(skyBox, json.size, json.position));
+  constructor(json, skyBox, size, position) {
+    if (undefined != json) {
+      super(json.item, skyBox);
+    } else {
+      super(undefined, skyBox, size, position);
+    }
   }
 
   setupMesh() {
@@ -92,13 +97,25 @@ class Sun extends SkyBoxItem {
 
     this.mesh = new THREE.Mesh(sunGeometry, sunMaterial);
   }
+
+  toJSON() {
+    let json = new Object();
+    json.item = super.toJSON();
+    return (json);
+  }
 }
 
 class Moon extends SkyBoxItem {
   colour;
 
-  constructor(skyBox, size, position, colour) {
-    super(skyBox, size, position);
+  constructor(json, skyBox, size, position, colour) {
+    if (undefined != json) {
+      colour = json.colour;
+      super(json.item, skyBox);
+    } else {
+      super(undefined, skyBox, size, position);
+    }
+
     if (undefined === colour) {
       this.colour = this.randomColour();
     } else {
@@ -107,13 +124,10 @@ class Moon extends SkyBoxItem {
   }
 
   toJSON() {
-    let json = super.toJSON();
+    let json = new Object();
+    json.item = super.toJSON();
     json.colour = this.colour;
     return (json);
-  }
-
-  static fromJSON(json, skyBox) {
-    return (new Moon(skyBox, json.size, json.position, json.colour));
   }
 
   setupMesh() {
@@ -142,8 +156,14 @@ class SkyBox extends THREE.Group {
   moons = new JSONSet();
   suns = new JSONSet();
 
-  constructor(size, system, populate, background, json) {
+  constructor(json, system, size, populate, background) {
     super();
+
+    if (undefined != json) {
+      size = json.size;
+      background = json.background;
+      populate = true;
+    }
 
     this.size = size;
     this.system = system;
@@ -176,10 +196,6 @@ class SkyBox extends THREE.Group {
       moons: moons,
       suns: suns
     }
-  }
-
-  static fromJSON(json, system) {
-    return (new SkyBox(json.size, system, true, json.background, json));
   }
 
   // Create box in an inactive state.
@@ -217,22 +233,22 @@ class SkyBox extends THREE.Group {
               break;
           }
 
-          this.moons.add(new Moon(this, (1 + Math.floor(Math.random() * MAX_MOON_SIZE)) * this.size / 100, position));
+          this.moons.add(new Moon(undefined, this, (1 + Math.floor(Math.random() * MAX_MOON_SIZE)) * this.size / 100, position));
         }
 
         // One sun for now.
         // Same position as light.
         let sz = Game.getGame().getUniverse().systemSize;
         let position = new THREE.Vector3(0, 0, sz * 2);
-        this.suns.add(new Sun(this, SUN_SIZE * this.size / 100, position));
+        this.suns.add(new Sun(undefined, this, SUN_SIZE * this.size / 100, position));
       } else {
         // Unpack json
         for (let moon of json.moons) {
-          this.moons.add(Moon.fromJSON(moon, this));
+          this.moons.add(new Moon(moon, this));
         }
 
         for (let sun of json.suns) {
-          this.suns.add(Sun.fromJSON(sun, this));
+          this.suns.add(new Sun(sun, this));
         }
       }
     }

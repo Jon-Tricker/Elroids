@@ -68,7 +68,7 @@ class EngineMesh extends THREE.Mesh {
         }
     )
 
-    flameMesh = null;
+    flameMesh;
 
     constructor(width, length) {
         let geometry = new THREE.ConeGeometry(width, length, 20, 1, true);
@@ -84,7 +84,7 @@ class EngineMesh extends THREE.Mesh {
 
     setFlameState(state) {
         if (state) {
-            if (null == this.flameMesh) {
+            if (undefined == this.flameMesh) {
                 // Add the flame cone
                 let width = this.geometry.parameters.radius;
                 let height = this.geometry.parameters.height;
@@ -102,11 +102,11 @@ class EngineMesh extends THREE.Mesh {
                 this.flameMesh = flameMesh;
             }
         } else {
-            if (null != this.flameMesh) {
+            if (undefined != this.flameMesh) {
                 // Remove flame.    
                 this.remove(this.flameMesh)
                 this.flameMesh.geometry.dispose();
-                this.flameMesh = null;
+                this.flameMesh = undefined;
             }
         }
 

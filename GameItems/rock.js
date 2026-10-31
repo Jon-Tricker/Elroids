@@ -10,10 +10,6 @@ import { Composition } from './minerals.js';
 import PlayerShip from '../Ships/playerShip.js'
 import Item from './item.js';
 
-// Type of rock graphics
-const ROCK_STYLE_SPHERE = 0;
-const ROCK_STYLE_FACIT = 1;
-
 const ROCK_RAM_DAMAGE = 1;
 
 // Radar colour. Same for all rocks.
@@ -34,8 +30,6 @@ class Rock extends Item {
   rockSize;
   originalHP;
   composition;
-
-  static rockStyle = Rock.ROCK_STYLE_SPHERE;
 
   constructor(rockSize, location, speed, composition) {
     super(location, speed, rockSize, rockSize * rockSize * rockSize, 1 + rockSize / 10);
@@ -69,14 +63,6 @@ class Rock extends Item {
     super.destruct(violent);
   }
 
-  static setRockStyle(style) {
-    if (style == "sphere") {
-      Rock.rockStyle = ROCK_STYLE_SPHERE;
-    } else {
-      Rock.rockStyle = ROCK_STYLE_FACIT;
-    }
-  }
-
   getRadarColour() {
     return (RADAR_COLOUR);
   }
@@ -86,12 +72,7 @@ class Rock extends Item {
   }
 
   setupMesh() {
-    let rockGeometry;
-    if (Rock.rockStyle == ROCK_STYLE_SPHERE) {
-      rockGeometry = new THREE.SphereGeometry(this.rockSize, 64, 64);
-    } else {
-      rockGeometry = new FacitRockGeometry(this.rockSize, this.composition);
-    }
+    let rockGeometry = new FacitRockGeometry(this.rockSize, this.composition);
 
     // compute vertex normals
     rockGeometry.computeVertexNormals();

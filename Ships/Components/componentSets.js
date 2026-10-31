@@ -108,7 +108,7 @@ class ComponentSets extends JSONSet {
     getByClass(name) {
         for (let set of this) {
             let comp = set.getByClass(name);
-            if (null != comp)
+            if (undefined != comp)
                 return (comp);
         }
 

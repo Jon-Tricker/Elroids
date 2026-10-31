@@ -20,7 +20,7 @@ import Utils from './Utils/utilities.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "12.0";
+const VERSION = "12.1";
 
 const ANIMATE_RATE = 25;            // frames/second
 
@@ -44,8 +44,6 @@ class Game {
 
     safe = false;
 
-    rockStyle;
-
     soundOn = false;
     testMode = false;
     startDocked = false;
@@ -66,29 +64,29 @@ class Game {
 
     // Sounds buffer bank. Sounds written in once they are loaded.
     static sounds = new Map([
-        ["zap", null],
-        ["pew", null],
-        ["explosion", null],
-        ["clang", null],
-        ["coin", null],
-        ["till", null],
-        ["click", null],
-        ["anvil", null],
-        ["roar", null],
-        ["poweron", null],
-        ["poweroff", null],
-        ["scream", null],
-        ["thud", null],
-        ["saw", null],
-        ["police", null]
+        ["zap", undefined],
+        ["pew", undefined],
+        ["explosion", undefined],
+        ["clang", undefined],
+        ["coin", undefined],
+        ["till", undefined],
+        ["click", undefined],
+        ["anvil", undefined],
+        ["roar", undefined],
+        ["poweron", undefined],
+        ["poweroff", undefined],
+        ["scream", undefined],
+        ["thud", undefined],
+        ["saw", undefined],
+        ["police", undefined]
     ]);
 
-    constructor(uniSize, systemSize, maxRockCount, rockStyle, safeMode, soundOn, startDocked) {
+    constructor(uniSize, systemSize, maxRockCount, safeMode, soundOn, startDocked) {
 
         // Set the static
         Game.game = this;
 
-        this.player = new Player();
+        this.player = new Player(undefined);
 
         if ((safeMode != null) && (safeMode.toLowerCase() == "true")) {
             this.safe = true;
@@ -109,8 +107,6 @@ class Game {
             this.player.addCredits(12345);
             //this.player.addCredits(121);
         }
-
-        Rock.setRockStyle(rockStyle);
 
         // Create shopping list.
         this.componentsList = new ComponentsList();
@@ -243,7 +239,7 @@ class Game {
         this.maxSaucerCount = json.maxSaucerCount;
         this.safe = json.safe;
 
-        this.player = Player.fromJSON(json.player, this);
+        this.player = new Player(json.player);
 
         this.setup(json);
     }

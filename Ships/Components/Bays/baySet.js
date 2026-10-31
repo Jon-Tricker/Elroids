@@ -158,7 +158,7 @@ class BaySet extends ComponentSet {
         } else {
             let existing = this.tradeGoods.getByType(goods.type);
 
-            if (null != existing) {
+            if (undefined != existing) {
                 // Already present. Tncrease number.
                 existing.number += goods.number;
                 this.tradeGoods.recalc();
@@ -201,7 +201,7 @@ class BaySet extends ComponentSet {
         } else {
             // Reduce count.
             let existing = this.tradeGoods.getByType(goods.type);
-            if (null == existing) {
+            if (undefined == existing) {
                 throw (new BugError("Bay does not contain " + existing));
             }
 

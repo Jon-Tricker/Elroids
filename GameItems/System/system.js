@@ -154,9 +154,9 @@ class System {
         if (undefined === json) {
             // Create static elements.
             let skyBoxSize = this.systemSize * 4;
-            this.skyBox = new SkyBox(skyBoxSize, this, true, background);
+            this.skyBox = new SkyBox(undefined, this, skyBoxSize, true, background);
         } else {
-            this.skyBox = SkyBox.fromJSON(json.skyBox, this);
+            this.skyBox = new SkyBox(json.skyBox, this);
         }
     }
 

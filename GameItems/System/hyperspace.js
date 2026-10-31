@@ -18,7 +18,7 @@ class Hyperspace extends System {
     createSkyBox(background, json) {
         // Create unpopulated. Json not used.
         let skyBoxSize = this.systemSize * 4;
-        this.skyBox = new SkyBox(skyBoxSize, this, false, background);
+        this.skyBox = new SkyBox(undefined, this, skyBoxSize, false, background);
     }
 }
 

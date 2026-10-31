@@ -29,9 +29,9 @@ class SaucerPirate extends Saucer {
     cargoMass = 0;      // t
 
     // Target mineral
-    target = null;
+    target;
 
-    farAway = null;
+    farAway;
     shootDue = 0;
 
     constructor(location, owner) {
@@ -60,7 +60,7 @@ class SaucerPirate extends Saucer {
         let targetLoc;
         if (0 < this.cargoMass) {
             // Run away
-            if (null == this.farAway) {
+            if (undefined == this.farAway) {
                 let game = Game.getGame();
                 this.farAway = game.getShip().location.getFarAway();
             }
@@ -143,7 +143,7 @@ class SaucerPirate extends Saucer {
         that.destruct(false);
 
         // Find new hiding place
-        this.farAway = null;
+        this.farAway = undefined;
 
         return (true);
     }

@@ -29,6 +29,8 @@
 		<LI>Labels are in the foreground. If something passes between the viewer and a labeled object label will be
 			infront.</LI>
 		<LI>Sometimes, e.g if rammed, can end up going faster than the maximum hull speed. Guess thats OK.</LI>
+		<LI>Page hit counter not shown on firefox. This is because, for 'performance reasons', they dont support synch XMLHttpRequests.
+			Woould need to do xhr.open("GET", "/HitCounter", true) and then wait for response.</LI>
 	</UL>
 
 	<H2>The 'Test Universe'</H2>
@@ -40,10 +42,6 @@
 	<P>For notes on code operation/stucture see the <A HREF="developer_code_notes.html">Developer Code notes.</A>.</P>
 
 	<H2>ToDos (In some sort of priority order)</H2>
-
-	<H3>V12.x Code improvements.</H3>
-	<P>Kill off remaining fromJSON() calls. Modify doc.</P>
-	<P>Make hypespace smaller.</P>
 
 	<H3>V13.x Rework saucers.</H3>
 	<P>Saucers are a cludge left over from early development.</P>

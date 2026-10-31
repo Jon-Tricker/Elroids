@@ -15,7 +15,12 @@ class Player {
 
     lastAnimate = 0;
 
-    constructor(credits, reputation) {
+    constructor(json, credits, reputation) {
+        if (undefined != json) {
+            credits = json.credits;
+            reputation = json.reputation;
+        }
+
         if (undefined === credits) {
             this.credits = 0;
             this.reputation = 0.40;
@@ -28,12 +33,8 @@ class Player {
     toJSON() {
         return {
             credits: this.credits,
-            reputation: this.reputation
+            reputation: Number(this.reputation.toFixed(4))
         }
-    }
-
-    static fromJSON(json) {
-        return (new Player(json.credits, json.reputation));
     }
 
     animate() {

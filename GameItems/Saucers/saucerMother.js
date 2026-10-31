@@ -31,20 +31,6 @@ class SaucerMother extends Saucer {
         super(SIZE, location, MASS, COLOUR, owner);
     }
 
-    toJSON() {
-        let json = super.toJSON();
-        // json.stationSpecific = ....
-        return (json);
-    }
-
-    static fromJSON(json, system) {
-        let newSaucer = new SaucerMother(Location.fromJSON(json.location, system), system.owner);
-        newSaucer.rotateX(json.rotationx);
-        newSaucer.rotateY(json.rotationy);
-        newSaucer.rotateZ(json.rotationz);
-        return (newSaucer);
-    }
-
     getName() {
         return ("Mother Saucer");
     }

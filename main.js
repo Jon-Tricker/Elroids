@@ -1,4 +1,4 @@
-// Copyright (C) Jon Tricker 2023.
+// Copyright (C) Jon Tricker 2023 - 2026
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -12,15 +12,14 @@ var scripts = document.getElementsByTagName('script');
 var lastScript = scripts[scripts.length - 1];
 var scriptName = lastScript;
 var rockCount = parseInt(scriptName.getAttribute('rockCount'));
-var uniSize = parseInt(scriptName.getAttribute('uniSize'));
-var rockStyle = scriptName.getAttribute('rockStyle');
+var systemSize = parseInt(scriptName.getAttribute('systemSize'));
 var startDocked = scriptName.getAttribute('startDocked');
 var soundOn = scriptName.getAttribute('soundOn');
 var safeMode = scriptName.getAttribute('safeMode');
 
 // Create the game objects
-// For the moment universe and system are the same size.
-const game = new Game(uniSize, uniSize, rockCount, rockStyle, safeMode, soundOn, startDocked);
+// Make universe a bit smaller than system. Reduces hyperspace travel times.
+const game = new Game(systemSize/2, systemSize, rockCount, safeMode, soundOn, startDocked);
 
 // Add event listener on clicks.
 // It takes a while for auto repeat to kick in. Also we don't know how fast it will be. So

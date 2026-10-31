@@ -18,7 +18,7 @@ class Missile extends Projectile {
       return (this.colour);
     } else {
       // Don't plot
-      return (null);
+      return (undefined);
     }
   }
 

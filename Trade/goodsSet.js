@@ -1,7 +1,7 @@
 // Base list class for Goods.
 import GameError from "../Game/gameError.js";
-import jsonSet from "../Game/Utils/jsonSet.js"
-import Game from "../Game/game.js";
+import jsonSet from "../Game/Utils/jsonSet.js";
+import BugError from "../Game/bugError.js";
 
 class GoodsSet extends jsonSet {
 
@@ -77,7 +77,7 @@ class GoodsSet extends jsonSet {
         }
 
         // Not found
-        return (null);
+        return (undefined);
     }
 
     getByClass(name) {
@@ -86,7 +86,9 @@ class GoodsSet extends jsonSet {
                 return (good);
             }
         }
-        return (null);
+
+        // Maybe in another set.
+        return(undefined);
     }
 
     getMass() {

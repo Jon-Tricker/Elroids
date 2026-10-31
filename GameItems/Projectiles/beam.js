@@ -29,7 +29,7 @@ class Beam extends Projectile {
 
   getRadarColour() {
     // No Radar return.
-    return (null);
+    return (undefined);
   }
 
   // Beam must line up with direction of travel.

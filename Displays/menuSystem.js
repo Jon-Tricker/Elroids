@@ -74,7 +74,7 @@ class MenuSystem {
     maxYCursor = 0;
 
     // Ugly variable used for passing 'last error' argument.
-    lastError = null;
+    lastError;
 
     static parser = new DOMParser();
 

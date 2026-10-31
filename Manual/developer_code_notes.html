@@ -98,21 +98,22 @@
 	<P>Each object persists only non-recreatable members. i.e NOT stuff, like meshes, that don't change and can be
 		dynamically re-created.</P>
 	<P>Also not Items, like Rocks, NPShips .etc, which can be randomly cretaed.</P>
-	<P>Each persistable object has a toJSON() method. This converts the non-recreateble members into JSON objects. These is built into one big JSON image and
-			then Stringified.</P>
-	<P>Restoring JSON objects is done in one of two ways:</P>
+	<P>Each persistable object has a toJSON() method. This converts the non-recreateble members into JSON objects. These
+		is built into one big JSON image and
+		then Stringified.</P>
+	<P>Restoring JSON objects is done by passing a 'json' attribute to the constructor.
 	<UL>
-		<LI>Older classes have a static fromJSON() method. This is given the JSON object, invokes the object's normal constructor and and returns a
-			new copy of the object.</LI>
-		<LI>More recent classes have a constructor that take a 'json' attribute. If this is non 'undefined' it is unpacked and the attributes are used. If it is 'undefined' the other passed attributes are used. 
-			(I want overloaded constructors!)</LI>
+		<LI>If this is non 'undefined' it is unpacked and the attributes are used.</LI>
+		<LI>If it is 'undefined' the other passed attributes are used.</LI>
 	</UL>
+	(I want overloaded constructors!)</P>
 	<P>Object sets can be handled with the utility class JSONSet.</P>
 
 	<H3>Item/System IDs</H3>
 	<P>During game operation references between objects are handled by standard javascript reference. However these
 		won't survive save/load operations.</P>
-	<P>When a reference need to be saved the target object is assigned a unique ID. This is converted back to the new
+	<P>When a reference need to be saved the target object is assigned a unique ID. This is converted back to the
+		new
 		reference during re-load.</P>
 
 	<H2>Item activation</H2>
@@ -136,12 +137,22 @@
 	<P>When Systems are constructed their Items are created with a populate() method. The Items are created in
 		'inactive' state.</P>
 	<P>When a System becomed 'active', generally because th Ship has moved into it, its setActive(true) method is
-		called. This invokes the setActive() of it's child Items. Each sets up it's graphical components (generally by
+		called. This invokes the setActive() of it's child Items. Each sets up it's graphical components (generally
+		by
 		calling setumMesh()) and adds itself to the scene.</P>
 	<P>When a System become 'inactive' its setActive(false) method is called. The child Items must remove themselves
 		from the scene and null all theit grapical components. The graphical parts should then be GCed.</P>
-	<P>ToDo: Maybe 'System' should extend threejs.Group. Objects contained in the System could be added to it. The the
+	<P>ToDo: Maybe 'System' should extend threejs.Group. Objects contained in the System could be added to it. The
+		the
 		whole Group could be added/removed from scene.</P>
+
+	<H2>Exceptions</H2>
+	<P>Two custom execption classes are thrown.
+		<UL>
+			<LI>BugError - Something 'impossible' detected. Thrown up to browser and game stops.</LI>
+			<LI>GameError - A user error has occured in the game (e.g. attempting to buy something but not enough credits). Caught and handled in game.</LI>
+		</UL>
+	</P>
 
 	<H2>Learnings</H2>
 	<UL>
@@ -154,24 +165,29 @@
 		<LI>Two threejs 'renderers' are used:
 			<UL>
 				<LI>A THREE.WebGLRenderer handles the 3D rendering.</LI>
-				<LI>A separate CSS2DRenderer handles 2D objects, like labels, that we want to be flat on to camera.</LI>
+				<LI>A separate CSS2DRenderer handles 2D objects, like labels, that we want to be flat on to camera.
+				</LI>
 			</UL>
 			This as described in the exapmle <A HREF="https://threejs.org/examples/css2d_label.html"> here.</A>
 		</LI>
 
 		<LI>1D conservation of momentum, during collisions, is handled as described in the equasions
 			<A HREF="https://en.wikipedia.org/wiki/Momentum"> here.</A>
-			Most discussion on extending this to 3D decends into a mass of 'Euler angles' and 'trig'. However since we
+			Most discussion on extending this to 3D decends into a mass of 'Euler angles' and 'trig'. However since
+			we
 			have both the
 			velocities and impact direction as x, y and z components it can be handled using
 			dot products (and less CPU) ... but it took a while to get the maths right.
 		</LI>
-		<LI>There are problems with 'quantized' time. A slower moving object can catch up with and collide with a faster
+		<LI>There are problems with 'quantized' time. A slower moving object can catch up with and collide with a
+			faster
 			one if it gets a move phase 'first'. Some messy work round have been required.</LI>
 		<LI>Sound support on Chrome is a pain. In an attempt to block audio spam audio components can only be
-			initialized from within user events. So sounds have to be loaded on the first key/mouse click. Which means
+			initialized from within user events. So sounds have to be loaded on the first key/mouse click. Which
+			means
 			they are not yet ready if this event wants to make a sound,</LI>
-		<LI>'statics' are slow. Require an instance of the class to be created? For better performance create a single
+		<LI>'statics' are slow. Require an instance of the class to be created? For better performance create a
+			single
 			instance as part of a top level object (e.g. Game) and call by reference.</LI>
 	</UL>
 
@@ -186,7 +202,8 @@
 		</LI>
 		<LI>Mass is in Tonnes (1000KG).</LI>
 		<LI>Time is in seconds.</LI>
-		<LI>Damage (HPs) is an arbitary unit. However, from the 'ram damage' calculation we can conclude that its units
+		<LI>Damage (HPs) is an arbitary unit. However, from the 'ram damage' calculation we can conclude that its
+			units
 			are M kg m/s</LI>
 		<LI>Rocks have a mass equal to the cube of their size. i.e (assuming cubic rocks) a density of about 1
 			tonne/m^3. Probably should be a bit higher and related to their composition. However it will do for now.
@@ -195,16 +212,20 @@
 
 	<P>There are a few incorrect 'artifacts' to make the game playable.</P>
 	<UL>
-		<LI>Rock mass is proportional to the cube of its size. When a rock splits it make 2 rocks of half the size. So
-			3/4 of the mass is lost. However this makes for a mangable amounts of minerals once a rock is broken down.
+		<LI>Rock mass is proportional to the cube of its size. When a rock splits it make 2 rocks of half the size.
+			So
+			3/4 of the mass is lost. However this makes for a mangable amounts of minerals once a rock is broken
+			down.
 			(The spare mass becomes 'dark matter')</LI>
 		<LI>Universe is too small. Only a few km across. Necessary to keep a reasonable rock density wihtout a huge
 			number of rocks.</LI>
-		<LI>Distances and sizes are far too small for a 'realistic' universe. However if made realistic objects would
+		<LI>Distances and sizes are far too small for a 'realistic' universe. However if made realistic objects
+			would
 			only be points of light in the distance. For playability everything is moved closer together. (Excuse:
 			StarTrek/Wars battles where ships engage a few hundred meters apart and travelling at a few 10s of kph.)
 		</LI>
-		<LI>At present angular momentum is not conserved (for anything) ... If it were ship contol would be difficult.
+		<LI>At present angular momentum is not conserved (for anything) ... If it were ship contol would be
+			difficult.
 		</LI>
 		<LI>Deceleration doesn't really make sense. Engines fire in a ramdom direction. But it is necessary for game
 			play.</LI>
@@ -214,7 +235,8 @@
 	<P>As a Java coder I prefer stongly typed languages. However...</P>
 	<OL>
 		<LI>I only found out about Typescript late in the development of this project.</LI>
-		<LI>I want the code available warts/comments and all. Not an additional build step with modified output.</LI>
+		<LI>I want the code available warts/comments and all. Not an additional build step with modified output.
+		</LI>
 	</OL>
 </BODY>
 

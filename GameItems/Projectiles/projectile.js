@@ -62,7 +62,7 @@ class Projectile extends Item {
       return (this.colour);
     } else {
       // Don't plot
-      return (null);
+      return (undefined);
     }
   }
 

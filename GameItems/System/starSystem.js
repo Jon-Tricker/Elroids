@@ -107,11 +107,11 @@ class StarSystem extends System {
 
         if (item instanceof Station) {
             this.stations.delete(item);
-        } 
-        
+        }
+
         if (item instanceof PoliceShip) {
             this.policeShips.delete(item);
-        }   
+        }
 
         if (item instanceof SaucerMother) {
             this.motherSaucers.delete(item);
@@ -301,15 +301,8 @@ class StarSystem extends System {
         }
     }
 
-    createSaucers(json) {
-        if (undefined === json) {
-            this.createMotherSaucer();
-        } else {
-            // Restore old saucers.
-            for (let saucer of json.saucers) {
-                SaucerMother.fromJSON(saucer, this);
-            }
-        }
+    createSaucers() {
+        this.createMotherSaucer();
     }
 
     createMotherSaucer() {

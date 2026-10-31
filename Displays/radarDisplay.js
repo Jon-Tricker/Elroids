@@ -64,7 +64,7 @@ class RadarDisplay extends DarkPanel {
             if (relPos.length() < RANGE) {
                 let colour = item.getRadarColour();
 
-                if (null != colour) {
+                if (undefined != colour) {
                     // Make it back relative to world and then Rotate to same angle as ship.
                     relPos.add(ship.location, false);
                     ship.worldToLocal(relPos);
