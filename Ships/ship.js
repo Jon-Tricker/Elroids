@@ -199,7 +199,10 @@ class Ship extends ItemPers {
     }
 
     recalc() {
-        this.compSets.recalc();
+        this.getCompSets().recalc();
+
+        // Cache mass
+        this.mass = this.getCompSets().getMass() + this.getCargoBay().getContentMass();
     }
 
     getCompSets() {
@@ -266,9 +269,10 @@ class Ship extends ItemPers {
         }
     }
 
-    getGunPoint() {
+    getGunPoint(direction) {
+        // For a ship always the same point.
         return (this.hull.getGunPoint());
-    }
+    } 
 
     // Upgrade the hull (and graphics).
     setHull(hull) {
@@ -306,8 +310,13 @@ class Ship extends ItemPers {
         return (this.aheadList);
     }
 
+    // For a normal ship thrust forward.
+    getThrustVec() {
+        return(this.getOrientation());
+    }
+
     accelerate() {
-        let xDirection = this.getOrientation();
+        let xDirection = this.getThrustVec();
 
         let thrust = this.getThrust();
         if (0 < thrust) {
@@ -503,7 +512,6 @@ class Ship extends ItemPers {
 
     loadMineral(mineral, mass) {
         this.getCargoBay().loadMineral(mineral, mass);
-
         this.recalc();
     }
 
@@ -528,17 +536,16 @@ class Ship extends ItemPers {
         return (this.compSets.baySet)
     }
 
-    getMass() {
-        return (this.compSets.getMass());
-    }
-
-    getTotalMass() {
-        return (this.getMass() + this.getCargoBay().getContentMass())
+    getUnladenMass() {
+        return(this.getCompSets().getMass());
     }
 
     // Fire selected weapons
-    shoot(date) {
-        this.compSets.weaponSet.shoot(this.getOrientation(), date);
+    shoot(date, dir) {
+        if (undefined == dir) {
+            dir = this.getOrientation();
+        }
+        this.compSets.weaponSet.shoot(dir, date);
     }
 
     // Get angle to a location.

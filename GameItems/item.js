@@ -48,7 +48,7 @@ class Item extends ItemGraphics {
 
     // Push item. Thrust in kN, mass in Tonnes. This should work without scaling.
     thrust(thrust, direction, maxspeed) {
-        let accRate = thrust / this.getTotalMass();
+        let accRate = thrust / this.getMass();
         direction.normalize();
 
         let newSpeed = this.speed.clone();
@@ -96,14 +96,9 @@ class Item extends ItemGraphics {
         return (this.mass);
     }
 
-    // Most things don't have any content
-    getTotalMass() {
-        return (this.mass);
-    }
-
     // Damage (HP) when ramming.
     getRamDamage() {
-        return (Math.ceil(this.getSpeed() * this.getTotalMass() / 1000));
+        return (Math.ceil(this.getSpeed() * this.getMass() / 1000));
     }   
     
     // Handle collision physics
@@ -142,8 +137,8 @@ class Item extends ItemGraphics {
         }
 
         // Get masses
-        let m1 = this.getTotalMass();
-        let m2 = that.getTotalMass();
+        let m1 = this.getMass();
+        let m2 = that.getMass();
         if (0 == (m1 + m2)) {
             console.log("Cant transfer momentum between massless objects.");
         } else {

@@ -85,7 +85,7 @@ class SaucerPirate extends Saucer {
         this.thrust(THRUST, targetSpeed, MAX_SPEED);
     }
 
-    getTotalMass() {
+    getMass() {
         return (this.mass + this.cargoMass);
     }
 

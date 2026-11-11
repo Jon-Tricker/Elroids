@@ -18,6 +18,7 @@ import BasicRadar from './Components/Avionics/basicRadar.js';
 import BasicCompass from './Components/Avionics/basicCompass.js';
 import BasicHud from './Components/Avionics/Huds/basicHud.js';
 import ComponentSets from './Components/componentSets.js';
+import LaserBeamWeapon from './Components/Weapons/laserBeamWeapon.js';
 
 class PlayerShip extends Ship {
     // Ship cameras are creted once and permanently attached to ship. 

@@ -26,7 +26,7 @@ class Projectile extends Item {
     direction = direction.normalize()
 
     // Start at owners gun location.
-    let startLocation = owner.getGunPoint();
+    let startLocation = owner.getGunPoint(direction);
 
     let startSpeed = direction.clone();
     startSpeed.multiplyScalar(speed);
@@ -64,6 +64,11 @@ class Projectile extends Item {
       // Don't plot
       return (undefined);
     }
+  }
+
+  // Projectiles don't rotate.
+  generateRotationRate() {
+    return(0);
   }
 
   setLabel(label) {

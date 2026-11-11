@@ -87,10 +87,6 @@ class ComponentSets extends JSONSet {
         return (this.mass);
     }
 
-    getTotalMass() {
-        return(this.mass + this.baySet.getContentMass());
-    }
-
     getTotalThrust() {
         return(this.engineSet.getTotalThrust());
     }

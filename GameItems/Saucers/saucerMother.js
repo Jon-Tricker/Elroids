@@ -7,11 +7,10 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import Game from '../../Game/game.js';
 import Saucer from './saucer.js';
-import SaucerShooter from "./saucerShooter.js";
+import Saucer2Shooter from '../../Ships/NonPlayerShips/Saucers/Saucer2Shooter.js';
 import SaucerRam from "./saucerRam.js";
 import SaucerHunter from "./saucerHunter.js";
 import SaucerPirate from "./saucerPirate.js";
-import Location from '../../Game/Utils/location.js';
 
 const COLOUR = "#80FF80";
 const SIZE = 50;
@@ -110,7 +109,7 @@ class SaucerMother extends Saucer {
                     let type = Math.floor(Math.random() * 4)
                     switch (type) {
                         case 0:
-                            saucer = new SaucerShooter(thisLoc, this);
+                            saucer = new Saucer2Shooter(thisLoc);
                             break;
 
                         case 1:

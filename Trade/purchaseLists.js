@@ -15,6 +15,7 @@ import LargeHull from "../Ships/Components/Hulls/largeHull.js";
 import BasicHud from "../Ships/Components/Avionics/Huds/basicHud.js";
 import RangeHud from "../Ships/Components/Avionics/Huds/rangeHud..js";
 import MiningHud from "../Ships/Components/Avionics/Huds/miningHud..js";
+import Saucer2Hull from "../Ships/Components/Hulls/saucer2Hull.js";
 
 class ComponentsList extends ComponentSets {
 
@@ -24,6 +25,7 @@ class ComponentsList extends ComponentSets {
         new SmallHull(this.hullSet);
         new MediumHull(this.hullSet);
         new LargeHull(this.hullSet);
+        new Saucer2Hull(this.hullSet);
         new BasicEngine(this.engineSet);
         new MediumEngine(this.engineSet);
         new LargeEngine(this.engineSet);

@@ -105,10 +105,6 @@ class BaySet extends ComponentSet {
         this.contentMass += this.tradeGoods.getMass();
     }
 
-    getTotalMass() {
-        return (this.mass + this.getContentMass());
-    }
-
     // Get total current mass of contents.
     getContentMass() {
         return (this.contentMass);

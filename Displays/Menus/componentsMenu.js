@@ -18,7 +18,7 @@ class ComponentsMenu {
 
         doc += "<P>"
 
-        doc += "<P>Mass Unladen " + ship.getMass() + "(t), Total " + ship.getTotalMass() + "(t)</P>";
+        doc += "<P>Mass Unladen " + ship.getUnladenMass() + "(t), Total " + ship.getMass() + "(t)</P>";
         doc += "<BR />";
 
         let setIndex = 0;

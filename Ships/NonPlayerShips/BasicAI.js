@@ -117,7 +117,7 @@ class BasicAI {
 
             case 3:
                 // Wait a while
-                done = this.wait(date);
+                done = this.wait(date, 2000 + Math.random() * 1000);
                 break;
 
             case 4:
@@ -247,10 +247,10 @@ class BasicAI {
         return (false);
     }
 
-    wait(date) {
+    wait(date, duration) {
         if (undefined == this.expire) {
             // Set a new expiry time
-            this.expire = date + 2000 + Math.random() * 3000;
+            this.expire = date + duration;
             return (false);
         }
 
@@ -279,6 +279,9 @@ class BasicAI {
             this.expire = undefined;
             return (true);
         }
+
+        // Remember it.
+        this.dest = dest;
 
         let ship = this.myShip;
 

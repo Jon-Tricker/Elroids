@@ -44,7 +44,7 @@ class SmugglerAI extends BasicAI {
 
             case 4:
                 // Wait a while
-                done = this.wait(date);
+                done = this.wait(date, 2000 + Math.random() * 1000);
                 break;
 
             case 5:

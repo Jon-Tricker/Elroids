@@ -10,7 +10,6 @@ import SaucerHunter from '../Saucers/saucerHunter.js';
 import SaucerMother from '../Saucers/saucerMother.js';
 import SaucerRam from '../Saucers/saucerRam.js';
 import SaucerPirate from '../Saucers/saucerPirate.js';
-import SaucerShooter from '../Saucers/saucerShooter.js';
 import Station from './station.js';
 import { SystemSpec } from './system.js';
 import Freighter from '../../Ships/NonPlayerShips/freighter.js';
@@ -18,6 +17,7 @@ import NPShipFactory from '../../Ships/NonPlayerShips/nPShipFactory.js';
 import Location from '../../Game/Utils/location.js';
 import PoliceShip from '../../Ships/NonPlayerShips/policeShip.js';
 import Utils from '../../Game/Utils/utilities.js';
+import Saucer2Shooter from '../../Ships/NonPlayerShips/Saucers/Saucer2Shooter.js';
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;           // m
@@ -141,7 +141,7 @@ class StarSystem extends System {
         if (!Game.getGame().testMode) {
             // If mother saucer detroyed periodicaly re-create
             if (0 == this.motherSaucers.size) {
-                if ((Math.random() * 1000) < 1) {
+                if ((Math.random() * 500) < 1) {
                     this.createMotherSaucer();
                 }
             }
@@ -212,6 +212,10 @@ class StarSystem extends System {
         this.createSaucers();
 
         if (Game.getGame().testMode) {
+
+            // Create test Saucer2.
+            new Saucer2Shooter(new Location(undefined, 500, -50, -50, this));
+
             // Create a few test rocks at set locations
 
             // Horizontal colliders
