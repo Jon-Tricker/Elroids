@@ -10,7 +10,7 @@ import { ComponentType } from '../component.js';
 
 class Saucer2Hull extends Hull {
 
-    static type = new ComponentType("Saucer hull", 1, 50, 5000, 1);
+    static type = new ComponentType("Saucer hull", 1, 50, undefined, 1);
 
     constructor(set, hullColour) {
         super(set, 200, hullColour);
@@ -23,9 +23,6 @@ class Saucer2Hull extends Hull {
 
     // 'Front' of hull is 'top' of saucer.
     getMesh() {
-        let scalingFactor = 0.8;
-        let size = this.getShip().length * scalingFactor;
-
         let mesh = new THREE.Group()
 
         // Add graphical components.

@@ -8,13 +8,19 @@ import * as THREE from 'three';
 import Utils from '../../../Game/Utils/utilities.js';
 import Game from '../../../Game/game.js';
 import NPShip from '../nonPlayerShip.js';
-import DumbMissile from '../../../GameItems/Projectiles/dumbMissile.js';
 import Location from '../../../Game/Utils/location.js';
 import { BasicAI } from '../basicAI.js';
 
 const MAX_ROTATE_RATE = 2;    // r/s
 
 class Saucer2AI extends BasicAI {
+
+    constructor(myShip) {
+        super(myShip);
+
+        // Saucers always angry.
+        this.setHostile(true);
+    }
 
     // Rotate towards world location.
     //
@@ -50,8 +56,8 @@ class Saucer2AI extends BasicAI {
 
 class Saucer2 extends NPShip {
 
-    constructor(size, location, speed, mass) {
-        super(size, size, size, location, speed, mass, 1);
+    constructor(size, location, speed) {
+        super(size, size, size, location, speed, 1);
 
         // Really don't want to pass this through the Ship herarchy when other Ships don't auto rotate.
         this.rotationRate = new THREE.Vector3(Math.random() * MAX_ROTATE_RATE * 2 - MAX_ROTATE_RATE, 0, 0);

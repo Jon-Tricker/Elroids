@@ -1,4 +1,8 @@
 // Base list class for all cargo bays.
+
+// Copyright (C) Jon Tricker 2026.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
 import * as THREE from 'three';
 import Game from '../../../Game/game.js';
 import ComponentSet from '../componentSet.js'
@@ -118,7 +122,7 @@ class BaySet extends ComponentSet {
         return (this.getCapacity() - this.getContentMass());
     }
 
-    loadMineral(mineral, mass) {
+    loadMineral(mineral, mass, dump) {
 
         // Load it all.
         if (this.minerals.has(mineral)) {
@@ -132,10 +136,10 @@ class BaySet extends ComponentSet {
         this.recalc();
 
         // Dump any overspill.
-        this.level();
+        this.level(dump);
     }
 
-    loadGoods(goods) {
+    loadGoods(goods, dump) {
         /*
         if (goods.getMass() > this.getAvailableCapacity()) {
             throw (new GameError("Not enough capacity in bay."))
@@ -167,7 +171,7 @@ class BaySet extends ComponentSet {
         }
 
         // Dump any overspill.
-        this.level();
+        this.level(dump);
     }
 
     // Empty everything
@@ -175,7 +179,7 @@ class BaySet extends ComponentSet {
         for (let comp of this.components) {
             this.components.delete(comp);
         }
-        
+
         for (let goods of this.tradeGoods) {
             this.tradeGoods.delete(goods);
         }
@@ -214,15 +218,19 @@ class BaySet extends ComponentSet {
         this.recalc();
     }
 
-    // Dump any overspill
-    level() {
+    // Remove any overspill.
+    // Optional dump it.
+    level(dump) {
         this.recalc();
 
         let spaceReqd = this.getContentMass() - this.capacity;
-        if (0 < spaceReqd) {
-            if (this.getShip() instanceof PlayerShip) {
-                Game.getGame().displays.addMessage("Bay full. Dumping surplus " + spaceReqd + "(t)");
-            }
+        if (0 > spaceReqd) {
+            // No need to level
+            return;
+        }
+
+        if (this.getShip() instanceof PlayerShip) {
+            Game.getGame().displays.addMessage("Bay full. Dumping surplus " + spaceReqd + "(t)");
         }
 
         // First dump minerals
@@ -240,10 +248,10 @@ class BaySet extends ComponentSet {
             if (this.minerals.get(cheapest) < spaceReqd) {
                 // Not enough.
                 spaceReqd -= this.minerals.get(cheapest);
-                this.dumpMineral(cheapest, this.minerals.get(cheapest));
+                this.dumpMineral(cheapest, this.minerals.get(cheapest), dump);
             } else {
                 // Enough. Dump and give up
-                this.dumpMineral(cheapest, Math.ceil(spaceReqd));
+                this.dumpMineral(cheapest, Math.ceil(spaceReqd), dump);
                 this.recalc();
                 return;
             }
@@ -274,7 +282,7 @@ class BaySet extends ComponentSet {
 
             // Delete it.
             spaceReqd -= cheapest.getMass() * dumpNumber;
-            this.dumpGoods(cheapest, dumpNumber);
+            this.dumpGoods(cheapest, dumpNumber, dump);
         }
 
         this.recalc();
@@ -287,7 +295,7 @@ class BaySet extends ComponentSet {
         this.level();
     }
 
-    dumpMineral(mineral, mass) {
+    dumpMineral(mineral, mass, dump) {
         if (undefined === mass) {
             // Dump it all
             mass = this.minerals.get(mineral);
@@ -295,15 +303,17 @@ class BaySet extends ComponentSet {
 
         this.unloadMineral(mineral, mass);
 
-        // Make mineral 
-        let ship = this.getShip();
-        let min = new Mineral(mass, ship.hull.getDumpPoint() , new THREE.Vector3(ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random()), mineral);
-        min.setActive(true);
+        if ((undefined != dump) || (true == dump)) {
+            // Make mineral 
+            let ship = this.getShip();
+            let min = new Mineral(mass, ship.hull.getDumpPoint(), new THREE.Vector3(ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random()), mineral);
+            min.setActive(true);
+        }
 
         this.recalc();
     }
 
-    dumpGoods(goods, number) {
+    dumpGoods(goods, number, dump) {
 
         if (undefined === number) {
             // Dump them all
@@ -313,13 +323,14 @@ class BaySet extends ComponentSet {
         // Take out of bay.
         this.unloadGoods(goods, number);
 
-        // Make goods crate, 
-        let ship = this.getShip();
-        let good = new goods.constructor();
-        good.number = number;
+        if ((undefined == dump) || (true == dump)) {
+            // Make goods crate, 
+            let ship = this.getShip();
+            let good = new goods.constructor();
+            good.number = number;
 
-        let shipLoc = ship.getLocation();
-        let crate = good.makeCrate(ship.hull.getDumpPoint(), new THREE.Vector3(ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random()));
+            good.makeCrate(ship.hull.getDumpPoint(), new THREE.Vector3(ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random()));
+        }
 
         this.recalc();
     }
@@ -345,14 +356,14 @@ class BaySet extends ComponentSet {
                     // Make mineral
                     let type = MineralTypes[1 + Math.floor(Math.random() * (MineralTypes.length - 1))];
                     let mass = Math.ceil(cost / type.value);
-                    this.loadMineral(type, mass);
+                    this.loadMineral(type, mass, false);
                     break;
 
                 case 1:
                     // Make goods.
                     let good = new (Game.getGame().goodsList.getRandomElement()).constructor();
                     good.number = Math.ceil(cost / good.type.cost);
-                    this.loadGoods(good);
+                    this.loadGoods(good, false);
                     break;
 
                 case 2:

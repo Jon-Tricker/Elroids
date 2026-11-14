@@ -91,7 +91,7 @@ const HP = 3;
 
 class PoliceShip extends NPShip {
     constructor(location, speed) {
-        super(5, 10, 20, location, speed, undefined, HP);
+        super(5, 10, 20, location, speed, HP);
 
         this.ai = new PoliceAI(this);
 

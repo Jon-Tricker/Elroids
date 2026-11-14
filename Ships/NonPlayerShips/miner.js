@@ -124,7 +124,7 @@ const HP = 3;
 
 class Miner extends NPShip {
     constructor(location, speed) {
-        super(5, 10, 20, location, speed, undefined, HP);
+        super(5, 10, 20, location, speed, HP);
 
         this.ai = new MinerAI(this);
     }  

@@ -20,9 +20,9 @@ import Utils from './Utils/utilities.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "13.0";
+const VERSION = "13.1";
 
-const ANIMATE_RATE = 25;            // frames/second
+const ANIMATE_RATE = 25;            // Target rate, frames/second
 
 // Load textures once.
 const craterTexture = new THREE.TextureLoader().load("./Game/Scenery/CraterTexture.gif");

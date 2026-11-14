@@ -67,9 +67,13 @@
 					</LI>
 					<LI>Items - All game objects within a system. Also implementation of non 'Vessel' objects.
 						<UL>
+							<LI>Ships. Sub classes are:</LI>
+							<UL>
+								<LI>PlayerShip - The one and only player ship.</LI>
+								<LI>NPShips - Non player ships that also have an AI to control their behaviour.</LI>
+								<LI>Saucers - A sub class of NPShips with some slightly different mechanics.</LI>
+							</UL>
 							<LI>Rocks</LI>
-							<LI>Saucers. Dont obey the laws of physics. One day should probably do so and become
-								'NPShips'.</LI>
 							<LI>Stations</LI>
 							<LI>Wormholes</LI>
 							<LI>Floating minerals and goods crates.</LI>

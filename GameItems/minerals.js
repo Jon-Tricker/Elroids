@@ -81,7 +81,6 @@ class Composition {
         this.composition.splice(i, 1);
       }
     }
-    // this.dump("x")
   }
 
   // Split in a way that 'concentrates' minerals.
@@ -122,9 +121,6 @@ class Composition {
     // Calculate values for both parts.
     this.calculateValues();
     newComp.calculateValues();
- 
-    // this.dump("old ");
-    // newComp.dump("new ");
 
     return (newComp);
   }
@@ -153,8 +149,6 @@ class Composition {
 
     this.spikyness /= this.composition.length;
     this.facets = Math.floor(this.facets / this.composition.length);
-
-    // console.log("xx" + this.spikyness + " " + this.facets);
   }
 
   // Convert into a number of Minerals.
@@ -239,9 +233,9 @@ const MineralTypes = new Array(
   new MineralType("Silicon", "Si",  new THREE.Color(0x808080), 0.6, 10, 0.5, 0, false),
   new MineralType("Iron", "Fe", new THREE.Color(0xB06000), 0.3, 15, 0.25, 20, false),
   new MineralType("Copper", "Cu", new THREE.Color(0x00D080), 0.2, 15, 0.16, 40, false),
-  new MineralType("Gold", "Au", new THREE.Color(0xFFF000), 0.3, 15, 0.04, 80, false),
-  new MineralType("Dilithium", "Li2", new THREE.Color(0x0080D0), 0.8, 20, 0.02, 200, false),
-  new MineralType("Octarine", "Oc", new THREE.Color(0xD000D0), 0.8, 20, 0.01, 500, true)
+  new MineralType("Gold", "Au", new THREE.Color(0xFFF000), 0.3, 15, 0.02, 80, false),
+  new MineralType("Dilithium", "Li2", new THREE.Color(0x0080D0), 0.8, 20, 0.01, 200, false),
+  new MineralType("Octarine", "Oc", new THREE.Color(0xD000D0), 0.8, 20, 0.005, 500, true)
 )
 
 export { MineralType, MineralComponent, Composition, MineralTypes };

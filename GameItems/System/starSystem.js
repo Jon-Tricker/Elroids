@@ -7,7 +7,7 @@ import Rock from '../rock.js';
 import Mineral from '../mineral.js';
 import { MineralTypes } from '../minerals.js';
 import SaucerHunter from '../Saucers/saucerHunter.js';
-import SaucerMother from '../Saucers/saucerMother.js';
+import Saucer2Mother from '../../Ships/NonPlayerShips/Saucers/Saucer2Mother.js';
 import SaucerRam from '../Saucers/saucerRam.js';
 import SaucerPirate from '../Saucers/saucerPirate.js';
 import Station from './station.js';
@@ -97,7 +97,7 @@ class StarSystem extends System {
             this.policeShips.add(item);
         }
 
-        if (item instanceof SaucerMother) {
+        if (item instanceof Saucer2Mother) {
             this.motherSaucers.add(item);
         }
     }
@@ -113,7 +113,7 @@ class StarSystem extends System {
             this.policeShips.delete(item);
         }
 
-        if (item instanceof SaucerMother) {
+        if (item instanceof Saucer2Mother) {
             this.motherSaucers.delete(item);
         }
     }
@@ -322,7 +322,7 @@ class StarSystem extends System {
             loc = hole.location;
         }
 
-        new SaucerMother(loc, null);
+        new Saucer2Mother(loc, null);
 
         // Game gradually gets harder.
         game.maxSaucerCount++;

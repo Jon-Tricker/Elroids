@@ -154,7 +154,7 @@ class Goods {
 
     // Is this available in a given system.
     isAvailableInSystem(system) {
-        return ((this.type.getTechLevel() <= system.getTechLevel()) && (this.type.getMagicLevel() <= system.getMagicLevel()));
+        return ((this.type.getTechLevel() <= system.getTechLevel()) && (this.type.getMagicLevel() <= system.getMagicLevel()) && (undefined != this.getCost()));
     }
 
     // Get cost of a unit in a given system.

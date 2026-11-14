@@ -89,7 +89,7 @@ const INITIAL_CARGO_VALUE = 1000;
 
 class Smuggler extends NPShip {
     constructor(location, speed) {
-        super(5, 10, 20, location, speed, undefined, HP);
+        super(5, 10, 20, location, speed, HP);
 
         this.ai = new SmugglerAI(this);
 

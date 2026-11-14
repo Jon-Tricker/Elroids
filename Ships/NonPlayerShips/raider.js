@@ -43,7 +43,7 @@ const HP = 3;
 
 class Raider extends NPShip {
     constructor(location, speed) {
-        super(5, 10, 20, location, speed, undefined, HP);
+        super(5, 10, 20, location, speed, HP);
         this.ai = new RaiderAI(this);
         this.setHostile(true);
     }   

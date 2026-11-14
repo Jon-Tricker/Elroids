@@ -1,5 +1,4 @@
 // Basic cargo bay
-
 import Bay from './bay.js';
 import { ComponentType } from '../component.js';
 
@@ -9,8 +8,8 @@ class BasicBay extends Bay {
 
     static type = new ComponentType("Miniskip", 1, 10, 200, 3);
 
-    constructor(ship) {
-        super(ship,  25);
+    constructor(set) {
+        super(set, 25);
     }
 
     getDescription() {

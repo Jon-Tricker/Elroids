@@ -8,8 +8,8 @@ class MediumBay extends Bay {
 
     static type = new ComponentType("Skip", 2, 20, 500, 3);
 
-    constructor(ship) {
-        super(ship, 50);
+    constructor(set) {
+        super(set, 50);
     }
 
     getDescription() {

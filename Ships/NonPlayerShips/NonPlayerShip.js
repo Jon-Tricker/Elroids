@@ -12,8 +12,8 @@ class NPShip extends Ship {
     // Brain of NP ship.
     ai;
 
-    constructor(height, width, length, location, speed, mass, hitPoints) {
-        super(undefined, height, width, length, location, speed, mass, hitPoints);
+    constructor(height, width, length, location, speed, hitPoints) {
+        super(undefined, height, width, length, location, speed, undefined, hitPoints);
         this.activateIfRequired();
     }
 

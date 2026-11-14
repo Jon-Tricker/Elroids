@@ -1,4 +1,4 @@
-// NPShip based random shooting saucer.
+// Random shooting saucer.
 
 // Copyright (C) Jon Tricker 2026.
 // Released under the terms of the GNU Public licence (GPL)
@@ -11,12 +11,14 @@ import Saucer2Hull from '../../Components/Hulls/saucer2Hull.js';
 import BasicEngine from '../../Components/Engines/basicEngine.js';
 import DumbMissileWeapon from '../../Components/Weapons/dumbMissileWeapon.js';
 import { Color } from 'three';
-import LaserBeamWeapon from '../../Components/Weapons/laserBeamWeapon.js';
+import BasicBay from '../../Components/Bays/basicBay.js';
 
 const COLOUR = new Color("#C0C0C0");
 
 const STANDOFF_DISTANCE = 300;
 const SHOOT_FREQUENCY = 2000;   // m/s
+
+const INITIAL_CARGO_VALUE = 80;
 
 class ShooterAI extends Saucer2AI {
 
@@ -29,7 +31,6 @@ class ShooterAI extends Saucer2AI {
             case 0:
                 // Get new location if reqd.
                 if (undefined == this.dest) {
-                    // Create position near ship.
                     this.dest = this.createTargetLocation();
                 }
 
@@ -77,6 +78,7 @@ class ShooterAI extends Saucer2AI {
         }
     }
 
+    // Create position near ship.
     createTargetLocation() {
         let pos = Game.getGame().getShip().getLocation().clone();
 
@@ -89,12 +91,9 @@ class ShooterAI extends Saucer2AI {
 
 class Saucer2Shooter extends Saucer2 {
     constructor(location, speed) {
-        super(20, location, speed, undefined);
+        super(20, location, speed);
 
         this.ai = new ShooterAI(this);
-
-        // Saucers always angry.
-        this.setHostile(true);
     }
 
     buildShip() {
@@ -104,8 +103,15 @@ class Saucer2Shooter extends Saucer2 {
         // Do custom stuff for this hull
         new BasicEngine(this.compSets.engineSet);
         new DumbMissileWeapon(this.compSets.weaponSet);
+        new BasicBay(this.compSets.baySet);
+        
+        this.compSets.baySet.loadRandomCargo(INITIAL_CARGO_VALUE);
 
         this.recalc();
+    }
+
+    getName() {
+        return("Shooter");
     }
 }
 

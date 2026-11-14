@@ -39,12 +39,12 @@ class BasicAI {
     pc = 0;
 
     // Wait timer
-    expire = undefined;
+    expire;
 
     myShip;
 
     // Destination may be an item or a location.
-    dest = undefined;
+    dest;
 
     constructor(myShip) {
         this.myShip = myShip;

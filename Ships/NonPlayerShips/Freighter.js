@@ -19,7 +19,7 @@ const INITIAL_CARGO_VALUE = 2000;
 
 class Freighter extends NPShip {
     constructor(location, speed) {
-        super(5, 10, 20, location, speed, undefined, HP);
+        super(5, 10, 20, location, speed, HP);
 
         this.ai = new FreighterAI(this);
 
