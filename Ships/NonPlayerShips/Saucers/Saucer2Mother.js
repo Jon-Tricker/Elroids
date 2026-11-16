@@ -9,9 +9,9 @@ import { Saucer2, Saucer2AI } from './Saucer2.js';
 import Saucer2Hull from '../../Components/Hulls/saucer2Hull.js';
 import BasicEngine from '../../Components/Engines/basicEngine.js';
 import Saucer2Shooter from './Saucer2Shooter.js';
-import SaucerHunter from '../../../GameItems/Saucers/saucerHunter.js';
-import SaucerPirate from '../../../GameItems/Saucers/saucerPirate.js';
-import SaucerRam from '../../../GameItems/Saucers/saucerRam.js';
+import Saucer2Hunter from './Saucer2Hunter.js';
+import Saucer2Pirate from './Saucer2Pirate.js';
+import Saucer2Rammer from './Saucer2Rammer.js';
 import { Color } from 'three';
 import Ballast from '../../Components/Bays/ballast.js';
 import BasicBay from '../../Components/Bays/basicBay.js';
@@ -19,7 +19,7 @@ import BasicBay from '../../Components/Bays/basicBay.js';
 const COLOUR = new Color("#80FF80");
 const SIZE = 50;
 
-const START_SPAWN_FREQUENCY = 30000;    // m/s
+const START_SPAWN_FREQUENCY = 20000;    // m/s
 const MAX_SPAWN_FREQUENCY = 10000;      // m/s
 const RELOC_FREQUENCY = 5000;          // m/s
 
@@ -33,7 +33,7 @@ class MotherAI extends Saucer2AI {
 
     constructor(myShip) {
         super(myShip);
-    } 
+    }
 
     // See extensive comment in parent class.
     hostileProgram(date) {
@@ -129,7 +129,7 @@ class Saucer2Mother extends Saucer2 {
     }
 
     getName() {
-        return("Mothersaucer");
+        return ("Mothersaucer");
     }
 
     buildShip() {
@@ -163,16 +163,15 @@ class Saucer2Mother extends Saucer2 {
                         break;
 
                     case 1:
-                        new SaucerHunter(thisLoc, this);
+                        new Saucer2Hunter(thisLoc);
                         break;
 
                     case 2:
-                        new SaucerPirate(thisLoc, this);
+                        new Saucer2Pirate(thisLoc);
                         break;
 
-                    case 3:
                     default:
-                        new SaucerRam(thisLoc, this);
+                        new Saucer2Rammer(thisLoc);
                         break;
                 }
             }

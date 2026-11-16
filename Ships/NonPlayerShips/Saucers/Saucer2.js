@@ -52,6 +52,13 @@ class Saucer2AI extends BasicAI {
 
         return (this.myShip.angleTo(loc) - angle);
     }
+    
+    // For sacucers don't erase dest between steps.
+    // The may ba a better behaviour for all NP Ships.
+    incPc() {
+        // If step done by default just inc the pc.
+        this.pc++;
+    }
 }
 
 class Saucer2 extends NPShip {

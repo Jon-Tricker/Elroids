@@ -21,11 +21,6 @@ class Mineral extends Item {
 
   constructor(mass, location, speed, type) {
 
-    // TODO remove.
-    if (mass != Math.floor(mass)) {
-      console.log("XXX");
-    }
-
     let size = Math.floor(Math.cbrt(mass));
     if (size < 1) {
       size = 1;

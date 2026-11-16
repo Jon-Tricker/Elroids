@@ -40,12 +40,12 @@ class ShooterAI extends Saucer2AI {
 
             case 1:
                 // Fire in random direction.
-                let range = Game.getGame().getShip().location.getRelative(this.myShip.location);
+                let range = this.myShip.location.getRelative(Game.getGame().getShip().location);
                 if ((STANDOFF_DISTANCE * 2) > range.length()) {
                     // Fire
                     let dir = Utils.createRandomVector(1);
 
-                    this.myShip.shoot(date, dir);
+                    this.myShip.shoot(undefined, dir);
                     done = true;
                 } else {
                     // Out of range ... relocate.

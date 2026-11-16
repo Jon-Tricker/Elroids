@@ -38,38 +38,40 @@
 	<P>This contains a populated Universe and Ship with test versions of most things. Can be used for code testing.</P>
 	<P>Player ship is conveniently lined up for docking.</P>
 	<P>Ship will be loaded with some random cargo and have some random damge.</P>
-	<P>"'Someone else' can add unittests later." ... as 'idiots' like to say :-)</P>
 	<P>For notes on code operation/stucture see the <A HREF="developer_code_notes.html">Developer Code notes.</A>.</P>
 
 	<H2>ToDos (In some sort of priority order)</H2>
 
 	<H3>V13.x Rework saucers.</H3>
-	<P>Convert other saucers to new type.</P>
 	<P>Re-implement exploding saucers. Explosion to have optional fragments.</P>
 	<P>Modify mother saucer re-spawn frequency to be based on time ... rather than number of animate cycles.</P>
-	<P>Look into value of created minerals. Sometimes looks to be a little high.</P>
-
-	<H3>V14.x Improve NPShips</H3>
-	<P>Remove HP ... use regular damage to systems instead ... if NPShips become too tough multiply the damage by some amount.</P>
-	<P>Less 'wild' navigation. Modify navigateThroughDest() to add lead. Possibly common code with attack().</P>
-	<P>Make miners less stupid. Dont charge in before all sub-rocks destroyed.</P>
-	<P>Don't 'stop' when attacking. Makes attacker an easy target.</P>
 	<P>Replace 'Saucer2' to 'Saucer' throughout.</P>
 
-	<H3>V15.x General tidy up.</H3>
+	<H3>V14.x General code tidy up.</H3>
+	<P>Investigate why damaged ship sometimes dumps non-integer amounts of minerals.</P>
+	<P>Look into value of created minerals. Sometimes looks to be a little high.</P>
 	<P>Make radar and compass components contain their own displays (like Huds).</P>
-	<P>Allow >1 ship to dock at the same time.</P>
-	<P>Add station aproach lights. Green - OK. Red - No docking. Yellow - Bad approach.</P>
 	<P>Don't show existing hull type in purchace list.</P>
 	<P>Convert GoodsList and ComponentsList to use classes ... like shipTypes in NPShipFactory.</P>
 	<P>Do a sweep of use of 'null'. These are a hang over from my days as a Java programer. In most cases change to undefned.</P>
 	<P>Modify flame cones to grow/shrink when pulsed. Not flicker.</P>
 	<P>Possibly don't need extra 2D layer for lables ... make them part of HUD layer.</P>
 
-	<H3>V16.x Fix game launch problems.</H3>
+	<H3>V15.x Improve stations</H3>
+	<P>Allow >1 ship to dock at the same time.</P>
+	<P>Add station aproach lights. Green - OK. Red - No docking. Yellow - Bad approach.</P>
+	<P>Add text display 'sign'.</P>
+
+	<H3>V16.x Improve NPShips</H3>
+	<P>Remove HP ... use regular damage to systems instead ... if NPShips become too tough multiply the damage by some amount.</P>
+	<P>Less 'wild' navigation. Modify navigateThroughDest() to add lead. Possibly common code with attack().</P>
+	<P>Make miners less stupid. Dont charge in before all sub-rocks destroyed.</P>
+	<P>Don't 'stop' when attacking. Makes attacker an easy target.</P>
+
+	<H3>V17.x Fix game launch problems.</H3>
 	<P>Add 'loading' screen.</P>
 
-	<H3>V17.x Add extra ship components.</H3>
+	<H3>V18.x Add extra ship components.</H3>
 	<UL>
 		<LI>Thrusters (directional control)</LI>
 		<LI>Hyperdrive. Reqd for hyperspace travel.</LI>

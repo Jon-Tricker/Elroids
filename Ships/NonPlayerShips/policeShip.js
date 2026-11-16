@@ -7,7 +7,7 @@
 import * as THREE from 'three';
 import NPShip from './nonPlayerShip.js';
 import Reputation from '../../Game/reputation.js';
-import Saucer from '../../GameItems/Saucers/saucer.js';
+import { Saucer2 } from './Saucers/Saucer2.js';
 import SmallHull from '../Components/Hulls/smallHull.js';
 import MediumEngine from '../Components/Engines/mediumEngine.js';
 import LaserBeamWeapon from '../Components/Weapons/laserBeamWeapon.js';
@@ -24,7 +24,7 @@ class PoliceAI extends BasicAI {
             case 0:
                 // Work out what to do
                 if (Math.random() < 0.5) {
-                    this.dest = this.myShip.location.system.getClosest(Saucer, this.myShip.location);
+                    this.dest = this.myShip.location.system.getClosest(Saucer2, this.myShip.location);
                     if (undefined != this.dest) {
                         this.pc = 2;
                         break;

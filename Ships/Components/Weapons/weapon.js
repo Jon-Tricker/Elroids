@@ -1,4 +1,9 @@
 // Base class for weapons
+
+// Copyright (C) Jon Tricker 2026.
+// Released under the terms of the GNU Public licence (GPL)
+//      https://www.gnu.org/licenses/gpl-3.0.en.html
+
 import { ComponentAct } from "../component.js";
 import GameError from "../../../Game/gameError.js";
 
@@ -54,6 +59,7 @@ class Weapon extends ComponentAct {
 
     // Determine loaded and ready to fire.
     // No sure we really need this ... just shoot() and throw if it fails.
+    // Pass undefined date if always want to fire.
     isReady(date) {
         if (undefined != this.maxAmmo) {
             if (0 == this.ammo) {
@@ -61,7 +67,7 @@ class Weapon extends ComponentAct {
             }
         }
 
-        if ((undefined == this.fireLast) || (date > this.fireLast + 1000 / this.fireRate)) {
+        if ((undefined == date) || (undefined == this.fireLast) || (date > this.fireLast + 1000 / this.fireRate)) {
             return (true);
         }
         return (false);
