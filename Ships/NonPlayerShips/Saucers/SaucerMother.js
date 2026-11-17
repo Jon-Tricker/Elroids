@@ -5,13 +5,13 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import Game from '../../../Game/game.js';
-import { Saucer2, Saucer2AI } from './Saucer2.js';
-import Saucer2Hull from '../../Components/Hulls/saucer2Hull.js';
+import { Saucer, SaucerAI } from './Saucer.js';
+import SaucerHull from '../../Components/Hulls/saucerHull.js';
 import BasicEngine from '../../Components/Engines/basicEngine.js';
-import Saucer2Shooter from './Saucer2Shooter.js';
-import Saucer2Hunter from './Saucer2Hunter.js';
-import Saucer2Pirate from './Saucer2Pirate.js';
-import Saucer2Rammer from './Saucer2Rammer.js';
+import SaucerShooter from './SaucerShooter.js';
+import SaucerHunter from './SaucerHunter.js';
+import SaucerPirate from './SaucerPirate.js';
+import SaucerRammer from './SaucerRammer.js';
 import { Color } from 'three';
 import Ballast from '../../Components/Bays/ballast.js';
 import BasicBay from '../../Components/Bays/basicBay.js';
@@ -25,7 +25,7 @@ const RELOC_FREQUENCY = 5000;          // m/s
 
 const INITIAL_CARGO_VALUE = 400;
 
-class MotherAI extends Saucer2AI {
+class MotherAI extends SaucerAI {
 
     currentSpawnFrequency = START_SPAWN_FREQUENCY;
     relocTime;
@@ -120,7 +120,7 @@ class MotherAI extends Saucer2AI {
     }
 }
 
-class Saucer2Mother extends Saucer2 {
+class SaucerMother extends Saucer {
 
     constructor(location, speed) {
         super(SIZE, location, speed);
@@ -133,7 +133,7 @@ class Saucer2Mother extends Saucer2 {
     }
 
     buildShip() {
-        this.hull = new Saucer2Hull(this.compSets.hullSet, COLOUR);
+        this.hull = new SaucerHull(this.compSets.hullSet, COLOUR);
         this.hull.setSlots(this.compSets);
 
         // Do custom stuff for this hull
@@ -159,19 +159,19 @@ class Saucer2Mother extends Saucer2 {
                 let type = Math.floor(Math.random() * 4)
                 switch (type) {
                     case 0:
-                        new Saucer2Shooter(thisLoc);
+                        new SaucerShooter(thisLoc);
                         break;
 
                     case 1:
-                        new Saucer2Hunter(thisLoc);
+                        new SaucerHunter(thisLoc);
                         break;
 
                     case 2:
-                        new Saucer2Pirate(thisLoc);
+                        new SaucerPirate(thisLoc);
                         break;
 
                     default:
-                        new Saucer2Rammer(thisLoc);
+                        new SaucerRammer(thisLoc);
                         break;
                 }
             }
@@ -179,4 +179,4 @@ class Saucer2Mother extends Saucer2 {
     }
 }
 
-export default Saucer2Mother;
+export default SaucerMother;

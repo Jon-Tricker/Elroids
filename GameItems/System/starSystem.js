@@ -6,18 +6,23 @@ import PlayerShip from '../../Ships/playerShip.js';
 import Rock from '../rock.js';
 import Mineral from '../mineral.js';
 import { MineralTypes } from '../minerals.js';
-import Saucer2Mother from '../../Ships/NonPlayerShips/Saucers/Saucer2Mother.js';
+import SaucerMother from '../../Ships/NonPlayerShips/Saucers/SaucerMother.js';
 import Station from './station.js';
 import NPShipFactory from '../../Ships/NonPlayerShips/nPShipFactory.js';
 import Location from '../../Game/Utils/location.js';
 import PoliceShip from '../../Ships/NonPlayerShips/policeShip.js';
 import Utils from '../../Game/Utils/utilities.js';
+import SaucerShooter from '../../Ships/NonPlayerShips/Saucers/SaucerShooter.js';
+import SaucerHunter from '../../Ships/NonPlayerShips/Saucers/SaucerHunter.js';
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;           // m
 
 // How often (average) are NPShips spawned.
 const NP_SHIP_FREQUENCY = 60000     // ms
+
+// How often mother saucers are spawned.
+const MOTHER_FREQUENCY = 30000      // ms
 
 class StarSystem extends System {
     rockCount = 0;
@@ -27,6 +32,9 @@ class StarSystem extends System {
 
     // Non player ship timer.
     nPShipTimer = 0;
+
+    // Mother saucer timer.
+    motherTimer = 0;
 
     // Special items in the system.
     motherSaucers = new Set();
@@ -91,7 +99,7 @@ class StarSystem extends System {
             this.policeShips.add(item);
         }
 
-        if (item instanceof Saucer2Mother) {
+        if (item instanceof SaucerMother) {
             this.motherSaucers.add(item);
         }
     }
@@ -107,7 +115,7 @@ class StarSystem extends System {
             this.policeShips.delete(item);
         }
 
-        if (item instanceof Saucer2Mother) {
+        if (item instanceof SaucerMother) {
             this.motherSaucers.delete(item);
         }
     }
@@ -135,8 +143,9 @@ class StarSystem extends System {
         if (!Game.getGame().testMode) {
             // If mother saucer detroyed periodicaly re-create
             if (0 == this.motherSaucers.size) {
-                if ((Math.random() * 500) < 1) {
+                if (date > this.motherTimer) {
                     this.createMotherSaucer();
+                    this.motherTimer = date + MOTHER_FREQUENCY * (1 + Math.random()) * 0.5;
                 }
             }
         }
@@ -203,12 +212,12 @@ class StarSystem extends System {
 
     // Create the dynamic content that is not persisted when system inactive.
     createDynamic(rockCount) {
-        this.createSaucers();
+        this.createMotherSaucer();
 
         if (Game.getGame().testMode) {
 
             // Create test Saucer.
-            // new Saucer2Pirate(new Location(undefined, 500, -50, -50, this));
+            new SaucerHunter(new Location(undefined, 500, -50, -50, this));
 
             // Create a few test rocks at set locations
 
@@ -299,10 +308,6 @@ class StarSystem extends System {
         }
     }
 
-    createSaucers() {
-        this.createMotherSaucer();
-    }
-
     createMotherSaucer() {
         let loc;
         let game = Game.getGame();
@@ -316,7 +321,7 @@ class StarSystem extends System {
             loc = hole.location;
         }
 
-        new Saucer2Mother(loc, null);
+        new SaucerMother(loc, null);
 
         // Game gradually gets harder.
         game.maxSaucerCount++;

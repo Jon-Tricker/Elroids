@@ -7,7 +7,6 @@
 import * as THREE from 'three';
 
 import Universe from '../GameItems/universe.js';
-import Rock from "../GameItems/rock.js";
 import GameError from "./gameError.js"
 import { ComponentsList } from '../Trade/purchaseLists.js';
 import { GoodsList } from '../Trade/goodsTypes.js';
@@ -20,7 +19,7 @@ import Utils from './Utils/utilities.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "13.2";
+const VERSION = "13.3";
 
 const ANIMATE_RATE = 25;            // Target rate, frames/second
 
@@ -52,6 +51,7 @@ class Game {
     maxSaucerCount = 5;
 
     paused = false;
+    stop = false;
 
     // Shopping catalogs.
     componentsList;
@@ -105,7 +105,6 @@ class Game {
 
             // Give us some cash
             this.player.addCredits(12345);
-            //this.player.addCredits(121);
         }
 
         // Create shopping list.
@@ -114,8 +113,6 @@ class Game {
 
         this.setup(undefined, uniSize, systemSize, maxRockCount);
 
-        // First call of animation loop.
-        this.loop();
     }
 
     setup(json, uniSize, systemSize, maxRockCount) {
@@ -148,6 +145,10 @@ class Game {
 
         // Make current system graphics active.
         this.universe.system.setActive(true);
+
+        // First call of animation loop.
+        this.stop = false;
+        this.loop();
     }
 
     static getGame() {
@@ -394,11 +395,11 @@ class Game {
             }
         }
 
-        // Re-request self
-        window.requestAnimationFrame(this.loop);
+        if (!this.stop) {
+            // Re-request self
+            window.requestAnimationFrame(this.loop);
+        }
     }
-
-
 }
 
 export default Game;

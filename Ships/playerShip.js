@@ -50,11 +50,18 @@ class PlayerShip extends Ship {
         return (json);
     }
 
-    destruct() {
+    // Cannot destruct ship. If we do lots of game internals will fails.
+    // But don't want it to continue to interact with other Items.
+    // So just game.
+    destruct(violent) {
+        Game.getGame().stop = true;
+        /*
         this.remove(this.pilotCamera);
         this.pilotCamera = undefined;
         this.remove(this.chaseCamera);
         this.chaseCamera = undefined;
+        super.destruct(violent);
+        */
     }
 
     buildShip() {

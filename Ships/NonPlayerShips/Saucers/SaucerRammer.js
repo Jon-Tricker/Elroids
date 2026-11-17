@@ -5,8 +5,8 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import Game from '../../../Game/game.js';
-import { Saucer2, Saucer2AI } from './Saucer2.js';
-import Saucer2Hull from '../../Components/Hulls/saucer2Hull.js';
+import { Saucer, SaucerAI } from './Saucer.js';
+import SaucerHull from '../../Components/Hulls/saucerHull.js';
 import BasicEngine from '../../Components/Engines/basicEngine.js';
 import { Color } from 'three';
 
@@ -14,7 +14,7 @@ const COLOUR = new Color("#C03030");
 
 const INITIAL_CARGO_VALUE = 80;
 
-class RammerAI extends Saucer2AI {
+class RammerAI extends SaucerAI {
 
     // See extensive comment in parent class.
     hostileProgram(date) {
@@ -40,7 +40,7 @@ class RammerAI extends Saucer2AI {
     }
 }
 
-class Saucer2Rammer extends Saucer2 {
+class SaucerRammer extends Saucer {
     constructor(location, speed) {
         super(20, location, speed);
 
@@ -48,7 +48,7 @@ class Saucer2Rammer extends Saucer2 {
     }
 
     buildShip() {
-        this.hull = new Saucer2Hull(this.compSets.hullSet, COLOUR);
+        this.hull = new SaucerHull(this.compSets.hullSet, COLOUR);
         this.hull.setSlots(this.compSets);
 
         // Do custom stuff for this hull
@@ -62,4 +62,4 @@ class Saucer2Rammer extends Saucer2 {
     }
 }
 
-export default Saucer2Rammer;
+export default SaucerRammer;

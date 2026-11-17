@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import { Hull, HullSection } from './hull.js';
 import { ComponentType } from '../component.js';
 
-class Saucer2Hull extends Hull {
+class SaucerHull extends Hull {
 
     static type = new ComponentType("Saucer hull", 1, 50, undefined, 1);
 
@@ -129,4 +129,4 @@ class Saucer2Hull extends Hull {
     }
 }
 
-export default Saucer2Hull;
+export default SaucerHull;

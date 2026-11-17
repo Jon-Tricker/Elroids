@@ -10,10 +10,11 @@ import Game from '../../../Game/game.js';
 import NPShip from '../nonPlayerShip.js';
 import Location from '../../../Game/Utils/location.js';
 import { BasicAI } from '../basicAI.js';
+import DumbMissile from '../../../GameItems/Projectiles/dumbMissile.js';
 
 const MAX_ROTATE_RATE = 2;    // r/s
 
-class Saucer2AI extends BasicAI {
+class SaucerAI extends BasicAI {
 
     constructor(myShip) {
         super(myShip);
@@ -61,7 +62,7 @@ class Saucer2AI extends BasicAI {
     }
 }
 
-class Saucer2 extends NPShip {
+class Saucer extends NPShip {
 
     constructor(size, location, speed) {
         super(size, size, size, location, speed, 1);
@@ -109,13 +110,12 @@ class Saucer2 extends NPShip {
     } 
     
     // Self destruct.
-    // TODO ... fix limited weapon fire rate.
     explode(date) {
         // Make fragments
-        let count = 100; //Math.ceil(Math.random() * 100);
+        let count = Math.ceil(Math.random() * 100);
         for (let i = 0; i < count; i++) {
             let dir = Utils.createRandomVector(1);
-            this.shoot(date, dir);
+            let frag = new DumbMissile(dir, this);
         }
 
         // Blow up.
@@ -123,4 +123,4 @@ class Saucer2 extends NPShip {
     }
 }
 
-export { Saucer2AI, Saucer2 };
+export { SaucerAI, Saucer };

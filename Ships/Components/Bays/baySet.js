@@ -223,7 +223,7 @@ class BaySet extends ComponentSet {
     level(dump) {
         this.recalc();
 
-        let spaceReqd = this.getContentMass() - this.capacity;
+        let spaceReqd = Math.ceil(this.getContentMass() - this.capacity);
         if (0 > spaceReqd) {
             // No need to level
             return;

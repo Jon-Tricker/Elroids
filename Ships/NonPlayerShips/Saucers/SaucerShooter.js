@@ -6,8 +6,8 @@
 
 import Game from '../../../Game/game.js';
 import Utils from '../../../Game/Utils/utilities.js';
-import { Saucer2, Saucer2AI } from './Saucer2.js';
-import Saucer2Hull from '../../Components/Hulls/saucer2Hull.js';
+import { Saucer, SaucerAI } from './Saucer.js';
+import SaucerHull from '../../Components/Hulls/saucerHull.js';
 import BasicEngine from '../../Components/Engines/basicEngine.js';
 import DumbMissileWeapon from '../../Components/Weapons/dumbMissileWeapon.js';
 import { Color } from 'three';
@@ -20,7 +20,7 @@ const SHOOT_FREQUENCY = 2000;   // m/s
 
 const INITIAL_CARGO_VALUE = 80;
 
-class ShooterAI extends Saucer2AI {
+class ShooterAI extends SaucerAI {
 
     // See extensive comment in parent class.
     hostileProgram(date) {
@@ -49,6 +49,7 @@ class ShooterAI extends Saucer2AI {
                     done = true;
                 } else {
                     // Out of range ... relocate.
+                    this.dest = undefined;
                     this.pc = 0;
                 }
                 break;
@@ -59,8 +60,15 @@ class ShooterAI extends Saucer2AI {
                 break;
 
             case 3:
-                // Occasionaly re-locate.
+                // Occasionally explode
+                if (Math.random() < 0.01) {
+                    this.myShip.explode();
+                    break;
+                }
+
+                // Occasionally re-locate.
                 if (Math.random() > 0.1) {
+                    this.dest = undefined;
                     this.pc = 1;
                 } else {
                     done = true;
@@ -69,6 +77,7 @@ class ShooterAI extends Saucer2AI {
 
             // Loop forever.
             default:
+                this.dest = undefined;
                 this.pc = 0;
                 break;
         }
@@ -89,7 +98,7 @@ class ShooterAI extends Saucer2AI {
     }
 }
 
-class Saucer2Shooter extends Saucer2 {
+class SaucerShooter extends Saucer {
     constructor(location, speed) {
         super(20, location, speed);
 
@@ -97,22 +106,22 @@ class Saucer2Shooter extends Saucer2 {
     }
 
     buildShip() {
-        this.hull = new Saucer2Hull(this.compSets.hullSet, COLOUR);
+        this.hull = new SaucerHull(this.compSets.hullSet, COLOUR);
         this.hull.setSlots(this.compSets);
 
         // Do custom stuff for this hull
         new BasicEngine(this.compSets.engineSet);
         new DumbMissileWeapon(this.compSets.weaponSet);
         new BasicBay(this.compSets.baySet);
-        
+
         this.compSets.baySet.loadRandomCargo(INITIAL_CARGO_VALUE);
 
         this.recalc();
     }
 
     getName() {
-        return("Shooter");
+        return ("Shooter");
     }
 }
 
-export default Saucer2Shooter;
+export default SaucerShooter;

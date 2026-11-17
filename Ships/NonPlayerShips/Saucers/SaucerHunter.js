@@ -7,8 +7,8 @@
 import * as THREE from 'three';
 import Game from '../../../Game/game.js';
 import Utils from '../../../Game/Utils/utilities.js';
-import { Saucer2, Saucer2AI } from './Saucer2.js';
-import Saucer2Hull from '../../Components/Hulls/saucer2Hull.js';
+import { Saucer, SaucerAI } from './Saucer.js';
+import SaucerHull from '../../Components/Hulls/saucerHull.js';
 import BasicEngine from '../../Components/Engines/basicEngine.js';
 import DumbMissileWeapon from '../../Components/Weapons/dumbMissileWeapon.js';
 import { Color } from 'three';
@@ -22,7 +22,7 @@ const BURST_COUNT = 3;
 
 const INITIAL_CARGO_VALUE = 100;
 
-class HunterAI extends Saucer2AI {
+class HunterAI extends SaucerAI {
 
     burstCount = 0;
 
@@ -65,6 +65,7 @@ class HunterAI extends Saucer2AI {
                     }
                 } else {
                     // Out of range ... relocate.
+                    this.dest = undefined;
                     this.pc = 0;
                 }
                 break;
@@ -77,6 +78,7 @@ class HunterAI extends Saucer2AI {
             case 3:
                 // Occasionaly re-locate.
                 if (Math.random() > 0.1) {
+                    this.dest = undefined;
                     this.pc = 1;
                 } else {
                     done = true;
@@ -85,6 +87,7 @@ class HunterAI extends Saucer2AI {
 
             // Loop forever.
             default:
+                this.dest = undefined;
                 this.pc = 0;
                 break;
         }
@@ -105,7 +108,7 @@ class HunterAI extends Saucer2AI {
     }
 }
 
-class Saucer2Hunter extends Saucer2 {
+class SaucerHunter extends Saucer {
     constructor(location, speed) {
         super(20, location, speed);
 
@@ -113,7 +116,7 @@ class Saucer2Hunter extends Saucer2 {
     }
 
     buildShip() {
-        this.hull = new Saucer2Hull(this.compSets.hullSet, COLOUR);
+        this.hull = new SaucerHull(this.compSets.hullSet, COLOUR);
         this.hull.setSlots(this.compSets);
 
         // Do custom stuff for this hull
@@ -131,4 +134,4 @@ class Saucer2Hunter extends Saucer2 {
     }
 }
 
-export default Saucer2Hunter;
+export default SaucerHunter;
