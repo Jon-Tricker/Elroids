@@ -4,8 +4,8 @@
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import Game from "../Game/game.js";
-import RadarDisplay from "./radarDisplay.js";
-import CompassDisplay from "./compassDisplay.js";
+import isplay from "./Components/Avionics/radarDisplay.js";
+import CompassDisplay from "./Components/Avionics/compassDisplay.js";
 import ComponentDisplays from "./Components/componentDisplays.js";
 import Terminal from './terminal.js'
 import MenuSystem from './menuSystem.js'
@@ -80,8 +80,8 @@ class Displays {
         let terminalCtx = terminalDoc.getContext("2d");
         this.terminal = new Terminal(terminalCtx, terminalDoc, DEFAULT_TERM_COLOUR);
 
-        this.radar = new RadarDisplay(this.statusCtx, DEFAULT_COLOUR);
-        this.compass = new CompassDisplay(this.statusCtx, DEFAULT_COLOUR);
+        this.radar = Game.getGame().getShip().compSets.avionicsSet.getRadar().getPanel(this.statusCtx, DEFAULT_COLOUR);
+        this.compass = Game.getGame().getShip().compSets.avionicsSet.getCompass().getPanel(this.statusCtx, DEFAULT_COLOUR);
         this.compDisplays = new ComponentDisplays(this.statusCtx, this.hudCtx, DEFAULT_COLOUR, this);
 
         // this.resize();
@@ -140,7 +140,7 @@ class Displays {
         } else {
             // Clear up old terminal
             this.terminal.clearBox();
-            this.meunSystem = null;
+            this.meunSystem = undefined;
         }
     }
 

@@ -23,8 +23,7 @@ class RangeHud extends Hud {
     }    
     
     // Return the HUD display panel for this component.
-    // This is in addition to the Component display panel that all components have.
-    getHudDisplay(ctx, defaultColour) {
+    getPanel(ctx, defaultColour) {
         return (new RangeHudDisplay(ctx, defaultColour, this));
     }
 }

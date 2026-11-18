@@ -68,10 +68,10 @@ class Station extends ItemPers {
     // Set of things docked with us. We don't dock with anything.
     dockedItems = new JSONSet();
 
-    constructor(json, location, owner) {
+    constructor(json, location) {
         // Random rotation
         if (undefined === json) {
-            super(undefined , location, new THREE.Vector3(), STATION_SIZE, STATION_MASS, STATION_HP, owner, true, undefined, new THREE.Vector3(ROTATE_RATE, 0, 0), true);
+            super(undefined , location, new THREE.Vector3(), STATION_SIZE, STATION_MASS, STATION_HP, undefined, true, undefined, new THREE.Vector3(ROTATE_RATE, 0, 0), true);
             if (!Game.getGame().testMode) {
                 this.rotateX(Math.random() * Math.PI);
                 this.rotateZ(Math.random() * Math.PI);
@@ -323,7 +323,7 @@ class Station extends ItemPers {
         // Paint guide lines.   
         let redCol = new THREE.Color('red');
         let greenCol = new THREE.Color('green');
-        let col = null;
+        let col;
         switch (side) {
             case BoxSides.FRONT:
                 col = whiteCol;
@@ -336,13 +336,13 @@ class Station extends ItemPers {
                 break
         }
 
-        if (null != col) {
+        if (undefined != col) {
             for (let x = 0; x < width; x++) {
                 text.setPixel(x, Math.floor(height / 2), col);
             }
         }
 
-        col = null;
+        col = undefined;
         switch (side) {
             case BoxSides.FRONT:
             case BoxSides.TOP:
@@ -365,7 +365,7 @@ class Station extends ItemPers {
                 break
         }
 
-        if (null != col) {
+        if (undefined != col) {
             for (let y = 0; y <= height - 1; y++) {
                 text.setPixel(Math.floor(width / 2), y, col);
             }
@@ -407,7 +407,7 @@ class Station extends ItemPers {
         // i.e is the ship's central location inside the station mesh? 
         // ToDo : Probably should be from every vertex of the ship mesh but WTF?
         let obj = this.isPointInside(ship.getLocation());
-        if (null != obj) {
+        if (undefined != obj) {
 
             // If inside bay handle docking.
             if (this.bayMesh == obj) {

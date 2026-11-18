@@ -29,9 +29,8 @@ class Hud extends ComponentAct {
     }
 
     // Return the HUD display panel for this component.
-    // This is in addition to the Component display panel that all components have.
-    getHudDisplay(ctx, defaultColour) {
-        throw new BugError("Cannot get display for base HUD class.")
+    getHudPanel(ctx, defaultColour) {
+        throw new BugError("Cannot get panel for base HUD class.")
     }
 
     getTargetSet(ship) {

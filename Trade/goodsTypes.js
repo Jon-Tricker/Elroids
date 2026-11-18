@@ -1,5 +1,4 @@
 // Types of goods.
-import Game from "../Game/game.js";
 import Goods from "./goods.js";
 import GoodsSet from "./goodsSet.js";
 
@@ -97,7 +96,9 @@ class Crystal extends Goods {
     }
 }
 
-
+// Avalable goods.
+//
+// We need to access member methods before instantization. So, rather than have loads of 'statics', create a prototype instance of each type.
 class GoodsList extends GoodsSet {
 
     constructor() {

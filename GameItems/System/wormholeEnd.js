@@ -47,7 +47,7 @@ class WormholeEnd extends ItemPers {
 
     constructor(json, location, label, wormhole, backgroundColour) {
         if (undefined == json) {
-            super(undefined, location, new THREE.Vector3(), RADIUS, MASS, HP, null, true, undefined, new THREE.Vector3, true);
+            super(undefined, location, new THREE.Vector3(), RADIUS, MASS, HP, undefined, true, undefined, new THREE.Vector3, true);
 
 
         } else {

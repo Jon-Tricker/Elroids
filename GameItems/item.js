@@ -31,11 +31,7 @@ class Item extends ItemGraphics {
             this.hitPoints = hitPoints;
         }
 
-        if (owner === undefined) {
-            this.owner = null;
-        } else {
-            this.owner = owner;
-        }
+        this.owner = owner;
     }
 
     getId() {

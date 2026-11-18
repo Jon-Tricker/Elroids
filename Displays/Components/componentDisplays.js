@@ -6,6 +6,7 @@
 import Game from "../../Game/game.js";
 import ShipCompDisplay from "./shipCompDisplay.js";
 import Hud from "../../Ships/Components/Avionics/Huds/hud.js";
+import Radar from "../../Ships/Components/Avionics/radar.js";
 import HudDisplay from "./Huds/hudDisplay.js";
 
 class ComponentDisplays extends Set {
@@ -60,7 +61,7 @@ class ComponentDisplays extends Set {
 
                     // Also add the HUD display if there is one.
                     if (comp instanceof Hud) {
-                        this.add(comp.getHudDisplay(this.hudCtx, this.defaultColour));
+                        this.add(comp.getPanel(this.hudCtx, this.defaultColour));
                     }
                 }
             }

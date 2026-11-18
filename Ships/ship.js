@@ -259,7 +259,7 @@ class Ship extends ItemPers {
 
             if (undefined != this.mesh) {
                 this.remove(this.mesh);
-                this.mesh = null;
+                this.mesh = undefined;
             }
         } else {
             // Only move to scene if not part of something else.

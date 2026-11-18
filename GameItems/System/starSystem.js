@@ -217,7 +217,7 @@ class StarSystem extends System {
         if (Game.getGame().testMode) {
 
             // Create test Saucer.
-            new SaucerHunter(new Location(undefined, 500, -50, -50, this));
+            // new SaucerHunter(new Location(undefined, 500, -50, -50, this));
 
             // Create a few test rocks at set locations
 
@@ -295,10 +295,10 @@ class StarSystem extends System {
         if (undefined === json) {
             // Create new stations.
             if (Game.getGame().testMode) {
-                // new Station(new Location(-4900, 0, 0, this), null);
-                new Station(undefined, new Location(undefined, 1100, 0, 0, this), null);
+                // new Station(new Location(-4900, 0, 0, this));
+                new Station(undefined, new Location(undefined, 1100, 0, 0, this));
             } else {
-                new Station(undefined, new Location(undefined, 0, 0, 0, this), null);
+                new Station(undefined, new Location(undefined, 0, 0, 0, this));
             }
         } else {
             // Restore old stations.
@@ -321,7 +321,7 @@ class StarSystem extends System {
             loc = hole.location;
         }
 
-        new SaucerMother(loc, null);
+        new SaucerMother(loc);
 
         // Game gradually gets harder.
         game.maxSaucerCount++;

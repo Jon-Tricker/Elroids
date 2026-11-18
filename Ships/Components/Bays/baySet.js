@@ -236,10 +236,10 @@ class BaySet extends ComponentSet {
         // First dump minerals
         while ((this.minerals.size > 0) && (0 < (spaceReqd = this.getContentMass() - this.capacity))) {
             // Find cheapest
-            let cheapest = null;
-            let cost = null;
+            let cheapest;
+            let cost;
             for (let [key, value] of this.minerals) {
-                if ((null == cost) || (key.value < cost)) {
+                if ((undefined == cost) || (key.value < cost)) {
                     cheapest = key;
                     cost = key.value;
                 }
@@ -260,15 +260,15 @@ class BaySet extends ComponentSet {
         // Not enough minerals. Dump other cargo.
         while ((0 < (this.components.getMass() + this.tradeGoods.getMass())) && (0 < (spaceReqd = this.getContentMass() - this.capacity))) {
             // Find cheapest component. 
-            let cheapest = null;
+            let cheapest;
             for (let comp of this.components) {
-                if ((null == cheapest) || (comp.getCost() < cheapest.getCost())) {
+                if ((undefined == cheapest) || (comp.getCost() < cheapest.getCost())) {
                     cheapest = comp;
                 }
             }
 
             for (let goods of this.tradeGoods) {
-                if ((null == cheapest) || (goods.getCost() < cheapest.getCost())) {
+                if ((undefined == cheapest) || (goods.getCost() < cheapest.getCost())) {
                     cheapest = goods;
                 }
             }

@@ -15,7 +15,7 @@ class BasicRadar extends Radar {
 
     getDescription() {
         return (super.getDescription() + "\n\n'" + this.getName() + "' is " + DESCRIPTION.toLowerCase());
-    }
+    }    
 }
 
 export default BasicRadar;

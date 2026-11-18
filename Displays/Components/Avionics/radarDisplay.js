@@ -1,6 +1,6 @@
 // Radar screen just one for the ship.
-import Game from '../Game/game.js';
-import DarkPanel from './Utils/darkPanel.js';
+import Game from '../../../Game/game.js';
+import DarkPanel from '../../Utils/darkPanel.js';
 
 const RANGE = 1500;     // m
 const FLAG_SIZE = 5;

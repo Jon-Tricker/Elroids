@@ -29,16 +29,16 @@ class MinerAI extends BasicAI {
                 let rock = this.myShip.location.system.getValuable(Rock, this.myShip.location);
                 let mineral = this.myShip.location.system.getValuable(Mineral, this.myShip.location);
 
-                if (null != mineral) {
+                if (undefined != mineral) {
                     // Is mineral worth more than rock (X10 because extracted mineral easier to get)
-                    if ((null == rock) || (rock.getRelativeValue(ship.getLocation()) < mineral.getRelativeValue(ship.getLocation()))) {
+                    if ((undefined == rock) || (rock.getRelativeValue(ship.getLocation()) < mineral.getRelativeValue(ship.getLocation()))) {
                         this.dest = mineral;
                         this.pc = 2;
                         break;
                     }
                 }
 
-                if (null != rock) {
+                if (undefined != rock) {
                     this.dest = rock;
                     this.pc = 3;
                 } else {

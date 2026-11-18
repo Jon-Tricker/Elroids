@@ -59,7 +59,7 @@ class SmugglerAI extends BasicAI {
                     done = true;
                 } else {
                     // If there is some cargo loop back and pick it up.
-                    if (null != this.myShip.location.system.getValuable(undefined, this.myShip.location)) {
+                    if (undefined != this.myShip.location.system.getValuable(undefined, this.myShip.location)) {
                         // Loop.
                         this.pc = 0;
                     } else {

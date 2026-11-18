@@ -32,7 +32,7 @@ class ComponentDisplay extends DarkPanel {
         let index = 0; 
         let spHeight = (this.height - 2 * this.lineWidth)/ this.subPanels.length;
         for (let panel of this.subPanels) {
-            panel.resize(this.width - this.lineWidth * 2, spHeight, this.x + this.lineWidth, (this.y + this.lineWidth) + (index * spHeight));
+            panel.resize(this.width - this.lineWidth * 4, spHeight, this.x + this.lineWidth * 2, (this.y + this.lineWidth) + (index * spHeight));
             index++;
         }
     }

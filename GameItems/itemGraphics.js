@@ -14,7 +14,7 @@ import Game from '../Game/game.js';
 import BugError from "../Game/bugError.js";
 import Utils from '../Game/Utils/utilities.js';
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-
+import { CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';
 const COLOUR = "#FFFFFF";
 
 // Distance for audio volume to half
@@ -228,7 +228,7 @@ class ItemGraphics extends THREE.Group {
     // Move item between systems.
     setSystem(newSystem) {
         // If already in a system remove it.
-        if (null != this.location.system) {
+        if (undefined != this.location.system) {
             this.location.system.removeItem(this);
         }
 
@@ -315,7 +315,7 @@ class ItemGraphics extends THREE.Group {
 
     // Accurate detection of if a point is inside our mesh.
     //
-    // Returns first mech encountered or null.
+    // Returns first mech encountered or undefined.
     // 
     // Expensive so only use once detectCollisions() has indicated that we are resonably close.
     //
@@ -334,7 +334,7 @@ class ItemGraphics extends THREE.Group {
         if (intersects.length % 2 === 1) {
             return (intersects[0].object);
         } else {
-            return (null);
+            return (undefined);
         }
     }
 
@@ -660,10 +660,7 @@ class ItemGraphics extends THREE.Group {
         let labelDiv = document.createElement('div');
         labelDiv.className = 'label';
         labelDiv.textContent = this.labelTxt;
-        // labelDiv.style.backgroundColor = '#FFFFFF';
         labelDiv.style.color = 'red';
-        // labelDiv.font-family = 'sans-serif';
-        // labelDiv.padding = '2px';
 
         this.label = new CSS2DObject(labelDiv);
         this.label.position.set(0, 0, 0);

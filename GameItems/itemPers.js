@@ -76,8 +76,9 @@ class ItemPers extends Item {
         }
 
         // Encode rotation as reasonable length Quartarian.
-        let quart = new JSONQuaternion();
-        this.getWorldQuaternion(quart);
+        let q = this.quaternion;
+        let quart = new JSONQuaternion(undefined, q.x, q.y, q.z, q.w);
+        // this.getWorldQuaternion(quart);
 
         return {   
             location: this.location.toJSON(),

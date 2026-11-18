@@ -332,7 +332,7 @@ class Terminal extends DarkPanel {
         if (undefined == sound) {
             // Need to create/attach PositionalAudio for this Item.
             let buffer = Game.sounds.get(name);
-            if (null == buffer) {
+            if (undefined == buffer) {
                 // Buffer not yet loaded into Univese
                 return (false);
             }

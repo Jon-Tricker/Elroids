@@ -15,8 +15,10 @@ import LargeHull from "../Ships/Components/Hulls/largeHull.js";
 import BasicHud from "../Ships/Components/Avionics/Huds/basicHud.js";
 import RangeHud from "../Ships/Components/Avionics/Huds/rangeHud..js";
 import MiningHud from "../Ships/Components/Avionics/Huds/miningHud..js";
-import SaucerHull from "../Ships/Components/Hulls/saucerHull.js";
 
+// Avalable components.
+//
+// We need to access member methods before instantization. So, rather than have loads of 'statics', create a prototype instance of each type.
 class ComponentsList extends ComponentSets {
 
     constructor() {
@@ -25,7 +27,6 @@ class ComponentsList extends ComponentSets {
         new SmallHull(this.hullSet);
         new MediumHull(this.hullSet);
         new LargeHull(this.hullSet);
-        new SaucerHull(this.hullSet);
         new BasicEngine(this.engineSet);
         new MediumEngine(this.engineSet);
         new LargeEngine(this.engineSet);

@@ -527,7 +527,7 @@ class MenuSystem {
 
     // Click a button
     clickButton(button, cursor) {
-        let action = null;
+        let action;
 
         for (let i = 0; i < button.attributes.length; i++) {
             let attrib = button.attributes[i];

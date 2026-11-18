@@ -1,7 +1,7 @@
 // Compass screen just one for the ship
 import * as THREE from 'three';
-import Game from '../Game/game.js';
-import DarkPanel from './Utils/darkPanel.js';
+import Game from '../../../Game/game.js';
+import DarkPanel from '../../Utils/darkPanel.js';
 
 const SCALE = 0.05;
 

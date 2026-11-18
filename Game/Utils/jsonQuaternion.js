@@ -7,12 +7,15 @@
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
 import * as THREE from 'three';
 
+// Precision for save.
+const DIGITS = 6;
+
 class JSONQuaternion extends THREE.Quaternion {
 
     constructor(json, x, y, z, w) {
         if (undefined != json) {
             x = json.x;
-            y - json.y;
+            y = json.y;
             z = json.z;
             w = json.w;
         }
@@ -22,10 +25,10 @@ class JSONQuaternion extends THREE.Quaternion {
 
     toJSON() {
         return {
-            x: Number(this.x.toFixed(4)),
-            y: Number(this.y.toFixed(4)),
-            z: Number(this.z.toFixed(4)),
-            w: Number(this.w.toFixed(4))
+            x: Number(this.x.toFixed(DIGITS)),
+            y: Number(this.y.toFixed(DIGITS)),
+            z: Number(this.z.toFixed(DIGITS)),
+            w: Number(this.w.toFixed(DIGITS))
         }
     }
 }
