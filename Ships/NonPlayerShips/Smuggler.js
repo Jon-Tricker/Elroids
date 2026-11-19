@@ -78,9 +78,7 @@ class SmugglerAI extends BasicAI {
                 break;
         }
 
-        if (done) {
-            this.incPc();
-        }
+        return (done);
     }
 }
 

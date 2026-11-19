@@ -19,8 +19,28 @@ class SaucerAI extends BasicAI {
     constructor(myShip) {
         super(myShip);
 
-        // Saucers always angry.
-        this.setHostile(true);
+        // Saucers angry if not in safe mode.
+        this.setHostile(!Game.getGame().isSafe());
+    }
+
+    // If not hostile just wander about.
+    program(date) {
+
+        // Is step complete?
+        // Also set to 'false' is step has explicitly modified the 'pc' (e.g. for a loop).
+        let done = false;
+
+        switch (this.pc) {
+            case 0:
+                done = this.navToRandomLocation(date);
+                break;  
+                
+            // Loop forever.
+            default:
+                this.pc = 0;
+                break;
+        }
+        return (done);
     }
 
     // Rotate towards world location.
@@ -29,11 +49,11 @@ class SaucerAI extends BasicAI {
     //
     // Return new angle to location.
     rotateTowardsLoc(loc, damp) {
-        let angle = Math.PI/2;
+        let angle = Math.PI / 2;
 
         // Work out delta in ship space.
         let delta = this.myShip.getShortestVec(loc);
-        
+
         this.myShip.worldToLocal(delta);
 
         // Work out a vector 80 degree rotated (towards X axis) from delta.
@@ -53,13 +73,6 @@ class SaucerAI extends BasicAI {
 
         return (this.myShip.angleTo(loc) - angle);
     }
-    
-    // For sacucers don't erase dest between steps.
-    // The may ba a better behaviour for all NP Ships.
-    incPc() {
-        // If step done by default just inc the pc.
-        this.pc++;
-    }
 }
 
 class Saucer extends NPShip {
@@ -69,14 +82,14 @@ class Saucer extends NPShip {
 
         // Really don't want to pass this through the Ship herarchy when other Ships don't auto rotate.
         this.rotationRate = new THREE.Vector3(Math.random() * MAX_ROTATE_RATE * 2 - MAX_ROTATE_RATE, 0, 0);
-    }   
-    
+    }
+
     getGunPoint(dir) {
         // A point in the direction of fire.
         let point = new THREE.Vector3();
 
         this.localToWorld(point);
-        
+
         // Move to a point outside ship in direction of fire.
         let delta = dir.clone().normalize();
         delta.multiplyScalar(this.length + 1);
@@ -85,12 +98,12 @@ class Saucer extends NPShip {
         let loc = new Location(undefined, point.x, point.y, point.z, this.location.system);
 
         return (loc);
-    }  
+    }
 
     // For a saucer thrust towards target.
     getThrustVec() {
         let delta = this.getLocation().getRelative(this.ai.getTargetLocation(this.ai.dest)).normalize();
-        return(delta);
+        return (delta);
     }
 
     takeDamage(hits, that) {
@@ -107,8 +120,8 @@ class Saucer extends NPShip {
 
     getRadarColour() {
         return ("#00D0D0");
-    } 
-    
+    }
+
     // Self destruct.
     explode(date) {
         // Make fragments

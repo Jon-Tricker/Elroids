@@ -42,25 +42,12 @@ class MotherAI extends SaucerAI {
         switch (this.pc) {
 
             case 0:
-                if (Game.getGame().isSafe()) {
-                    // Do nothing
-                    let timeOut = this.wait(date, 1000);
-
-                    if (timeOut) {
-                        this.pc = 0;
-                    }
-                } else {
-                    done = true;
-                }
+                this.dest = this.createRunLocation();
+                this.relocTime = date + RELOC_FREQUENCY;
+                done = true;
                 break;
 
             case 1:
-                // Get location if reqd.
-                if (undefined == this.dest) {
-                    this.dest = this.createRunLocation();
-                    this.relocTime = date + RELOC_FREQUENCY;
-                }
-
                 // Move to location.
                 done = this.navigateThrough(this.getTargetLocation(this.dest));
 
@@ -82,7 +69,6 @@ class MotherAI extends SaucerAI {
 
                 // Periodically relocate.
                 if (date > this.relocTime) {
-                    this.dest = undefined;
                     done = true;
                 }
 
@@ -94,9 +80,7 @@ class MotherAI extends SaucerAI {
                 break;
         }
 
-        if (done) {
-            this.incPc();
-        }
+        return (done);
     }
 
     // Create a location far from ship.
@@ -152,28 +136,26 @@ class SaucerMother extends Saucer {
     spawn() {
         let game = Game.getGame();
 
-        if (!game.isSafe()) {
-            if (game.getSystem().saucerCount < game.maxSaucerCount) {
-                let thisLoc = this.getLocation();
+        if (game.getSystem().saucerCount < game.maxSaucerCount) {
+            let thisLoc = this.getLocation();
 
-                let type = Math.floor(Math.random() * 4)
-                switch (type) {
-                    case 0:
-                        new SaucerShooter(thisLoc);
-                        break;
+            let type = Math.floor(Math.random() * 4)
+            switch (type) {
+                case 0:
+                    new SaucerShooter(thisLoc);
+                    break;
 
-                    case 1:
-                        new SaucerHunter(thisLoc);
-                        break;
+                case 1:
+                    new SaucerHunter(thisLoc);
+                    break;
 
-                    case 2:
-                        new SaucerPirate(thisLoc);
-                        break;
+                case 2:
+                    new SaucerPirate(thisLoc);
+                    break;
 
-                    default:
-                        new SaucerRammer(thisLoc);
-                        break;
-                }
+                default:
+                    new SaucerRammer(thisLoc);
+                    break;
             }
         }
     }

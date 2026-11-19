@@ -43,7 +43,8 @@ class BasicAI {
 
     myShip;
 
-    // Destination may be an item or a location.
+    // Current destination may be an item or a location.
+    // Set 'undefined' if destination reached.
     dest;
 
     constructor(myShip) {
@@ -70,7 +71,8 @@ class BasicAI {
         }
 
         if (step) {
-            this.incPc();
+            // If step done by default just inc the pc.
+            this.pc++;
         }
     }
 
@@ -83,7 +85,7 @@ class BasicAI {
         vec.multiplyScalar(-1);
         vec.add(this.myShip.location);
 
-        return(vec);
+        return (vec);
     }
 
     // The 'program' for this AI type. Used when not in hostile mode.
@@ -169,21 +171,13 @@ class BasicAI {
         return (done);
     }
 
-    incPc() {
-        // No longer have dest
-        this.dest = undefined;
-
-        // If step done by default just inc the pc.
-        this.pc++;
-    }
-
     // Navigate to a random location.
     navToRandomLocation(date) {
         if (!this.haveDest()) {
             this.dest = Utils.createRandomVector(this.myShip.location.system.systemSize);
         }
 
-        return (this.navigateThrough(this.dest));
+        return (this.navigateTo(this.dest));
     }
 
     // Navigate to station aproach point.
@@ -201,7 +195,7 @@ class BasicAI {
             this.dest = this.myShip.location.system.wormholeEnds.values().next().value;
         }
 
-        return (this.navigateThrough(this.dest));
+        return (this.dest);
     }
 
     // Navigate to cargo.
@@ -357,7 +351,14 @@ class BasicAI {
 
         // We know what where we want to go.
         // Let individual AI decide how to get there.
-        return (this.navigateToDest(dest, maxSpeed));
+        let done = this.navigateToDest(dest, maxSpeed)
+
+        if (done) {
+            // Done with dest
+            this.dest = undefined;
+        }
+
+        return (done);
     }
 
     navigateThrough(dest, maxSpeed) {
@@ -367,8 +368,15 @@ class BasicAI {
         }
 
         // We know what where we want to go.
-        // Let individual AI decide how to get there.
-        return (this.navigateThroughDest(dest, maxSpeed));
+        // Let individual AI decide how to get there. 
+        let done = this.navigateThroughDest(dest, maxSpeed)
+
+        if (done) {
+            // Done with dest
+            this.dest = undefined;
+        }
+
+        return (done);
     }
 
 
@@ -405,6 +413,7 @@ class BasicAI {
         }
 
         let loc = this.getTargetLocation(dest);
+
         return (this.navigateToLoc(loc, true, maxSpeed));
     }
 

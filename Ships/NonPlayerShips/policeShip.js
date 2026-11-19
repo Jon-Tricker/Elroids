@@ -57,9 +57,7 @@ class PoliceAI extends BasicAI {
                 break;
         }
 
-        if (done) {
-            this.incPc();
-        }
+        return (done);
     }
 
     // See extensive comment in parent class.
@@ -81,7 +79,6 @@ class PoliceAI extends BasicAI {
                 this.pc = 0;
                 break;
         }
-
         return (done);
     }
 
@@ -106,10 +103,6 @@ class PoliceShip extends NPShip {
         new LaserBeamWeapon(this.compSets.weaponSet);
 
         this.recalc();
-    }
-
-    destruct(violent) {
-        super.destruct(violent);
     }
 
     getName() {

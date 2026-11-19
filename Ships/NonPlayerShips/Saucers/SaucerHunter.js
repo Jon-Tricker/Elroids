@@ -33,16 +33,17 @@ class HunterAI extends SaucerAI {
         switch (this.pc) {
 
             case 0:
-                // Get new location if reqd.
-                if (undefined == this.dest) {
-                    this.dest = this.createTargetLocation();
-                }
+                // Get new location.
+                this.dest = this.createTargetLocation();
+                done = true;
+                break;
 
+            case 1:
                 // Move to location.
                 done = this.navigateThrough(this.getTargetLocation(this.dest));
                 break;
 
-            case 1:
+            case 2:
                 // Fire at ship.
                 let dir = this.myShip.location.getRelative(Game.getGame().getShip().location);
 
@@ -65,21 +66,19 @@ class HunterAI extends SaucerAI {
                     }
                 } else {
                     // Out of range ... relocate.
-                    this.dest = undefined;
                     this.pc = 0;
                 }
                 break;
 
-            case 2:
+            case 3:
                 // Wait a while.
                 done = this.wait(date, SHOOT_FREQUENCY);
                 break;
 
-            case 3:
+            case 4:
                 // Occasionaly re-locate.
                 if (Math.random() > 0.1) {
-                    this.dest = undefined;
-                    this.pc = 1;
+                    this.pc = 2;
                 } else {
                     done = true;
                 }
@@ -87,14 +86,11 @@ class HunterAI extends SaucerAI {
 
             // Loop forever.
             default:
-                this.dest = undefined;
                 this.pc = 0;
                 break;
         }
 
-        if (done) {
-            this.incPc();
-        }
+        return (done);
     }
 
     // Create position near ship.

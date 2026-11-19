@@ -34,9 +34,7 @@ class RammerAI extends SaucerAI {
                 break;
         }
 
-        if (done) {
-            this.incPc();
-        }
+        return (done);
     }
 }
 

@@ -303,7 +303,7 @@ class BaySet extends ComponentSet {
 
         this.unloadMineral(mineral, mass);
 
-        if ((undefined != dump) || (true == dump)) {
+        if ((undefined == dump) || (true == dump)) {
             // Make mineral 
             let ship = this.getShip();
             let min = new Mineral(mass, ship.hull.getDumpPoint(), new THREE.Vector3(ship.speed.x * Math.random(), ship.speed.y * Math.random(), ship.speed.z * Math.random()), mineral);

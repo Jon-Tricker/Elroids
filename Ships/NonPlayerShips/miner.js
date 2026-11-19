@@ -22,6 +22,7 @@ class MinerAI extends BasicAI {
         switch (this.pc) {
             case 0:
                 done = this.navToRandomLocation(date);
+                done = true;
                 break;
 
             case 1:
@@ -30,8 +31,8 @@ class MinerAI extends BasicAI {
                 let mineral = this.myShip.location.system.getValuable(Mineral, this.myShip.location);
 
                 if (undefined != mineral) {
-                    // Is mineral worth more than rock (X10 because extracted mineral easier to get)
-                    if ((undefined == rock) || (rock.getRelativeValue(ship.getLocation()) < mineral.getRelativeValue(ship.getLocation()))) {
+                    // Is mineral worth more than rock (because extracted mineral easier to get)
+                    if ((undefined == rock) || (rock.getRelativeValue(ship.getLocation()) < (5 * mineral.getRelativeValue(ship.getLocation())))) {
                         this.dest = mineral;
                         this.pc = 2;
                         break;
@@ -49,7 +50,7 @@ class MinerAI extends BasicAI {
                 break;
 
             case 2:
-                // Hunt mineral
+                // Navigete to mineral
                 if (this.navigateThroughDest(this.dest)) {
                     // Look for something new,
                     this.pc = 4;
@@ -114,9 +115,7 @@ class MinerAI extends BasicAI {
                 break;
         }
 
-        if (done) {
-            this.incPc();
-        }
+        return (done);
     }
 }
 

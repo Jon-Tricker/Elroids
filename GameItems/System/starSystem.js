@@ -14,6 +14,8 @@ import PoliceShip from '../../Ships/NonPlayerShips/policeShip.js';
 import Utils from '../../Game/Utils/utilities.js';
 import SaucerShooter from '../../Ships/NonPlayerShips/Saucers/SaucerShooter.js';
 import SaucerHunter from '../../Ships/NonPlayerShips/Saucers/SaucerHunter.js';
+import SaucerRammer from '../../Ships/NonPlayerShips/Saucers/SaucerRammer.js';
+import SaucerPirate from '../../Ships/NonPlayerShips/Saucers/SaucerPirate.js';
 
 // Box to clear out arround respawn site.
 const RESPAWN_SIZE = 250;           // m
@@ -217,7 +219,7 @@ class StarSystem extends System {
         if (Game.getGame().testMode) {
 
             // Create test Saucer.
-            // new SaucerHunter(new Location(undefined, 500, -50, -50, this));
+            // new SaucerPirate(new Location(undefined, 500, -50, -50, this));
 
             // Create a few test rocks at set locations
 

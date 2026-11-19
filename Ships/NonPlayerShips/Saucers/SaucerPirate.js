@@ -33,18 +33,19 @@ class PirateAI extends SaucerAI {
 
         switch (this.pc) {
 
-            case 0:
-                // Get new location if reqd.
-                if (undefined == this.dest) {
-                    this.dest = this.createTargetLocation();
-                }
+            case 0: 
+                // Get new location
+                this.dest = this.createTargetLocation();
+                done = true;
+                break;
 
+            case 1:
                 // Move to location.
                 done = this.navigateThrough(this.getTargetLocation(this.dest));
                 break;
 
             // Look for loot.
-            case 1:
+            case 2:
                 // Find a new target
                 let loot = this.myShip.location.system.getValuable(undefined, this.location);
                 if ((undefined != loot) && (MIN_LOOT_VALUE < loot.getValue())) {
@@ -60,10 +61,9 @@ class PirateAI extends SaucerAI {
                 break;
 
             // Go get the loot.
-            case 2:
-                if ((undefined == this.dest) || this.dest.isDestructed()) {
+            case 3:
+                if (this.dest.isDestructed()) {
                     // It's gone. Maybe got it.
-                    this.dest = undefined;
                     done = true;
                 } else {
                     done = this.navigateThrough(this.getTargetLocation(this.dest));
@@ -72,7 +72,7 @@ class PirateAI extends SaucerAI {
                 break;
 
             // Check if we have enough loot.
-            case 3:
+            case 4:
                 if (MIN_RUN_MASS > this.myShip.compSets.baySet.getContentMass()) {
                     this.pc = 0;
                 }
@@ -80,7 +80,7 @@ class PirateAI extends SaucerAI {
                 break;
 
             // Run
-            case 4:
+            case 5:
                 this.dest = this.myShip.location.system.getWormholeEnds().get(0);
                 done = this.navigateThrough(this.getTargetLocation(this.dest));
 
@@ -105,9 +105,7 @@ class PirateAI extends SaucerAI {
                 break;
         }
 
-        if (done) {
-            this.incPc();
-        }
+        return (done);
     }
 
     // Create position near ship.

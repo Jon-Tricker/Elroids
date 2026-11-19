@@ -19,7 +19,7 @@ import Utils from './Utils/utilities.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "14.0";
+const VERSION = "14.1";
 
 const ANIMATE_RATE = 25;            // Target rate, frames/second
 

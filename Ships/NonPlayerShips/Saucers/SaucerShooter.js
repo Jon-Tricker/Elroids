@@ -29,16 +29,17 @@ class ShooterAI extends SaucerAI {
         switch (this.pc) {
 
             case 0:
-                // Get new location if reqd.
-                if (undefined == this.dest) {
-                    this.dest = this.createTargetLocation();
-                }
+                // Get new location.
+                this.dest = this.createTargetLocation();
+                done = true;
+                break;
 
+            case 1:
                 // Move to location.
                 done = this.navigateThrough(this.getTargetLocation(this.dest));
                 break;
 
-            case 1:
+            case 2:
                 // Fire in random direction.
                 let range = this.myShip.location.getRelative(Game.getGame().getShip().location);
                 if ((STANDOFF_DISTANCE * 2) > range.length()) {
@@ -49,17 +50,16 @@ class ShooterAI extends SaucerAI {
                     done = true;
                 } else {
                     // Out of range ... relocate.
-                    this.dest = undefined;
                     this.pc = 0;
                 }
                 break;
 
-            case 2:
+            case 3:
                 // Wait a while.
                 done = this.wait(date, SHOOT_FREQUENCY);
                 break;
 
-            case 3:
+            case 4:
                 // Occasionally explode
                 if (Math.random() < 0.01) {
                     this.myShip.explode();
@@ -68,8 +68,7 @@ class ShooterAI extends SaucerAI {
 
                 // Occasionally re-locate.
                 if (Math.random() > 0.1) {
-                    this.dest = undefined;
-                    this.pc = 1;
+                    this.pc = 2;
                 } else {
                     done = true;
                 }
@@ -77,14 +76,11 @@ class ShooterAI extends SaucerAI {
 
             // Loop forever.
             default:
-                this.dest = undefined;
                 this.pc = 0;
                 break;
         }
 
-        if (done) {
-            this.incPc();
-        }
+        return (done);
     }
 
     // Create position near ship.
