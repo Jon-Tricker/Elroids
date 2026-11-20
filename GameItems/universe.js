@@ -17,11 +17,12 @@ import ItemPers from './itemPers.js';
 
 const SYSTEM_SPECS = [
     new SystemSpec(undefined, "Sol", 6, 2, 5, "Mostly harmless."),
-    new SystemSpec(undefined, "Asteel", 6, 1, 4, "Industrial, capitalist society."),
-    new SystemSpec(undefined, "Kessel", 7, 1, 6, "High tech society."),
+    new SystemSpec(undefined, "Asteel", 6, 1, 3, "Industrial, capitalist society."),
+    new SystemSpec(undefined, "Kessel", 7, 1, 5, "High tech society."),
     new SystemSpec(undefined, "Endor", 2, 4, 2, "Low tech, magical society."),
     new SystemSpec(undefined, "Coruscant", 7, 2, 7, "High tech, authoritarian society."),
-    new SystemSpec(undefined, "Oz", 3, 4, 7, "Magical, authoritarian society.")
+    new SystemSpec(undefined, "Oz", 3, 4, 7, "Magical, authoritarian society."),
+    new SystemSpec(undefined, "Tatooine", 6, 2, 1, "A hive of scum and villainy.")
 ];
 
 class Universe {

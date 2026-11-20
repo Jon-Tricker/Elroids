@@ -6,7 +6,7 @@ const DESCRIPTION = "Medium power engine.";
 
 class MediumEngine extends Engine {
 
-    static type = new ComponentType("Pootle", 6, 10, 4000, 2);
+    static type = new ComponentType("Raptor", 6, 10, 4000, 2);
 
     constructor(set) {
         super(set, 6000);

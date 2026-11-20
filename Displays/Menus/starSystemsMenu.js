@@ -1,6 +1,7 @@
 // Star systems menu.
 import Game from '../../Game/game.js';
 import MenuTable from './menuTable.js';
+import { SystemTradeDetailsMenu } from './tradeMenu.js';
 import { MineralType, MineralTypes } from "../../GameItems/minerals.js";
 import Reputation from '../../Game/reputation.js';
 
@@ -26,6 +27,8 @@ class StarSystemsMenu {
 
         let heads = new Array();
         heads.push("System");
+        heads.push("Details");
+        heads.push("Trade\nValues");
         heads.push("Reputation");
         heads.push("Can dock");
         heads.push("Hunted");
@@ -34,13 +37,15 @@ class StarSystemsMenu {
         let index = 0;
         for (let system of systems) {
             let vals = new Array();
-            vals.push("<button type=\"button\" onclick=\"StarSystemsMenu.onDetailsClick(this, " + index + ")\">" + system.spec.name + "</button>");
+            vals.push(system.spec.name);
+            vals.push("<button type=\"button\" onclick=\"StarSystemsMenu.onDetailsClick(this, " + index + ")\">Show</button>");
+            vals.push("<button type=\"button\" onclick=\"StarSystemsMenu.onTradeDetailsClick(this, " + index + ")\">Show</button>");
             let rep = Reputation.getRepInSystem(game.player, system);
             vals.push(rep.getText());
             vals.push(rep.getCanDock());
             vals.push(rep.getAttack());
             tab.addRow(vals);
-            index ++;
+            index++;
         }
 
         doc += tab.toString();
@@ -56,6 +61,13 @@ class StarSystemsMenu {
         let system = game.universe.systems.get(index);
 
         StarSystemsMenu.displayDetails(menuSystem, system);
+    }
+    
+    static onTradeDetailsClick(menuSystem, index) {
+        let game = Game.getGame();
+        let system = game.universe.systems.get(index);
+
+        menuSystem.pushScript(SystemTradeDetailsMenu, system);
     }
 
     static displayDetails(menuSystem, system) {
@@ -95,7 +107,8 @@ class StarSystemDetailsMenu {
 
         doc += "<BR />";
         doc += "Description: " + system.getDescription();
-        doc += "<BR /></P>";
+
+        doc += "</P>";
         doc += "</BODY>"
 
         return (doc);

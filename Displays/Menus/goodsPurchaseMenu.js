@@ -1,6 +1,7 @@
 // Goods purchase menu.
 import Game from '../../Game/game.js';
 import MenuTable from './menuTable.js';
+import { GoodsTradeDetailsMenu } from './tradeMenu.js';
 
 let goodsPurchaseMenu = "\
 <BODY>\
@@ -23,28 +24,30 @@ class GoodsPurchaseMenu {
             let printHeads = true;
             let index = 0;
             for (let goods of game.goodsList) {
-                if (goods.isLegal(game.universe.system)) {
-                    if (printHeads) {
-                        let heads = new Array();
-                        heads.push("Name");
-                        heads.push("Details");
-                        heads.push("Buy 1(Cr)");
-                        heads.push("Buy 10(Cr)");
+                if (printHeads) {
+                    let heads = new Array();
+                    heads.push("Name");
+                    heads.push("Details");
+                    heads.push("Trade\nValues");
+                    heads.push("Legal");
+                    heads.push("Buy 1(Cr)");
+                    heads.push("Buy 10(Cr)");
 
-                        tab.addHeadings(heads);
-                        printHeads = false;
-                    }
-
-                    if (goods.isAvailableInSystem(game.universe.system)) {
-                        let vals = new Array();
-                        vals.push(goods.getName(true));
-                        vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onDetailsClick(this, " + index + ")\">Show</button>");
-                        vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onBuyClick(this, " + index + ", 1)\">" + goods.getValueInSystem(game.universe.system) + "</button>");
-                        vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onBuyClick(this, " + index + ", 10)\">" + goods.getValueInSystem(game.universe.system) * 10 + "</button>");
-                        tab.addRow(vals);
-                    }
+                    tab.addHeadings(heads);
+                    printHeads = false;
                 }
-                index ++;
+
+                if (goods.isAvailableInSystem(game.universe.system)) {
+                    let vals = new Array();
+                    vals.push(goods.getName(true));
+                    vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onDetailsClick(this, " + index + ")\">Show</button>");
+                    vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onTradeDetailsClick(this, " + index + ")\">Show</button>");
+                    vals.push(goods.isLegal(game.universe.system));
+                    vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onBuyClick(this, " + index + ", 1)\">" + goods.getValueInSystem(game.universe.system) + "</button>");
+                    vals.push("<button type=\"button\" onclick=\"GoodsPurchaseMenu.onBuyClick(this, " + index + ", 10)\">" + goods.getValueInSystem(game.universe.system) * 10 + "</button>");
+                    tab.addRow(vals);
+                }
+                index++;
             }
             doc += tab.toString();
             doc += "<BR />";
@@ -61,6 +64,11 @@ class GoodsPurchaseMenu {
         menuSystem.pushScript(GoodsDetailsMenu, goods);
     }
 
+    static onTradeDetailsClick(menuSystem, index) {
+        let goods = GoodsPurchaseMenu.getGoodsForIndex(index);
+        menuSystem.pushScript(GoodsTradeDetailsMenu, goods);
+    }
+
     static onBuyClick(menuSystem, index, number) {
         let game = Game.getGame();
         let goods = GoodsPurchaseMenu.getGoodsForIndex(index);
@@ -71,7 +79,7 @@ class GoodsPurchaseMenu {
 
     static getGoodsForIndex(index) {
         let goods = Game.getGame().goodsList.get(index);
-        return(goods);
+        return (goods);
     }
 }
 
@@ -100,8 +108,6 @@ class GoodsDetailsMenu {
         doc += "<P>";
         doc += goods.getDescription();
         doc += "</P>";
-
-        doc += "<BR />";
 
         doc += "</BODY>"
 

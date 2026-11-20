@@ -62,7 +62,7 @@ class Luxury extends Goods {
 
 class Gun extends Goods {
 
-    static type = new GoodsType("Gun", "Guns", 3, 0, 4, 0.1, 50);
+    static type = new GoodsType("Gun", "Guns", 3, 0, 4, 0.1, 100);
 
     getDescription() {
         return ("For shooting things.");
@@ -75,6 +75,15 @@ class Food extends Goods {
 
     getDescription() {
         return ("Munchie things.");
+    }
+}
+
+class Textile extends Goods {
+
+    static type = new GoodsType("Textile", "Textiles", 2, 1, 7, 1, 30);
+
+    getDescription() {
+        return ("Stuff to wear.");
     }
 }
 
@@ -96,6 +105,15 @@ class Crystal extends Goods {
     }
 }
 
+class Wand extends Goods {
+
+    static type = new GoodsType("Wand", "Wands", 0, 3, undefined, 0.1, 1000);
+
+    getDescription() {
+        return ("For casting magic.");
+    }
+}
+
 // Avalable goods.
 //
 // We need to access member methods before instantization. So, rather than have loads of 'statics', create a prototype instance of each type.
@@ -109,8 +127,10 @@ class GoodsList extends GoodsSet {
         new Luxury(this);
         new Gun(this);
         new Food(this);
+        new Textile(this);
         new Narcotic(this);
         new Crystal(this);
+        new Wand(this);
     }
 }
 

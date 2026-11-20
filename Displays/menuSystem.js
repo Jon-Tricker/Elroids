@@ -20,8 +20,8 @@ import { componentsMenu } from './Menus/componentsMenu.js';
 import { ComponentsMenu } from './Menus/componentsMenu.js';
 import { ComponentDetailsMenu } from './Menus/compPurchaseMenu.js';
 import { compPurchaseMenu } from './Menus/compPurchaseMenu.js';
-import { CompPurchaseMenu } from './Menus/compPurchaseMenu.js';
 import { goodsPurchaseMenu } from './Menus/goodsPurchaseMenu.js';
+import { CompPurchaseMenu } from './Menus/compPurchaseMenu.js';
 import { GoodsPurchaseMenu } from './Menus/goodsPurchaseMenu.js';
 import { cargoMenu } from './Menus/cargoMenu.js';
 import { CargoMenu } from './Menus/cargoMenu.js';
@@ -191,16 +191,24 @@ class MenuSystem {
         let terminal = this.display.terminal;
 
         if (keyboard.getClearState("X") || keyboard.getClearState("x")) {
-            terminal.setScrollToCursor(true);
             if (this.targetCursor.y < this.maxYCursor) {
+                terminal.setScrollToCursor(true);
                 this.targetCursor.y++;
+            } else {
+                // Scroll beyond cursor.
+                terminal.setScrollToCursor(false);
+                terminal.scrollDown();
             }
         }
 
         if (keyboard.getClearState("S") || keyboard.getClearState("s")) {
-            terminal.setScrollToCursor(true);
             if (this.targetCursor.y > 0) {
+                terminal.setScrollToCursor(true);
                 this.targetCursor.y--;
+            } else {
+                // Scroll beyond cursor.
+                terminal.setScrollToCursor(false);
+                terminal.scrollUp();
             }
         }
 

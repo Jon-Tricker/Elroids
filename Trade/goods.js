@@ -143,7 +143,7 @@ class Goods {
     getValueInSystem(system) {
         let value;
 
-        value = this.getUnitCostInSystem(system, this.number);
+        value = this.getUnitCostInSystem(system);
 
         if (undefined != this.number) {
             value *= this.number;
@@ -158,20 +158,27 @@ class Goods {
     }
 
     // Get cost of a unit in a given system.
+    // If a system can't make it it's more valuable.
     getUnitCostInSystem(system) {
         let value = this.type.cost;
         if (undefined != system) {
-            // Take account of system levels.
             let sysLevel = system.spec.techLevel;
 
             if (sysLevel < this.getTechLevel()) {
-                value *= 1 + ((this.getTechLevel() - sysLevel) * 0.5);
+                value *= 1 + ((this.getTechLevel() - sysLevel) * 0.2);
             }
 
             sysLevel = system.spec.magicLevel;
 
             if (sysLevel < this.getMagicLevel()) {
-                value *= 1 + ((this.getMagicLevel() - sysLevel) * 0.5);
+                value *= 1 + ((this.getMagicLevel() - sysLevel) * 0.2);
+            }
+
+            // Illegal goods are more valuable ... if you can get away with it.
+            sysLevel = system.spec.lawLevel;
+
+            if (sysLevel > this.getLawLevel()) {
+                value *= 1 + ((sysLevel - this.getLawLevel()) * 0.2);
             }
         }
 
@@ -182,8 +189,8 @@ class Goods {
     buy(ship, number, isFree) {
         if (undefined === isFree) {
             isFree = false;
-        }
-
+        }  
+      
         // Check that there is capacity.
         if ((this.getMass() * number) > ship.compSets.baySet.getAvailableCapacity()) {
             throw (new GameError("Insufficient bay capacity."))
@@ -193,6 +200,15 @@ class Goods {
         if (!isFree) {
             if (!ship.getPlayer().addCredits(-this.getValueInSystem(ship.system) * number)) {
                 return (false);
+            }
+        }  
+
+        if ((!isFree) && (!this.isLegal(ship.location.system))) {
+            // ToDo: Add more complex penalties/benefits for illegal purchases.
+            if (Math.random() < 0.5) {
+                ship.playSound("police");
+                ship.getPlayer().decReputation();
+                throw new GameError("'Elo 'elo 'elo. You can't have that! Credits confiscated.");
             }
         }
 
@@ -224,7 +240,7 @@ class Goods {
 
         let pay = true;
         if (!this.isLegal(ship.location.system)) {
-            // ToDo: Add more complex penalties/benefits fro illegal sales.
+            // ToDo: Add more complex penalties/benefits for illegal sales.
             if (Math.random() < 0.5) {
                 ship.playSound("police");
                 ship.getPlayer().decReputation();

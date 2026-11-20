@@ -47,7 +47,7 @@ class SystemSpec {
                 // Work out mineral abundance for this system.
                 abundance = mineralType.abundance * (0.5 + Math.random());
                 if (mineralType.getIsMagic()) {
-                    abundance *= this.magicLevel;
+                    abundance *= (this.magicLevel - 1) * 2;
                 }
             } else {
                 // Use passed.
