@@ -20,7 +20,6 @@ const STANDOFF_DISTANCE = 500;
 const SHOOT_FREQUENCY = 2000;   // m/s
 
 const MIN_LOOT_VALUE = 50;      // Min value for loot to be interesting.
-const MIN_RUN_MASS = 10;        // Min mass of loot befor running.
 
 const INITIAL_CARGO_VALUE = 100;
 
@@ -41,7 +40,7 @@ class PirateAI extends SaucerAI {
 
             case 1:
                 // Move to location.
-                done = this.navigateThrough(this.getTargetLocation(this.dest));
+                done = this.navigateThrough(this.dest);
                 break;
 
             // Look for loot.
@@ -73,7 +72,7 @@ class PirateAI extends SaucerAI {
 
             // Check if we have enough loot.
             case 4:
-                if (MIN_RUN_MASS > this.myShip.compSets.baySet.getContentMass()) {
+                if (this.myShip.compSets.baySet.getContentMass() < (this.myShip.compSets.baySet.getCapacity()/2)) {
                     this.pc = 0;
                 }
                 done = true;
@@ -134,8 +133,6 @@ class SaucerPirate extends Saucer {
         new BasicEngine(this.compSets.engineSet);
         new LaserBeamWeapon(this.compSets.weaponSet);
         new BasicBay(this.compSets.baySet);
-
-        this.compSets.baySet.loadRandomCargo(INITIAL_CARGO_VALUE);
 
         this.recalc();
     }

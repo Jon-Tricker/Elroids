@@ -166,7 +166,7 @@ class Location extends THREE.Vector3 {
         let delta = Location.createRandomInSystem(this.system);
 
         // Move it to one edge of the universe.
-        switch (Math.floor(Math.random()) * 3) {
+        switch (Math.floor(Math.random() * 3)) {
             case 0:
                 delta.x = sz;
                 break;

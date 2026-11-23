@@ -172,8 +172,9 @@ class Displays {
         
         let game = Game.getGame();
         let text = "V" + game.getVersion() + "    Credits:" + this.printNum(game.player.getCredits()) +
-            "    Reputation: " + Reputation.getRepInSystem(game.player, game.getSystem()).getText() + " (" + Number(game.player.getReputation()).toFixed(2).padStart(0) + ")"
-        "    Frame rate:" + this.printNum(game.universe.getActualAnimateRate()) + "/s";
+            "    Reputation: " + Reputation.getRepInSystem(game.player, game.getSystem()).getText() + " (" + Number(game.player.getReputation()).toFixed(2).padStart(0) + ")" +
+            "    Score: " + game.player.getScore() +
+            "    Frame rate:" + this.printNum(game.universe.getActualAnimateRate()) + "/s";
         if (game.isSafe()) {
             text += "     Safe Mode: On";
         }

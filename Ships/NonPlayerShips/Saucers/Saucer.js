@@ -19,7 +19,7 @@ class SaucerAI extends BasicAI {
     constructor(myShip) {
         super(myShip);
 
-        // Saucers angry if not in safe mode.
+        // Angry if not in safe mode.
         this.setHostile(!Game.getGame().isSafe());
     }
 

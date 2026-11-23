@@ -9,6 +9,7 @@ class ComponentSet extends GoodsSet {
 
     // Cached values
     hp;
+    value;
 
     // Can >1 be active
     multiOn = true;
@@ -36,10 +37,13 @@ class ComponentSet extends GoodsSet {
         super.recalc();
 
         this.hp = 0;
-        this.mass
         for (let comp of this) {
-            this.hp += comp.getCurrentHp()
+            this.hp += comp.getCurrentHp();
         }
+    }
+
+    getValue() {
+        return(this.value);
     }
 
     takeDamage(hits) {

@@ -44,10 +44,6 @@ class PoliceAI extends BasicAI {
 
             case 2:
                 // Hunt saucer.
-                if (this.dest.isDestructed()) {
-                    done = true;
-                    break;
-                }
                 done = this.attack(this.dest, date);
                 break;
 

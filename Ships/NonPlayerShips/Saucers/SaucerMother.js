@@ -13,14 +13,13 @@ import SaucerHunter from './SaucerHunter.js';
 import SaucerPirate from './SaucerPirate.js';
 import SaucerRammer from './SaucerRammer.js';
 import { Color } from 'three';
-import Ballast from '../../Components/Bays/ballast.js';
 import BasicBay from '../../Components/Bays/basicBay.js';
 
 const COLOUR = new Color("#80FF80");
 const SIZE = 50;
 
-const START_SPAWN_FREQUENCY = 20000;    // m/s
-const MAX_SPAWN_FREQUENCY = 10000;      // m/s
+const START_SPAWN_FREQUENCY = 60000;    // m/s
+const MAX_SPAWN_FREQUENCY = 20000;      // m/s
 const RELOC_FREQUENCY = 5000;          // m/s
 
 const INITIAL_CARGO_VALUE = 400;
@@ -124,10 +123,10 @@ class SaucerMother extends Saucer {
         new BasicEngine(this.compSets.engineSet);
         new BasicBay(this.compSets.baySet);
 
-        // Add some balast to up weight.
-        new Ballast(this.compSets.baySet, 500);
-
         this.compSets.baySet.loadRandomCargo(INITIAL_CARGO_VALUE);
+
+        // Slow us down a bit.
+        this.setBallast(500);
 
         this.recalc();
     }

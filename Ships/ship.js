@@ -7,7 +7,6 @@
 
 import * as THREE from 'three';
 import Game from '../Game/game.js';
-import Explosion from '../GameItems/explosion.js';
 import Mineral from '../GameItems/mineral.js';
 import GoodsCrate from '../Trade/goodsCrate.js';
 import Station from '../GameItems/System/station.js';
@@ -93,6 +92,9 @@ class Ship extends ItemPers {
 
     // Array of Items that we would collide with if went straight forward.
     aheadList = undefined;
+
+    // Extra mass to slow us down.
+    ballast = 0;            // Tonnes
 
     constructor(json, height, width, length, location, speed, mass, hitPoints, owner, persist) {
         if (undefined == json) {
@@ -201,8 +203,7 @@ class Ship extends ItemPers {
     recalc() {
         this.getCompSets().recalc();
 
-        // Cache mass
-        this.mass = this.getCompSets().getMass() + this.getCargoBay().getContentMass();
+        this.mass = this.getCompSets().getMass() + this.getCargoBay().getContentMass() + this.ballast;
     }
 
     getCompSets() {
@@ -537,7 +538,7 @@ class Ship extends ItemPers {
     }
 
     getUnladenMass() {
-        return(this.getCompSets().getMass());
+        return(this.getCompSets().getMass() + this.ballast);
     }
 
     // Fire selected weapons
@@ -574,6 +575,11 @@ class Ship extends ItemPers {
         spd.add(this.location);
         this.worldToLocal(spd);
         return (spd.x);
+    }
+
+    setBallast(mass) {
+        // Add new ballast
+        this.ballast = mass;
     }
 }
 

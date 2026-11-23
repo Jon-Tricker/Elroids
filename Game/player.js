@@ -10,6 +10,9 @@ import Reputation from "./reputation.js";
 class Player {
     credits;
 
+    score;
+    initialScore;       // Value of starting stuff.
+
     // Reputation (0 - 1 but displayed as 0.xx - 10).
     reputation;
 
@@ -19,6 +22,7 @@ class Player {
         if (undefined != json) {
             credits = json.credits;
             reputation = json.reputation;
+            initialScore = json.initialScore;
         }
 
         if (undefined === credits) {
@@ -33,18 +37,54 @@ class Player {
     toJSON() {
         return {
             credits: this.credits,
-            reputation: Number(this.reputation.toFixed(4))
+            reputation: Number(this.reputation.toFixed(4)),
+            initialScore: this.initialScore
         }
     }
 
     animate() {
         let time = Game.getGame().universe.getTime();
 
+        // Sort out score.
+        if (undefined == this.initialScore) {
+            this.initialScore = this.currentScore();
+        }
+        this.score = this.currentScore();
+
         // Gradually increase rep.
         this.incReputation(false, 0.0001 * (time - this.lastAnimate) / 1000);
 
         this.lastAnimate = time;
     }
+
+    getScore() {
+        return(this.score)
+    }
+
+    // Work out the current score.
+    currentScore() {
+        // Add credits.
+        let sc = this.credits;
+
+        // Add ship value.
+        sc += Game.getGame().getShip().compSets.getValue();
+
+        // Don't add goods value ... don't know how mucj they will sell for.
+        // sc += Game.getGame().getShip().compSets.baySet.getContentValue();
+        
+        // Sub starting score.
+        if (undefined == this.initialScore) {
+            return(Math.floor(sc));
+        } else {
+            sc -= this.initialScore;
+        }
+
+        // Factor reputation
+        sc *= 1 + this.getReputation()/25;
+
+        return(Math.floor(sc));
+    }
+
 
     getCredits() {
         return (this.credits);

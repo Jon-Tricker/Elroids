@@ -22,6 +22,7 @@ class ComponentSets extends JSONSet {
 
     // Cached values
     mass;
+    value;
     hp;
 
     ship;
@@ -76,15 +77,21 @@ class ComponentSets extends JSONSet {
     recalc() {
         this.mass = 0;
         this.hp = 0;
+        this.value = 0;
         for (let set of this) {
             set.recalc();
             this.mass += set.getMass(); 
+            this.value += set.getValue();
             this.hp += set.getCurrentHp();
         }
     }  
     
     getMass() {
         return (this.mass);
+    } 
+    
+    getValue() {
+        return (this.value);
     }
 
     getTotalThrust() {

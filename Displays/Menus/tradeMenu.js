@@ -32,11 +32,7 @@ class SystemTradeDetailsMenu {
             vals.push(avail);
             vals.push(goods.isLegal(system));
             vals.push(goods.getCost());
-            if (avail) {
-                vals.push(goods.getUnitCostInSystem(system));
-            } else {
-                vals.push("N/A");
-            }
+            vals.push(goods.getUnitCostInSystem(system));
 
             valTab.addRow(vals);
         }
@@ -63,7 +59,7 @@ class GoodsTradeDetailsMenu {
         let heads = new Array();
         heads.push("System");
         heads.push("Legal");
-        heads.push("Value (Cr)");
+        heads.push("Value\n(Cr)");
         
         valTab.addHeadings(heads);
 

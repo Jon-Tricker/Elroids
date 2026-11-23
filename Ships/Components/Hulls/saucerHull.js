@@ -10,7 +10,7 @@ import { ComponentType } from '../component.js';
 
 class SaucerHull extends Hull {
 
-    static type = new ComponentType("Saucer hull", 1, 50, undefined, 1);
+    static type = new ComponentType("Saucer hull", 1, 50, 0, 1);
 
     constructor(set, hullColour) {
         super(set, 200, hullColour);

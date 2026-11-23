@@ -195,7 +195,7 @@ class BasicAI {
             this.dest = this.myShip.location.system.wormholeEnds.values().next().value;
         }
 
-        return (this.dest);
+        return (this.navigateTo(this.dest));
     }
 
     // Navigate to cargo.
@@ -229,10 +229,11 @@ class BasicAI {
         }
 
         if (undefined != ship.dockedWith) {
+            this.dest = undefined;
             return (true);
         }
 
-        if (this.navigateToDest(this.dest, Station.getMaxDockingSpeed() / 2)) {
+        if (this.navigateTo(this.dest, Station.getMaxDockingSpeed() / 2)) {
             return (true)
         }
 
@@ -271,6 +272,7 @@ class BasicAI {
         // If target destroyed we are done.
         if (dest.isDestructed()) {
             this.expire = undefined;
+            this.dest = undefined;
             return (true);
         }
 
@@ -283,7 +285,7 @@ class BasicAI {
 
         // If too far away navigate towards.
         if (range > MAX_FIRE_RANGE) {
-            return (this.navigateThroughDest(dest));
+            return (this.navigateThrough(dest));
         } else {
             // If necessry get closer. Do not change firing angle.
             // ToDo : Not quite right. But shoud cause some interesting behaviour.

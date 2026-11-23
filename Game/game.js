@@ -19,7 +19,7 @@ import Utils from './Utils/utilities.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "15.0";
+const VERSION = "15.1";
 
 const ANIMATE_RATE = 25;            // Target rate, frames/second
 
@@ -293,7 +293,8 @@ class Game {
             this.getShip().respawn();
         } else {
             this.getShip().destruct(false);
-            this.displays.addMessage("Game Over! ... Refresh page to play again.", 0);
+            this.displays.addMessage("Game Over! ... Final score: " + this.player.getScore(), 0);
+            this.displays.addMessage("Refresh page to play again.", 0);
         }
     }
 

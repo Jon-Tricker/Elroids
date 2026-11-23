@@ -3,11 +3,13 @@
 // Copyright (C) Jon Tricker 2023, 2025.
 // Released under the terms of the GNU Public licence (GPL)
 //      https://www.gnu.org/licenses/gpl-3.0.en.html
+import Game from '../../Game/game.js';
 import NPShip from './nonPlayerShip.js';
 import SmallHull from '../Components/Hulls/smallHull.js';
 import MediumEngine from '../Components/Engines/mediumEngine.js';
 import BasicBay from '../Components/Bays/basicBay.js';
 import DumbMissileWeapon from '../Components/Weapons/dumbMissileWeapon.js';
+import LaserBeamWeapon from '../Components/Weapons/laserBeamWeapon.js';
 import { BasicAI } from './basicAI.js';
 
 class RaiderAI extends BasicAI {
@@ -45,7 +47,9 @@ class Raider extends NPShip {
     constructor(location, speed) {
         super(5, 10, 20, location, speed, HP);
         this.ai = new RaiderAI(this);
-        this.setHostile(true);
+
+        // Angry if not in safe mode.
+        this.setHostile(!Game.getGame().isSafe());
     }   
     
     buildShip() { 
@@ -54,7 +58,11 @@ class Raider extends NPShip {
         
         // Do custom stuff for this hull
         new MediumEngine(this.compSets.engineSet);
-        new DumbMissileWeapon(this.compSets.weaponSet);
+        if (Math.random() > 0.3) {
+            new DumbMissileWeapon(this.compSets.weaponSet);
+        } else {
+            new LaserBeamWeapon(this.compSets.weaponSet);
+        }
         new BasicBay(this.compSets.baySet);
 
         this.recalc();

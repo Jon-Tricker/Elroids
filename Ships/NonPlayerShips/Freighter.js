@@ -33,13 +33,9 @@ class Freighter extends NPShip {
         // Do custom stuff for this hull
         new BasicEngine(this.compSets.engineSet);
         new BasicEngine(this.compSets.engineSet);
+        new BasicEngine(this.compSets.engineSet);
         new DumbMissileWeapon(this.compSets.weaponSet);
         new MediumBay(this.compSets.baySet);
-        //new BasicRadar(this.compSets.avionicsSet);
-        //new BasicCompass(this.compSets.avionicsSet);
-        //new BasicHud(this.compSets.avionicsSet);
-        // new RangeHud(this.compSets.avionicsSet);
-        // new MiningHud(this.compSets.avionicsSet);
 
         this.recalc();
     }

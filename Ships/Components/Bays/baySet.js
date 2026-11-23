@@ -20,6 +20,7 @@ class BaySet extends ComponentSet {
     // Cached values
     contentMass;
     capacity;
+    contentValue;
 
     // Stored stuff.
     minerals;
@@ -97,21 +98,31 @@ class BaySet extends ComponentSet {
         }
 
         this.contentMass = 0;
-        this.contentMass += this.components.getMass();
+        this.contentValue = 0;
+
+        this.contentMass += this.components.getMass(); 
+        this.contentValue += this.components.getValue();
 
         // Ugly but minerals in not initialized when recalc called from super.constructor.
         if (undefined != this.minerals) {
-            for (let [key, value] of this.minerals) {
-                this.contentMass += value;
+            for (let [type, mass] of this.minerals) {
+                this.contentMass += mass;
+                this.contentValue += type.value * mass;
             }
         }
 
         this.contentMass += this.tradeGoods.getMass();
+        this.contentValue += this.tradeGoods.getValue();
     }
 
     // Get total current mass of contents.
     getContentMass() {
         return (this.contentMass);
+    } 
+    
+    // Get total current value of contents.
+    getContentValue() {
+        return (this.contentValue);
     }
 
     getCapacity() {
@@ -224,7 +235,7 @@ class BaySet extends ComponentSet {
         this.recalc();
 
         let spaceReqd = Math.ceil(this.getContentMass() - this.capacity);
-        if (0 > spaceReqd) {
+        if (0 >= spaceReqd) {
             // No need to level
             return;
         }

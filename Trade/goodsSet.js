@@ -8,7 +8,10 @@ class GoodsSet extends jsonSet {
     plural;
     singular;
 
+    // Cached values
     mass = 0;      // Tonnes
+    value = 0;
+
     slots = 0;
 
     // Group of sets that this a member of.
@@ -47,8 +50,10 @@ class GoodsSet extends jsonSet {
     // Recalculate any composite variables.
     recalc() {
         this.mass = 0;
+        this.value = 0;
         for (let comp of this) {
             this.mass += comp.getMass();
+            this.value += comp.getCost();
         }
     }
 
@@ -93,6 +98,10 @@ class GoodsSet extends jsonSet {
 
     getMass() {
         return (this.mass);
+    }
+
+    getValue() {
+        return(this.value);
     }
 
     getSlots() {
