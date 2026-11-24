@@ -121,15 +121,19 @@ class PlayerShip extends Ship {
             // Handle movement keys
             if (keyboard.getState(" ")) {
                 this.accelerate();
+
+                // Clear stuck break on Firefox.
+                keyboard.getClearState("/")
+
             } else {
                 this.hull.setFlameState(false);
             }
 
-            if (keyboard.getState("?") || keyboard.getState("/")) {
+            if (keyboard.getState("?") || keyboard.getState("/") || keyboard.getState(";") || keyboard.getState(":")) {
                 this.decelerate();
             }
 
-            if (!keyboard.getState(" ") && !keyboard.getState("?") && !keyboard.getState("/") && this.engineSoundOn) {
+            if (!keyboard.getState(" ") && !keyboard.getState("?") && !keyboard.getState("/") && !keyboard.getState(";") && !keyboard.getState(":") && this.engineSoundOn) {
                 this.setEngineSound(false);
             }
 
@@ -143,10 +147,10 @@ class PlayerShip extends Ship {
                 }
             }
 
-            if (keyboard.getState("S") || keyboard.getState("s")) {
+            if (keyboard.getState("X") || keyboard.getState("x")) {
                 this.climb();
             } else {
-                if (keyboard.getState("X") || keyboard.getState("x")) {
+                if (keyboard.getState("S") || keyboard.getState("s")) {
                     this.dive();
                 } else {
                     this.pitchRate.zero();

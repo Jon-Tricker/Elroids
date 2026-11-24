@@ -13,7 +13,7 @@ const DESCRIPTION = "A small hull used for scouts and light freighters.";
 
 class SmallHull extends Hull {
 
-    static type = new ComponentType("GP1", 5, 50, 1000, 3);
+    static type = new ComponentType("Sloop", 5, 50, 1000, 3);
 
     constructor(set, hullColour) {
         super(set, 200, hullColour);

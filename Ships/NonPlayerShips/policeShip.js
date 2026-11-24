@@ -13,6 +13,9 @@ import MediumEngine from '../Components/Engines/mediumEngine.js';
 import LaserBeamWeapon from '../Components/Weapons/laserBeamWeapon.js';
 import { BasicAI } from './basicAI.js';
 import Game from '../../Game/game.js';
+import Utils from '../../Game/Utils/utilities.js';
+
+const STANDOFF_DISTANCE = 500;
 
 class PoliceAI extends BasicAI {
 
@@ -26,7 +29,7 @@ class PoliceAI extends BasicAI {
                 if (Math.random() < 0.5) {
                     this.dest = this.myShip.location.system.getClosest(Saucer, this.myShip.location);
                     if (undefined != this.dest) {
-                        this.pc = 2;
+                        this.pc = 3;
                         break;
                     }
                 }
@@ -35,14 +38,19 @@ class PoliceAI extends BasicAI {
                 break;
 
             case 1:
-                // Patrol
-                done = this.navToRandomLocation(date);
-                if (done) {
-                    this.pc = 3;
-                }
+                this.dest = this.createPatrolLocation();
+                done = true;
                 break;
 
             case 2:
+                // Patrol
+                done = this.navigateThrough(this.dest);
+                if (done) {
+                    this.pc = 4;
+                }
+                break;
+
+            case 3:
                 // Hunt saucer.
                 done = this.attack(this.dest, date);
                 break;
@@ -54,6 +62,22 @@ class PoliceAI extends BasicAI {
         }
 
         return (done);
+    } 
+    
+    // Create position near ship.
+    createPatrolLocation() {
+
+        if (Math.random() > 0.5) {
+            // Sometimes go to random location
+            return(Utils.createRandomVector(this.myShip.location.system.systemSize));
+        }
+
+        // Sometimes lurk near 
+        let pos = this.myShip.location.system.stations.values().next().value.getLocation().clone();
+        let offset = Utils.createRandomVector(STANDOFF_DISTANCE)
+        pos.add(offset);
+
+        return (pos);
     }
 
     // See extensive comment in parent class.

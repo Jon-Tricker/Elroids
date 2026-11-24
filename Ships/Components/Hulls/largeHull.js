@@ -7,13 +7,12 @@
 import * as THREE from 'three';
 import { Hull, HullSection } from './hull.js';
 import { ComponentType } from '../component.js';
-import ComponentSets from '../componentSets.js';
 
 const DESCRIPTION = "A large used for heavy freighters.";
 
 class LargeHull extends Hull {
 
-    static type = new ComponentType("GP3", 7, 100, 10000, 6);
+    static type = new ComponentType("Scooner", 7, 100, 10000, 6);
 
     constructor(set, hullColour) {
         super(set, 250, hullColour);

@@ -18,7 +18,7 @@ const DESCRIPTION = "A mid sized hull used for general purpose freighters.";
 
 class MediumHull extends Hull {
 
-    static type =  new ComponentType("GP2", 6, 50, 5000, 4);
+    static type =  new ComponentType("Cutter", 6, 50, 5000, 4);
 
     constructor(set, hullColour) {
         super(set, 250, hullColour);
