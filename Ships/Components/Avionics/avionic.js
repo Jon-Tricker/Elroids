@@ -3,7 +3,7 @@ import { ComponentAct } from "../component.js";
 
 const DESCRIPTION = "Avionics are the 'brains' of the ship.\n" +
                     "Includes components like Radar, Compass and Computers.\n" +
-                    "If multiple versions of a type are installed then the 'best' (and least damaged)\n" +
+                    "If multiple versions of a type are installed then the 'best' (and least damaged)" +
                     "is used."
  
 class Avionic extends ComponentAct {

@@ -13,8 +13,8 @@ import SmallHull from "../Ships/Components/Hulls/smallHull.js";
 import MediumHull from "../Ships/Components/Hulls/mediumHull.js";
 import LargeHull from "../Ships/Components/Hulls/largeHull.js";
 import BasicHud from "../Ships/Components/Avionics/Huds/basicHud.js";
-import RangeHud from "../Ships/Components/Avionics/Huds/rangeHud..js";
-import MiningHud from "../Ships/Components/Avionics/Huds/miningHud..js";
+import RangeHud from "../Ships/Components/Avionics/Huds/rangeHud.js";
+import MiningHud from "../Ships/Components/Avionics/Huds/miningHud.js";
 
 // Avalable components.
 //
