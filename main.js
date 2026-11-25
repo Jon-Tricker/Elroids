@@ -9,13 +9,21 @@ import MyCamera from './Game/Scenery/myCamera.js';
 
 // Some plumbing to get passed parameters.
 var scripts = document.getElementsByTagName('script');
-var lastScript = scripts[scripts.length - 1];
-var scriptName = lastScript;
-var rockCount = parseInt(scriptName.getAttribute('rockCount'));
-var systemSize = parseInt(scriptName.getAttribute('systemSize'));
-var startDocked = scriptName.getAttribute('startDocked');
-var soundOn = scriptName.getAttribute('soundOn');
-var safeMode = scriptName.getAttribute('safeMode');
+
+// Find a script with the 'rockCount' attribute.
+// In some environments (e.g. Itch) may not be the last one.
+let script;
+for (script of scripts) {
+  if (null != script.getAttribute('rockCount')) {
+    break;
+  }
+}
+
+var rockCount = parseInt(script.getAttribute('rockCount'));
+var systemSize = parseInt(script.getAttribute('systemSize'));
+var startDocked = script.getAttribute('startDocked');
+var soundOn = script.getAttribute('soundOn');
+var safeMode = script.getAttribute('safeMode');
 
 // Create the game objects
 // Make universe a bit smaller than system. Reduces hyperspace travel times.

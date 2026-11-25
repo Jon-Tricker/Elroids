@@ -18,19 +18,15 @@ class Player {
 
     lastAnimate = 0;
 
-    constructor(json, credits, reputation) {
+    constructor(json) {
         if (undefined != json) {
-            credits = json.credits;
-            reputation = json.reputation;
-            initialScore = json.initialScore;
-        }
-
-        if (undefined === credits) {
+            this.credits = json.credits;
+            this.reputation = json.reputation;
+            this.initialScore = json.initialScore;
+        } else {
             this.credits = 0;
             this.reputation = 0.40;
-        } else {
-            this.credits = credits;
-            this.reputation = reputation;
+            // Don't yet know vale of ship. So for now leave initialScore undefined.
         }
     }
 
