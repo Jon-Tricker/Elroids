@@ -22,10 +22,16 @@ class NPShipFactory {
     // Create a random ship
     static createRandom(location, moving) {
         let type;
-        // Don't auto create police ships.
-        do {
-            type = this.shipTypes.getRandomElement();
-        } while (type == PoliceShip);
+
+        // Create more raiders for low law level.
+        if (location.system.getLawLevel() < (Math.random() * 3)) {
+            type = Raider;
+        } else {
+            // Don't auto create police ships.
+            do {
+                type = this.shipTypes.getRandomElement();
+            } while (type == PoliceShip);
+        }
 
         let ship = this.createShip(type, location, undefined);
         return (ship);
@@ -43,7 +49,7 @@ class NPShipFactory {
         // Look in direction of travel.
         // Since we have not yet been drawn position = 0,0,0. So don't need to convert to world coords.
         ship.lookAt(speed);
-        ship.rotateY(-Math.PI/2)
+        ship.rotateY(-Math.PI / 2)
 
         return (ship);
     }

@@ -10,10 +10,11 @@ import MyCamera from './Game/Scenery/myCamera.js';
 // Some plumbing to get passed parameters.
 var scripts = document.getElementsByTagName('script');
 
-// Find a script with the 'rockCount' attribute.
+// Find a script with the 'rockCount' attribute. Start at the most recent.
 // In some environments (e.g. Itch) may not be the last one.
 let script;
-for (script of scripts) {
+for (let i = scripts.length - 1; i >= 0; i--) {
+  script = scripts[i];
   if (null != script.getAttribute('rockCount')) {
     break;
   }
@@ -27,7 +28,7 @@ var safeMode = script.getAttribute('safeMode');
 
 // Create the game objects
 // Make universe a bit smaller than system. Reduces hyperspace travel times.
-const game = new Game(systemSize/2, systemSize, rockCount, safeMode, soundOn, startDocked);
+const game = new Game(systemSize / 2, systemSize, rockCount, safeMode, soundOn, startDocked);
 
 // Add event listener on clicks.
 // It takes a while for auto repeat to kick in. Also we don't know how fast it will be. So
