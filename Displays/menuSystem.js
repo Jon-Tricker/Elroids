@@ -27,6 +27,7 @@ import { cargoMenu } from './Menus/cargoMenu.js';
 import { CargoMenu } from './Menus/cargoMenu.js';
 import { playerMenu, PlayerMenu } from './Menus/playerMenu.js';
 import { starSystemsMenu, StarSystemsMenu } from './Menus/starSystemsMenu.js';
+import { modesMenu, ModesMenu } from './Menus/modesMenu.js';
 import Universe from '../GameItems/universe.js';
 import GameError from '../Game/gameError.js';
 import BugError from '../Game/bugError.js';
@@ -81,13 +82,17 @@ class MenuSystem {
     // Log some detail
     log = false;
 
-    constructor(display) {
+    constructor(display, menu) {
         this.display = display;
         try {
-            if (undefined != this.getShip().getDockedWith()) {
-                this.pushMenu(dockedMenu);
+            if (undefined != menu) {
+                this.pushMenu(menu);
             } else {
-                this.pushMenu(topMenu);
+                if (undefined != this.getShip().getDockedWith()) {
+                    this.pushMenu(dockedMenu);
+                } else {
+                    this.pushMenu(topMenu);
+                }
             }
         }
         catch (e) {

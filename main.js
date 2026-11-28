@@ -20,15 +20,42 @@ for (let i = scripts.length - 1; i >= 0; i--) {
   }
 }
 
-var rockCount = parseInt(script.getAttribute('rockCount'));
-var systemSize = parseInt(script.getAttribute('systemSize'));
-var startDocked = script.getAttribute('startDocked');
-var soundOn = script.getAttribute('soundOn');
-var safeMode = script.getAttribute('safeMode');
+// Get attributes
+let rc = script.getAttribute('rockCount');
+let rockCount;
+if (null != rc) {
+  rockCount = parseInt(rc);
+}
+
+let ss = script.getAttribute('systemSize');
+let systemSize;
+if (null != ss) {
+  systemSize = parseInt(ss);
+}
+
+let startDocked = script.getAttribute('startDocked');
+if (null == startDocked) {
+  startDocked = undefined;
+}
+
+let soundOn = script.getAttribute('soundOn');
+if (null == soundOn) {
+  soundOn = undefined;
+}
+
+let safeMode = script.getAttribute('safeMode');
+if (null == safeMode) {
+  safeMode = undefined;
+}
+
+let challenge = script.getAttribute('challenge');
+if (null == challenge) {
+  challenge = undefined;
+}
 
 // Create the game objects
 // Make universe a bit smaller than system. Reduces hyperspace travel times.
-const game = new Game(systemSize / 2, systemSize, rockCount, safeMode, soundOn, startDocked);
+const game = new Game(systemSize / 2, systemSize, rockCount, safeMode, soundOn, startDocked, challenge);
 
 // Add event listener on clicks.
 // It takes a while for auto repeat to kick in. Also we don't know how fast it will be. So

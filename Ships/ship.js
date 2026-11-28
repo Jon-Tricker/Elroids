@@ -96,7 +96,7 @@ class Ship extends ItemPers {
     // Extra mass to slow us down.
     ballast = 0;            // Tonnes
 
-    constructor(json, height, width, length, location, speed, mass, hitPoints, owner, persist) {
+    constructor(json, height, width, length, location, speed, mass, hitPoints, owner, persist, preDamage) {
         if (undefined == json) {
             super(undefined, location, speed, length, mass, hitPoints, owner, false, undefined, new THREE.Vector3(), persist);
         } else {
@@ -120,6 +120,10 @@ class Ship extends ItemPers {
         if (undefined == json) {
             // Build new ship
             this.buildShip();
+
+            if (undefined != preDamage) {
+                this.preDamage(preDamage);
+            }
         } else {
             // Unpack old ship
             this.unpackShip(json);
@@ -146,6 +150,13 @@ class Ship extends ItemPers {
 
     buildShip() {
         throw new BugError("Abstract ship cannot be built.")
+    }
+
+
+    // Inflict a percentage of damage on the ship.
+    // Used to simulate starting with a damaged ship.
+    preDamage(percent) {
+        this.compSets.preDamage(percent);
     }
 
     toJSON() {

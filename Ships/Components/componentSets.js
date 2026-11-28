@@ -43,14 +43,14 @@ class ComponentSets extends JSONSet {
         this.weaponSet = new WeaponSet(this, weaponSlots);
         super.add(this.weaponSet);
         this.baySet = new BaySet(this, baySlots);
-        super.add(this.baySet); 
+        super.add(this.baySet);
         this.avionicsSet = new AvionicsSet(this, avionicsSlots);
         super.add(this.avionicsSet);
 
         this.recalc();
     }
 
-    setSlots(hullSlots, engineSlots, weaponSlots, baySlots, avionicsSlots) { 
+    setSlots(hullSlots, engineSlots, weaponSlots, baySlots, avionicsSlots) {
         this.hullSet.setSlots(hullSlots);
         this.engineSet.setSlots(engineSlots);
         this.weaponSet.setSlots(weaponSlots);
@@ -80,22 +80,31 @@ class ComponentSets extends JSONSet {
         this.value = 0;
         for (let set of this) {
             set.recalc();
-            this.mass += set.getMass(); 
+            this.mass += set.getMass();
             this.value += set.getValue();
             this.hp += set.getCurrentHp();
         }
-    }  
-    
+    }
+
     getMass() {
         return (this.mass);
-    } 
-    
+    }
+
     getValue() {
         return (this.value);
     }
 
     getTotalThrust() {
-        return(this.engineSet.getTotalThrust());
+        return (this.engineSet.getTotalThrust());
+    }
+
+    // Inflict a percentage of damage.
+    // Used to simulate starting with damaged components.
+    preDamage(percent) {
+        for (let set of this) {
+            set.preDamage(percent);
+        }
+        this.recalc();
     }
 
     takeDamage(hits) {
@@ -122,9 +131,9 @@ class ComponentSets extends JSONSet {
     // This is a bit inefficient but is rarely used and, in general, we would rather have Sets and Sets ... not Arrays.
     getRandomElement() {
         if (0 == this.size) {
-            return(undefined);
+            return (undefined);
         }
-        
+
         let index = Math.floor(Math.random() * this.size);
 
         let i = 0;

@@ -133,10 +133,11 @@ class Displays {
     }
 
     // Set terminal state.
-    terminalEnable(state) {
+    // Optional pass a non defalt menu.
+    terminalEnable(state, menu) {
         this.terminalIsOn = state;
         if (state) {
-            this.menuSystem = new MenuSystem(this);
+            this.menuSystem = new MenuSystem(this, menu);
         } else {
             // Clear up old terminal
             this.terminal.clearBox();

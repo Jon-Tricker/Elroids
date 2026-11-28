@@ -12,7 +12,7 @@ const DESCRIPTION = "A simple gun sight.";
 
 class BasicHud extends Hud {
 
-    static type = new ComponentType("BasicHud", 4, 1, 500, 1);
+    static type = new ComponentType("BasicHud", 3, 1, 500, 1);
 
     constructor(ship) {
         super(ship);

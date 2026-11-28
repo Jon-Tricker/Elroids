@@ -194,6 +194,12 @@ class Component extends Goods {
         return ((Math.random() * 50) <= this.status);
     }
 
+    // Inflict a percentage of damage.
+    // Used to simulate starting with damaged components.
+    preDamage(percent) { 
+        this.status = (100 - percent) + (Math.floor(Math.random() * percent));
+    }
+
     // Take damage 
     // Return the amount taken.
     takeDamage(hits) {

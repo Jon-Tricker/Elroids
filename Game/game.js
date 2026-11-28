@@ -16,10 +16,13 @@ import Keyboard from "./Utils/keyboard.js";
 import Player from './player.js';
 import Displays from '../Displays/displays.js';
 import Utils from './Utils/utilities.js';
+import { modesMenu, ModesMenu } from '../Displays/Menus/modesMenu.js';
+import EndorChal from './Challenges/Endor/endorChal.js';
+import BugError from './bugError.js';
 
 const MAX_ROCK_VELOCITY = 25;       // m/s
 const MAX_ROCK_SIZE = 40;           // m
-const VERSION = "15.5";
+const VERSION = "15.6";
 
 const ANIMATE_RATE = 25;            // Target rate, frames/second
 
@@ -41,11 +44,16 @@ class Game {
     displays;
     player;
 
+    // Config attributes.
     safe = false;
-
     soundOn = false;
     testMode = false;
     startDocked = false;
+    startSystem = "Sol";
+    preDamage = undefined;
+
+    // Current challenge
+    challenge;
 
     // Gradually increasing saucer number limit.
     maxSaucerCount = 5;
@@ -78,25 +86,31 @@ class Game {
         ["scream", undefined],
         ["thud", undefined],
         ["saw", undefined],
+        ["tada", undefined],
         ["police", undefined]
     ]);
 
-    constructor(uniSize, systemSize, maxRockCount, safeMode, soundOn, startDocked) {
+    // List of challenges
+    static challenges = {
+        EndorChal
+    };
+
+    constructor(uniSize, systemSize, maxRockCount, safeMode, soundOn, startDocked, challenge) {
 
         // Set the static
         Game.game = this;
 
-        this.player = new Player(undefined);
+        this.player = new Player(undefined);  
 
-        if ((safeMode != null) && (safeMode.toLowerCase() == "true")) {
+        if ((safeMode != undefined) && (safeMode.toLowerCase() == "true")) {
             this.safe = true;
         }
 
-        if ((soundOn != null) && (soundOn.toLowerCase() == "true")) {
+        if ((soundOn != undefined) && (soundOn.toLowerCase() == "true")) {
             this.soundOn = true;
         }
 
-        if ((startDocked != null) && (startDocked.toLowerCase() == "true")) {
+        if ((startDocked != undefined) && (startDocked.toLowerCase() == "true")) {
             this.startDocked = true;
         }
 
@@ -107,12 +121,23 @@ class Game {
             this.player.addCredits(12345);
         }
 
+        // If we have a challenge overwrite values.
+        if((undefined != challenge) && ("" != challenge)) {
+            let constructor = Game.challenges[challenge]; 
+
+            if (undefined == constructor) {
+                throw new BugError("Unknown challenge \"" + challenge + "\".");
+            }
+
+            this.challenge = new constructor();
+            this.challenge.setupGame(this);
+        }
+
         // Create shopping list.
         this.componentsList = new ComponentsList();
         this.goodsList = new GoodsList();
 
         this.setup(undefined, uniSize, systemSize, maxRockCount);
-
     }
 
     setup(json, uniSize, systemSize, maxRockCount) {
@@ -376,6 +401,15 @@ class Game {
             this.scene.animate();
         }
         this.displays.animate(this.universe.getTime(), Keyboard);
+
+        // Check for challenge completion.
+        if (undefined != this.challenge) {
+            if (this.challenge.isComplete()) {
+                this.displays.addMessage("Great! Challenge '" + this.challenge.getName() + "' complete.", 10000);
+                this.displays.terminal.playSound('tada', 0.5);
+                this.challenge = undefined;
+            }
+        }
     }
 
     // Add animation loop to handle re-rendering.

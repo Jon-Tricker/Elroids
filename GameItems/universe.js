@@ -163,16 +163,9 @@ class Universe {
 
         // Scan through systems and setup other variables.
         if (undefined != json) {
-            this.system = this.getSystemByName(json.currentSystem)
+            this.system = this.getSystemByName(json.currentSystem);
         } else {
-            let count = 0;;
-            for (let system of this.systems) {
-
-                // First system is active.
-                if (0 == count++) {
-                    this.system = system;
-                }
-            }
+            this.system = this.getSystemByName(Game.getGame().startSystem);
         }
     }
 
@@ -238,7 +231,7 @@ class Universe {
 
         if (undefined === json) {
             if (Game.getGame().testMode) {
-                this.ship = new PlayerShip(undefined, 5, 10, 20, new Location(undefined, 0, 0, 0, system));
+                this.ship = hip(undefined, 5, 10, 20, new Location(undefined, 0, 0, 0, system));
 
                 // Do some damage
                 this.ship.compSets.takeDamage(1);
@@ -293,7 +286,7 @@ class Universe {
                     count++;
                 }
             } else {
-                this.ship = new PlayerShip(undefined, 5, 10, 20, new Location(undefined, -200, 100, 0, system));
+                this.ship = new PlayerShip(undefined, 5, 10, 20, new Location(undefined, -200, 100, 0, system), Game.getGame().preDamage);
             }
         } else {
             this.ship = new PlayerShip(json.ship);

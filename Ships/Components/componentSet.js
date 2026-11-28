@@ -46,6 +46,15 @@ class ComponentSet extends GoodsSet {
         return(this.value);
     }
 
+    // Inflict a percentage of damage.
+    // Used to simulate starting with damaged components.
+    preDamage(percent) { 
+        for (let comp of this) {
+            comp.preDamage(percent);
+        }
+        this.recalc();
+    }
+    
     takeDamage(hits) {
         // Damage a random comp.
         let comp = this.getRandomElement();

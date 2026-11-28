@@ -6,7 +6,7 @@ const DESCRIPTION = "Basic compass avionics.";
 
 class BasicCompass extends Compass {
 
-    static type = new ComponentType("Wayfinder1", 1,  1, 5000, 1,)
+    static type = new ComponentType("Wayfinder1", 2,  1, 5000, 1,)
 
     constructor(set) {
         super(set);

@@ -7,7 +7,7 @@ const DESCRIPTION = "Basic radar avionics.";
 
 class BasicRadar extends Radar {
 
-    static type = new ComponentType("Rpad1", 1,  1, 5000, 1,)
+    static type = new ComponentType("Rpad1", 3,  1, 5000, 1,)
 
     constructor(set) {
         super(set);

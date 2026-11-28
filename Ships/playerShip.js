@@ -28,9 +28,9 @@ class PlayerShip extends Ship {
 
     originalPosition;
 
-    constructor(json, height, width, length, location) {
+    constructor(json, height, width, length, location, preDamage) {
         if (undefined == json) {
-            super(undefined, height, width, length, location, undefined, undefined, undefined, undefined, true);
+            super(undefined, height, width, length, location, undefined, undefined, undefined, undefined, true, preDamage);
             this.originalPosition = location.clone();
         } else {
             super(json.ship);
